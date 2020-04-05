@@ -17,7 +17,9 @@ import re
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Pattern, Sequence
+from typing import Optional, Pattern, Sequence
+
+from ..model import Member
 
 
 class FilterAction(Enum):
@@ -96,3 +98,40 @@ class ChainedStringFilter(StringFilter):
             if action is not FilterAction.NEUTRAL:
                 combined_action = action
         return combined_action
+
+
+class MemberFilter:
+    """Filter for selecting members (of a compound) to insert.
+
+    Attributes:
+        name_filter: Filter for the name of the members to include.
+        kind_filter: Filter for the kind of the members to include.
+        prot_filter: Filter for the protection level of the members to include.
+    """
+    name_filter: StringFilter
+    kind_filter: StringFilter
+    prot_filter: StringFilter
+
+    # TODO static_filter: BoolFilter
+
+    def __init__(self,
+                 name_filter: Optional[StringFilter] = None,
+                 kind_filter: Optional[StringFilter] = None,
+                 prot_filter: Optional[StringFilter] = None):
+        self.name_filter = name_filter or AllStringFilter()
+        self.kind_filter = kind_filter or AllStringFilter()
+        self.prot_filter = prot_filter or AllStringFilter()
+
+    def __call__(self, member: Member) -> bool:
+        """Apply the filter to a member.
+
+        Returns:
+            True if the member should be included.
+        """
+        if self.name_filter(member.name) is FilterAction.EXCLUDE:
+            return False
+        if self.kind_filter(member.kind) is FilterAction.EXCLUDE:
+            return False
+        if self.prot_filter(member.prot) is FilterAction.EXCLUDE:
+            return False
+        return True
