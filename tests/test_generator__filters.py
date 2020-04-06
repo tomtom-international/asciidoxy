@@ -13,9 +13,12 @@
 # limitations under the License.
 """Test filters for generated parts."""
 
+import pytest
+
 from asciidoxy.generator.filters import (AllStringFilter, NoneStringFilter, IncludeStringFilter,
                                          ExcludeStringFilter, ChainedStringFilter, MemberFilter,
-                                         FilterAction)
+                                         FilterAction, InnerClassFilter)
+from asciidoxy.model import Compound, InnerTypeReference
 
 
 def test_all_string_filter():
@@ -146,3 +149,52 @@ def test_member_filter__all(cpp_class):
 
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
     assert sorted(member_names) == sorted(["PublicStaticMethod"])
+
+
+@pytest.fixture
+def cpp_class_with_inner_classes(cpp_class):
+    cpp_class.inner_classes[0].referred_object.kind = "class"
+
+    nested_class = Compound("cpp")
+    nested_class.name = "NestedStruct"
+    nested_class.kind = "struct"
+    inner_class_reference = InnerTypeReference(language="cpp")
+    inner_class_reference.name = nested_class.name
+    inner_class_reference.referred_object = nested_class
+    cpp_class.inner_classes.append(inner_class_reference)
+
+    nested_class = Compound("cpp")
+    nested_class.name = "AnotherStruct"
+    nested_class.kind = "struct"
+    inner_class_reference = InnerTypeReference(language="cpp")
+    inner_class_reference.name = nested_class.name
+    inner_class_reference.referred_object = nested_class
+    cpp_class.inner_classes.append(inner_class_reference)
+
+    return cpp_class
+
+
+def test_inner_class_filter__name(cpp_class_with_inner_classes):
+    inner_class_filter = InnerClassFilter(
+        name_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r".*Nested.*")))
+
+    inner_class_names = [m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)]
+    assert sorted(inner_class_names) == sorted(["NestedClass", "NestedStruct"])
+
+
+def test_inner_class_filter__kind(cpp_class_with_inner_classes):
+    inner_class_filter = InnerClassFilter(
+        kind_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"struct")))
+
+    inner_class_names = [m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)]
+    assert sorted(inner_class_names) == sorted(["NestedStruct", "AnotherStruct"])
+
+
+def test_inner_class_filter__all(cpp_class_with_inner_classes):
+    inner_class_filter = InnerClassFilter(
+        name_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"Nested.*")),
+        kind_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"struct"))
+    )
+
+    inner_class_names = [m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)]
+    assert sorted(inner_class_names) == sorted(["NestedStruct"])

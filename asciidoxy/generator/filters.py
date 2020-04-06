@@ -19,7 +19,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Optional, Pattern, Sequence
 
-from ..model import Member
+from ..model import InnerTypeReference, Member
 
 
 class FilterAction(Enum):
@@ -133,5 +133,38 @@ class MemberFilter:
         if self.kind_filter(member.kind) is FilterAction.EXCLUDE:
             return False
         if self.prot_filter(member.prot) is FilterAction.EXCLUDE:
+            return False
+        return True
+
+
+class InnerClassFilter:
+    """Filter for selecting inner classes (of a compound) to insert.
+
+    Ignores class references that have not been resolved.
+
+    Attributes:
+        name_filter: Filter for the name of the members to include.
+        kind_filter: Filter for the kind of the members to include.
+    """
+    name_filter: StringFilter
+    kind_filter: StringFilter
+
+    def __init__(self,
+                 name_filter: Optional[StringFilter] = None,
+                 kind_filter: Optional[StringFilter] = None):
+        self.name_filter = name_filter or AllStringFilter()
+        self.kind_filter = kind_filter or AllStringFilter()
+
+    def __call__(self, ref: InnerTypeReference) -> bool:
+        """Apply the filter to an inner class.
+
+        Returns:
+            True if the inner class should be included.
+        """
+        if ref.referred_object is None:
+            return False
+        if self.name_filter(ref.referred_object.name) is FilterAction.EXCLUDE:
+            return False
+        if self.kind_filter(ref.referred_object.kind) is FilterAction.EXCLUDE:
             return False
         return True
