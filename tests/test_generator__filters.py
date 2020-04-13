@@ -18,7 +18,7 @@ import pytest
 from asciidoxy.generator.filters import (AllStringFilter, NoneStringFilter, IncludeStringFilter,
                                          ExcludeStringFilter, ChainedStringFilter, MemberFilter,
                                          FilterAction, InnerClassFilter, EnumValueFilter,
-                                         ExceptionFilter)
+                                         ExceptionFilter, filter_from_strings)
 from asciidoxy.model import Compound, EnumValue, InnerTypeReference, ThrowsClause
 
 
@@ -126,8 +126,10 @@ def test_member_filter__kind(cpp_class):
         kind_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"(enum|class)")))
 
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
-    assert sorted(member_names) == sorted(["PublicEnum", "ProtectedEnum", "PrivateEnum",
-                                           "PublicClass", "ProtectedClass", "PrivateClass"])
+    assert sorted(member_names) == sorted([
+        "PublicEnum", "ProtectedEnum", "PrivateEnum", "PublicClass", "ProtectedClass",
+        "PrivateClass"
+    ])
 
 
 def test_member_filter__prot(cpp_class):
@@ -135,18 +137,20 @@ def test_member_filter__prot(cpp_class):
         prot_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"protected")))
 
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
-    assert sorted(member_names) == sorted(["ProtectedVariable", "ProtectedEnum", "ProtectedClass",
-                                           "ProtectedTypedef", "ProtectedStruct", "ProtectedTrash",
-                                           "MyClass", "operator++", "ProtectedMethod",
-                                           "ProtectedStaticMethod"])
+    assert sorted(member_names) == sorted([
+        "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
+        "ProtectedStruct", "ProtectedTrash", "MyClass", "operator++", "ProtectedMethod",
+        "ProtectedStaticMethod"
+    ])
 
 
 def test_member_filter__all(cpp_class):
-    member_filter = MemberFilter(
-        name_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r".*Static.*")),
-        kind_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"function")),
-        prot_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"public"))
-    )
+    member_filter = MemberFilter(name_filter=ChainedStringFilter(
+        NoneStringFilter(), IncludeStringFilter(r".*Static.*")),
+                                 kind_filter=ChainedStringFilter(NoneStringFilter(),
+                                                                 IncludeStringFilter(r"function")),
+                                 prot_filter=ChainedStringFilter(NoneStringFilter(),
+                                                                 IncludeStringFilter(r"public")))
 
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
     assert sorted(member_names) == sorted(["PublicStaticMethod"])
@@ -179,7 +183,9 @@ def test_inner_class_filter__name(cpp_class_with_inner_classes):
     inner_class_filter = InnerClassFilter(
         name_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r".*Nested.*")))
 
-    inner_class_names = [m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)]
+    inner_class_names = [
+        m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)
+    ]
     assert sorted(inner_class_names) == sorted(["NestedClass", "NestedStruct"])
 
 
@@ -187,17 +193,20 @@ def test_inner_class_filter__kind(cpp_class_with_inner_classes):
     inner_class_filter = InnerClassFilter(
         kind_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"struct")))
 
-    inner_class_names = [m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)]
+    inner_class_names = [
+        m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)
+    ]
     assert sorted(inner_class_names) == sorted(["NestedStruct", "AnotherStruct"])
 
 
 def test_inner_class_filter__all(cpp_class_with_inner_classes):
     inner_class_filter = InnerClassFilter(
         name_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"Nested.*")),
-        kind_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"struct"))
-    )
+        kind_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r"struct")))
 
-    inner_class_names = [m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)]
+    inner_class_names = [
+        m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)
+    ]
     assert sorted(inner_class_names) == sorted(["NestedStruct"])
 
 
@@ -225,3 +234,106 @@ def test_exception_filter__name():
 
     assert member_filter(throws_clause_1) is False
     assert member_filter(throws_clause_2) is True
+
+
+@pytest.fixture
+def strings_to_filter():
+    return [
+        "", "Apple", "Banana", "AppleTree", "BananaTree", "Strawberry", "StrawberryDaiquiri",
+        "AppleJuice", "BananaJuice"
+    ]
+
+
+def test_filter_from_strings__no_filter(strings_to_filter):
+    string_filter = filter_from_strings([])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(strings_to_filter)
+
+
+def test_filter_from_strings__accept_all(strings_to_filter):
+    string_filter = filter_from_strings(["ALL"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(strings_to_filter)
+
+
+def test_filter_from_strings__accept_none(strings_to_filter):
+    string_filter = filter_from_strings(["NONE"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == []
+
+
+def test_filter_from_strings__explicit_none_explicit_include(strings_to_filter):
+    string_filter = filter_from_strings(["NONE", "+.*Tree"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(["AppleTree", "BananaTree"])
+
+
+def test_filter_from_strings__explicit_none_implicit_include(strings_to_filter):
+    string_filter = filter_from_strings(["NONE", ".*Daiquiri"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(["StrawberryDaiquiri"])
+
+
+def test_filter_from_strings__explicit_all_exclude(strings_to_filter):
+    string_filter = filter_from_strings(["ALL", "-.*Banana"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(
+        ["", "Apple", "AppleJuice", "AppleTree", "Strawberry", "StrawberryDaiquiri"])
+
+
+def test_filter_from_strings__implicit_none(strings_to_filter):
+    string_filter = filter_from_strings(["+.*Tree"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(["AppleTree", "BananaTree"])
+
+
+def test_filter_from_strings__implicit_all(strings_to_filter):
+    string_filter = filter_from_strings(["-Banana"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(
+        ["", "Apple", "AppleTree", "AppleJuice", "Strawberry", "StrawberryDaiquiri"])
+
+
+def test_filter_from_strings__explicit_all_exclude_include(strings_to_filter):
+    string_filter = filter_from_strings(["ALL", "-.*Banana", "+.*Juice"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(
+        ["", "Apple", "AppleJuice", "AppleTree", "Strawberry", "StrawberryDaiquiri", "BananaJuice"])
+
+
+def test_filter_from_strings__implicit_all_exclude_include(strings_to_filter):
+    string_filter = filter_from_strings(["-.*Banana", "+.*Juice"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(
+        ["", "Apple", "AppleJuice", "AppleTree", "Strawberry", "StrawberryDaiquiri", "BananaJuice"])
+
+
+def test_filter_from_strings__explicit_none_include_exclude(strings_to_filter):
+    string_filter = filter_from_strings(["NONE", "+.*Tree", "-Banana"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(["AppleTree"])
+
+
+def test_filter_from_strings__implicit_none_include_exclude(strings_to_filter):
+    string_filter = filter_from_strings(["+.*Tree", "-Banana"])
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(["AppleTree"])
+
+
+def test_filter_from_strings__single_explicit_include(strings_to_filter):
+    string_filter = filter_from_strings("+.*Tree")
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(["AppleTree", "BananaTree"])
+
+
+def test_filter_from_strings__single_implicit_include(strings_to_filter):
+    string_filter = filter_from_strings(".*Tree")
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(["AppleTree", "BananaTree"])
+
+
+def test_filter_from_strings__single_exclude(strings_to_filter):
+    string_filter = filter_from_strings("-Banana")
+    filtered = [s for s in strings_to_filter if string_filter(s) == FilterAction.INCLUDE]
+    assert sorted(filtered) == sorted(
+        ["", "Apple", "AppleTree", "AppleJuice", "Strawberry", "StrawberryDaiquiri"])

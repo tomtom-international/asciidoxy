@@ -17,7 +17,7 @@ import re
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Optional, Pattern, Sequence
+from typing import List, Optional, Pattern, Sequence, Union
 
 from ..model import EnumValue, InnerTypeReference, Member, ThrowsClause
 
@@ -212,3 +212,52 @@ class ExceptionFilter:
         if self.name_filter(throws_clause.type.name) is FilterAction.EXCLUDE:
             return False
         return True
+
+
+def filter_from_strings(filter_strings: Union[str, Sequence[str]]) -> StringFilter:
+    """Create a string filter from a sequence of input strings.
+
+    Each string in the sequence can have the following format:
+    - `ALL`: Accept all strings.
+    - `NONE`: Accept no strings.
+    - `<regex>` or `+<regex>`: Include strings matching the regex.
+    - `-<regex>`: Exclude strings matching the regex.
+
+    If the first string is an include regex, an implicit NONE is inserted before. If the first
+    string is an exclude regex, an implicit ALL is inserted before.
+
+    Args:
+        filter_strings: List of filter strings to build the filter from.
+
+    Returns:
+        A string filter matching the input specification.
+    """
+    if isinstance(filter_strings, str):
+        filter_strings = [filter_strings]
+
+    filters: List[StringFilter] = []
+
+    for filter_string in filter_strings:
+        if filter_string == "ALL":
+            filters.append(AllStringFilter())
+        elif filter_string == "NONE":
+            filters.append(NoneStringFilter())
+        elif filter_string.startswith("-"):
+            filters.append(ExcludeStringFilter(filter_string[1:]))
+        elif filter_string.startswith("+"):
+            filters.append(IncludeStringFilter(filter_string[1:]))
+        else:
+            filters.append(IncludeStringFilter(filter_string))
+
+    if len(filters) > 0:
+        if isinstance(filters[0], ExcludeStringFilter):
+            filters.insert(0, AllStringFilter())
+        elif isinstance(filters[0], IncludeStringFilter):
+            filters.insert(0, NoneStringFilter())
+
+    if len(filters) == 0:
+        return AllStringFilter()
+    elif len(filters) == 1:
+        return filters[0]
+    else:
+        return ChainedStringFilter(*filters)
