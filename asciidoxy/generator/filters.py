@@ -19,7 +19,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Optional, Pattern, Sequence
 
-from ..model import InnerTypeReference, Member
+from ..model import EnumValue, InnerTypeReference, Member, ThrowsClause
 
 
 class FilterAction(Enum):
@@ -178,7 +178,7 @@ class EnumValueFilter:
     """
     name_filter: StringFilter
 
-    def __init__(self, name_filter: StringFilter)
+    def __init__(self, name_filter: StringFilter):
         self.name_filter = name_filter
 
     def __call__(self, enum_value: EnumValue) -> bool:
@@ -188,5 +188,27 @@ class EnumValueFilter:
             True if the enum value should be included.
         """
         if self.name_filter(enum_value.name) is FilterAction.EXCLUDE:
+            return False
+        return True
+
+
+class ExceptionFilter:
+    """Filter for selecting exceptions (of a member) to insert.
+
+    Attributes:
+        name_filter: Filter for the name of the exceptions to include.
+    """
+    name_filter: StringFilter
+
+    def __init__(self, name_filter: StringFilter):
+        self.name_filter = name_filter
+
+    def __call__(self, throws_clause: ThrowsClause) -> bool:
+        """Apply the filter to an exception in a throws clause.
+
+        Returns:
+            True if the enum value should be included.
+        """
+        if self.name_filter(throws_clause.type.name) is FilterAction.EXCLUDE:
             return False
         return True

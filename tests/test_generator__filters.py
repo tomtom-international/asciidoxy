@@ -17,8 +17,9 @@ import pytest
 
 from asciidoxy.generator.filters import (AllStringFilter, NoneStringFilter, IncludeStringFilter,
                                          ExcludeStringFilter, ChainedStringFilter, MemberFilter,
-                                         FilterAction, InnerClassFilter, EnumValueFilter)
-from asciidoxy.model import Compound, EnumValue, InnerTypeReference
+                                         FilterAction, InnerClassFilter, EnumValueFilter,
+                                         ExceptionFilter)
+from asciidoxy.model import Compound, EnumValue, InnerTypeReference, ThrowsClause
 
 
 def test_all_string_filter():
@@ -211,3 +212,16 @@ def test_enum_value_filter__name():
 
     assert member_filter(enum_value_1) is True
     assert member_filter(enum_value_2) is False
+
+
+def test_exception_filter__name():
+    throws_clause_1 = ThrowsClause("cpp")
+    throws_clause_1.type.name = "std::runtime_exception"
+    throws_clause_2 = ThrowsClause("cpp")
+    throws_clause_2.type.name = "NumericError"
+
+    member_filter = ExceptionFilter(
+        name_filter=ChainedStringFilter(AllStringFilter(), ExcludeStringFilter(r"std::.*")))
+
+    assert member_filter(throws_clause_1) is False
+    assert member_filter(throws_clause_2) is True
