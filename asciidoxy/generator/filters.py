@@ -168,3 +168,25 @@ class InnerClassFilter:
         if self.kind_filter(ref.referred_object.kind) is FilterAction.EXCLUDE:
             return False
         return True
+
+
+class EnumValueFilter:
+    """Filter for selecting enum values (of a compound or member) to insert.
+
+    Attributes:
+        name_filter: Filter for the name of the enum values to include.
+    """
+    name_filter: StringFilter
+
+    def __init__(self, name_filter: StringFilter)
+        self.name_filter = name_filter
+
+    def __call__(self, enum_value: EnumValue) -> bool:
+        """Apply the filter to an enum value.
+
+        Returns:
+            True if the enum value should be included.
+        """
+        if self.name_filter(enum_value.name) is FilterAction.EXCLUDE:
+            return False
+        return True

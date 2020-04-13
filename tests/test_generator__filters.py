@@ -17,8 +17,8 @@ import pytest
 
 from asciidoxy.generator.filters import (AllStringFilter, NoneStringFilter, IncludeStringFilter,
                                          ExcludeStringFilter, ChainedStringFilter, MemberFilter,
-                                         FilterAction, InnerClassFilter)
-from asciidoxy.model import Compound, InnerTypeReference
+                                         FilterAction, InnerClassFilter, EnumValueFilter)
+from asciidoxy.model import Compound, EnumValue, InnerTypeReference
 
 
 def test_all_string_filter():
@@ -198,3 +198,16 @@ def test_inner_class_filter__all(cpp_class_with_inner_classes):
 
     inner_class_names = [m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)]
     assert sorted(inner_class_names) == sorted(["NestedStruct"])
+
+
+def test_enum_value_filter__name():
+    enum_value_1 = EnumValue("cpp")
+    enum_value_1.name = "kSomeEnumValue"
+    enum_value_2 = EnumValue("cpp")
+    enum_value_2.name = "kAnotherEnumValue"
+
+    member_filter = EnumValueFilter(
+        name_filter=ChainedStringFilter(NoneStringFilter(), IncludeStringFilter(r".*ome.*")))
+
+    assert member_filter(enum_value_1) is True
+    assert member_filter(enum_value_2) is False
