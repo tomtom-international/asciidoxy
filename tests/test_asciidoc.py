@@ -508,9 +508,9 @@ def test_process_adoc_multi_file(warnings_are_errors, build_dir, single_and_mult
         assert content == expected_output_file.read_text()
 
 
-@pytest.mark.parametrize("test_file_name",
-                         ["dangling_link", "dangling_cross_doc_ref", "double_insert",
-                          "dangling_link_in_insert"])
+@pytest.mark.parametrize(
+    "test_file_name",
+    ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
 def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_page, adoc_data,
                                    xml_data):
     from asciidoxy.asciidoc import multi_page
