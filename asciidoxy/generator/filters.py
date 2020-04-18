@@ -291,43 +291,104 @@ def filter_from_strings(filter_strings: Union[str, Sequence[str]]) -> StringFilt
         return ChainedStringFilter(*filters)
 
 
+def combine_strings(first: Union[str, Sequence[str]],
+                    second: Union[str, Sequence[str]]) -> Union[str, Sequence[str]]:
+    if isinstance(first, str):
+        first = [first]
+    if isinstance(second, str):
+        second = [second]
+
+    return list(first) + list(second)
+
+
+def combine_specs(first: Optional[FilterSpec],
+                  second: Optional[FilterSpec]) -> Optional[FilterSpec]:
+    """Combine two filter specs."""
+    if first is None and second is None:
+        return None
+    if first is None:
+        return second
+    if second is None:
+        return first
+
+    if isinstance(first, collections.abc.Mapping) or isinstance(second, collections.abc.Mapping):
+        if isinstance(first, (str, collections.abc.Sequence)):
+            first = {"name": first}
+        if isinstance(second, (str, collections.abc.Sequence)):
+            second = {"name": second}
+
+        result = {}
+        for key in set(first.keys()) | set(second.keys()):
+            if key not in first:
+                result[key] = second[key]
+            elif key not in second:
+                result[key] = first[key]
+            else:
+                result[key] = combine_strings(first[key], second[key])
+
+        return result
+
+    else:
+        return combine_strings(first, second)
+
+
 class InsertionFilter:
     """Filter members of an element to be inserted."""
-    member_filter: Optional[MemberFilter]
-    inner_class_filter: Optional[InnerClassFilter]
-    enum_value_filter: Optional[EnumValueFilter]
-    exception_filter: Optional[ExceptionFilter]
+    _member_filter: Optional[MemberFilter]
+    _inner_class_filter: Optional[InnerClassFilter]
+    _enum_value_filter: Optional[EnumValueFilter]
+    _exception_filter: Optional[ExceptionFilter]
+
+    _member_spec: Optional[FilterSpec]
+    _inner_class_spec: Optional[FilterSpec]
+    _enum_value_spec: Optional[FilterSpec]
+    _exception_spec: Optional[FilterSpec]
 
     def __init__(self,
                  members: Optional[FilterSpec] = None,
                  inner_classes: Optional[FilterSpec] = None,
                  enum_values: Optional[FilterSpec] = None,
                  exceptions: Optional[FilterSpec] = None):
-        self.member_filter = MemberFilter.from_spec(members)
-        self.inner_class_filter = InnerClassFilter.from_spec(inner_classes)
-        self.enum_value_filter = EnumValueFilter.from_spec(enum_values)
-        self.exception_filter = ExceptionFilter.from_spec(exceptions)
+        self._member_spec = members
+        self._inner_class_spec = inner_classes
+        self._enum_value_spec = enum_values
+        self._exception_spec = exceptions
+
+        self._member_filter = MemberFilter.from_spec(members)
+        self._inner_class_filter = InnerClassFilter.from_spec(inner_classes)
+        self._enum_value_filter = EnumValueFilter.from_spec(enum_values)
+        self._exception_filter = ExceptionFilter.from_spec(exceptions)
 
     def members(self, compound: Compound) -> Generator[Member, None, None]:
         """Get members matching the filter."""
         for member in compound.members:
-            if self.member_filter is None or self.member_filter(member):
+            if self._member_filter is None or self._member_filter(member):
                 yield member
 
     def inner_classes(self, compound: Compound) -> Generator[InnerTypeReference, None, None]:
         """Get inner classes matching the filter."""
         for inner in compound.inner_classes:
-            if self.inner_class_filter is None or self.inner_class_filter(inner):
+            if self._inner_class_filter is None or self._inner_class_filter(inner):
                 yield inner
 
     def enum_values(self, element: Union[Compound, Member]) -> Generator[EnumValue, None, None]:
         """Get enum values matching the filter."""
         for enum_value in element.enumvalues:
-            if self.enum_value_filter is None or self.enum_value_filter(enum_value):
+            if self._enum_value_filter is None or self._enum_value_filter(enum_value):
                 yield enum_value
 
     def exceptions(self, member: Member) -> Generator[ThrowsClause, None, None]:
         """Get exceptions matching the filter."""
         for exception in member.exceptions:
-            if self.exception_filter is None or self.exception_filter(exception):
+            if self._exception_filter is None or self._exception_filter(exception):
                 yield exception
+
+    def extend(self,
+               members: Optional[FilterSpec] = None,
+               inner_classes: Optional[FilterSpec] = None,
+               enum_values: Optional[FilterSpec] = None,
+               exceptions: Optional[FilterSpec] = None) -> "InsertionFilter":
+        return InsertionFilter(combine_specs(self._member_spec, members),
+                               combine_specs(self._inner_class_spec, inner_classes),
+                               combine_specs(self._enum_value_spec, enum_values),
+                               combine_specs(self._exception_spec, exceptions))

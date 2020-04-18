@@ -14,6 +14,7 @@
 """Helper functions for Objective C templates."""
 
 from asciidoxy.asciidoc import Context
+from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.templates.helpers import link_from_ref, print_ref
 
 
@@ -50,20 +51,21 @@ def objc_method_signature(method, context: Context):
         return f"{prefix}{method_parts[0]}"
 
 
-def public_methods(element):
-    return (m for m in element.members if (m.kind == "function" and m.prot == "public"
-                                           and not m.static and "NS_UNAVAILABLE" not in m.name))
+def public_methods(element, insert_filter: InsertionFilter):
+    return (m for m in insert_filter.members(element)
+            if (m.kind == "function" and m.prot == "public" and not m.static))
 
 
-def public_class_methods(element):
-    return (m for m in element.members if (m.kind == "function" and m.prot == "public" and m.static
-                                           and "NS_UNAVAILABLE" not in m.name))
+def public_class_methods(element, insert_filter: InsertionFilter):
+    return (m for m in insert_filter.members(element)
+            if (m.kind == "function" and m.prot == "public" and m.static))
 
 
-def public_properties(element):
-    return (m for m in element.members if m.kind == "property" and m.prot == "public")
+def public_properties(element, insert_filter: InsertionFilter):
+    return (m for m in insert_filter.members(element)
+            if m.kind == "property" and m.prot == "public")
 
 
-def public_simple_enclosed_types(element):
+def public_simple_enclosed_types(element, insert_filter: InsertionFilter):
     # For some reason enclosed types are always set to private, so ignore visibility
-    return (m for m in element.members if m.kind in ["enum", "class", "protocol"])
+    return (m for m in insert_filter.members(element) if m.kind in ["enum", "class", "protocol"])

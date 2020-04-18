@@ -37,7 +37,7 @@ ${element.description}
 [cols='h,5a']
 |===
 
-% for enum in enums(element):
+% for enum in enums(element, insert_filter):
 ${api_context.insert(enum)}
 |
 [[${enum.id},${enum.name}]]${enum.name}

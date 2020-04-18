@@ -18,7 +18,8 @@ import pytest
 from asciidoxy.generator.filters import (AllStringFilter, NoneStringFilter, IncludeStringFilter,
                                          ExcludeStringFilter, ChainedStringFilter, MemberFilter,
                                          FilterAction, InnerClassFilter, EnumValueFilter,
-                                         ExceptionFilter, filter_from_strings, InsertionFilter)
+                                         ExceptionFilter, filter_from_strings, InsertionFilter,
+                                         combine_specs)
 from asciidoxy.model import Compound, EnumValue, InnerTypeReference, ThrowsClause
 
 
@@ -481,3 +482,79 @@ def test_insertion_filer__member__exceptions__filter_name(api_reference):
 
     exception_names = [exception.type.name for exception in insertion_filter.exceptions(member)]
     assert sorted(exception_names) == sorted([])
+
+
+@pytest.mark.parametrize("first, second, expected", [
+    (None, None, None),
+    ("Update", None, "Update"),
+    (None, "ALL", "ALL"),
+    (["NONE", "ALL"], None, ["NONE", "ALL"]),
+    (None, ["NONE", "ALL"], ["NONE", "ALL"]),
+    ({
+        "name": "ALL"
+    }, None, {
+        "name": "ALL"
+    }),
+    (None, {
+        "name": "ALL"
+    }, {
+        "name": "ALL"
+    }),
+    ("NONE", "ALL", ["NONE", "ALL"]),
+    ("Alpha", ["Beta", "Gamma"], ["Alpha", "Beta", "Gamma"]),
+    (["Alpha", "Beta"], "Gamma", ["Alpha", "Beta", "Gamma"]),
+    (["Alpha", "Beta"], ["Gamma", "Delta"], ["Alpha", "Beta", "Gamma", "Delta"]),
+    ({
+        "name": "Alpha"
+    }, {
+        "name": "Beta"
+    }, {
+        "name": ["Alpha", "Beta"]
+    }),
+    ({
+        "name": "Alpha"
+    }, {
+        "kind": "Beta"
+    }, {
+        "name": "Alpha",
+        "kind": "Beta"
+    }),
+    ({
+        "name": "Alpha"
+    }, {
+        "name": "Gamma",
+        "kind": "Beta"
+    }, {
+        "name": ["Alpha", "Gamma"],
+        "kind": "Beta"
+    }),
+    ({
+        "name": "Gamma",
+        "kind": "Beta"
+    }, "Alpha", {
+        "name": ["Gamma", "Alpha"],
+        "kind": "Beta"
+    }),
+    ({
+        "kind": "Beta"
+    }, "Alpha", {
+        "name": "Alpha",
+        "kind": "Beta"
+    }),
+    ("Alpha", {
+        "name": "Gamma",
+        "kind": "Beta"
+    }, {
+        "name": ["Alpha", "Gamma"],
+        "kind": "Beta"
+    }),
+    ("Alpha", {
+        "kind": "Beta"
+    }, {
+        "name": "Alpha",
+        "kind": "Beta"
+    }),
+],
+                         ids=lambda x: type(x).__name__)
+def test_combine_specs(first, second, expected):
+    assert combine_specs(first, second) == expected

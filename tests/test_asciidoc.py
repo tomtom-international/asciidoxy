@@ -105,6 +105,14 @@ def _check_inserted_file_contains(inserted_adoc, expected):
     assert expected in content
 
 
+def _check_inserted_file_does_not_contain(inserted_adoc, expected):
+    file_name = Path(inserted_adoc[9:-16])
+    assert file_name.is_file()
+
+    content = file_name.read_text(encoding="UTF-8")
+    assert expected not in content
+
+
 def test_insert_class(api):
     result = api.insert("asciidoxy::geometry::Coordinate")
     assert result.startswith("include::")
@@ -249,6 +257,30 @@ def test_insert_tracks_all_references(api):
     linked_names = [link.name for link in api._context.linked]
     assert "Coordinate" in linked_names
     assert "TrafficEvent" in linked_names
+
+
+def test_insert_class__global_filter_members(api):
+    api.filter(members="-SharedData")
+    result = api.insert("asciidoxy::traffic::TrafficEvent")
+    _check_inserted_file_does_not_contain(result, "SharedData")
+    _check_inserted_file_contains(result, "Update")
+    _check_inserted_file_contains(result, "CalculateDelay")
+
+
+def test_insert_class__global_filter_members__ignore(api):
+    api.filter(members="-SharedData")
+    result = api.insert("asciidoxy::traffic::TrafficEvent", ignore_global_filter=True)
+    _check_inserted_file_contains(result, "SharedData")
+    _check_inserted_file_contains(result, "Update")
+    _check_inserted_file_contains(result, "CalculateDelay")
+
+
+def test_insert_class__global_filter_members__extend(api):
+    api.filter(members="-SharedData")
+    result = api.insert("asciidoxy::traffic::TrafficEvent", members="-Update")
+    _check_inserted_file_does_not_contain(result, "SharedData")
+    _check_inserted_file_does_not_contain(result, "Update")
+    _check_inserted_file_contains(result, "CalculateDelay")
 
 
 def test_link_class(api):

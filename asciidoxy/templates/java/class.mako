@@ -35,50 +35,50 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(public_complex_enclosed_types(element)):
+% if has(public_complex_enclosed_types(element, insert_filter)):
 |*Enclosed types*
 |
-% for enclosed in public_complex_enclosed_types(element):
+% for enclosed in public_complex_enclosed_types(element, insert_filter):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constructors(element)):
+% if has(public_constructors(element, insert_filter)):
 |*Constructors*
 |
-% for constructor in public_constructors(element):
+% for constructor in public_constructors(element, insert_filter):
 `xref:${constructor.id}[${constructor.name}${type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constants(element)):
+% if has(public_constants(element, insert_filter)):
 |*Constants*
 |
-% for constant in public_constants(element):
+% for constant in public_constants(element, insert_filter):
 `${constant.name}`::
 ${constant.description}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_static_methods(element)):
+% if has(public_static_methods(element, insert_filter)):
 |*Static methods*
 |
-% for method in public_static_methods(element):
+% for method in public_static_methods(element, insert_filter):
 `xref:${method.id}[static ${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_methods(element)):
+% if has(public_methods(element, insert_filter)):
 |*Methods*
 |
-% for method in public_methods(element):
+% for method in public_methods(element, insert_filter):
 `xref:${method.id}[${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
 ${method.brief}
 % endfor
@@ -88,7 +88,7 @@ ${method.brief}
 
 == Members
 ################################################################################### Constructors ##
-% for constructor in public_constructors(element):
+% for constructor in public_constructors(element, insert_filter):
 [[${constructor.id},${constructor.name}]]
 ${api_context.insert(constructor)}
 [source,java,subs="-specialchars,macros+"]
@@ -126,7 +126,7 @@ ${exception.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in public_static_methods(element):
+% for method in public_static_methods(element, insert_filter):
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
@@ -171,7 +171,7 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in public_methods(element):
+% for method in public_methods(element, insert_filter):
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
@@ -218,6 +218,6 @@ ${exception.description}
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in public_complex_enclosed_types(element):
-${api.insert_fragment(enclosed)}
+% for enclosed in public_complex_enclosed_types(element, insert_filter):
+${api.insert_fragment(enclosed, insert_filter)}
 % endfor

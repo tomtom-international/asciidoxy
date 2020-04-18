@@ -21,6 +21,7 @@ from asciidoxy.model import Compound, Member, ReturnValue, TypeRef, InnerTypeRef
 from asciidoxy.templates.java.helpers import (public_methods, public_static_methods,
                                               public_constructors, public_constants,
                                               public_complex_enclosed_types)
+from asciidoxy.generator.filters import InsertionFilter
 
 
 @pytest.fixture
@@ -91,28 +92,86 @@ def java_class():
     return compound
 
 
-def test_public_constructors(java_class):
-    result = list(public_constructors(java_class))
+def test_public_constructors__no_filter(java_class):
+    result = list(public_constructors(java_class, InsertionFilter()))
     assert len(result) == 1
     assert result[0].name == "MyClass"
     assert result[0].prot == "public"
 
 
-def test_public_methods(java_class):
-    result = [m.name for m in public_methods(java_class)]
+def test_public_constructors__filter_match(java_class):
+    result = list(public_constructors(java_class, InsertionFilter(members="MyClass")))
+    assert len(result) == 1
+    assert result[0].name == "MyClass"
+    assert result[0].prot == "public"
+
+
+def test_public_constructors__filter_no_match(java_class):
+    result = list(public_constructors(java_class, InsertionFilter(members="NONE")))
+    assert len(result) == 0
+
+
+def test_public_methods__no_filter(java_class):
+    result = [m.name for m in public_methods(java_class, InsertionFilter())]
     assert sorted(result) == sorted(["PublicMethod"])
 
 
-def test_public_static_methods(java_class):
-    result = [m.name for m in public_static_methods(java_class)]
+def test_public_methods__filter_match(java_class):
+    result = [m.name for m in public_methods(java_class, InsertionFilter(members="PublicMethod"))]
+    assert sorted(result) == sorted(["PublicMethod"])
+
+
+def test_public_methods__filter_no_match(java_class):
+    result = [m.name for m in public_methods(java_class, InsertionFilter(members="NONE"))]
+    assert len(result) == 0
+
+
+def test_public_static_methods__no_filter(java_class):
+    result = [m.name for m in public_static_methods(java_class, InsertionFilter())]
     assert sorted(result) == sorted(["PublicStaticMethod"])
 
 
-def test_public_constants(java_class):
-    result = [m.name for m in public_constants(java_class)]
+def test_public_static_methods__filter_match(java_class):
+    result = [m.name for m in public_static_methods(java_class, InsertionFilter(members="Public"))]
+    assert sorted(result) == sorted(["PublicStaticMethod"])
+
+
+def test_public_static_methods__filter_no_match(java_class):
+    result = [m.name for m in public_static_methods(java_class, InsertionFilter(members="NONE"))]
+    assert len(result) == 0
+
+
+def test_public_constants__no_filter(java_class):
+    result = [m.name for m in public_constants(java_class, InsertionFilter())]
     assert result == ["PublicConstant"]
 
 
-def test_public_complex_enclosed_types(java_class):
-    result = [m.name for m in public_complex_enclosed_types(java_class)]
+def test_public_constants__filter_match(java_class):
+    result = [m.name for m in public_constants(java_class, InsertionFilter(members="Public"))]
+    assert result == ["PublicConstant"]
+
+
+def test_public_constants__filter_no_match(java_class):
+    result = [m.name for m in public_constants(java_class, InsertionFilter(members="NONE"))]
+    assert len(result) == 0
+
+
+def test_public_complex_enclosed_types__no_filter(java_class):
+    result = [m.name for m in public_complex_enclosed_types(java_class, InsertionFilter())]
     assert result == ["NestedClass"]
+
+
+def test_public_complex_enclosed_types__filter_match(java_class):
+    result = [
+        m.name
+        for m in public_complex_enclosed_types(java_class, InsertionFilter(inner_classes="Nested"))
+    ]
+    assert result == ["NestedClass"]
+
+
+def test_public_complex_enclosed_types__filter_no_match(java_class):
+    result = [
+        m.name
+        for m in public_complex_enclosed_types(java_class, InsertionFilter(inner_classes="NONE"))
+    ]
+    assert len(result) == 0
