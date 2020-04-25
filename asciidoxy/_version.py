@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Top-level package for AsciiDoxy."""
+"""Version information."""
 
-from ._version import (__title__, __description__, __url__, __version__, __author__,
-                       __author_email__, __license__)
+__title__ = "asciidoxy"
+__description__ = "AsciiDoxy generates API documentation from Doxygen XML output to AsciiDoc."
+__url__ = "https://github.com/tomtom-international/asciidoxy"
+__version__ = "0.5.2"
+__author__ = "Rob van der Most"
+__author_email__ = "Rob.vanderMost@TomTom.com"
+__license__ = "Apache 2.0"

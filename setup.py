@@ -22,6 +22,9 @@ import os
 from pathlib import Path
 from setuptools import setup, find_packages
 
+from asciidoxy._version import (__title__, __description__, __url__, __version__, __author__,
+                                __author_email__, __license__)
+
 with open("README.adoc") as readme_file:
     readme = readme_file.read()
 
@@ -34,21 +37,9 @@ setup_requirements = ["pytest-runner>=5", ]
 
 test_requirements = ["pytest>=4", ]
 
-version = os.environ.get("WHEEL_VERSION", None)
-if not version:
-    version_file = Path(__file__).parent / "version.txt"
-    if version_file.is_file():
-        with version_file.open("r", encoding="utf-8") as f:
-            minor_version = f.read()
-        if minor_version:
-            version = f"{minor_version.strip()}-dev"
-    else:
-        # Version file is not accessible from tox
-        version = "0.0.0-dev"
-
 setup(
-    author="Rob van der Most",
-    author_email="Rob.vanderMost@TomTom.com",
+    author=__author__,
+    author_email=__author_email__,
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -59,10 +50,11 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Topic :: Documentation",
         "Topic :: Software Development :: Documentation",
     ],
-    description="Generate AsciiDoc documentation from Doxygen XML output.",
+    description=__description__,
     entry_points={
         "console_scripts": [
             "asciidoxy=asciidoxy.cli:main",
@@ -70,14 +62,15 @@ setup(
     },
     install_requires=requirements,
     long_description=readme + "\n\n" + history,
+    license=__license__,
     include_package_data=True,
     keywords="asciidoxy",
-    name="asciidoxy",
+    name=__title__,
     packages=find_packages(include=["asciidoxy", "asciidoxy.*"]),
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://bitbucket.tomtomgroup.com/projects/NAVKIT2/repos/nk2-tools-asciidoxy",
-    version=version,
+    url=__url__,
+    version=__version__,
     zip_safe=False,
 )
