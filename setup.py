@@ -25,10 +25,10 @@ from setuptools import setup, find_packages
 from asciidoxy._version import (__title__, __description__, __url__, __version__, __author__,
                                 __author_email__, __license__)
 
-with open("README.adoc") as readme_file:
+with open("README.md") as readme_file:
     readme = readme_file.read()
 
-with open("CHANGELOG.adoc") as history_file:
+with open("CHANGELOG.md") as history_file:
     history = history_file.read()
 
 requirements = ["mako~=1.1", "aiohttp~=3.6", "aiodns", "cchardet", "toml~=0.10"]
@@ -62,6 +62,7 @@ setup(
     },
     install_requires=requirements,
     long_description=readme + "\n\n" + history,
+    long_description_content_type="text/markdown",
     license=__license__,
     include_package_data=True,
     keywords="asciidoxy",
