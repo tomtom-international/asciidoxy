@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.16">
+  <compounddef id="namespaceasciidoxy_1_1unsupported__kind" kind="namespace" language="C++">
+    <compoundname>asciidoxy::unsupported_kind</compoundname>
+      <sectiondef kind="var">
+      <memberdef kind="unsupported_kind" id="unsupported__kind_8hpp_1a3ac100c245cf82467f89b6a0d53bfe4c" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr bool</type>
+        <definition>constexpr bool asciidoxy::unsupported_kind::kUnsupportedKindSample</definition>
+        <argsstring></argsstring>
+        <name>kUnsupportedKindSample</name>
+        <initializer>= true</initializer>
+        <briefdescription>
+<para>Placeholder.</para>
+        </briefdescription>
+        <detaileddescription>
+<para>Placeholder.</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="unsupported_kind.hpp" line="24" column="23" bodyfile="unsupported_kind.hpp" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="unsupported_kind.hpp" line="18" column="26"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,14 @@
+= Test sub-document
+
+Sub-document document text.
+
+== Sub-document chapter [[sub-document-chapter]]
+
+include::BUILD_DIR/fragments/cpp-classasciidoxy_1_1geometry_1_1_coordinate.adoc[leveloffset=+1]
+
+Reference to main-document:
+<<.asciidoxy.multifile_test.input.adoc#main-document-chapter,Reference to main-document>>
+
+Link to sub-document API:
+xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[Severity]
+

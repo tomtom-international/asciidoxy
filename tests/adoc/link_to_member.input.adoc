@@ -1,0 +1,9 @@
+= Test document
+
+This is some generic text.
+
+A link: ${api.link("asciidoxy::geometry::Coordinate::Altitude")}
+
+The class reference:
+
+${api.insert("asciidoxy::geometry::Coordinate")}

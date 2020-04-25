@@ -1,0 +1,14 @@
+
+
+= [[cpp-traffic-event_8hpp_1aadd656922dd873c8ab5de7c891b557e1,asciidoxy::traffic::TpegCauseCode]]TpegCauseCode
+
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+using TpegCauseCode = int
+----
+
+
+
+

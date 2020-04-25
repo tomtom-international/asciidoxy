@@ -1,0 +1,9 @@
+= Test sub-document in table
+
+Sub-document document text.
+
+== Sub-document in table [[sub-document-in-table]]
+
+Reference to main-document:
+${api.cross_document_ref("../multifile_test.input.adoc", "main-document-chapter",
+                         link_text="Reference to main-document")}

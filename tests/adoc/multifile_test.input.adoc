@@ -1,0 +1,31 @@
+= Test document
+
+Main document text.
+
+== Main document chapter [[main-document-chapter]]
+
+${api.insert_enum("asciidoxy::traffic::TrafficEvent::Severity")}
+
+Reference to sub-document:
+${api.cross_document_ref("sub_directory/multifile_subdoc_test.input.adoc", "sub-document-chapter",
+                         link_text="Reference to sub-document")}
+
+Link to sub-document API:
+${api.link("asciidoxy::geometry::Coordinate")}
+
+Link to sub-document API member:
+${api.link("asciidoxy::geometry::Coordinate::IsValid")}
+
+${api.include("sub_directory/multifile_subdoc_test.input.adoc", link_text="Sub-document",
+              link_prefix="== ")}
+
+Reference in a table to a sub-document:
+|---
+| Sub-document ID | Title
+| ${api.cross_document_ref("sub_directory/multifile_subdoc_in_table_test.input.adoc",
+                           "sub-document-in-table", link_text="Sub-document in table")}
+| Sub document in a table
+|---
+
+Hidden link in multi-page, embedded in single-page:
+${api.include("sub_directory/multifile_subdoc_in_table_test.input.adoc", multi_page_link=False)}

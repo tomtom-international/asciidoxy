@@ -1,0 +1,57 @@
+
+
+= [[java-interfacecom_1_1asciidoxy_1_1system_1_1_service,Service]]Service
+
+
+[source,java,subs="-specialchars,macros+"]
+----
+interface com.asciidoxy.system.Service
+----
+Base class for services.
+
+
+
+[cols='h,5a']
+|===
+
+|*Methods*
+|
+`xref:java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c[void Start()]`::
+Start the service.
+`xref:java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1ad536a549ed8f7722de70a708fb415bcc[void Stop()]`::
+Stop the service.
+
+|===
+
+== Members
+[[java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c,Start]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+void Start()
+----
+
+Start the service.
+
+
+
+[cols='h,5a']
+|===
+|===
+'''
+[[java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1ad536a549ed8f7722de70a708fb415bcc,Stop]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+void Stop()
+----
+
+Stop the service.
+
+
+
+[cols='h,5a']
+|===
+|===
+'''
+

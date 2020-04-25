@@ -1,0 +1,37 @@
+= Test document
+
+Main document text.
+
+== Main document chapter [[main-document-chapter]]
+
+include::BUILD_DIR/fragments/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9.adoc[leveloffset=+1]
+
+Reference to sub-document:
+<<sub_directory/multifile_subdoc_test.input.adoc#sub-document-chapter,Reference to sub-document>>
+
+Link to sub-document API:
+xref:sub_directory/multifile_subdoc_test.input.adoc#cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]
+
+Link to sub-document API member:
+xref:sub_directory/multifile_subdoc_test.input.adoc#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[IsValid]
+
+== <<sub_directory/multifile_subdoc_test.input.adoc#,Sub-document>>
+
+Reference in a table to a sub-document:
+|---
+| Sub-document ID | Title
+| <<sub_directory/multifile_subdoc_in_table_test.input.adoc#sub-document-in-table,Sub-document in table>>
+| Sub document in a table
+|---
+
+Hidden link in multi-page, embedded in single-page:
+
+
+[frame=none, grid=none, cols="<.^,^.^,>.^"]
+|===
+|
+
+|
+
+|<<sub_directory/multifile_subdoc_test.input.adoc#,Next>>
+|===

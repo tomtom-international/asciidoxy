@@ -1,0 +1,5 @@
+= Test document
+
+The class reference:
+
+${api.insert("asciidoxy::positioning::Positioning")}

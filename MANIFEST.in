@@ -1,0 +1,11 @@
+include CHANGELOG.adoc
+include LICENSE
+include README.adoc
+include version.txt
+
+recursive-include tests *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-include asciidoxy *.mako
+
+recursive-include docs *.adoc *.jpg *.png *.gif

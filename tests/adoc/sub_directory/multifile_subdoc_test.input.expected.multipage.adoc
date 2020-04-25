@@ -1,0 +1,23 @@
+= Test sub-document
+
+Sub-document document text.
+
+== Sub-document chapter [[sub-document-chapter]]
+
+include::BUILD_DIR/fragments/cpp-classasciidoxy_1_1geometry_1_1_coordinate.adoc[leveloffset=+1]
+
+Reference to main-document:
+<<../multifile_test.input.adoc#main-document-chapter,Reference to main-document>>
+
+Link to sub-document API:
+xref:../multifile_test.input.adoc#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[Severity]
+
+[frame=none, grid=none, cols="<.^,^.^,>.^"]
+|===
+|<<../multifile_test.input.adoc#,Prev>>
+
+|<<../multifile_test.input.adoc#,Up>> +
+<<../multifile_test.input.adoc#,Home>>
+
+|<<multifile_subdoc_in_table_test.input.adoc#,Next>>
+|===

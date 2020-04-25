@@ -1,0 +1,6 @@
+= Test document
+
+${api.insert("asciidoxy::geometry::Coordinate")}
+
+${api.insert("asciidoxy::geometry::Coordinate")}
+

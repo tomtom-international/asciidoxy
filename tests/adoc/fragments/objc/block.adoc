@@ -1,0 +1,15 @@
+
+
+= [[objc-_a_d_traffic_event_8h_1a38c6f0aeef5e08b2f836e0dc35b02a15,OnTrafficEventCallback]]OnTrafficEventCallback
+
+
+
+[source,objectivec,subs="-specialchars,macros+"]
+----
+typedef void(^ OnTrafficEventCallback) (id&lt;xref:objc-protocol_a_d_traffic_event-p[ADTrafficEvent]&gt;)
+----
+Callback for receiving new traffic events.
+
+
+
+

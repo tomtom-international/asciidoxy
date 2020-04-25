@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.11">
+  <compounddef id="classtomtom_1_1navkit2_1_1place_1_1_coordinate" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>Coordinate</compoundname>
+    <briefdescription>
+<para>Class to hold information about a coordinate. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" line="26" column="1" bodyfile="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" bodystart="26" bodyend="133"/>
+  </compounddef>
+  <compounddef id="interfacetomtom_1_1navkit2_1_1place_1_1_coordinate" kind="interface" language="C++" prot="public" final="yes">
+    <compoundname>Coordinate</compoundname>
+    <briefdescription>
+<para>Class to hold information about a coordinate. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" line="26" column="1" bodyfile="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" bodystart="26" bodyend="133"/>
+  </compounddef>
+  <compounddef id="classtomtom_1_1navkit2_1_1place_1_1_boundingbox" kind="class" language="Java" prot="public" final="yes">
+    <compoundname>BoundingBox</compoundname>
+    <briefdescription>
+<para>Class to hold information about a coordinate. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" line="26" column="1" bodyfile="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" bodystart="26" bodyend="133"/>
+  </compounddef>
+  <compounddef id="classtomtom_1_1navkit2_1_1place_1_1_boundingbox2" kind="class" language="Objective-C" prot="public" final="yes">
+    <compoundname>BoundingBox</compoundname>
+    <briefdescription>
+<para>Class to hold information about a coordinate. </para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" line="26" column="1" bodyfile="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" bodystart="26" bodyend="133"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,65 @@
+
+
+= [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event,asciidoxy::traffic::TrafficEvent]]TrafficEvent
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;traffic_event.hpp&gt;
+
+class asciidoxy::traffic::TrafficEvent
+----
+Information about a traffic event.
+
+
+
+[cols='h,5a']
+|===
+
+|*Enclosed types*
+|
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[Severity]`::
+Severity scale for traffic events.
+`xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]`::
+Details about a traffic event.
+
+|*Constructors*
+|
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41[TrafficEvent()]`::
+Default constructor.
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc[TrafficEvent(TrafficEventData)]`::
+Construct a traffic event from data.
+
+|*Methods*
+|
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28[const TrafficEventData & Data()]`::
+Get the traffic event details.
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b[bool Update(int, int)]`::
+Update the traffic event data.
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf[std::shared_ptr&lt;TrafficEventData&gt; SharedData()]`::
+Get a shared pointer to a copy of the data.
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17[long CalculateDelay()]`::
+Calculate the current delay.
+
+|===
+
+include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9.adoc[leveloffset=+1]
+
+== Members
+
+include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17.adoc[leveloffset=+1]
+'''
+
+
+include::DIRECTORY/cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data.adoc[leveloffset=+1]
+

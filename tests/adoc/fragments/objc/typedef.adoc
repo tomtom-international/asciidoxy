@@ -1,0 +1,14 @@
+
+
+= [[objc-_a_d_traffic_event_8h_1a929385fc78158cf2be0d44416a5df884,TpegCauseCode]]TpegCauseCode
+
+
+
+[source,objectivec,subs="-specialchars,macros+"]
+----
+typedef NSInteger TpegCauseCode
+----
+Type for TPEG cause codes.
+
+
+

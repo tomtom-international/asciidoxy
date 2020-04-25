@@ -1,0 +1,6 @@
+= Test document
+
+This is some generic text.
+
+A link: ${api.link("asciidoxy::geometry::Coordinate")}
+
