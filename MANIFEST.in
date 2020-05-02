@@ -1,7 +1,6 @@
-include CHANGELOG.adoc
+include CHANGELOG.md
 include LICENSE
-include README.adoc
-include version.txt
+include README.md
 
 recursive-include tests *
 recursive-exclude * __pycache__
