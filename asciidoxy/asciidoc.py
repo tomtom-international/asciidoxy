@@ -27,6 +27,7 @@ from typing import Collection, Dict, List, MutableMapping, NamedTuple, Optional,
 from . import templates
 from .api_reference import AmbiguousLookupError, ApiReference
 from .doxygen_xml import DoxygenXmlParser, safe_language_tag
+from .generator.filters import FilterSpec, InsertionFilter
 from .model import Member, ReferableElement, json_repr
 
 logger = logging.getLogger(__name__)
@@ -242,6 +243,7 @@ class Context(object):
                                 documentation.
         namespace:          Current namespace to use when looking up references.
         language:           Default language to use when looking up references.
+        insert_filter:      Filter used to select members of elements to insert.
         preprocessing_run:  True when preprocessing. During preprocessing no files are generated.
         reference:          API reference information.
         linked:             All elements to which links are inserted in the documentation.
@@ -255,6 +257,7 @@ class Context(object):
 
     namespace: Optional[str] = None
     language: Optional[str] = None
+    insert_filter: InsertionFilter
 
     preprocessing_run: bool
 
@@ -270,6 +273,8 @@ class Context(object):
         self.base_dir = base_dir
         self.build_dir = build_dir
         self.fragment_dir = fragment_dir
+
+        self.insert_filter = InsertionFilter()
 
         self.preprocessing_run = True
 
@@ -308,6 +313,7 @@ class Context(object):
         sub.linked = self.linked
         sub.inserted = self.inserted
         sub.in_to_out_file_map = self.in_to_out_file_map
+        sub.insert_filter = self.insert_filter
 
         return sub
 
@@ -400,28 +406,106 @@ class Api(object):
             raise ReferenceNotFoundError(name, lang=lang, kind=kind)
         return element
 
+    def filter(self,
+               *,
+               members: Optional[FilterSpec] = None,
+               inner_classes: Optional[FilterSpec] = None,
+               enum_values: Optional[FilterSpec] = None,
+               exceptions: Optional[FilterSpec] = None) -> str:
+        """Set a default filter used when inserting API reference documentation.
+
+        The filter controls which members of an element are inserted. Only the members matching the
+        filter are inserted, the others are ignored. Depending on the exact type of element
+        inserted, its members, inner classes, enum values and/or exceptions can be filtered.
+
+        A filter specification is either a single string, a list of strings, or a dictionary.
+
+        A single string is the same as a list of strings with just one item.
+
+        A list of strings defines a set of regular expressions to be applied to the name. They are
+        applied in the order they are specified. If the element is still included after all filters
+        have been applied, it is inserted.
+
+        Each string can have the following value:
+        * `NONE`: Exclude all elements.
+        * `ALL`: Include all elements.
+        * `<regular expression>` or `+<regular expression`: Include elements that match the regular
+          expression.
+        * `-<regular expression>`: Exclude elements that match the regular expression.
+
+        If the first string is an include regular expression, an implicit `NONE` is prepended, if
+        the first string is an exclude regular expression, an implicit `ALL` is prepended.
+
+        Some filters support filtering on other properties than the name. By default they only
+        filter on the name. To filter the other properties use a dictionary, where the key is the
+        name of the property, and the value is a string or list of strings with the filter.
+
+        Args:
+            members:       Filter to apply to members of a compound. Supports filtering on `name`,
+                               `kind`, and `prot`ection level.
+            inner_classes: Filter to apply to inner classes of a compound. Supports filtering on
+                               `name` and `kind`.
+            enum_values:   Filter to apply to enum values of a compound or member. Supports
+                               filtering on `name` only.
+            exceptions:    Filter to apply to exceptions thrown by a member. Supports filtering on
+                               the `name` of the exception type only.
+
+        Returns:
+            An empty string.
+        """
+        self._context.insert_filter = InsertionFilter(members, inner_classes, enum_values,
+                                                      exceptions)
+        return ""
+
     def insert(self,
                name: str,
                *,
                kind: Optional[str] = None,
                lang: Optional[str] = None,
+               members: Optional[FilterSpec] = None,
+               inner_classes: Optional[FilterSpec] = None,
+               enum_values: Optional[FilterSpec] = None,
+               exceptions: Optional[FilterSpec] = None,
+               ignore_global_filter: bool = False,
                leveloffset: str = "+1") -> str:
         """Insert API reference documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
         disambiguate.
 
+        For the supported format of the filter arguments see `Api.filter()`.
+
         Args:
-            name:        Fully qualified name of the object to insert.
-            kind:        Kind of object to generate reference documentation for.
-            lang:        Programming language of the object.
-            leveloffset: Offset of the top header of the inserted text from the top level header
-                             of the including document.
+            name:                 Fully qualified name of the object to insert.
+            kind:                 Kind of object to generate reference documentation for.
+            lang:                 Programming language of the object.
+            members:              Filter to apply to members of a compound. Supports filtering on
+                                      `name`, `kind`, and `prot`ection level.
+            inner_classes:        Filter to apply to inner classes of a compound. Supports
+                                      filtering on `name` and `kind`.
+            enum_values:          Filter to apply to enum values of a compound or member. Supports
+                                      filtering on `name` only.
+            exceptions:           Filter to apply to exceptions thrown by a member. Supports
+                                      filtering on the `name` of the exception type only.
+            ignore_global_filter: True to ignore the global filter set with `Api.filter()`. False
+                                      to apply the filters on top of the global filter.
+            leveloffset:          Offset of the top header of the inserted text from the top level
+                                      header of the including document.
 
         Returns:
             AsciiDoc text to include in the document.
         """
-        return self.insert_fragment(self.find_element(name, kind=kind, lang=lang), leveloffset)
+        if ignore_global_filter:
+            insert_filter = InsertionFilter(members, inner_classes, enum_values, exceptions)
+        elif (members is not None or inner_classes is not None or enum_values is not None
+              or exceptions is not None):
+            insert_filter = self._context.insert_filter.extend(members, inner_classes, enum_values,
+                                                               exceptions)
+        else:
+            insert_filter = self._context.insert_filter
+
+        return self.insert_fragment(self.find_element(name, kind=kind, lang=lang), insert_filter,
+                                    leveloffset)
 
     def link(self,
              name: str,
@@ -516,13 +600,17 @@ class Api(object):
         return (f"<<{referenced_file_name}#{anchor},"
                 f"{link_text if link_text is not None else anchor}>>")
 
-    def insert_fragment(self, element, leveloffset: str = "+1") -> str:
+    def insert_fragment(self,
+                        element,
+                        insert_filter: InsertionFilter,
+                        leveloffset: str = "+1") -> str:
         """Generate and insert a documentation fragment.
 
         Args:
-            element:     Python representation of the element to insert.
-            leveloffset: Offset of the top header of the inserted text from the top level header
-                             of the including document.
+            element:          Python representation of the element to insert.
+            insertion_filter: Filter for members to insert.
+            leveloffset:      Offset of the top header of the inserted text from the top level
+                                  header of the including document.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -533,6 +621,7 @@ class Api(object):
 
         rendered_doc = self._template(element.language,
                                       element.kind).render(element=element,
+                                                           insert_filter=insert_filter,
                                                            api_context=self._context,
                                                            api=self)
 

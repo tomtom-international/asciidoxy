@@ -105,6 +105,14 @@ def _check_inserted_file_contains(inserted_adoc, expected):
     assert expected in content
 
 
+def _check_inserted_file_does_not_contain(inserted_adoc, expected):
+    file_name = Path(inserted_adoc[9:-16])
+    assert file_name.is_file()
+
+    content = file_name.read_text(encoding="UTF-8")
+    assert expected not in content
+
+
 def test_insert_class(api):
     result = api.insert("asciidoxy::geometry::Coordinate")
     assert result.startswith("include::")
@@ -173,6 +181,7 @@ def test_insert_cpp_function(api):
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "bool IsValid()")
 
+
 def test_insert_with_default_language(api):
     with pytest.raises(AmbiguousReferenceError) as exception:
         api.insert("Logger")
@@ -224,6 +233,7 @@ def test_insert_error_when_reference_not_found(api):
     with pytest.raises(ReferenceNotFoundError):
         api.insert("asciidoxy::geometry::Sphere")
 
+
 @pytest.mark.parametrize("xml_data,api_reference_set", [(Path(__file__).parent / "data", [""])])
 def test_insert_error_when_kind_not_supported(api):
     with pytest.raises(TemplateMissingError):
@@ -249,6 +259,30 @@ def test_insert_tracks_all_references(api):
     linked_names = [link.name for link in api._context.linked]
     assert "Coordinate" in linked_names
     assert "TrafficEvent" in linked_names
+
+
+def test_insert_class__global_filter_members(api):
+    api.filter(members="-SharedData")
+    result = api.insert("asciidoxy::traffic::TrafficEvent")
+    _check_inserted_file_does_not_contain(result, "SharedData")
+    _check_inserted_file_contains(result, "Update")
+    _check_inserted_file_contains(result, "CalculateDelay")
+
+
+def test_insert_class__global_filter_members__ignore(api):
+    api.filter(members="-SharedData")
+    result = api.insert("asciidoxy::traffic::TrafficEvent", ignore_global_filter=True)
+    _check_inserted_file_contains(result, "SharedData")
+    _check_inserted_file_contains(result, "Update")
+    _check_inserted_file_contains(result, "CalculateDelay")
+
+
+def test_insert_class__global_filter_members__extend(api):
+    api.filter(members="-SharedData")
+    result = api.insert("asciidoxy::traffic::TrafficEvent", members="-Update")
+    _check_inserted_file_does_not_contain(result, "SharedData")
+    _check_inserted_file_does_not_contain(result, "Update")
+    _check_inserted_file_contains(result, "CalculateDelay")
 
 
 def test_link_class(api):
@@ -497,8 +531,8 @@ def test_process_adoc_multi_file(warnings_are_errors, build_dir, single_and_mult
     assert (
         output_files[main_doc_file] == main_doc_file.with_name(f".asciidoxy.{main_doc_file.name}"))
     assert (output_files[sub_doc_file] == sub_doc_file.with_name(f".asciidoxy.{sub_doc_file.name}"))
-    assert (output_files[sub_doc_in_table_file] ==
-            sub_doc_file.with_name(f".asciidoxy.{sub_doc_in_table_file.name}"))
+    assert (output_files[sub_doc_in_table_file] == sub_doc_file.with_name(
+        f".asciidoxy.{sub_doc_in_table_file.name}"))
     for input_file, output_file in output_files.items():
         assert output_file.is_file()
         expected_output_file = input_file.with_suffix(
@@ -508,9 +542,9 @@ def test_process_adoc_multi_file(warnings_are_errors, build_dir, single_and_mult
         assert content == expected_output_file.read_text()
 
 
-@pytest.mark.parametrize("test_file_name",
-                         ["dangling_link", "dangling_cross_doc_ref", "double_insert",
-                          "dangling_link_in_insert"])
+@pytest.mark.parametrize(
+    "test_file_name",
+    ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
 def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_page, adoc_data,
                                    xml_data):
     from asciidoxy.asciidoc import multi_page

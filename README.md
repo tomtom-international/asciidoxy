@@ -267,22 +267,69 @@ ${api.insert_function("MyNamespace::FreeFunction", lang="c++")}
 
 Use the `insert` methods to insert API reference documentation at the current location.
 
-  - `name`  
+  - `name`
     Fully qualified name of the element to insert.
 
-  - `lang`  
+  - `lang`
     Name of the programming language.
 
-  - `kind`  
+  - `kind`
     Kind of element to insert.
 
-  - `leveloffset`  
+  - `leveloffset`
     Offset for the headers in the reference from the top level of the current file. Defaults to +1.
 
 Trying to insert an unknown element will result in an error.
 
 When not specifying the language and kind, AsciiDoxy will try to find the element by name, and
 deduce the kind and language. If there are multiple matching elements, an error is raised.
+
+### Filtering what is inserted
+
+By default `api.insert` inserts all contents of the API element. You can control which members,
+inner classes, enum values, and exceptions get inserted for every call to `api.insert` or for a
+specific call.
+
+To apply a filter for all calls use:
+
+``` python
+${api.filter([members=<filter_spec>,]
+             [inner_classes=<filter_spec>,]
+             [enum_values=<filter_spec>,]
+             [exceptions=<filter_spec>])
+```
+
+For filtering only on a specific element:
+
+``` python
+${api.insert(...,
+             [members=<filter_spec>,]
+             [inner_classes=<filter_spec>,]
+             [enum_values=<filter_spec>,]
+             [exceptions=<filter_spec>])
+```
+
+A filter specification is either a single string, a list of strings, or a dictionary.
+
+A single string is the same as a list of strings with just one item.
+
+A list of strings defines a set of regular expressions to be applied to the name. They are
+applied in the order they are specified. If the element is still included after all filters
+have been applied, it is inserted.
+
+Each string can have the following value:
+* `NONE`: Exclude all elements.
+* `ALL`: Include all elements.
+* `<regular expression>` or `+<regular expression`: Include elements that match the regular
+  expression.
+* `-<regular expression>`: Exclude elements that match the regular expression.
+
+If the first string is an include regular expression, an implicit `NONE` is prepended, if
+the first string is an exclude regular expression, an implicit `ALL` is prepended.
+
+Some filters support filtering on other properties than the name. By default they only
+filter on the name. To filter the other properties use a dictionary, where the key is the
+name of the property, and the value is a string or list of strings with the filter.
 
 ### Linking to API reference
 
@@ -302,19 +349,19 @@ ${api.link_class("MyNamespace::MyClass", lang="c++")}
 Insert a link to an API reference element. By default the short name of the element is used as the
 text of the link.
 
-  - `name`  
+  - `name`
     Fully qualified name of the element to insert.
 
-  - `lang`  
+  - `lang`
     Name of the programming language.
 
-  - `kind`  
+  - `kind`
     Kind of element to insert.
 
-  - `text`  
+  - `text`
     Alternative text to use for the link.
 
-  - `full_name`  
+  - `full_name`
     Use the fully qualified name of the referenced element.
 
 By default a warning is shown if the element is unknown, or is not inserted in the same document
@@ -377,17 +424,17 @@ another place where the included document cannot be embedded. In this case, use
 setting `multi_page_link` to `False`. The included document will still be processed using Mako, but
 there will be no link.
 
-  - `file_name`  
+  - `file_name`
     Relative or absolute path to the file to include.
 
-  - `leveloffset`  
+  - `leveloffset`
     Offset for the headers in the included file from the top level of the current file. Defaults to
     +1.
 
 ### Cross-referencing sections in other AsciiDoc files
 
     ${api.cross_document_ref(<file_name>, anchor=<section-anchor>[, link_text=<text>])}
-    
+
     # Examples:
     ${api.cross_document_ref("component/component_a.adoc", anchor="section-1")}
     ${api.cross_document_ref("component/component_a.adoc", anchor="section 1", link_text="Component A - Section 1")}
@@ -410,7 +457,7 @@ ${api.language(None)}
 Set the default language for all following commands. Other languages will be ignored, unless
 overridden with a `lang` argument. This setting also applies to all files included afterwards.
 
-  - `language`  
+  - `language`
     Language to use as default, or `None` to reset.
 
 ### Starting namespace
@@ -431,7 +478,7 @@ Current support is not very smart yet. It only looks for the concatenation of na
 and if not found it searches again for just name. It does not understand namespace separators yet,
 and will not try to find elements on other levels in the same namespace tree.
 
-  - `namespace`  
+  - `namespace`
     Namespace prefix to search first, or `None` to reset.
 
 ## Development
@@ -544,3 +591,7 @@ providing the path to the version of Doxygen to use.
 A separate directory is created for each version of Doxygen. The tests will run on each directory.
 
 </div>
+
+The expectations for the tests in `test_templates.py` can be easily regenerated when templates have
+been changed. Run `pytest --update-expected-results` to overwrite the current expectations with the
+new output. Make sure to check the diff to see if there are no unexpected side effects!

@@ -39,40 +39,40 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(public_simple_enclosed_types(element)):
+% if has(public_simple_enclosed_types(element, insert_filter)):
 |*Enclosed types*
 |
-% for enclosed in public_simple_enclosed_types(element):
+% for enclosed in public_simple_enclosed_types(element, insert_filter):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_properties(element)):
+% if has(public_properties(element, insert_filter)):
 |*Properties*
 |
-% for prop in public_properties(element):
+% for prop in public_properties(element, insert_filter):
 `xref:${prop.id}[${prop.name}]`::
 ${prop.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_class_methods(element)):
+% if has(public_class_methods(element, insert_filter)):
 |*Class methods*
 |
-% for method in public_class_methods(element):
+% for method in public_class_methods(element, insert_filter):
 `xref:${method.id}[+ ${method.name}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_methods(element)):
+% if has(public_methods(element, insert_filter)):
 |*Methods*
 |
-% for method in public_methods(element):
+% for method in public_methods(element, insert_filter):
 `xref:${method.id}[- ${method.name}]`::
 ${method.brief}
 % endfor
@@ -81,14 +81,14 @@ ${method.brief}
 |===
 
 ############################################################################ Simple inner types ##
-% for enclosed in public_simple_enclosed_types(element):
-${api.insert_fragment(enclosed)}
+% for enclosed in public_simple_enclosed_types(element, insert_filter):
+${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 
 == Members
 
 ##################################################################################### Properties ##
-% for prop in public_properties(element):
+% for prop in public_properties(element, insert_filter):
 [[${prop.id},${prop.name}]]
 ${api_context.insert(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
@@ -103,7 +103,7 @@ ${prop.description}
 '''
 % endfor
 ################################################################################## Class methods ##
-% for method in public_class_methods(element):
+% for method in public_class_methods(element, insert_filter):
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,objectivec,subs="-specialchars,macros+"]
@@ -149,7 +149,7 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in public_methods(element):
+% for method in public_methods(element, insert_filter):
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,objectivec,subs="-specialchars,macros+"]

@@ -1,0 +1,69 @@
+
+
+= [[objc-interface_a_d_coordinate,ADCoordinate]]ADCoordinate
+
+
+[source,objectivec,subs="-specialchars,macros+"]
+----
+#import &lt;ADCoordinate.h&gt;
+
+@interface ADCoordinate
+----
+Class to hold information about a coordinate.
+
+A coordinate has a latitude, longitude, and an altitude.
+
+[cols='h,5a']
+|===
+
+|*Properties*
+|
+`xref:objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94[latitude]`::
+The latitude in degrees.
+`xref:objc-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e[longitude]`::
+The longitude in degrees.
+`xref:objc-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2[altitude]`::
+The altitude in meters.
+
+|===
+
+
+== Members
+
+[[objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]
+
+[source,objectivec,subs="-specialchars,macros+"]
+----
+@property() CLLocationDegrees latitude
+----
+
+The latitude in degrees.
+
+
+
+'''
+[[objc-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e,longitude]]
+
+[source,objectivec,subs="-specialchars,macros+"]
+----
+@property() CLLocationDegrees longitude
+----
+
+The longitude in degrees.
+
+
+
+'''
+[[objc-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2,altitude]]
+
+[source,objectivec,subs="-specialchars,macros+"]
+----
+@property() CLLocationDistance altitude
+----
+
+The altitude in meters.
+
+
+
+'''
+

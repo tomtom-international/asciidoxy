@@ -40,49 +40,49 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(public_simple_enclosed_types(element)) or has(public_complex_enclosed_types(element)):
+% if (has(public_simple_enclosed_types(element, insert_filter)) or has(public_complex_enclosed_types(element, insert_filter))):
 |*Enclosed types*
 |
-% for enclosed in chain(public_simple_enclosed_types(element), public_complex_enclosed_types(element)):
+% for enclosed in chain(public_simple_enclosed_types(element, insert_filter), public_complex_enclosed_types(element, insert_filter)):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constructors(element)):
+% if has(public_constructors(element, insert_filter)):
 |*Constructors*
 |
-% for constructor in public_constructors(element):
+% for constructor in public_constructors(element, insert_filter):
 `xref:${constructor.id}[${constructor.name}${type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_variables(element)):
+% if has(public_variables(element, insert_filter)):
 |*Variables*
 |
-% for variable in public_variables(element):
+% for variable in public_variables(element, insert_filter):
 `xref:${variable.id}[${variable.name}]`::
 ${variable.brief}
 % endfor
 % endif
 ###################################################################################################
-% if has(public_static_methods(element)):
+% if has(public_static_methods(element, insert_filter)):
 |*Static methods*
 |
-% for method in public_static_methods(element):
+% for method in public_static_methods(element, insert_filter):
 `xref:${method.id}[static ${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_methods(element)):
+% if has(public_methods(element, insert_filter)):
 |*Methods*
 |
-% for method in public_methods(element):
+% for method in public_methods(element, insert_filter):
 `xref:${method.id}[${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
 ${method.brief}
 % endfor
@@ -91,19 +91,19 @@ ${method.brief}
 |===
 
 ##################################################################### Enclosed enums and typedefs ##
-% for enclosed in public_simple_enclosed_types(element):
-${api.insert_fragment(enclosed)}
+% for enclosed in public_simple_enclosed_types(element, insert_filter):
+${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 
 == Members
 
 ################################################################################### Constructors ##
-% for constructor in public_constructors(element):
-${api.insert_fragment(constructor)}
+% for constructor in public_constructors(element, insert_filter):
+${api.insert_fragment(constructor, insert_filter)}
 '''
 % endfor
 ###################################################################################### Variables ##
-% for variable in public_variables(element):
+% for variable in public_variables(element, insert_filter):
 [[${variable.id},${variable.name}]]
 ${api_context.insert(variable)}
 
@@ -119,18 +119,18 @@ ${variable.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in public_static_methods(element):
-${api.insert_fragment(method)}
+% for method in public_static_methods(element, insert_filter):
+${api.insert_fragment(method, insert_filter)}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in public_methods(element):
-${api.insert_fragment(method)}
+% for method in public_methods(element, insert_filter):
+${api.insert_fragment(method, insert_filter)}
 '''
 % endfor
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in public_complex_enclosed_types(element):
-${api.insert_fragment(enclosed)}
+% for enclosed in public_complex_enclosed_types(element, insert_filter):
+${api.insert_fragment(enclosed, insert_filter)}
 % endfor

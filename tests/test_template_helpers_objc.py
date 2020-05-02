@@ -19,6 +19,7 @@ import pytest
 
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.asciidoc import Context, DocumentTreeNode
+from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Member, ReturnValue, Parameter, TypeRef
 from asciidoxy.templates.objc.helpers import (public_methods, public_class_methods,
                                               public_properties, public_simple_enclosed_types,
@@ -92,27 +93,75 @@ def objc_class():
     return compound
 
 
-def test_public_methods(objc_class):
-    result = [m.name for m in public_methods(objc_class)]
+def test_public_methods__no_filter(objc_class):
+    result = [m.name for m in public_methods(objc_class, InsertionFilter())]
+    assert sorted(result) == sorted(["NS_UNAVAILABLE", "PublicMethod"])
+
+
+def test_public_methods__filter_match(objc_class):
+    result = [m.name for m in public_methods(objc_class, InsertionFilter(members="-NS_"))]
     assert sorted(result) == sorted(["PublicMethod"])
 
 
-def test_public_class_methods(objc_class):
-    result = [m.name for m in public_class_methods(objc_class)]
+def test_public_methods__filter_no_match(objc_class):
+    result = [m.name for m in public_methods(objc_class, InsertionFilter(members="NONE"))]
+    assert len(result) == 0
+
+
+def test_public_class_methods__no_filter(objc_class):
+    result = [m.name for m in public_class_methods(objc_class, InsertionFilter())]
     assert sorted(result) == sorted(["PublicStaticMethod"])
 
 
-def test_public_properties(objc_class):
-    result = [m.name for m in public_properties(objc_class)]
+def test_public_class_methods__filter_match(objc_class):
+    result = [m.name for m in public_class_methods(objc_class, InsertionFilter(members="Public"))]
+    assert sorted(result) == sorted(["PublicStaticMethod"])
+
+
+def test_public_class_methods__filter_no_match(objc_class):
+    result = [m.name for m in public_class_methods(objc_class, InsertionFilter(members="NONE"))]
+    assert len(result) == 0
+
+
+def test_public_properties__no_filter(objc_class):
+    result = [m.name for m in public_properties(objc_class, InsertionFilter())]
     assert result == ["PublicProperty"]
 
 
-def test_public_simple_enclosed_types(objc_class):
-    result = [m.name for m in public_simple_enclosed_types(objc_class)]
+def test_public_properties__filter_match(objc_class):
+    result = [m.name for m in public_properties(objc_class, InsertionFilter(members="Public"))]
+    assert result == ["PublicProperty"]
+
+
+def test_public_properties__filter_no_match(objc_class):
+    result = [m.name for m in public_properties(objc_class, InsertionFilter(members="NONE"))]
+    assert len(result) == 0
+
+
+def test_public_simple_enclosed_types__no_filter(objc_class):
+    result = [m.name for m in public_simple_enclosed_types(objc_class, InsertionFilter())]
     assert sorted(result) == sorted([
         "PublicEnum", "ProtectedEnum", "PrivateEnum", "PublicClass", "ProtectedClass",
         "PrivateClass", "PublicProtocol", "ProtectedProtocol", "PrivateProtocol"
     ])
+
+
+def test_public_simple_enclosed_types__filter_match(objc_class):
+    result = [
+        m.name for m in public_simple_enclosed_types(objc_class, InsertionFilter(members=".*Enum"))
+    ]
+    assert sorted(result) == sorted([
+        "PublicEnum",
+        "ProtectedEnum",
+        "PrivateEnum",
+    ])
+
+
+def test_public_simple_enclosed_types__filter_no_match(objc_class):
+    result = [
+        m.name for m in public_simple_enclosed_types(objc_class, InsertionFilter(members="NONE"))
+    ]
+    assert len(result) == 0
 
 
 def test_objc_method_signature__no_params_simple_return(context):

@@ -1,0 +1,108 @@
+
+
+= [[java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event,TrafficEvent]]TrafficEvent
+
+
+[source,java,subs="-specialchars,macros+"]
+----
+class com.asciidoxy.traffic.TrafficEvent
+----
+Information about a traffic event.
+
+
+
+[cols='h,5a']
+|===
+
+|*Enclosed types*
+|
+`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]`::
+Details about a traffic event.
+
+|*Constructors*
+|
+`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e[TrafficEvent(TrafficEventData)]`::
+Construct a traffic event from data.
+
+|*Methods*
+|
+`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac[TrafficEventData Data()]`::
+Get the traffic event details.
+`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a72847da5fa4e03763f089c5d044085d4[boolean Update(int, int)]`::
+Update the traffic event data.
+
+|===
+
+== Members
+[[java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e,TrafficEvent]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+TrafficEvent(xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData] data)
+----
+
+Construct a traffic event from data.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData] data`::
+The data to contain.
+
+|===
+'''
+[[java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac,Data]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData] Data()
+----
+
+Get the traffic event details.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]`::
+Traffic event details.
+
+|===
+'''
+[[java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a72847da5fa4e03763f089c5d044085d4,Update]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+boolean Update(int cause, int delay)
+----
+
+Update the traffic event data.
+
+Verifies the new information before updating.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`int cause`::
+New TPEG cause code.
+
+`int delay`::
+New delay in seconds.
+
+| Returns
+|
+`boolean`::
+True if the update is valid.
+
+|===
+'''
+
+
+include::DIRECTORY/java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data.adoc[leveloffset=+1]
+

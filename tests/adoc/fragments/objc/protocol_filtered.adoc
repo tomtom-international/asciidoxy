@@ -1,0 +1,59 @@
+
+
+= [[objc-protocol_a_d_traffic_event-p,ADTrafficEvent]]ADTrafficEvent
+
+
+[source,objectivec,subs="-specialchars,macros+"]
+----
+#import &lt;ADTrafficEvent.h&gt;
+
+@protocol ADTrafficEvent
+----
+Information about a traffic event.
+
+
+
+[cols='h,5a']
+|===
+
+|*Methods*
+|
+`xref:objc-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262[updateWithCause:andDelay:]`::
+Update the traffic event data.
+
+|===
+
+
+== Members
+
+[[objc-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,updateWithCause:andDelay:]]
+
+[source,objectivec,subs="-specialchars,macros+"]
+----
+- (id)updateWithCause:(NSInteger)cause
+             andDelay:(NSInteger)delay;
+----
+
+Update the traffic event data.
+
+Verifies the new information before updating.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`(NSInteger)cause`::
+New TPEG cause code.
+
+`(NSInteger)delay`::
+New delay in seconds.
+
+| Returns
+|
+`id`::
+True if the update is valid.
+
+|===
+
+'''
+
