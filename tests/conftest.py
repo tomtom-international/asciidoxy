@@ -24,6 +24,18 @@ from asciidoxy.model import Compound, Member, ReturnValue, InnerTypeReference
 _xml_dir = Path(__file__).parent / "xml"
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--update-expected-results",
+        action="store_true",
+        help="Update the expected results for template tests with the current results.")
+
+
+@pytest.fixture
+def update_expected_results(request):
+    return request.config.getoption("update_expected_results")
+
+
 def _doxygen_versions():
     return [str(version.name) for version in _xml_dir.glob("*")]
 

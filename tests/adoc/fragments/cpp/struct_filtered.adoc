@@ -1,0 +1,58 @@
+
+
+= [[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,asciidoxy::traffic::TrafficEvent::TrafficEventData]]TrafficEventData
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;traffic_event.hpp&gt;
+
+struct asciidoxy::traffic::TrafficEvent::TrafficEventData
+----
+Details about a traffic event.
+
+Use the cause and delay to properly inform your users.
+
+[cols='h,5a']
+|===
+
+|*Variables*
+|
+`xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675[cause]`::
+TPEG cause code.
+`xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68[severity]`::
+Severity of the event.
+|===
+
+
+== Members
+
+[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,cause]]
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-traffic-event_8hpp_1aadd656922dd873c8ab5de7c891b557e1[TpegCauseCode] cause
+----
+
+TPEG cause code.
+
+
+
+'''
+[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,severity]]
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[Severity] severity
+----
+
+Severity of the event.
+
+
+
+'''
+
+
+

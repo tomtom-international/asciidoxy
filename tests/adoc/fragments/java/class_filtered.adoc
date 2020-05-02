@@ -1,0 +1,108 @@
+
+
+= [[java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate,Coordinate]]Coordinate
+
+
+[source,java,subs="-specialchars,macros+"]
+----
+class com.asciidoxy.geometry.Coordinate
+----
+Class to hold information about a coordinate.
+
+A coordinate has a latitude, longitude, and an altitude.
+
+[cols='h,5a']
+|===
+
+|*Constructors*
+|
+`xref:java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1ab88068a456629b5519234b68de8c375f[Coordinate()]`::
+Default constructor.
+
+|*Methods*
+|
+`xref:java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a1430fa173dddd5b12f049044f86e4244[double Latitude()]`::
+Latitude.
+`xref:java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1afe78701035a481e3ee4f5611355a54ed[double Longitude()]`::
+Longitude.
+`xref:java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a7da297a2e2933bb44990d2e61a22f4cd[double Altitude()]`::
+Altitude.
+
+|===
+
+== Members
+[[java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1ab88068a456629b5519234b68de8c375f,Coordinate]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+Coordinate()
+----
+
+Default constructor.
+
+
+
+'''
+[[java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a1430fa173dddd5b12f049044f86e4244,Latitude]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+double Latitude()
+----
+
+Latitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The latitude in degrees.
+
+|===
+'''
+[[java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1afe78701035a481e3ee4f5611355a54ed,Longitude]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+double Longitude()
+----
+
+Longitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The longitude in degrees.
+
+|===
+'''
+[[java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a7da297a2e2933bb44990d2e61a22f4cd,Altitude]]
+
+[source,java,subs="-specialchars,macros+"]
+----
+double Altitude()
+----
+
+Altitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The altitude in meters.
+
+|===
+'''
+
+
+

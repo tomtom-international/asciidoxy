@@ -544,3 +544,7 @@ providing the path to the version of Doxygen to use.
 A separate directory is created for each version of Doxygen. The tests will run on each directory.
 
 </div>
+
+The expectations for the tests in `test_templates.py` can be easily regenerated when templates have
+been changed. Run `pytest --update-expected-results` to overwrite the current expectations with the
+new output. Make sure to check the diff to see if there are no unexpected side effects!

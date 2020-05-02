@@ -1,0 +1,33 @@
+
+
+= [[cpp-classasciidoxy_1_1system_1_1_service,asciidoxy::system::Service]]Service
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;service.hpp&gt;
+
+class asciidoxy::system::Service
+----
+This is an interface for service classes.
+
+Base class for services.
+
+[cols='h,5a']
+|===
+
+|*Methods*
+|
+`xref:cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8[void Start()]`::
+Start the service.
+
+|===
+
+
+== Members
+
+include::DIRECTORY/cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8.adoc[leveloffset=+1]
+'''
+
+
+

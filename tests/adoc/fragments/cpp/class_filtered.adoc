@@ -1,0 +1,68 @@
+
+
+= [[cpp-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy::geometry::Coordinate]]Coordinate
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;coordinate.hpp&gt;
+
+class asciidoxy::geometry::Coordinate
+----
+Class to hold information about a coordinate.
+
+A coordinate has a latitude, longitude, and an altitude.
+
+[cols='h,5a']
+|===
+
+|*Constructors*
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318[Coordinate()]`::
+Default constructor.
+
+|*Methods*
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11[double Latitude()]`::
+Latitude.
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1[double Longitude()]`::
+Longitude.
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[bool IsValid()]`::
+Check if the coordinate is valid.
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a[void Update(const Coordinate &)]`::
+Update from another coordinate.
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45[void Update(std::tuple&lt;double, double, double&gt;)]`::
+Update from a tuple of latitude, longitude and altitue.
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779[void Update(std::tuple&lt;double, double&gt;)]`::
+Update from a tuple of only latitude and longitude.
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3[void Update(double, double)]`::
+Update latitude and longitude.
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891[void Update(double, double, double)]`::
+Update from separate values.
+
+|===
+
+
+== Members
+
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891.adoc[leveloffset=+1]
+'''
+
+
+

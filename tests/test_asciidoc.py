@@ -181,6 +181,7 @@ def test_insert_cpp_function(api):
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "bool IsValid()")
 
+
 def test_insert_with_default_language(api):
     with pytest.raises(AmbiguousReferenceError) as exception:
         api.insert("Logger")
@@ -231,6 +232,7 @@ def test_insert_error_when_lang_not_supported(api):
 def test_insert_error_when_reference_not_found(api):
     with pytest.raises(ReferenceNotFoundError):
         api.insert("asciidoxy::geometry::Sphere")
+
 
 @pytest.mark.parametrize("xml_data,api_reference_set", [(Path(__file__).parent / "data", [""])])
 def test_insert_error_when_kind_not_supported(api):
@@ -529,8 +531,8 @@ def test_process_adoc_multi_file(warnings_are_errors, build_dir, single_and_mult
     assert (
         output_files[main_doc_file] == main_doc_file.with_name(f".asciidoxy.{main_doc_file.name}"))
     assert (output_files[sub_doc_file] == sub_doc_file.with_name(f".asciidoxy.{sub_doc_file.name}"))
-    assert (output_files[sub_doc_in_table_file] ==
-            sub_doc_file.with_name(f".asciidoxy.{sub_doc_in_table_file.name}"))
+    assert (output_files[sub_doc_in_table_file] == sub_doc_file.with_name(
+        f".asciidoxy.{sub_doc_in_table_file.name}"))
     for input_file, output_file in output_files.items():
         assert output_file.is_file()
         expected_output_file = input_file.with_suffix(
