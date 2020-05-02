@@ -13,6 +13,16 @@ This package was created with [Cookiecutter](https://github.com/audreyr/cookiecu
 [audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage) project
 template.
 
+Before going public on GitHub, several TomTommers contributed to the internal version of AsciiDoxy.
+Many thanks to:
+- Andy Salter
+- Arkadiusz Skalski
+- Lukasz Glowcyk
+- Nebojsa Mrmak
+- Niels van der Schans
+- Robert Gernert
+- Tomasz Maj
+
 ## What does AsciiDoxy do?
 
 In essence AsciiDoxy is a preprocessor for AsciiDoc files. It looks for specific tags in these files
