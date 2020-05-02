@@ -17,7 +17,8 @@ import pytest
 
 import xml.etree.ElementTree as ET
 
-from asciidoxy.doxygen_xml import CppLanguage, DoxygenXmlParser
+from asciidoxy.doxygenparser.cpp import CppLanguage
+from asciidoxy.doxygenparser.parser import DoxygenXmlParser
 from tests.shared import assert_equal_or_none_if_empty, sub_element
 
 

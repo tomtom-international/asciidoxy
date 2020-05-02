@@ -26,7 +26,7 @@ from typing import Collection, Dict, List, MutableMapping, NamedTuple, Optional,
 
 from . import templates
 from .api_reference import AmbiguousLookupError, ApiReference
-from .doxygen_xml import DoxygenXmlParser, safe_language_tag
+from .doxygenparser import DoxygenXmlParser, safe_language_tag
 from .generator.filters import FilterSpec, InsertionFilter
 from .model import Member, ReferableElement, json_repr
 

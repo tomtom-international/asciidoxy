@@ -16,7 +16,7 @@
 import pytest
 
 from asciidoxy.api_reference import AmbiguousLookupError
-from asciidoxy.doxygen_xml import DoxygenXmlParser
+from asciidoxy.doxygenparser.parser import DoxygenXmlParser
 
 
 def test_find_complete_match(parser_factory):

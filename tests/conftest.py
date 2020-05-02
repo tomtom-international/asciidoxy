@@ -18,7 +18,7 @@ import pytest
 from pathlib import Path
 
 from asciidoxy.asciidoc import Api, Context, DocumentTreeNode
-from asciidoxy.doxygen_xml import DoxygenXmlParser
+from asciidoxy.doxygenparser import DoxygenXmlParser
 from asciidoxy.model import Compound, Member, ReturnValue, InnerTypeReference
 
 _xml_dir = Path(__file__).parent / "xml"
