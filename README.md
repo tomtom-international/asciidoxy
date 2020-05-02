@@ -1,5 +1,10 @@
 # AsciiDoxy
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
+[![pip downloads](https://img.shields.io/pypi/dm/asciidoxy)](https://pypi.org/project/asciidoxy)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/asciidoxy)](https://pypi.org/project/asciidoxy)
+[![PyPI](https://img.shields.io/pypi/v/asciidoxy)](https://pypi.org/project/asciidoxy)
+
 AsciiDoxy generates API documentation from Doxygen XML output to AsciiDoc.
 
 Supported languages:
