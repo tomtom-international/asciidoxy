@@ -12,3 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Modules for generating AsciiDoc output as part of the preprocessing."""
+
+from .asciidoc import process_adoc, Context
+from .errors import AsciiDocError
+from .filters import InsertionFilter
+
+__all__ = ["process_adoc", "AsciiDocError", "Context", "InsertionFilter"]

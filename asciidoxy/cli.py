@@ -25,8 +25,8 @@ from typing import Optional, Sequence, List
 
 from mako.exceptions import RichTraceback
 
-from .asciidoc import process_adoc, AsciiDocError
 from .collect import collect, specs_from_file, CollectError, SpecificationError
+from .generator import process_adoc, AsciiDocError
 
 
 def error(*args, **kwargs) -> None:
@@ -135,14 +135,6 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     else:
         version_file = None
 
-    if args.warnings_are_errors:
-        from . import asciidoc
-        asciidoc.warnings_are_errors = True
-
-    if args.multi_page:
-        from . import asciidoc
-        asciidoc.multi_page = True
-
     extension = output_extension(args.backend)
     if extension is None:
         logger.error(f"Backend {args.backend} is not supported.")
@@ -174,7 +166,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                                           build_dir,
                                           xml_dirs,
                                           debug=args.debug,
-                                          force_language=args.force_language)
+                                          force_language=args.force_language,
+                                          warnings_are_errors=args.warnings_are_errors,
+                                          multi_page=args.multi_page)
 
     except AsciiDocError as e:
         logger.error(f"Error while processing AsciiDoc file:\n\t{e}")

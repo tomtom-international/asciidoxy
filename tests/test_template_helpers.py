@@ -20,7 +20,7 @@ import pytest
 from unittest.mock import call, patch
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.asciidoc import Context, DocumentTreeNode
+from asciidoxy.generator.asciidoc import Context, DocumentTreeNode
 from asciidoxy.templates.helpers import (link_from_ref, print_ref, argument_list, type_list, has,
                                          type_and_name, chain)
 from asciidoxy.model import Parameter, TypeRef
@@ -37,7 +37,7 @@ def context(input_file, build_dir, fragment_dir):
 
 @pytest.fixture
 def context_mock(context):
-    with patch("asciidoxy.asciidoc.Context", wraps=context) as mock:
+    with patch("asciidoxy.generator.asciidoc.Context", wraps=context) as mock:
         yield mock
 
 

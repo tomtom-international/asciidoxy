@@ -17,8 +17,8 @@ import pytest
 
 from pathlib import Path
 
-from asciidoxy.asciidoc import Api, Context, DocumentTreeNode
 from asciidoxy.doxygenparser import DoxygenXmlParser
+from asciidoxy.generator.asciidoc import Api, Context, DocumentTreeNode
 from asciidoxy.model import Compound, Member, ReturnValue, InnerTypeReference
 
 _xml_dir = Path(__file__).parent / "xml"
@@ -191,3 +191,27 @@ def cpp_class():
     compound.inner_classes.append(inner_class_reference)
 
     return compound
+
+
+@pytest.fixture
+def warnings_are_errors(context):
+    context.warnings_are_errors = True
+    return True
+
+
+@pytest.fixture(params=[True, False], ids=["warnings-are-errors", "warnings-are-not-errors"])
+def warnings_are_and_are_not_errors(request, context):
+    context.warnings_are_errors = request.param
+    return request.param
+
+
+@pytest.fixture
+def multi_page(context):
+    context.multi_page = True
+    return True
+
+
+@pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
+def single_and_multi_page(request, context):
+    context.multi_page = request.param
+    return request.param

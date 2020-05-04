@@ -22,319 +22,19 @@ from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from pathlib import Path
-from typing import Collection, Dict, List, MutableMapping, NamedTuple, Optional, Tuple
+from typing import Collection, MutableMapping, NamedTuple, Optional
 
-from . import templates
-from .api_reference import AmbiguousLookupError, ApiReference
-from .doxygenparser import DoxygenXmlParser, safe_language_tag
-from .generator.filters import FilterSpec, InsertionFilter
-from .model import Member, ReferableElement, json_repr
+from .. import templates
+from ..api_reference import AmbiguousLookupError
+from ..doxygenparser import DoxygenXmlParser, safe_language_tag
+from ..model import ReferableElement, json_repr
+from .context import Context
+from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
+                     ReferenceNotFoundError, TemplateMissingError, UnlinkableError)
+from .filters import FilterSpec, InsertionFilter
+from .navigation import DocumentTreeNode, navigation_bar, relative_path
 
 logger = logging.getLogger(__name__)
-
-warnings_are_errors = False
-multi_page = False
-
-
-class AsciiDocError(Exception):
-    """Base class for errors while processing an AsciiDoc input file."""
-    pass
-
-
-class TemplateMissingError(AsciiDocError):
-    """There is no template to render a specific element.
-
-    Attributes:
-        lang: Language of the element missing a template.
-        kind: Kind of element missing a template
-    """
-    lang: str
-    kind: str
-
-    def __init__(self, lang: str, kind: str):
-        self.lang = lang
-        self.kind = kind
-
-    def __str__(self) -> str:
-        return f"There is no template to render a {self.kind} for {self.lang}"
-
-
-class ReferenceNotFoundError(AsciiDocError):
-    """The reference specified in the document cannot be found.
-
-    Attributes:
-        name: Name in the reference.
-        lang: Language specified in the reference.
-        kind: Element kind specified in the reference.
-    """
-    name: str
-    lang: str
-    kind: str
-
-    def __init__(self, name: str, lang: Optional[str], kind: Optional[str]):
-        self.lang = lang or "any"
-        self.kind = kind or "any"
-        self.name = name
-
-    def __str__(self) -> str:
-        return f"Cannot find {self.kind} {self.name} for {self.lang}"
-
-
-class UnlinkableError(AsciiDocError):
-    """The reference cannot be linked to.
-
-    Attributes:
-        name: Name in the reference.
-        lang: Language specified in the reference.
-        kind: Element kind specified in the reference.
-    """
-    name: str
-    lang: str
-    kind: str
-
-    def __init__(self, name: str, lang: Optional[str], kind: Optional[str]):
-        self.lang = lang or "any"
-        self.kind = kind or "any"
-        self.name = name
-
-    def __str__(self) -> str:
-        return (f"Cannot link to {self.kind} {self.name} for {self.lang}."
-                " This may be a bug/limitation in AsciiDoxy or missing information in the Doxygen"
-                " XML files.")
-
-
-class AmbiguousReferenceError(AsciiDocError):
-    """The reference matches multiple elements.
-
-    Attributes:
-        name: Name in the reference.
-        candidates: All candidates that match the search query.
-    """
-    name: str
-    candidates: List[ReferableElement]
-
-    def __init__(self, name: str, candidates: List[ReferableElement]):
-        self.name = name
-        self.candidates = candidates
-
-    def __str__(self) -> str:
-        def element_to_str(element: ReferableElement) -> str:
-            signature = ""
-            if isinstance(element, Member) and element.kind == "function":
-                signature = f"({', '.join(str(e.type) for e in element.params)})"
-
-            return f"{element.language} {element.kind} {element.full_name}{signature}"
-
-        return (f"Multiple matches for {self.name}. Please provide more details."
-                "\nMatching candidates:\n" + "\n".join(element_to_str(e) for e in self.candidates))
-
-
-class IncludeFileNotFoundError(AsciiDocError):
-    """Include file cannot be found on the file system.
-
-    Attributes:
-        file_name: Name of the file that cannot be found.
-    """
-    file_name: str
-
-    def __init__(self, file_name: str):
-        self.file_name = file_name
-
-    def __str__(self) -> str:
-        return f"Include file not found: {self.file_name}"
-
-
-class ConsistencyError(AsciiDocError):
-    """There is an inconsistency in the generated documentation.
-
-    E.g. links are dangling.
-
-    Attributes:
-        msg: Message explaining the inconsistency.
-    """
-    msg: str
-
-    def __init__(self, msg: str):
-        self.msg = msg
-
-    def __str__(self) -> str:
-        return self.msg
-
-
-class DocumentTreeNode(object):
-    """A node in the hierarchical tree of documents.
-
-    The tree represents the structure of the documentation. The node can represent either a root
-    document, an intermediate document or a leaf document.
-
-    Attributes:
-        in_file: File from which the node was read.
-        parent: Parent node in the tree.
-        children: Child nodes in the tree.
-    """
-    in_file: Path
-    parent: Optional["DocumentTreeNode"]
-    children: List["DocumentTreeNode"]
-
-    def __init__(self, in_file: Path, parent: "DocumentTreeNode" = None):
-        self.in_file = in_file
-        self.parent = parent
-        self.children = []
-
-    def preorder_traversal_next(self):
-        if len(self.children) > 0:
-            return self.children[0]
-        return self._next_subtree()
-
-    def preorder_traversal_prev(self):
-        if self.parent is None:
-            return None
-        i, this_doc = self.parent._find_child(self.in_file)
-        assert this_doc is not None
-        return self.parent.children[i - 1]._last_leaf() if i > 0 else self.parent
-
-    def find_child(self, child_in_file: Path):
-        _, child = self._find_child(child_in_file)
-        return child
-
-    def root(self):
-        return self if self.parent is None else self.parent.root()
-
-    def all_documents_in_tree(self):
-        return self.root()._all_documents_in_subtree()
-
-    def _next_subtree(self):
-        if self.parent is None:
-            return None
-        i, this_doc = self.parent._find_child(self.in_file)
-        assert this_doc is not None
-        if len(self.parent.children) > i + 1:
-            return self.parent.children[i + 1]
-        return self.parent._next_subtree()
-
-    def _last_leaf(self):
-        if len(self.children) == 0:
-            return self
-        return self.children[-1]._last_leaf()
-
-    def _find_child(self, in_file: Path) -> Tuple[int, Optional["DocumentTreeNode"]]:
-        for i, elem in enumerate(self.children):
-            if (elem.in_file == in_file):
-                return (i, elem)
-        return (0, None)
-
-    def _all_documents_in_subtree(self):
-        yield self
-        for child in self.children:
-            for d in child._all_documents_in_subtree():
-                yield d
-
-
-class Context(object):
-    """Contextual information about the document being generated.
-
-    This information is meant to be shared with all included documents as well.
-
-    Attributes:
-        base_dir:           Base directory from which the documentation is generated. Relative
-                                paths are relative to the base directory.
-        build_dir:          Directory for (temporary) build artifacts.
-        fragment_dir:       Directory containing generated fragments to be included in the
-                                documentation.
-        namespace:          Current namespace to use when looking up references.
-        language:           Default language to use when looking up references.
-        insert_filter:      Filter used to select members of elements to insert.
-        preprocessing_run:  True when preprocessing. During preprocessing no files are generated.
-        reference:          API reference information.
-        linked:             All elements to which links are inserted in the documentation.
-        inserted:           All elements that have been inserted in the documentation.
-        in_to_out_file_map: Mapping from input files for AsciiDoctor to the resulting output files.
-        current_document:   Node in the Document Tree that is currently being processed.
-    """
-    base_dir: Path
-    build_dir: Path
-    fragment_dir: Path
-
-    namespace: Optional[str] = None
-    language: Optional[str] = None
-    insert_filter: InsertionFilter
-
-    preprocessing_run: bool
-
-    reference: ApiReference
-
-    linked: List[ReferableElement]
-    inserted: MutableMapping[str, Path]
-    in_to_out_file_map: Dict[Path, Path]
-    current_document: DocumentTreeNode
-
-    def __init__(self, base_dir: Path, build_dir: Path, fragment_dir: Path, reference: ApiReference,
-                 current_document: DocumentTreeNode):
-        self.base_dir = base_dir
-        self.build_dir = build_dir
-        self.fragment_dir = fragment_dir
-
-        self.insert_filter = InsertionFilter()
-
-        self.preprocessing_run = True
-
-        self.reference = reference
-
-        self.linked = []
-        self.inserted = {}
-        self.in_to_out_file_map = {}
-        self.current_document = current_document
-
-    def insert(self, element) -> str:
-        if self.preprocessing_run:
-            if element.id in self.inserted:
-                msg = f"Duplicate insertion of {element.name}"
-                if warnings_are_errors:
-                    raise ConsistencyError(msg)
-                else:
-                    logger.warning(msg)
-            self.inserted[element.id] = self.current_document.in_file
-
-        return ""  # Prevent output in templates
-
-    def sub_context(self) -> "Context":
-        sub = Context(base_dir=self.base_dir,
-                      build_dir=self.build_dir,
-                      fragment_dir=self.fragment_dir,
-                      reference=self.reference,
-                      current_document=self.current_document)
-
-        # Copies
-        sub.namespace = self.namespace
-        sub.language = self.language
-        sub.preprocessing_run = self.preprocessing_run
-
-        # References
-        sub.linked = self.linked
-        sub.inserted = self.inserted
-        sub.in_to_out_file_map = self.in_to_out_file_map
-        sub.insert_filter = self.insert_filter
-
-        return sub
-
-    def link_to_element(self,
-                        element_id: str,
-                        link_text: str,
-                        element: Optional[ReferableElement] = None) -> str:
-        def file_part():
-            if not multi_page or element_id not in self.inserted:
-                return ""
-            containing_file = self.inserted[element_id]
-            assert containing_file is not None
-            if self.current_document.in_file != containing_file:
-                return f"{_relative_path(self.current_document.in_file, containing_file)}#"
-
-        if element is None:
-            element = self.reference.find(target_id=element_id)
-        if element is not None:
-            self.linked.append(element)
-
-        return f"xref:{file_part() or ''}{element_id}[{link_text}]"
 
 
 class Api(object):
@@ -536,7 +236,7 @@ class Api(object):
         try:
             element = self.find_element(name, kind=kind, lang=lang)
         except ReferenceNotFoundError as ref_not_found:
-            if warnings_are_errors:
+            if self._context.warnings_are_errors:
                 raise
             else:
                 logger.warning(str(ref_not_found))
@@ -544,7 +244,7 @@ class Api(object):
 
         if element.id is None:
             unlinkable = UnlinkableError(name, lang=lang, kind=kind)
-            if warnings_are_errors:
+            if self._context.warnings_are_errors:
                 raise unlinkable
             else:
                 logger.warning(str(unlinkable))
@@ -586,12 +286,12 @@ class Api(object):
                 msg = (f"Invalid cross-reference from document '{self._current_file}' "
                        f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
                        f"is not included anywhere across whole documentation tree.")
-                if warnings_are_errors:
+                if self._context.warnings_are_errors:
                     raise ConsistencyError(msg)
                 else:
                     logger.warning(msg)
 
-        if not multi_page:
+        if not self._context.multi_page:
             file_path = Path(file_name)
             if not file_path.is_absolute():
                 file_path = (self._current_file.parent / file_path).resolve().relative_to(
@@ -677,9 +377,9 @@ class Api(object):
             assert sub_context.current_document is not None
 
         out_file = _process_adoc(file_path, sub_context)
-        if multi_page:
+        if self._context.multi_page:
             if multi_page_link:
-                referenced_file = _relative_path(self._current_file, file_path)
+                referenced_file = relative_path(self._current_file, file_path)
                 return (f"{link_prefix}"
                         f"<<{referenced_file}#,{link_text if link_text else referenced_file}>>")
             else:
@@ -738,15 +438,19 @@ def process_adoc(in_file: Path,
                  build_dir: Path,
                  xml_dirs: Collection[Path],
                  debug: bool = False,
-                 force_language: Optional[str] = None):
+                 force_language: Optional[str] = None,
+                 warnings_are_errors: bool = False,
+                 multi_page: bool = False):
     """Process an AsciiDoc file and insert API reference.
 
     Args:
-        in_file:        AsciiDoc file to process.
-        build_dir:      Directory to store build artifacts in.
-        xml_dirs:       List of directories containing Doxygen XML files.
-        debug:          True to store debug information.
-        force_language: Force language used when parsing doxygen XML files.
+        in_file:             AsciiDoc file to process.
+        build_dir:           Directory to store build artifacts in.
+        xml_dirs:            List of directories containing Doxygen XML files.
+        debug:               True to store debug information.
+        force_language:      Force language used when parsing doxygen XML files.
+        warnings_are_errors: True to treat every warning as an error.
+        multi_page:          True to enable multi page output.
 
     Returns:
         Dictionary that maps input AsciiDoc files to output AsciiDoc files with inserted API
@@ -770,6 +474,9 @@ def process_adoc(in_file: Path,
 
     context.build_dir.mkdir(parents=True, exist_ok=True)
     context.fragment_dir.mkdir(parents=True, exist_ok=True)
+
+    context.warnings_are_errors = warnings_are_errors
+    context.multi_page = multi_page
 
     try:
         _process_adoc(in_file, context)
@@ -799,7 +506,7 @@ def _process_adoc(in_file: Path, context: Context):
     if not context.preprocessing_run:
         with out_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
-            if multi_page:
+            if context.multi_page:
                 nav_bar = navigation_bar(context.current_document)
                 if nav_bar:
                     print(nav_bar, file=f)
@@ -814,7 +521,7 @@ def _check_links(context: Context):
         names = {f"{e.language}: {e.full_name}" for e in context.linked if e.id in dangling}
         msg = ("The following elements are linked to, but not included in the documentation:\n\t" +
                "\n\t".join(names))
-        if warnings_are_errors:
+        if context.warnings_are_errors:
             raise ConsistencyError(msg)
         else:
             logger.warning(msg)
@@ -822,45 +529,3 @@ def _check_links(context: Context):
 
 def _out_file_name(in_file: Path) -> Path:
     return in_file.parent / f".asciidoxy.{in_file.name}"
-
-
-def _relative_path(from_file: Path, to_file: Path):
-    assert from_file.is_absolute()
-    assert to_file.is_absolute()
-
-    path = Path()
-    for ancestor in from_file.parents:
-        try:
-            path = path / to_file.relative_to(ancestor)
-            break
-        except ValueError:
-            path = path / '..'
-
-    return path
-
-
-def navigation_bar(doc: DocumentTreeNode) -> str:
-    next_doc: DocumentTreeNode = doc.preorder_traversal_next()
-    prev_doc: DocumentTreeNode = doc.preorder_traversal_prev()
-
-    # Don't generate navigation bar for single page documents
-    if next_doc is None and prev_doc is None:
-        return ""
-
-    up_doc: Optional[DocumentTreeNode] = doc.parent
-    root_doc: DocumentTreeNode = doc.root()
-
-    def _xref_string(referencing_file: Path, doc: Optional[DocumentTreeNode], link_text: str):
-        if doc is None:
-            return ""
-        return f"<<{_relative_path(referencing_file, doc.in_file)}#,{link_text}>>"
-
-    home_row = f" +\n{_xref_string(doc.in_file, root_doc, 'Home')}" if root_doc != doc else ''
-    return (f"""[frame=none, grid=none, cols="<.^,^.^,>.^"]
-|===
-|{_xref_string(doc.in_file, prev_doc, 'Prev')}
-
-|{_xref_string(doc.in_file, up_doc, 'Up')}{home_row}
-
-|{_xref_string(doc.in_file, next_doc, 'Next')}
-|===""")

@@ -13,7 +13,7 @@
 # limitations under the License.
 """Helper functions for API reference templates."""
 
-from asciidoxy.asciidoc import Context
+from asciidoxy.generator import Context
 
 
 def link_from_ref(ref, context: Context):
