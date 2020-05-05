@@ -456,12 +456,13 @@ def test_include_error_file_not_found(api, input_file):
                          ids=["warnings-are-errors", "warnings-are-not-errors"])
 @pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
 def test_process_adoc_single_file(warnings_are_errors, build_dir, test_file_name,
-                                  single_and_multi_page, adoc_data, xml_data):
+                                  single_and_multi_page, adoc_data, api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
 
     output_file = process_adoc(input_file,
-                               build_dir, [xml_data],
+                               build_dir,
+                               api_reference,
                                warnings_are_errors=warnings_are_errors)[input_file]
     assert output_file.is_file()
 
@@ -470,14 +471,15 @@ def test_process_adoc_single_file(warnings_are_errors, build_dir, test_file_name
     assert content == expected_output_file.read_text()
 
 
-def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, xml_data):
+def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, api_reference):
     main_doc_file = adoc_data / "multifile_test.input.adoc"
     sub_doc_file = main_doc_file.parent / "sub_directory" / "multifile_subdoc_test.input.adoc"
     sub_doc_in_table_file = main_doc_file.parent / "sub_directory" \
         / "multifile_subdoc_in_table_test.input.adoc"
 
     output_files = process_adoc(main_doc_file,
-                                build_dir, [xml_data],
+                                build_dir,
+                                api_reference,
                                 warnings_are_errors=True,
                                 multi_page=single_and_multi_page)
     assert len(output_files) == 3
@@ -495,11 +497,12 @@ def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, xm
         assert content == expected_output_file.read_text()
 
 
+@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 @pytest.mark.parametrize(
     "test_file_name",
     ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
 def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_page, adoc_data,
-                                   xml_data):
+                                   api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
@@ -508,7 +511,9 @@ def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_p
         if expected_output_file_multipage.is_file():
             expected_output_file = expected_output_file_multipage
 
-    output_file = process_adoc(input_file, build_dir, [xml_data],
+    output_file = process_adoc(input_file,
+                               build_dir,
+                               api_reference,
                                multi_page=single_and_multi_page)[input_file]
     assert output_file.is_file()
 
@@ -517,13 +522,14 @@ def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_p
     assert content == expected_output_file.read_text()
 
 
+@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 @pytest.mark.parametrize("test_file_name, error", [("dangling_link", ConsistencyError),
                                                    ("dangling_cross_doc_ref", ConsistencyError),
                                                    ("double_insert", ConsistencyError),
                                                    ("dangling_link_in_insert", ConsistencyError)])
 def test_process_adoc_file_warning_as_error(build_dir, test_file_name, error, single_and_multi_page,
-                                            adoc_data, xml_data):
+                                            adoc_data, api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 
     with pytest.raises(error):
-        process_adoc(input_file, build_dir, [xml_data], warnings_are_errors=True)
+        process_adoc(input_file, build_dir, api_reference, warnings_are_errors=True)

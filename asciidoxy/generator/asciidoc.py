@@ -14,7 +14,6 @@
 """Generation of AsciiDoc output."""
 
 import functools
-import json
 import logging
 import os
 
@@ -22,12 +21,12 @@ from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from pathlib import Path
-from typing import Collection, MutableMapping, NamedTuple, Optional
+from typing import MutableMapping, NamedTuple, Optional
 
 from .. import templates
-from ..api_reference import AmbiguousLookupError
-from ..doxygenparser import DoxygenXmlParser, safe_language_tag
-from ..model import ReferableElement, json_repr
+from ..api_reference import AmbiguousLookupError, ApiReference
+from ..doxygenparser import safe_language_tag
+from ..model import ReferableElement
 from .context import Context
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
                      ReferenceNotFoundError, TemplateMissingError, UnlinkableError)
@@ -436,9 +435,7 @@ class Api(object):
 
 def process_adoc(in_file: Path,
                  build_dir: Path,
-                 xml_dirs: Collection[Path],
-                 debug: bool = False,
-                 force_language: Optional[str] = None,
+                 api_reference: ApiReference,
                  warnings_are_errors: bool = False,
                  multi_page: bool = False):
     """Process an AsciiDoc file and insert API reference.
@@ -446,9 +443,7 @@ def process_adoc(in_file: Path,
     Args:
         in_file:             AsciiDoc file to process.
         build_dir:           Directory to store build artifacts in.
-        xml_dirs:            List of directories containing Doxygen XML files.
-        debug:               True to store debug information.
-        force_language:      Force language used when parsing doxygen XML files.
+        api_reference:       API reference to insert in the documents.
         warnings_are_errors: True to treat every warning as an error.
         multi_page:          True to enable multi page output.
 
@@ -457,20 +452,11 @@ def process_adoc(in_file: Path,
             reference.
     """
 
-    parser = DoxygenXmlParser(force_language=force_language)
-
-    logger.info("Loading API reference")
-    for xml_dir in xml_dirs:
-        for xml_file in xml_dir.glob("**/*.xml"):
-            parser.parse(xml_file)
-    parser.resolve_references()
-
     context = Context(base_dir=in_file.parent,
                       build_dir=build_dir,
                       fragment_dir=build_dir / "fragments",
-                      reference=parser.api_reference,
+                      reference=api_reference,
                       current_document=DocumentTreeNode(in_file, None))
-    context.reference = parser.api_reference
 
     context.build_dir.mkdir(parents=True, exist_ok=True)
     context.fragment_dir.mkdir(parents=True, exist_ok=True)
@@ -478,18 +464,12 @@ def process_adoc(in_file: Path,
     context.warnings_are_errors = warnings_are_errors
     context.multi_page = multi_page
 
-    try:
-        _process_adoc(in_file, context)
-        context.linked = []
-        context.preprocessing_run = False
-        context.in_to_out_file_map[in_file] = _process_adoc(in_file, context)
-        _check_links(context)
-        return context.in_to_out_file_map
-    finally:
-        if debug:
-            logger.info("Writing debug data, sorry for the delay!")
-            with (context.build_dir / "debug.json").open("w", encoding="utf-8") as f:
-                json.dump(context.reference.elements, f, default=json_repr, indent=2)
+    _process_adoc(in_file, context)
+    context.linked = []
+    context.preprocessing_run = False
+    context.in_to_out_file_map[in_file] = _process_adoc(in_file, context)
+    _check_links(context)
+    return context.in_to_out_file_map
 
 
 def _process_adoc(in_file: Path, context: Context):
