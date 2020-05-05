@@ -4,14 +4,14 @@
     <compoundname>use_same_from_multiple_namespaces.hpp</compoundname>
     <includes local="no">same_in_multiple_namespaces.hpp</includes>
     <incdepgraph>
-      <node id="2">
-        <label>same_in_multiple_namespaces.hpp</label>
-      </node>
       <node id="1">
         <label>use_same_from_multiple_namespaces.hpp</label>
         <link refid="use__same__from__multiple__namespaces_8hpp"/>
         <childnode refid="2" relation="include">
         </childnode>
+      </node>
+      <node id="2">
+        <label>same_in_multiple_namespaces.hpp</label>
       </node>
     </incdepgraph>
     <innernamespace refid="namespaceasciidoxy">asciidoxy</innernamespace>

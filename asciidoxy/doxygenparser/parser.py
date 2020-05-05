@@ -25,6 +25,7 @@ from .cpp import CppLanguage
 from .java import JavaLanguage
 from .language_base import Language, ParserBase
 from .objc import ObjectiveCLanguage
+from .python import PythonLanguage
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..model import (ReferableElement, TypeRefBase)
 
@@ -48,6 +49,7 @@ class DoxygenXmlParser(ParserBase):
             CppLanguage.TAG: CppLanguage(self),
             JavaLanguage.TAG: JavaLanguage(self),
             ObjectiveCLanguage.TAG: ObjectiveCLanguage(self),
+            PythonLanguage.TAG: PythonLanguage(self),
         }
 
         if not self._force_language:

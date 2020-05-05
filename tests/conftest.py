@@ -101,7 +101,7 @@ def api_reference_set():
 
     Override this using `pytest.mark.parametrize` to load other API references.
     """
-    return "cpp/default", "java/default", "objc/default"
+    return "cpp/default", "java/default", "objc/default", "python/default"
 
 
 @pytest.fixture

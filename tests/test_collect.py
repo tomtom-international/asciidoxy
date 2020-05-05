@@ -24,7 +24,7 @@ from asciidoxy.collect import (DownloadError, InvalidPackageError, HttpPackageSp
                                SpecificationError, LocalPackageSpec, collect, specs_from_file,
                                versions_from_file)
 
-from.shared import ProgressMock
+from .shared import ProgressMock
 
 
 async def start_server(aiohttp_server, *routes):

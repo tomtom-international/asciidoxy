@@ -160,7 +160,7 @@ def test_insert_with_default_language_can_be_overridden(api):
 
 def test_insert_relative_name_with_namespace(api):
     api.namespace("asciidoxy::geometry::")
-    result = api.insert("Coordinate")
+    result = api.insert("Coordinate", lang="cpp")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")

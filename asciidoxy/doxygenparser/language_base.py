@@ -63,8 +63,8 @@ class Language(object):
 
     TAG: str
 
-    TYPE_PREFIXES: Pattern
-    TYPE_SUFFIXES: Pattern
+    TYPE_PREFIXES: Optional[Pattern]
+    TYPE_SUFFIXES: Optional[Pattern]
     TYPE_NESTED_START: Pattern
     TYPE_NESTED_SEPARATOR: Pattern
     TYPE_NESTED_END: Pattern
@@ -116,7 +116,7 @@ class Language(object):
             return None
 
         def match_and_extract(regex, text):
-            if text:
+            if regex is not None and text:
                 match = regex.match(text)
                 if match:
                     return match.group(0), text[match.end():]
@@ -307,6 +307,9 @@ class Language(object):
         id = id.replace("__", "-")
 
         return f"{self.TAG}-{id}"
+
+    def is_language_standard_type(self, type_name: str) -> bool:
+        return False
 
     def cleanup_name(self, name: str) -> str:
         return name
