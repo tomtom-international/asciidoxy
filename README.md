@@ -1,4 +1,11 @@
-# AsciiDoxy
+```
+    ___              _ _ ____
+   /   |  __________(_|_) __ \____  _  ____  __
+  / /| | / ___/ ___/ / / / / / __ \| |/_/ / / /
+ / ___ |(__  ) /__/ / / /_/ / /_/ />  </ /_/ /
+/_/  |_/____/\___/_/_/_____/\____/_/|_|\__, /
+                                      /____/
+```
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![pip downloads](https://img.shields.io/pypi/dm/asciidoxy)](https://pypi.org/project/asciidoxy)

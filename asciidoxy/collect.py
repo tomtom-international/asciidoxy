@@ -31,6 +31,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Type, TypeVar, Union
 
+from tqdm import tqdm
+
 logger = logging.getLogger(__name__)
 
 
@@ -279,7 +281,9 @@ class HttpPackageSpec(PackageSpec):
         return spec
 
 
-async def collect(specs: Sequence[PackageSpec], download_dir: Path) -> List[Package]:
+async def collect(specs: Sequence[PackageSpec],
+                  download_dir: Path,
+                  progress: Optional[tqdm] = None) -> List[Package]:
     """Collect the packages based on the list of specifications.
 
     Args:
@@ -294,11 +298,22 @@ async def collect(specs: Sequence[PackageSpec], download_dir: Path) -> List[Pack
             required directories.
         DownloadError: An error occurred while downloading a remote package.
     """
+    if progress is not None:
+
+        async def _progress_report(coro):
+            ret = await coro
+            progress.update()
+            return ret
+    else:
+
+        async def _progress_report(coro):
+            return await coro
+
     conn = aiohttp.TCPConnector(limit=4)
     async with aiohttp.ClientSession(connector=conn, raise_for_status=True) as session:
         jobs = []
         for spec in specs:
-            jobs.append(spec.collect(download_dir, session))
+            jobs.append(_progress_report(spec.collect(download_dir, session)))
         return await asyncio.gather(*jobs)
 
 

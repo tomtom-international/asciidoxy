@@ -25,11 +25,13 @@ from pathlib import Path
 from typing import Optional, Sequence, List
 
 from mako.exceptions import RichTraceback
+from tqdm import tqdm
 
 from .collect import collect, specs_from_file, CollectError, SpecificationError
 from .doxygenparser import DoxygenXmlParser
 from .generator import process_adoc, AsciiDocError
 from .model import json_repr
+from ._version import __version__
 
 
 def error(*args, **kwargs) -> None:
@@ -75,6 +77,15 @@ def output_extension(backend: str) -> Optional[str]:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> None:
+    print(rf"""
+    ___              _ _ ____  {__version__:>16}
+   /   |  __________(_|_) __ \____  _  ____  __
+  / /| | / ___/ ___/ / / / / / __ \| |/_/ / / /
+ / ___ |(__  ) /__/ / / /_/ / /_/ />  </ /_/ /
+/_/  |_/____/\___/_/_/_____/\____/_/|_|\__, /
+                                      /____/
+""")
+
     parser = argparse.ArgumentParser(description="Generate API documentation using AsciiDoctor",
                                      allow_abbrev=False)
     parser.add_argument("input_file", metavar="INPUT_FILE", help="Input AsciiDoc file.")
@@ -110,7 +121,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     parser.add_argument("--debug", action="store_true", help="Store debug information.")
     parser.add_argument("--log",
                         metavar="LOG_LEVEL",
-                        default="INFO",
+                        default="WARNING",
                         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
                         help="Set the log level.")
     parser.add_argument("--force-language",
@@ -143,7 +154,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         logger.error(f"Backend {args.backend} is not supported.")
         sys.exit(1)
 
-    logger.info("Collecting packages")
+    logger.info("Collecting packages  ")
     try:
         package_specs = specs_from_file(spec_file, version_file)
     except SpecificationError:
@@ -152,20 +163,25 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     download_dir = build_dir / "download"
     try:
-        packages = asyncio.get_event_loop().run_until_complete(collect(package_specs, download_dir))
+        with tqdm(desc="Collecting packages  ", total=len(package_specs), unit="pkg") as progress:
+            packages = asyncio.get_event_loop().run_until_complete(
+                collect(package_specs, download_dir, progress))
     except CollectError:
         logger.exception("Failed to collect packages.")
         sys.exit(1)
 
     logger.info("Loading packages")
-    include_dirs = []
+    include_dirs: List[Path] = []
     xml_parser = DoxygenXmlParser(force_language=args.force_language)
-    for pkg in packages:
+    for pkg in tqdm(packages, desc="Loading API reference", unit="pkg"):
         include_dirs.extend(pkg.include_dirs)
         for xml_dir in pkg.xml_dirs:
             for xml_file in xml_dir.glob("**/*.xml"):
                 xml_parser.parse(xml_file)
-    xml_parser.resolve_references()
+
+    with tqdm(desc="Resolving references ", unit="ref") as progress:
+        xml_parser.resolve_references(progress)
+
     if args.debug:
         logger.info("Writing debug data, sorry for the delay!")
         with (build_dir / "debug.json").open("w", encoding="utf-8") as f:
@@ -174,11 +190,13 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     in_file = copy_and_switch_to_intermediate_dir(
         Path(args.input_file).resolve(), include_dirs, build_dir)
     try:
-        in_to_out_file_map = process_adoc(in_file,
-                                          build_dir,
-                                          xml_parser.api_reference,
-                                          warnings_are_errors=args.warnings_are_errors,
-                                          multi_page=args.multi_page)
+        with tqdm(desc="Processing asciidoc  ", total=1, unit="file") as progress:
+            in_to_out_file_map = process_adoc(in_file,
+                                              build_dir,
+                                              xml_parser.api_reference,
+                                              warnings_are_errors=args.warnings_are_errors,
+                                              multi_page=args.multi_page,
+                                              progress=progress)
 
     except AsciiDocError as e:
         logger.error(f"Error while processing AsciiDoc file:\n\t{e}")
@@ -191,8 +209,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     logger.info("Running asciidoctor")
     in_dir = in_file.parent
-    for (in_adoc_file, out_adoc_file) in ((k, v) for (k, v) in in_to_out_file_map.items()
-                                          if args.multi_page or k == in_file):
+    for (in_adoc_file, out_adoc_file) in tqdm(
+        [(k, v) for (k, v) in in_to_out_file_map.items() if args.multi_page or k == in_file],
+            desc="Running asciidoctor  ", unit="file"):
         out_file = destination_dir / in_adoc_file.relative_to(in_dir).with_suffix(extension)
         asciidoctor(destination_dir, out_file, out_adoc_file, args.multi_page, args.backend,
                     extra_args)

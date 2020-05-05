@@ -19,6 +19,8 @@ import xml.etree.ElementTree as ET
 
 from typing import List, Mapping, Optional, Set
 
+from tqdm import tqdm
+
 from .cpp import CppLanguage
 from .java import JavaLanguage
 from .language_base import Language, ParserBase
@@ -96,12 +98,16 @@ class DoxygenXmlParser(ParserBase):
     def unresolved_ref(self, ref: TypeRefBase) -> None:
         self._unresolved_refs.append(ref)
 
-    def resolve_references(self) -> None:
+    def resolve_references(self, progress: Optional[tqdm] = None) -> None:
         """Resolve all references between objects from different XML files."""
 
         unresolved_names: Set[str] = set()
         still_unresolved = []
+        if progress is not None:
+            progress.total = len(self._unresolved_refs)
         for ref in self._unresolved_refs:
+            if progress is not None:
+                progress.update()
             assert ref.name
 
             # Try perfect match

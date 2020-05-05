@@ -9,6 +9,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
   - Allow filtering what members, enum values, inner classes, and exceptions get included when
       using api.insert().
+  - Show progress bars for long running tasks.
+
+### Changed
+  - Default log level decreased to warnings.
 
 ## [0.5.2] - (24 Apr 2020)
 ### Added

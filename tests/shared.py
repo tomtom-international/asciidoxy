@@ -34,3 +34,12 @@ def assert_equal_or_none_if_empty(value: Optional[str], text: str) -> None:
         assert not value
     else:
         assert value == text
+
+
+class ProgressMock:
+    def __init__(self):
+        self.total = 0
+        self.ready = 0
+
+    def update(self, n=1):
+        self.ready += n

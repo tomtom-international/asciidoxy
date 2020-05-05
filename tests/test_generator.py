@@ -25,6 +25,7 @@ from asciidoxy.generator.navigation import DocumentTreeNode
 from asciidoxy.generator.errors import (AmbiguousReferenceError, ConsistencyError,
                                         IncludeFileNotFoundError, ReferenceNotFoundError,
                                         TemplateMissingError)
+from .shared import ProgressMock
 
 
 @pytest.fixture
@@ -460,15 +461,20 @@ def test_process_adoc_single_file(warnings_are_errors, build_dir, test_file_name
     input_file = adoc_data / f"{test_file_name}.input.adoc"
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
 
+    progress_mock = ProgressMock()
     output_file = process_adoc(input_file,
                                build_dir,
                                api_reference,
-                               warnings_are_errors=warnings_are_errors)[input_file]
+                               warnings_are_errors=warnings_are_errors,
+                               progress=progress_mock)[input_file]
     assert output_file.is_file()
 
     content = output_file.read_text()
     content = content.replace(os.fspath(build_dir), "BUILD_DIR")
     assert content == expected_output_file.read_text()
+
+    assert progress_mock.ready == progress_mock.total
+    assert progress_mock.total == 2
 
 
 def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, api_reference):
@@ -477,11 +483,13 @@ def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, ap
     sub_doc_in_table_file = main_doc_file.parent / "sub_directory" \
         / "multifile_subdoc_in_table_test.input.adoc"
 
+    progress_mock = ProgressMock()
     output_files = process_adoc(main_doc_file,
                                 build_dir,
                                 api_reference,
                                 warnings_are_errors=True,
-                                multi_page=single_and_multi_page)
+                                multi_page=single_and_multi_page,
+                                progress=progress_mock)
     assert len(output_files) == 3
     assert (
         output_files[main_doc_file] == main_doc_file.with_name(f".asciidoxy.{main_doc_file.name}"))
@@ -495,6 +503,9 @@ def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, ap
         content = output_file.read_text()
         content = content.replace(os.fspath(build_dir), "BUILD_DIR")
         assert content == expected_output_file.read_text()
+
+    assert progress_mock.ready == progress_mock.total
+    assert progress_mock.total == 2 * len(output_files)
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
