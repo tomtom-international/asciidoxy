@@ -17,6 +17,7 @@ import pytest
 
 from pathlib import Path
 
+from asciidoxy.api_reference import ApiReference
 from asciidoxy.doxygenparser import DoxygenXmlParser
 from asciidoxy.generator.asciidoc import Api, Context, DocumentTreeNode
 from asciidoxy.model import Compound, Member, ReturnValue, InnerTypeReference
@@ -215,3 +216,12 @@ def multi_page(context):
 def single_and_multi_page(request, context):
     context.multi_page = request.param
     return request.param
+
+
+@pytest.fixture
+def empty_context(input_file, build_dir, fragment_dir):
+    return Context(base_dir=input_file.parent,
+                   build_dir=build_dir,
+                   fragment_dir=fragment_dir,
+                   reference=ApiReference(),
+                   current_document=DocumentTreeNode(input_file))

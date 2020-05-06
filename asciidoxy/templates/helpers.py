@@ -16,12 +16,14 @@
 from asciidoxy.generator import Context
 
 
-def link_from_ref(ref, context: Context):
+def link_from_ref(ref, context: Context, nested_start="&lt;", nested_end="&gt;"):
     if ref is None:
         return ""
 
     if ref.nested:
-        nested = f"&lt;{', '.join(link_from_ref(r, context) for r in ref.nested)}&gt;"
+        nested = (f"{nested_start}"
+                  f"{', '.join(link_from_ref(r, context) for r in ref.nested)}"
+                  f"{nested_end}")
     else:
         nested = ""
 

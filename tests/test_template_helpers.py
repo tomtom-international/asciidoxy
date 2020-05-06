@@ -19,25 +19,14 @@ import pytest
 
 from unittest.mock import call, patch
 
-from asciidoxy.api_reference import ApiReference
-from asciidoxy.generator.asciidoc import Context, DocumentTreeNode
 from asciidoxy.templates.helpers import (link_from_ref, print_ref, argument_list, type_list, has,
                                          type_and_name, chain)
 from asciidoxy.model import Parameter, TypeRef
 
 
 @pytest.fixture
-def context(input_file, build_dir, fragment_dir):
-    return Context(base_dir=input_file.parent,
-                   build_dir=build_dir,
-                   fragment_dir=fragment_dir,
-                   reference=ApiReference(),
-                   current_document=DocumentTreeNode(input_file))
-
-
-@pytest.fixture
-def context_mock(context):
-    with patch("asciidoxy.generator.asciidoc.Context", wraps=context) as mock:
+def context_mock(empty_context):
+    with patch("asciidoxy.generator.asciidoc.Context", wraps=empty_context) as mock:
         yield mock
 
 
@@ -162,11 +151,11 @@ def test_print_ref__nested_types():
     assert print_ref(ref) == "const MyType&lt;Nested1, Nested2&gt; &"
 
 
-def test_argument_list__empty(context):
-    assert argument_list([], context) == "()"
+def test_argument_list__empty(empty_context):
+    assert argument_list([], empty_context) == "()"
 
 
-def test_argument_list(context):
+def test_argument_list(empty_context):
     type1 = TypeRef("lang")
     type1.prefix = "const "
     type1.name = "Type1"
@@ -192,7 +181,7 @@ def test_argument_list(context):
     param3.name = "arg3"
 
     assert (argument_list([param1, param2, param3],
-                          context) == "(const Type1, xref:lang-type2[Type2] & arg2, "
+                          empty_context) == "(const Type1, xref:lang-type2[Type2] & arg2, "
             "Type3&lt;const Type1, xref:lang-type2[Type2] &&gt; arg3)")
 
 
@@ -285,7 +274,7 @@ def test_chain():
     assert collect_chained(gen_one(), gen_empty()) == [1]
 
 
-def test_type_and_name(context):
+def test_type_and_name(empty_context):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -296,10 +285,10 @@ def test_type_and_name(context):
     param.type = ref
     param.name = "arg"
 
-    assert type_and_name(param, context) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
+    assert type_and_name(param, empty_context) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_type_and_name__no_name(context):
+def test_type_and_name__no_name(empty_context):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -310,4 +299,4 @@ def test_type_and_name__no_name(context):
     param.type = ref
     param.name = ""
 
-    assert type_and_name(param, context) == "const xref:lang-tomtom_1_MyType[MyType] &"
+    assert type_and_name(param, empty_context) == "const xref:lang-tomtom_1_MyType[MyType] &"
