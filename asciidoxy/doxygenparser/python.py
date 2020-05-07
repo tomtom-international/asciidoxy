@@ -29,10 +29,10 @@ class PythonLanguage(Language):
     TYPE_NESTED_START = re.compile(r"\s*\[\s*")
     TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
     TYPE_NESTED_END = re.compile(r"\s*\]")
-    TYPE_NAME = re.compile(r"[a-zA-Z0-9_.]+")
+    TYPE_NAME = re.compile(r"\"?[a-zA-Z0-9_.]+\"?")
 
     def cleanup_name(self, name: str) -> str:
-        return name.replace("::", ".").strip()
+        return name.replace("::", ".").replace('"', "").strip()
 
     def short_name(self, name: str) -> str:
         return name.split(".")[-1]

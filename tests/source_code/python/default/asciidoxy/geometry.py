@@ -41,3 +41,13 @@ class Coordinate:
             True if valid, False if not.
         """
         ...
+
+    @classmethod
+    def from_string(cls, value: str) -> "Coordinate":
+        """Create a coordinate from its string representation."""
+        ...
+
+    @staticmethod
+    def combine(left: "Coordinate", right: "Coordinate") -> "Coordinate":
+        """Combine two coordinates."""
+        ...

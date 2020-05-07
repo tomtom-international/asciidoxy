@@ -30,11 +30,12 @@ def test_parse_python_class(parser_factory):
     assert python_class.description == "A coordinate has a latitude, longitude, and an altitude."
     assert python_class.namespace == "asciidoxy.geometry"
 
-    assert len(python_class.members) == 5
+    assert len(python_class.members) == 7
     assert len(python_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in python_class.members)
-    assert member_names == sorted(["altitude", "latitude", "longitude", "is_valid", "__init__"])
+    assert member_names == sorted(["altitude", "latitude", "longitude", "is_valid", "__init__",
+                                   "from_string", "combine"])
 
 
 def test_parse_python_class_with_nested_class(parser_factory):
@@ -132,3 +133,104 @@ def test_parse_python_method(parser_factory):
     assert not member.returns.type.suffix
     assert len(member.returns.type.nested) == 0
     assert member.returns.description == "True if the update is valid."
+
+
+def test_parse_python_classmethod(parser_factory):
+    parser = parser_factory("python/default")
+
+    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.from_string",
+                                       kind="function",
+                                       lang="python")
+
+    assert member is not None
+    assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
+                         "1a993b41d0a7518e83d751aa90e0d15fbe")
+    assert member.name == "from_string"
+    assert member.prot == "public"
+    assert member.static is False
+
+    assert len(member.params) == 2
+
+    assert member.params[0].type
+    assert member.params[0].type.name == "cls"
+    assert not member.params[0].name
+    assert not member.params[0].description
+
+    assert member.params[1].type
+    assert member.params[1].type.name == "str"
+    assert member.params[1].name == "value"
+    assert not member.params[1].description
+
+    assert len(member.exceptions) == 0
+    assert len(member.enumvalues) == 0
+
+    assert member.returns is not None
+    assert member.returns.type is not None
+    assert not member.returns.type.id
+    assert not member.returns.type.kind
+    assert member.returns.type.language == "python"
+    assert member.returns.type.name == "Coordinate"
+    assert member.returns.type.namespace == "asciidoxy.geometry.Coordinate"
+    assert not member.returns.type.prefix
+    assert not member.returns.type.suffix
+    assert len(member.returns.type.nested) == 0
+    assert not member.returns.description
+
+
+def test_parse_python_staticmethod(parser_factory):
+    parser = parser_factory("python/default")
+
+    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.combine",
+                                       kind="function",
+                                       lang="python")
+
+    assert member is not None
+    assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
+                         "1a4b820d9d0bdf81ddd7e22c243a41421d")
+    assert member.name == "combine"
+    assert member.prot == "public"
+    assert member.static is True
+
+    assert len(member.params) == 2
+
+    assert member.params[0].type
+    assert member.params[0].type.name == "Coordinate"
+    assert member.params[0].name == "left"
+    assert not member.params[0].description
+
+    assert member.params[1].type
+    assert member.params[1].type.name == "Coordinate"
+    assert member.params[1].name == "right"
+    assert not member.params[1].description
+
+
+def test_parse_python_variable(parser_factory):
+    parser = parser_factory("python/default")
+
+    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.longitude",
+                                       kind="variable",
+                                       lang="python")
+
+    assert member is not None
+    assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
+                         "1a0eb652e91c894dc2e49d9fbf3f224aa5")
+    assert member.name == "longitude"
+    assert member.prot == "public"
+    assert member.static is False
+
+    assert len(member.params) == 0
+    assert len(member.exceptions) == 0
+    assert len(member.enumvalues) == 0
+
+    # Not supported by Doxygen yet
+    # assert member.returns is not None
+    # assert member.returns.type is not None
+    # assert not member.returns.type.id
+    # assert not member.returns.type.kind
+    # assert member.returns.type.language == "python"
+    # assert member.returns.type.name == "float"
+    # assert member.returns.type.namespace == "asciidoxy.geometry.Coordinate"
+    # assert not member.returns.type.prefix
+    # assert not member.returns.type.suffix
+    # assert len(member.returns.type.nested) == 0
+    # assert not member.returns.description
