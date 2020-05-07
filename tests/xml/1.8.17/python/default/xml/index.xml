@@ -20,6 +20,7 @@
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ad7ebc90048fc465f046cf37cf2300d9e" kind="function"><name>__init__</name></member>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e" kind="function"><name>update</name></member>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2a565164d3af2f5655c7ef819ff4545" kind="function"><name>calculate_delay</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3" kind="function"><name>refresh_data</name></member>
   </compound>
   <compound refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kind="class"><name>asciidoxy::traffic::TrafficEvent::TrafficEventData</name>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a7a93792cb0d89c430b35d085f36e804e" kind="variable"><name>cause</name></member>

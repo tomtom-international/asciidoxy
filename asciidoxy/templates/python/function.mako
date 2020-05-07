@@ -30,7 +30,7 @@ ${element.brief}
 
 ${element.description}
 
-% if has(element.params) or has(element.exceptions) or element.returns:
+% if has(params(element)) or has(insert_filter.exceptions(element)) or element.returns:
 [cols='h,5a']
 |===
 % if has(params(element)):

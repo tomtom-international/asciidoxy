@@ -104,12 +104,56 @@
         <detaileddescription>
 <para><simplesect kind="return"><para>The delay in seconds.</para>
 </simplesect>
-<verbatim>        RuntimeError Thrown when the update encounters a critical error.
-</verbatim> </para>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>RuntimeError</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when the update encounters a critical error. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
         <location file="asciidoxy/traffic.py" line="89" column="1" bodyfile="asciidoxy/traffic.py" bodystart="89" bodyend="91"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>None</type>
+        <definition> None asciidoxy.traffic.TrafficEvent.refresh_data</definition>
+        <argsstring>(self)</argsstring>
+        <name>refresh_data</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <briefdescription>
+<para>Refresh the traffic event data. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>NoDataError</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when there is no data to refresh. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>InvalidDataError</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when the data is invalid. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="98" column="1" bodyfile="asciidoxy/traffic.py" bodystart="98" bodyend="100"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -117,11 +161,12 @@
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="asciidoxy/traffic.py" line="19" column="1" bodyfile="asciidoxy/traffic.py" bodystart="19" bodyend="91"/>
+    <location file="asciidoxy/traffic.py" line="19" column="1" bodyfile="asciidoxy/traffic.py" bodystart="19" bodyend="100"/>
     <listofallmembers>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ad7ebc90048fc465f046cf37cf2300d9e" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>__init__</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a32be293fd10a77aa74964459d3738726" prot="private" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>_data</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2a565164d3af2f5655c7ef819ff4545" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>calculate_delay</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>refresh_data</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>update</name></member>
     </listofallmembers>
   </compounddef>

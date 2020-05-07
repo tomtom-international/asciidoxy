@@ -92,9 +92,18 @@
 <codeline lineno="79"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>The<sp/>delay<sp/>in<sp/>seconds.</highlight></codeline>
 <codeline lineno="80"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="81"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Raises:</highlight></codeline>
-<codeline lineno="82"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>RuntimeError<sp/>Thrown<sp/>when<sp/>the<sp/>update<sp/>encounters<sp/>a<sp/>critical<sp/>error.</highlight></codeline>
+<codeline lineno="82"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>RuntimeError:<sp/>Thrown<sp/>when<sp/>the<sp/>update<sp/>encounters<sp/>a<sp/>critical<sp/>error.</highlight></codeline>
 <codeline lineno="83"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>...</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"></highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3" kindref="member">refresh_data</ref>(self)<sp/>-&gt;<sp/>None:</highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Refresh<sp/>the<sp/>traffic<sp/>event<sp/>data.</highlight></codeline>
+<codeline lineno="88"><highlight class="stringliteral"></highlight></codeline>
+<codeline lineno="89"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Raises:</highlight></codeline>
+<codeline lineno="90"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>NoDataError:<sp/><sp/><sp/><sp/><sp/><sp/>Thrown<sp/>when<sp/>there<sp/>is<sp/>no<sp/>data<sp/>to<sp/>refresh.</highlight></codeline>
+<codeline lineno="91"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>InvalidDataError:<sp/>Thrown<sp/>when<sp/>the<sp/>data<sp/>is<sp/>invalid.</highlight></codeline>
+<codeline lineno="92"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>...</highlight></codeline>
     </programlisting>
     <location file="asciidoxy/traffic.py"/>
   </compounddef>

@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, type_and_name, argument_list)
+from asciidoxy.templates.helpers import (link_from_ref, type_and_name, argument_list, has)
 %>
 
 = [[${element.id},${element.name}]]
@@ -29,10 +29,10 @@ ${element.brief}
 
 ${element.description}
 
-% if element.params or element.exceptions or element.returns:
+% if has(element.params) or has(insert_filter.exceptions(element)) or element.returns:
 [cols='h,5a']
 |===
-% if element.params:
+% if has(element.params):
 | Parameters
 |
 % for param in element.params:
@@ -48,10 +48,10 @@ ${param.description}
 ${element.returns.description}
 
 % endif
-% if element.exceptions:
+% if has(insert_filter.exceptions(element)):
 | Throws
 |
-% for exception in element.exceptions:
+% for exception in insert_filter.exceptions(element):
 `${exception.type.name}`::
 ${exception.description}
 

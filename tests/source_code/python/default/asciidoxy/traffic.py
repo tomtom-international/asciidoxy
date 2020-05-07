@@ -79,6 +79,15 @@ class TrafficEvent:
             The delay in seconds.
 
         Raises:
-            RuntimeError Thrown when the update encounters a critical error.
+            RuntimeError: Thrown when the update encounters a critical error.
+        """
+        ...
+
+    def refresh_data(self) -> None:
+        """Refresh the traffic event data.
+
+        Raises:
+            NoDataError:      Thrown when there is no data to refresh.
+            InvalidDataError: Thrown when the data is invalid.
         """
         ...

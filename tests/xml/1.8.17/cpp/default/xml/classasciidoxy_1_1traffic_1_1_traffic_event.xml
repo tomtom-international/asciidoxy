@@ -68,7 +68,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="traffic_event.hpp" line="129" column="20" bodyfile="traffic_event.hpp" bodystart="129" bodyend="-1"/>
+        <location file="traffic_event.hpp" line="131" column="20" bodyfile="traffic_event.hpp" bodystart="131" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
@@ -186,11 +186,28 @@
 <para>Not sure why you want this.</para>
 <para><simplesect kind="return"><para>The shared pointer. </para>
 </simplesect>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>std::runtime_exception</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown if no copy of the data is available. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>InvalidEventError</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when the event data is invalid. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
 </para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="traffic_event.hpp" line="118" column="19"/>
+        <location file="traffic_event.hpp" line="120" column="19"/>
       </memberdef>
       <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type>long</type>
@@ -216,7 +233,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="traffic_event.hpp" line="126" column="8"/>
+        <location file="traffic_event.hpp" line="128" column="8"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -224,7 +241,7 @@
     <detaileddescription>
 <para>Information about a traffic event. </para>
     </detaileddescription>
-    <location file="traffic_event.hpp" line="28" column="19" bodyfile="traffic_event.hpp" bodystart="28" bodyend="130"/>
+    <location file="traffic_event.hpp" line="28" column="19" bodyfile="traffic_event.hpp" bodystart="28" bodyend="132"/>
     <listofallmembers>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>CalculateDelay</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>Data</name></member>

@@ -114,6 +114,8 @@ class TrafficEvent {
    * Not sure why you want this.
    *
    * @returns The shared pointer.
+   * @throws std::runtime_exception Thrown if no copy of the data is available.
+   * @throws InvalidEventError Thrown when the event data is invalid.
    */
   std::shared_ptr<TrafficEventData> SharedData() const;
 

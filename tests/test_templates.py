@@ -31,11 +31,6 @@ def _read_fragment(include_statement: str) -> str:
     return content
 
 
-# TODO: In other PR/branch
-#  Add test for cpp function and java function
-#  Insertion filter for exceptions in functions
-
-
 @pytest.mark.parametrize(
     "element_name,language,expected_result",
     [("asciidoxy::geometry::Coordinate", "cpp", "fragments/cpp/class.adoc"),
@@ -44,6 +39,7 @@ def _read_fragment(include_statement: str) -> str:
      ("asciidoxy::traffic::TrafficEvent::TrafficEventData", "cpp", "fragments/cpp/struct.adoc"),
      ("asciidoxy::traffic::TpegCauseCode", "cpp", "fragments/cpp/typedef.adoc"),
      ("asciidoxy::traffic::TrafficEvent", "cpp", "fragments/cpp/nested.adoc"),
+     ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", "fragments/cpp/function.adoc"),
      ("com.asciidoxy.geometry.Coordinate", "java", "fragments/java/class.adoc"),
      ("com.asciidoxy.traffic.TrafficEvent.Severity", "java", "fragments/java/enum.adoc"),
      ("com.asciidoxy.system.Service", "java", "fragments/java/interface.adoc"),
@@ -83,6 +79,9 @@ filtered_testdata = [
     ("asciidoxy::traffic::TrafficEvent", "cpp", {
         "inner_classes": ["+Severity", "-TrafficEventData"]
     }, "fragments/cpp/nested_filtered.adoc"),
+    ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", {
+        "exceptions": "-std::"
+    }, "fragments/cpp/function_filtered.adoc"),
     ("com.asciidoxy.geometry.Coordinate", "java", {
         "members": "-IsValid"
     }, "fragments/java/class_filtered.adoc"),
@@ -111,6 +110,9 @@ filtered_testdata = [
     ("asciidoxy.geometry.Coordinate", "python", {
         "members": "-altitude"
     }, "fragments/python/class_filtered.adoc"),
+    ("asciidoxy.traffic.TrafficEvent.refresh_data", "python", {
+        "exceptions": "NoDataError",
+    }, "fragments/python/function_filtered.adoc"),
 ]
 
 

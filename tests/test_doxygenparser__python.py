@@ -34,8 +34,8 @@ def test_parse_python_class(parser_factory):
     assert len(python_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in python_class.members)
-    assert member_names == sorted(["altitude", "latitude", "longitude", "is_valid", "__init__",
-                                   "from_string", "combine"])
+    assert member_names == sorted(
+        ["altitude", "latitude", "longitude", "is_valid", "__init__", "from_string", "combine"])
 
 
 def test_parse_python_class_with_nested_class(parser_factory):
