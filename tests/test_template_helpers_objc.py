@@ -18,7 +18,7 @@ Tests for Objective C template helpers.
 import pytest
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.asciidoc import Context, DocumentTreeNode
+from asciidoxy.generator.asciidoc import Context, DocumentTreeNode
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Member, ReturnValue, Parameter, TypeRef
 from asciidoxy.templates.objc.helpers import (public_methods, public_class_methods,

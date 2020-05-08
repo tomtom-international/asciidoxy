@@ -13,8 +13,7 @@
 # limitations under the License.
 """Helper functions for Objective C templates."""
 
-from asciidoxy.asciidoc import Context
-from asciidoxy.generator.filters import InsertionFilter
+from asciidoxy.generator import Context, InsertionFilter
 from asciidoxy.templates.helpers import link_from_ref, print_ref
 
 

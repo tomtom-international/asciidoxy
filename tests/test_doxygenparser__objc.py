@@ -19,7 +19,8 @@ import pytest
 
 import xml.etree.ElementTree as ET
 
-from asciidoxy.doxygen_xml import DoxygenXmlParser, ObjectiveCLanguage
+from asciidoxy.doxygenparser.objc import ObjectiveCLanguage
+from asciidoxy.doxygenparser.parser import DoxygenXmlParser
 from .shared import assert_equal_or_none_if_empty
 
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Tests for the `asciidoxy.asciidoc`.
+Tests for the `asciidoxy.generator.asciidoc`.
 """
 
 import os
@@ -20,10 +20,11 @@ import pytest
 
 from pathlib import Path
 
-from asciidoxy.asciidoc import (AmbiguousReferenceError, Api, ConsistencyError, DocumentTreeNode,
-                                IncludeFileNotFoundError, ReferenceNotFoundError,
-                                TemplateMissingError, navigation_bar, process_adoc)
-from asciidoxy.model import ReferableElement
+from asciidoxy.generator.asciidoc import Api, process_adoc
+from asciidoxy.generator.navigation import DocumentTreeNode
+from asciidoxy.generator.errors import (AmbiguousReferenceError, ConsistencyError,
+                                        IncludeFileNotFoundError, ReferenceNotFoundError,
+                                        TemplateMissingError)
 
 
 @pytest.fixture
@@ -43,58 +44,6 @@ def sub_document_api(sub_document_file, context):
 def preprocessing_api(input_file, context):
     context.preprocessing_run = True
     return Api(input_file, context)
-
-
-@pytest.fixture
-def warnings_are_errors():
-    import asciidoxy.asciidoc
-    asciidoxy.asciidoc.warnings_are_errors = True
-    yield
-    asciidoxy.asciidoc.warnings_are_errors = False
-
-
-@pytest.fixture(params=[True, False], ids=["warnings-are-errors", "warnings-are-not-errors"])
-def warnings_are_and_are_not_errors(request):
-    import asciidoxy.asciidoc
-    asciidoxy.asciidoc.warnings_are_errors = request.param
-    yield
-    asciidoxy.asciidoc.warnings_are_errors = False
-
-
-@pytest.fixture
-def multi_page():
-    import asciidoxy.asciidoc
-    asciidoxy.asciidoc.multi_page = True
-    yield
-    asciidoxy.asciidoc.multi_page = False
-
-
-@pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
-def single_and_multi_page(request):
-    import asciidoxy.asciidoc
-    asciidoxy.asciidoc.multi_page = request.param
-    yield
-    asciidoxy.asciidoc.multi_page = False
-
-
-@pytest.fixture
-def document_tree_two_subpages():
-    root = DocumentTreeNode(Path("/project/index.adoc"))
-    sub_page1 = DocumentTreeNode(root.in_file.parent / "sub_page1.adoc", root)
-    root.children.append(sub_page1)
-    sub_page2 = DocumentTreeNode(root.in_file.parent / "sub_page2.adoc", root)
-    root.children.append(sub_page2)
-    return root
-
-
-@pytest.fixture
-def document_tree_two_levels_deep(document_tree_two_subpages):
-    sub_page1 = document_tree_two_subpages.children[0]
-    sub_page1.children.append(
-        DocumentTreeNode(sub_page1.in_file.parent / "sub_page1_1.adoc", sub_page1))
-    sub_page1.children.append(
-        DocumentTreeNode(sub_page1.in_file.parent / "sub_page1_2.adoc", sub_page1))
-    return document_tree_two_subpages
 
 
 def _check_inserted_file_contains(inserted_adoc, expected):
@@ -503,13 +452,18 @@ def test_include_error_file_not_found(api, input_file):
         api.include("non_existing_file.adoc")
 
 
+@pytest.mark.parametrize("warnings_are_errors", [True, False],
+                         ids=["warnings-are-errors", "warnings-are-not-errors"])
 @pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
-def test_process_adoc_single_file(warnings_are_and_are_not_errors, build_dir, test_file_name,
-                                  single_and_multi_page, adoc_data, xml_data):
+def test_process_adoc_single_file(warnings_are_errors, build_dir, test_file_name,
+                                  single_and_multi_page, adoc_data, api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
 
-    output_file = process_adoc(input_file, build_dir, [xml_data])[input_file]
+    output_file = process_adoc(input_file,
+                               build_dir,
+                               api_reference,
+                               warnings_are_errors=warnings_are_errors)[input_file]
     assert output_file.is_file()
 
     content = output_file.read_text()
@@ -517,16 +471,17 @@ def test_process_adoc_single_file(warnings_are_and_are_not_errors, build_dir, te
     assert content == expected_output_file.read_text()
 
 
-def test_process_adoc_multi_file(warnings_are_errors, build_dir, single_and_multi_page, adoc_data,
-                                 xml_data):
-    from asciidoxy.asciidoc import multi_page
-
+def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, api_reference):
     main_doc_file = adoc_data / "multifile_test.input.adoc"
     sub_doc_file = main_doc_file.parent / "sub_directory" / "multifile_subdoc_test.input.adoc"
     sub_doc_in_table_file = main_doc_file.parent / "sub_directory" \
         / "multifile_subdoc_in_table_test.input.adoc"
 
-    output_files = process_adoc(main_doc_file, build_dir, [xml_data])
+    output_files = process_adoc(main_doc_file,
+                                build_dir,
+                                api_reference,
+                                warnings_are_errors=True,
+                                multi_page=single_and_multi_page)
     assert len(output_files) == 3
     assert (
         output_files[main_doc_file] == main_doc_file.with_name(f".asciidoxy.{main_doc_file.name}"))
@@ -536,28 +491,30 @@ def test_process_adoc_multi_file(warnings_are_errors, build_dir, single_and_mult
     for input_file, output_file in output_files.items():
         assert output_file.is_file()
         expected_output_file = input_file.with_suffix(
-            ".expected.multipage.adoc" if multi_page else ".expected.singlepage.adoc")
+            ".expected.multipage.adoc" if single_and_multi_page else ".expected.singlepage.adoc")
         content = output_file.read_text()
         content = content.replace(os.fspath(build_dir), "BUILD_DIR")
         assert content == expected_output_file.read_text()
 
 
+@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 @pytest.mark.parametrize(
     "test_file_name",
     ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
 def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_page, adoc_data,
-                                   xml_data):
-    from asciidoxy.asciidoc import multi_page
-
+                                   api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
-    if multi_page:
+    if single_and_multi_page:
         expected_output_file_multipage = expected_output_file.with_suffix('.multipage.adoc')
         if expected_output_file_multipage.is_file():
             expected_output_file = expected_output_file_multipage
 
-    output_file = process_adoc(input_file, build_dir, [xml_data])[input_file]
+    output_file = process_adoc(input_file,
+                               build_dir,
+                               api_reference,
+                               multi_page=single_and_multi_page)[input_file]
     assert output_file.is_file()
 
     content = output_file.read_text()
@@ -565,223 +522,14 @@ def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_p
     assert content == expected_output_file.read_text()
 
 
+@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 @pytest.mark.parametrize("test_file_name, error", [("dangling_link", ConsistencyError),
                                                    ("dangling_cross_doc_ref", ConsistencyError),
                                                    ("double_insert", ConsistencyError),
                                                    ("dangling_link_in_insert", ConsistencyError)])
-def test_process_adoc_file_warning_as_error(warnings_are_errors, build_dir, test_file_name, error,
-                                            single_and_multi_page, adoc_data, xml_data):
+def test_process_adoc_file_warning_as_error(build_dir, test_file_name, error, single_and_multi_page,
+                                            adoc_data, api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 
     with pytest.raises(error):
-        process_adoc(input_file, build_dir, [xml_data])
-
-
-def test_context_create_sub_context(context):
-    context.namespace = "ns"
-    context.language = "lang"
-
-    sub = context.sub_context()
-    assert sub is not context
-
-    assert sub.base_dir == context.base_dir
-    assert sub.build_dir == context.build_dir
-    assert sub.fragment_dir == context.fragment_dir
-
-    assert sub.namespace == context.namespace
-    assert sub.language == context.language
-
-    assert sub.reference is context.reference
-    assert sub.linked is context.linked
-    assert sub.inserted is context.inserted
-
-    sub.namespace = "other"
-    sub.language = "objc"
-    assert sub.namespace != context.namespace
-    assert sub.language != context.language
-
-    assert len(context.linked) == 0
-    assert "element" not in context.inserted
-    sub.linked.append(ReferableElement("element"))
-    sub.inserted["element"] = Path("path")
-    assert len(context.linked) == 1
-    assert "element" in context.inserted
-
-
-def test_context_link_to_element_singlepage(context):
-    element_id = "element"
-    file_containing_element = "other_file.adoc"
-    link_text = "Link"
-    context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
-    assert context.link_to_element(element_id, link_text) == f"xref:{element_id}[{link_text}]"
-
-
-def test_context_link_to_element_multipage(context, multi_page):
-    element_id = "element"
-    file_containing_element = "other_file.adoc"
-    link_text = "Link"
-    context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
-    assert (context.link_to_element(
-        element_id, link_text) == f"xref:{file_containing_element}#{element_id}[{link_text}]")
-
-
-def test_context_link_to_element_multipage_element_in_the_same_document(context, multi_page):
-    element_id = "element"
-    link_text = "Link"
-    context.inserted[element_id] = context.current_document.in_file
-    assert (context.link_to_element(element_id, link_text) == f"xref:{element_id}[{link_text}]")
-
-
-def test_context_link_to_element_element_not_inserted(context, single_and_multi_page):
-    element_id = "element"
-    link_text = "Link"
-    assert element_id not in context.inserted
-    assert context.link_to_element(element_id, link_text) == f"xref:{element_id}[{link_text}]"
-
-
-def test_document_tree_node():
-    # Test tree:
-    #
-    #       root
-    #        /|\
-    #       / | \
-    #      /  |  \
-    #     /   |   \
-    #    a    b    c
-    #    /\        /\
-    #   /  \      /  \
-    # a_a  a_b  c_a  c_b
-    #      / \
-    #     /   \
-    #    /     \
-    #  a_b_a  a_b_b
-    root = DocumentTreeNode('root')
-    a = DocumentTreeNode('a', root)
-    root.children.append(a)
-    b = DocumentTreeNode('b', root)
-    root.children.append(b)
-    c = DocumentTreeNode('c', root)
-    root.children.append(c)
-    a_a = DocumentTreeNode('a_a', a)
-    a.children.append(a_a)
-    a_b = DocumentTreeNode('a_b', a)
-    a.children.append(a_b)
-    a_b_a = DocumentTreeNode('a_b_a', a_b)
-    a_b.children.append(a_b_a)
-    a_b_b = DocumentTreeNode('a_b_b', a_b)
-    a_b.children.append(a_b_b)
-    c_a = DocumentTreeNode('c_a', c)
-    c.children.append(c_a)
-    c_b = DocumentTreeNode('c_b', c)
-    c.children.append(c_b)
-
-    def verify_node(node: DocumentTreeNode, expected_parent: DocumentTreeNode,
-                    expected_prev: DocumentTreeNode, expected_next: DocumentTreeNode):
-        assert node.root() is root
-        assert node.parent is expected_parent
-        assert node.preorder_traversal_prev() is expected_prev
-        assert node.preorder_traversal_next() is expected_next
-
-    verify_node(root, expected_parent=None, expected_prev=None, expected_next=a)
-    verify_node(a, expected_parent=root, expected_prev=root, expected_next=a_a)
-    verify_node(a_a, expected_parent=a, expected_prev=a, expected_next=a_b)
-    verify_node(a_b, expected_parent=a, expected_prev=a_a, expected_next=a_b_a)
-    verify_node(a_b_a, expected_parent=a_b, expected_prev=a_b, expected_next=a_b_b)
-    verify_node(a_b_b, expected_parent=a_b, expected_prev=a_b_a, expected_next=b)
-    verify_node(b, expected_parent=root, expected_prev=a_b_b, expected_next=c)
-    verify_node(c, expected_parent=root, expected_prev=b, expected_next=c_a)
-    verify_node(c, expected_parent=root, expected_prev=b, expected_next=c_a)
-    verify_node(c_a, expected_parent=c, expected_prev=c, expected_next=c_b)
-    verify_node(c_b, expected_parent=c, expected_prev=c_a, expected_next=None)
-
-
-def test_document_tree_node_all_documents_from_root_node(document_tree_two_levels_deep):
-
-    assert ({str(d.in_file)
-             for d in document_tree_two_levels_deep.all_documents_in_tree()} == {
-                 "/project/index.adoc", "/project/sub_page1.adoc", "/project/sub_page2.adoc",
-                 "/project/sub_page1_1.adoc", "/project/sub_page1_2.adoc"
-             })
-
-
-def test_document_tree_node_all_documents_from_middle_node(document_tree_two_levels_deep):
-    middle_doc = document_tree_two_levels_deep.children[1]
-
-    assert ({str(d.in_file)
-             for d in middle_doc.all_documents_in_tree()} == {
-                 "/project/index.adoc", "/project/sub_page1.adoc", "/project/sub_page2.adoc",
-                 "/project/sub_page1_1.adoc", "/project/sub_page1_2.adoc"
-             })
-
-
-def test_document_tree_node_all_documents_from_leaf_node(document_tree_two_levels_deep):
-    leaf_doc = document_tree_two_levels_deep.children[0].children[0]
-
-    assert ({str(d.in_file)
-             for d in leaf_doc.all_documents_in_tree()} == {
-                 "/project/index.adoc", "/project/sub_page1.adoc", "/project/sub_page2.adoc",
-                 "/project/sub_page1_1.adoc", "/project/sub_page1_2.adoc"
-             })
-
-
-def test_navigation_bar_first_document(document_tree_two_subpages):
-    next_doc = document_tree_two_subpages.children[0]
-    assert navigation_bar(document_tree_two_subpages) == (
-        f"""[frame=none, grid=none, cols="<.^,^.^,>.^"]
-|===
-|
-
-|
-
-|<<{next_doc.in_file.relative_to(document_tree_two_subpages.in_file.parent)}#,Next>>
-|===""")
-
-
-def test_navigation_bar_middle_document(document_tree_two_subpages):
-    doc = document_tree_two_subpages.children[0]
-    next_doc = document_tree_two_subpages.children[1]
-    assert navigation_bar(doc) == (f"""[frame=none, grid=none, cols="<.^,^.^,>.^"]
-|===
-|<<{document_tree_two_subpages.in_file.relative_to(doc.in_file.parent)}#,Prev>>
-
-|<<{document_tree_two_subpages.in_file.relative_to(doc.in_file.parent)}#,Up>> +
-<<{document_tree_two_subpages.in_file.relative_to(doc.in_file.parent)}#,Home>>
-
-|<<{next_doc.in_file.relative_to(document_tree_two_subpages.in_file.parent)}#,Next>>
-|===""")
-
-
-def test_navigation_bar_last_document(document_tree_two_subpages):
-    doc = document_tree_two_subpages.children[1]
-    prev_doc = document_tree_two_subpages.children[0]
-    assert navigation_bar(doc) == (f"""[frame=none, grid=none, cols="<.^,^.^,>.^"]
-|===
-|<<{prev_doc.in_file.relative_to(doc.in_file.parent)}#,Prev>>
-
-|<<{document_tree_two_subpages.in_file.relative_to(doc.in_file.parent)}#,Up>> +
-<<{document_tree_two_subpages.in_file.relative_to(doc.in_file.parent)}#,Home>>
-
-|
-|===""")
-
-
-def test_navigation_bar_all_links_different(document_tree_two_levels_deep):
-    doc = document_tree_two_levels_deep.children[0].children[1]
-    prev_doc = document_tree_two_levels_deep.children[0].children[0]
-    next_doc = document_tree_two_levels_deep.children[1]
-    up_doc = document_tree_two_levels_deep.children[0]
-
-    assert navigation_bar(doc) == (f"""[frame=none, grid=none, cols="<.^,^.^,>.^"]
-|===
-|<<{prev_doc.in_file.relative_to(doc.in_file.parent)}#,Prev>>
-
-|<<{up_doc.in_file.relative_to(doc.in_file.parent)}#,Up>> +
-<<{document_tree_two_levels_deep.in_file.relative_to(doc.in_file.parent)}#,Home>>
-
-|<<{next_doc.in_file.relative_to(doc.in_file.parent)}#,Next>>
-|===""")
-
-
-def test_navigation_bar_single_document():
-    doc = DocumentTreeNode("/project/index.adoc")
-    assert not navigation_bar(doc)
+        process_adoc(input_file, build_dir, api_reference, warnings_are_errors=True)

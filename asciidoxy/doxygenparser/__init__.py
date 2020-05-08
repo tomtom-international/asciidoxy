@@ -11,10 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Modules for generating AsciiDoc output as part of the preprocessing."""
+"""Parser for Doxygen XML output."""
 
-from .asciidoc import process_adoc, Context
-from .errors import AsciiDocError
-from .filters import InsertionFilter
+from .parser import DoxygenXmlParser, safe_language_tag
 
-__all__ = ["process_adoc", "AsciiDocError", "Context", "InsertionFilter"]
+__all__ = ["DoxygenXmlParser", "safe_language_tag"]
