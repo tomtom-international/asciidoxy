@@ -31,7 +31,7 @@ with open("README.md") as readme_file:
 with open("CHANGELOG.md") as history_file:
     history = history_file.read()
 
-requirements = ["mako~=1.1", "aiohttp~=3.6", "aiodns", "cchardet", "toml~=0.10"]
+requirements = ["mako~=1.1", "aiohttp~=3.6", "aiodns", "cchardet", "toml~=0.10", "tqdm~=4.46"]
 
 setup_requirements = ["pytest-runner>=5", ]
 

@@ -24,6 +24,8 @@ from asciidoxy.collect import (DownloadError, InvalidPackageError, HttpPackageSp
                                SpecificationError, LocalPackageSpec, collect, specs_from_file,
                                versions_from_file)
 
+from.shared import ProgressMock
+
 
 async def start_server(aiohttp_server, *routes):
     app = web.Application()
@@ -255,6 +257,24 @@ async def test_local_package_subdirs_not_matched(tmp_path):
 
     with pytest.raises(InvalidPackageError):
         await collect([spec], output_dir)
+
+
+async def test_progress_report(tmp_path):
+    output_dir = tmp_path / "output"
+    input_dir = tmp_path / "input"
+
+    input_dir.mkdir(parents=True, exist_ok=True)
+    (input_dir / "xml").mkdir()
+
+    spec = LocalPackageSpec("test", input_dir)
+    spec.xml_subdir = "xml"
+    spec.include_subdir = "adoc"
+
+    progress_mock = ProgressMock()
+
+    packages = await collect([spec, spec, spec], output_dir, progress=progress_mock)
+    assert len(packages) == 3
+    assert progress_mock.ready == 3
 
 
 def test_versions_from_file(tmp_path):

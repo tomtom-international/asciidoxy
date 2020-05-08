@@ -18,6 +18,8 @@ import logging
 from pathlib import Path
 from typing import Dict, List, MutableMapping, Optional
 
+from tqdm import tqdm
+
 from ..api_reference import ApiReference
 from ..model import ReferableElement
 from .errors import ConsistencyError
@@ -63,6 +65,7 @@ class Context(object):
     multi_page: bool = False
 
     reference: ApiReference
+    progress: Optional[tqdm] = None
 
     linked: List[ReferableElement]
     inserted: MutableMapping[str, Path]
@@ -115,6 +118,7 @@ class Context(object):
         sub.inserted = self.inserted
         sub.in_to_out_file_map = self.in_to_out_file_map
         sub.insert_filter = self.insert_filter
+        sub.progress = self.progress
 
         return sub
 

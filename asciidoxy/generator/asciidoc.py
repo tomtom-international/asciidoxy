@@ -23,6 +23,8 @@ from mako.template import Template
 from pathlib import Path
 from typing import MutableMapping, NamedTuple, Optional
 
+from tqdm import tqdm
+
 from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..doxygenparser import safe_language_tag
@@ -437,7 +439,8 @@ def process_adoc(in_file: Path,
                  build_dir: Path,
                  api_reference: ApiReference,
                  warnings_are_errors: bool = False,
-                 multi_page: bool = False):
+                 multi_page: bool = False,
+                 progress: Optional[tqdm] = None):
     """Process an AsciiDoc file and insert API reference.
 
     Args:
@@ -463,6 +466,7 @@ def process_adoc(in_file: Path,
 
     context.warnings_are_errors = warnings_are_errors
     context.multi_page = multi_page
+    context.progress = progress
 
     _process_adoc(in_file, context)
     context.linked = []
@@ -481,6 +485,10 @@ def _process_adoc(in_file: Path, context: Context):
     if context.preprocessing_run:
         context.in_to_out_file_map[in_file] = out_file
 
+        if context.progress is not None:
+            context.progress.total = 2 * len(context.in_to_out_file_map)
+            context.progress.update(0)
+
     rendered_doc = template.render(api=api)
 
     if not context.preprocessing_run:
@@ -490,6 +498,9 @@ def _process_adoc(in_file: Path, context: Context):
                 nav_bar = navigation_bar(context.current_document)
                 if nav_bar:
                     print(nav_bar, file=f)
+
+    if context.progress is not None:
+        context.progress.update()
 
     return out_file
 

@@ -18,6 +18,8 @@ import pytest
 from asciidoxy.api_reference import AmbiguousLookupError
 from asciidoxy.doxygenparser.parser import DoxygenXmlParser
 
+from .shared import ProgressMock
+
 
 def test_find_complete_match(parser_factory):
     parser = parser_factory("cpp/default")
@@ -351,6 +353,16 @@ def test_resolve_references_fails_when_ambiguous(parser_factory):
     assert member.returns.type
     assert not member.returns.type.id
     assert not member.returns.type.kind
+
+
+def test_resolve_references__report_progress(parser_factory):
+    parser = parser_factory("cpp/default", "cpp/consumer")
+
+    progress_mock = ProgressMock()
+    parser.resolve_references(progress=progress_mock)
+
+    assert progress_mock.ready == progress_mock.total
+    assert progress_mock.total == 38
 
 
 def test_force_language_java(parser_factory):
