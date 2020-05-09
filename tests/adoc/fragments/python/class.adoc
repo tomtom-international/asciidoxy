@@ -16,27 +16,27 @@ A coordinate has a latitude, longitude, and an altitude.
 
 |*Constructors*
 |
-`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f[__init__]`::
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f[+++__init__+++]`::
 
 
 |*Variables*
 |
-`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8[latitude]`::
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8[+++latitude+++]`::
 Latitude in degrees.
-`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a0eb652e91c894dc2e49d9fbf3f224aa5[longitude]`::
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a0eb652e91c894dc2e49d9fbf3f224aa5[+++longitude+++]`::
 Longitude in degrees.
-`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1ad238c9c268dc5518859400dc9c857fe3[altitude]`::
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1ad238c9c268dc5518859400dc9c857fe3[+++altitude+++]`::
 Altitude in meters.
 |*Static methods*
 |
-`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d[combine]`::
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d[+++combine+++]`::
 Combine two coordinates.
 
 |*Methods*
 |
-`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891[is_valid]`::
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891[+++is_valid+++]`::
 Check if the coordinate is valid.
-`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe[from_string]`::
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe[+++from_string+++]`::
 Create a coordinate from its string representation.
 
 |===

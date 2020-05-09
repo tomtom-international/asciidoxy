@@ -24,11 +24,7 @@ ${api_context.insert(element)}
 
 [source,python,subs="-specialchars,macros+"]
 ----
-% if element.include:
-#include &lt;${element.include}&gt;
-
-% endif
-${"struct" if element.kind == "struct" else "class"} ${element.full_name}
+class ${element.full_name}
 ----
 ${element.brief}
 
@@ -43,7 +39,7 @@ ${element.description}
 |*Enclosed types*
 |
 % for enclosed in public_enclosed_types(element, insert_filter):
-`xref:${enclosed.id}[${enclosed.name}]`::
+`xref:${enclosed.id}[+++${enclosed.name}+++]`::
 ${enclosed.brief}
 % endfor
 
@@ -53,7 +49,7 @@ ${enclosed.brief}
 |*Constructors*
 |
 % for constructor in public_constructors(element, insert_filter):
-`xref:${constructor.id}[${constructor.name}]`::
+`xref:${constructor.id}[+++${constructor.name}+++]`::
 ${constructor.brief}
 % endfor
 
@@ -63,7 +59,7 @@ ${constructor.brief}
 |*Variables*
 |
 % for variable in public_variables(element, insert_filter):
-`xref:${variable.id}[${variable.name}]`::
+`xref:${variable.id}[+++${variable.name}+++]`::
 ${variable.brief}
 % endfor
 % endif
@@ -72,7 +68,7 @@ ${variable.brief}
 |*Static methods*
 |
 % for method in public_static_methods(element, insert_filter):
-`xref:${method.id}[${method.name}]`::
+`xref:${method.id}[+++${method.name}+++]`::
 ${method.brief}
 % endfor
 
@@ -82,7 +78,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in public_methods(element, insert_filter):
-`xref:${method.id}[${method.name}]`::
+`xref:${method.id}[+++${method.name}+++]`::
 ${method.brief}
 % endfor
 
