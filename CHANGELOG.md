@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Allow filtering what members, enum values, inner classes, and exceptions get included when
       using api.insert().
   - Show progress bars for long running tasks.
+  - Support for documenting python code with the help of doxypypy.
 
 ### Changed
   - Default log level decreased to warnings.

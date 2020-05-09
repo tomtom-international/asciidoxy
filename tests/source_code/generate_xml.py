@@ -38,14 +38,14 @@ def main() -> int:
     xml_dir = (Path(__file__).parent / ".." / "xml" / version).resolve()
     xml_dir.mkdir(parents=True, exist_ok=True)
 
+    env = {key: value for key, value in os.environ.items()}
     for doxyfile in Path(__file__).parent.glob("**/Doxyfile*"):
         cwd = doxyfile.parent.resolve()
         out_dir = xml_dir / doxyfile.parent
         out_dir.mkdir(parents=True, exist_ok=True)
-        subprocess.run([doxygen, os.fspath(doxyfile.resolve())],
-                       cwd=cwd,
-                       env={"OUTPUT_DIR": os.fspath(out_dir)},
-                       check=True)
+
+        env["OUTPUT_DIR"] = os.fspath(out_dir)
+        subprocess.run([doxygen, os.fspath(doxyfile.resolve())], cwd=cwd, env=env, check=True)
 
     return 0
 

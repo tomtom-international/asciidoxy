@@ -4,14 +4,14 @@
     <compoundname>ADTrafficEvent.h</compoundname>
     <includes local="no">Foundation/Foundation.h</includes>
     <incdepgraph>
+      <node id="2">
+        <label>Foundation/Foundation.h</label>
+      </node>
       <node id="1">
         <label>ADTrafficEvent.h</label>
         <link refid="_a_d_traffic_event_8h"/>
         <childnode refid="2" relation="include">
         </childnode>
-      </node>
-      <node id="2">
-        <label>Foundation/Foundation.h</label>
       </node>
     </incdepgraph>
     <innerclass refid="interface_traffic_event_data" prot="public">TrafficEventData</innerclass>

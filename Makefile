@@ -90,17 +90,6 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/asciidoxy.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ asciidoxy
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
-
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
-
 release: dist ## package and upload a release
 	twine upload dist/*
 
@@ -122,3 +111,13 @@ docker: dist ## build the docker image
 
 format: ## format the code
 	yapf -r -i -p asciidoxy tests
+
+docs: ## generate documentation
+	mkdir -p build/doc/doxygen
+	mkdir -p build/doc/asciidoxy
+	cd documentation && doxygen
+	cd documentation && asciidoxy --build-dir ../build/doc/asciidoxy \
+		--destination-dir ../build/doc/output \
+		--spec-file asciidoxy.toml \
+		--debug --multi-page \
+		index.adoc

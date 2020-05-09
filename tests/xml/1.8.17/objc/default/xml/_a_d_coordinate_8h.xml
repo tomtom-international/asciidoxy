@@ -5,9 +5,6 @@
     <includes local="no">CoreLocation/CLLocation.h</includes>
     <includes local="no">Foundation/Foundation.h</includes>
     <incdepgraph>
-      <node id="3">
-        <label>Foundation/Foundation.h</label>
-      </node>
       <node id="1">
         <label>ADCoordinate.h</label>
         <link refid="_a_d_coordinate_8h"/>
@@ -15,6 +12,9 @@
         </childnode>
         <childnode refid="3" relation="include">
         </childnode>
+      </node>
+      <node id="3">
+        <label>Foundation/Foundation.h</label>
       </node>
       <node id="2">
         <label>CoreLocation/CLLocation.h</label>

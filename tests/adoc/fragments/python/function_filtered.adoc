@@ -1,0 +1,23 @@
+
+
+= [[python-classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3,refresh_data]]
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+def refresh_data(self) -> None
+----
+
+Refresh the traffic event data.
+
+
+
+[cols='h,5a']
+|===
+| Throws
+|
+`NoDataError`::
+Thrown when there is no data to refresh.
+
+|===
+

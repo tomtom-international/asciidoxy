@@ -1,0 +1,31 @@
+
+
+= [[python-classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e,update]]
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+def update(self, cause: int, delay: int) -> bool
+----
+
+Update the traffic event data.
+
+Verifies the new information before updating.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`cause: int`::
+New TPEG cause code.
+
+`delay: int`::
+New delay in seconds.
+
+| Returns
+|
+`bool`::
+True if the update is valid.
+
+|===
+

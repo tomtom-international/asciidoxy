@@ -12,12 +12,13 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/asciidoxy)](https://pypi.org/project/asciidoxy)
 [![PyPI](https://img.shields.io/pypi/v/asciidoxy)](https://pypi.org/project/asciidoxy)
 
-AsciiDoxy generates API documentation from Doxygen XML output to AsciiDoc.
+AsciiDoxy generates API documentation from [Doxygen](https://doxygen.nl) XML output to AsciiDoc.
 
 Supported languages:
 - C++
 - Java
 - Objective C
+- Python (using [doxypypy](https://github.com/Feneric/doxypypy))
 
 ## Credits
 
@@ -145,6 +146,15 @@ the XML.
 
     GENERATE_XML           = YES
     EXTENSION_MAPPING      = h=objective-c
+
+#### Python
+
+To fully support python docstrings formats like the Google Python Style Guide it is recommended to
+use [doxypypy](https://github.com/Feneric/doxypypy) as a filter for Doxygen.
+
+    FILTER_PATTERNS        = *.py="doxypypy -a -c"
+
+Support for type hints in Doxygen is still limited: https://github.com/doxygen/doxygen/issues/7320.
 
 ### Package specification
 

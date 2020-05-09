@@ -11,3 +11,4 @@ pytest-runner==5.2
 pytest-sugar==0.9.2
 pytest-aiohttp==0.3.0
 yapf==0.29.0
+doxypypy==0.8.8.6

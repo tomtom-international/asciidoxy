@@ -1,0 +1,81 @@
+
+
+= [[python-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy.geometry.Coordinate]]Coordinate
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+class asciidoxy.geometry.Coordinate
+----
+Class to hold information about a coordinate.
+
+A coordinate has a latitude, longitude, and an altitude.
+
+[cols='h,5a']
+|===
+
+|*Constructors*
+|
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f[+++__init__+++]`::
+
+
+|*Variables*
+|
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8[+++latitude+++]`::
+Latitude in degrees.
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a0eb652e91c894dc2e49d9fbf3f224aa5[+++longitude+++]`::
+Longitude in degrees.
+|*Static methods*
+|
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d[+++combine+++]`::
+Combine two coordinates.
+
+|*Methods*
+|
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891[+++is_valid+++]`::
+Check if the coordinate is valid.
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe[+++from_string+++]`::
+Create a coordinate from its string representation.
+
+|===
+
+== Members
+
+include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f.adoc[leveloffset=+1]
+'''
+[[python-classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8,latitude]]
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+latitude
+----
+
+Latitude in degrees.
+
+
+
+'''
+[[python-classasciidoxy_1_1geometry_1_1_coordinate_1a0eb652e91c894dc2e49d9fbf3f224aa5,longitude]]
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+longitude
+----
+
+Longitude in degrees.
+
+
+
+'''
+include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe.adoc[leveloffset=+1]
+'''
+
+
+
+

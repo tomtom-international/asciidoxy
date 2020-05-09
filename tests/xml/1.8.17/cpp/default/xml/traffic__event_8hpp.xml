@@ -75,16 +75,16 @@
 <codeline lineno="99"><highlight class="normal"></highlight></codeline>
 <codeline lineno="109"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b" kindref="member">Update</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>cause,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>delay);</highlight></codeline>
 <codeline lineno="110"><highlight class="normal"></highlight></codeline>
-<codeline lineno="118"><highlight class="normal"><sp/><sp/>std::shared_ptr&lt;TrafficEventData&gt;<sp/><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf" kindref="member">SharedData</ref>()<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">;</highlight></codeline>
-<codeline lineno="119"><highlight class="normal"></highlight></codeline>
-<codeline lineno="126"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" kindref="member">CalculateDelay</ref>();</highlight></codeline>
-<codeline lineno="127"><highlight class="normal"></highlight></codeline>
-<codeline lineno="128"><highlight class="normal"><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
-<codeline lineno="129"><highlight class="normal"><sp/><sp/><ref refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref><sp/>data_;</highlight></codeline>
-<codeline lineno="130"><highlight class="normal">};</highlight></codeline>
-<codeline lineno="131"><highlight class="normal"></highlight></codeline>
-<codeline lineno="132"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>traffic</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="133"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="120"><highlight class="normal"><sp/><sp/>std::shared_ptr&lt;TrafficEventData&gt;<sp/><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf" kindref="member">SharedData</ref>()<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="121"><highlight class="normal"></highlight></codeline>
+<codeline lineno="128"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" kindref="member">CalculateDelay</ref>();</highlight></codeline>
+<codeline lineno="129"><highlight class="normal"></highlight></codeline>
+<codeline lineno="130"><highlight class="normal"><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="131"><highlight class="normal"><sp/><sp/><ref refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref><sp/>data_;</highlight></codeline>
+<codeline lineno="132"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"></highlight></codeline>
+<codeline lineno="134"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>traffic</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="135"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="traffic_event.hpp"/>
   </compounddef>

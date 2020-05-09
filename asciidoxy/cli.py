@@ -211,7 +211,8 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     in_dir = in_file.parent
     for (in_adoc_file, out_adoc_file) in tqdm(
         [(k, v) for (k, v) in in_to_out_file_map.items() if args.multi_page or k == in_file],
-            desc="Running asciidoctor  ", unit="file"):
+            desc="Running asciidoctor  ",
+            unit="file"):
         out_file = destination_dir / in_adoc_file.relative_to(in_dir).with_suffix(extension)
         asciidoctor(destination_dir, out_file, out_adoc_file, args.multi_page, args.backend,
                     extra_args)

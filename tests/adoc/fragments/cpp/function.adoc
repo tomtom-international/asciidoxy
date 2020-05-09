@@ -1,0 +1,31 @@
+
+
+= [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,SharedData]]
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+ std::shared_ptr&lt;xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]&gt; SharedData()
+----
+
+Get a shared pointer to a copy of the data.
+
+Not sure why you want this.
+
+[cols='h,5a']
+|===
+| Returns
+|
+`std::shared_ptr&lt;xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]&gt;`::
+The shared pointer.
+
+| Throws
+|
+`std::runtime_exception`::
+Thrown if no copy of the data is available.
+
+`InvalidEventError`::
+Thrown when the event data is invalid.
+
+|===
+
