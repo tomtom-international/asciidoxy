@@ -15,8 +15,11 @@
 
 import re
 
+import xml.etree.ElementTree as ET
+
 from typing import Optional
 
+from ..model import Compound, Member
 from .language_base import Language
 
 
@@ -48,3 +51,12 @@ class PythonLanguage(Language):
             return namespace
         else:
             return None
+
+    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
+        member = super().parse_member(memberdef_element, parent)
+
+        if member.returns and member.returns.type and member.returns.type.name == "def":
+            # Workaround for Doxygen issue
+            member.returns = None
+
+        return member

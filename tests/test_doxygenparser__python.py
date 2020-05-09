@@ -234,3 +234,38 @@ def test_parse_python_variable(parser_factory):
     # assert not member.returns.type.suffix
     # assert len(member.returns.type.nested) == 0
     # assert not member.returns.description
+
+
+def test_parse_python_constructor(parser_factory):
+    parser = parser_factory("python/default")
+
+    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.__init__",
+                                       kind="function",
+                                       lang="python")
+
+    assert member is not None
+    assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
+                         "1ae2c5561a335e7d226ae84bd561abb95f")
+    assert member.name == "__init__"
+    assert member.full_name == "asciidoxy.geometry.Coordinate.__init__"
+    assert member.language == "python"
+    assert member.kind == "function"
+    assert member.definition == "def asciidoxy.geometry.Coordinate.__init__"
+    assert member.args == "(self)"
+    assert not member.brief
+    assert not member.description
+    assert member.prot == "public"
+    assert member.static is False
+    assert member.namespace == "asciidoxy.geometry.Coordinate"
+
+    assert len(member.params) == 1
+
+    assert member.params[0].type
+    assert member.params[0].type.name == "self"
+    assert not member.params[0].name
+    assert not member.params[0].description
+
+    assert len(member.exceptions) == 0
+    assert len(member.enumvalues) == 0
+
+    assert member.returns is None
