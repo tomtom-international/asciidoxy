@@ -240,6 +240,21 @@ def test_params__cls():
     assert list(params(member)) == [param2]
 
 
+def test_params__no_type():
+    param1 = Parameter()
+    param1.type = None
+    param1.name = "arg1"
+
+    param2 = Parameter()
+    param2.type = None
+    param2.name = "arg2"
+
+    member = Member("lang")
+    member.params = [param1, param2]
+
+    assert list(params(member)) == [param1, param2]
+
+
 def test_public_static_methods__no_filter(python_class):
     result = list(m.name for m in public_static_methods(python_class, InsertionFilter()))
     assert sorted(result) == sorted(["public_static_method"])

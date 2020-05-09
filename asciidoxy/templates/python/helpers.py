@@ -31,7 +31,8 @@ def type_and_name(param, context: Context):
 
 
 def params(element):
-    return (param for param in element.params if param.type.name not in ("self", "cls"))
+    return (param for param in element.params
+            if (not param.type or param.type.name not in ("self", "cls")))
 
 
 def public_static_methods(element, insert_filter: InsertionFilter):

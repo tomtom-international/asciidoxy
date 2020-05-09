@@ -3,7 +3,7 @@
 = [[python-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy.geometry.Coordinate]]Coordinate
 
 
-[source,cpp,subs="-specialchars,macros+"]
+[source,python,subs="-specialchars,macros+"]
 ----
 class asciidoxy.geometry.Coordinate
 ----
@@ -48,7 +48,7 @@ include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a33
 [[python-classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8,latitude]]
 
 
-[source,cpp,subs="-specialchars,macros+"]
+[source,python,subs="-specialchars,macros+"]
 ----
 latitude
 ----
@@ -61,7 +61,7 @@ Latitude in degrees.
 [[python-classasciidoxy_1_1geometry_1_1_coordinate_1a0eb652e91c894dc2e49d9fbf3f224aa5,longitude]]
 
 
-[source,cpp,subs="-specialchars,macros+"]
+[source,python,subs="-specialchars,macros+"]
 ----
 longitude
 ----
@@ -74,7 +74,7 @@ Longitude in degrees.
 [[python-classasciidoxy_1_1geometry_1_1_coordinate_1ad238c9c268dc5518859400dc9c857fe3,altitude]]
 
 
-[source,cpp,subs="-specialchars,macros+"]
+[source,python,subs="-specialchars,macros+"]
 ----
 altitude
 ----

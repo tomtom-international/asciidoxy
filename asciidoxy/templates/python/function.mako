@@ -19,7 +19,7 @@ from asciidoxy.templates.python.helpers import (type_and_name, argument_list, pa
 = [[${element.id},${element.name}]]
 ${api_context.insert(element)}
 
-[source,cpp,subs="-specialchars,macros+"]
+[source,python,subs="-specialchars,macros+"]
 ----
 ${"@staticmethod\n" if element.static else ""}\
 def ${element.name}${argument_list(element.params, api_context)} \

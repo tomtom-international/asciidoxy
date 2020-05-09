@@ -22,7 +22,7 @@ public_constructors, public_variables, public_enclosed_types)
 = [[${element.id},${element.full_name}]]${element.name}
 ${api_context.insert(element)}
 
-[source,cpp,subs="-specialchars,macros+"]
+[source,python,subs="-specialchars,macros+"]
 ----
 % if element.include:
 #include &lt;${element.include}&gt;
@@ -101,7 +101,7 @@ ${api.insert_fragment(constructor, insert_filter)}
 [[${variable.id},${variable.name}]]
 ${api_context.insert(variable)}
 
-[source,cpp,subs="-specialchars,macros+"]
+[source,python,subs="-specialchars,macros+"]
 ----
 % if variable.returns is not None:
 ${variable.name}: ${link_from_ref(variable.returns.type, api_context)}
