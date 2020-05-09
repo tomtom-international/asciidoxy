@@ -55,7 +55,7 @@ class PythonLanguage(Language):
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
         member = super().parse_member(memberdef_element, parent)
 
-        if member.returns and member.returns.type and member.returns.type.name == "def":
+        if member and member.returns and member.returns.type and member.returns.type.name == "def":
             # Workaround for Doxygen issue
             member.returns = None
 
