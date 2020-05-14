@@ -128,6 +128,7 @@ class Api(object):
         have been applied, it is inserted.
 
         Each string can have the following value:
+
         * `NONE`: Exclude all elements.
         * `ALL`: Include all elements.
         * `<regular expression>` or `+<regular expression`: Include elements that match the regular
