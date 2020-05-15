@@ -139,3 +139,6 @@ pip-selfcheck.json
 
 ## Test results
 test_results/
+
+## Test source code copied during documentation build
+documentation/source_code/

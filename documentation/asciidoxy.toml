@@ -12,10 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[packages]
+[sources]
 
-[packages.asciidoxy]
+[sources.local]
 type = "local"
 xml_subdir = "xml"
 include_subdir = "adoc"
+
+[packages]
+
+[packages.asciidoxy]
+source = "local"
 package_dir = "../build/doc/doxygen"
+
+[packages.cppexamples]
+source = "local"
+package_dir = "../tests/xml/1.8.17/cpp/default"
+
+[packages.javaexamples]
+source = "local"
+package_dir = "../tests/xml/1.8.17/java/default"
+
+[packages.objcexamples]
+source = "local"
+package_dir = "../tests/xml/1.8.17/objc/default"
+
+[packages.pythoncexamples]
+source = "local"
+package_dir = "../tests/xml/1.8.17/python/default"
