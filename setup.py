@@ -28,9 +28,6 @@ from asciidoxy._version import (__title__, __description__, __url__, __version__
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-with open("CHANGELOG.md") as history_file:
-    history = history_file.read()
-
 requirements = ["mako~=1.1", "aiohttp~=3.6", "aiodns", "cchardet", "toml~=0.10", "tqdm~=4.46"]
 
 setup_requirements = ["pytest-runner>=5", ]
@@ -61,7 +58,7 @@ setup(
         ],
     },
     install_requires=requirements,
-    long_description=readme + "\n\n" + history,
+    long_description=readme,
     long_description_content_type="text/markdown",
     license=__license__,
     include_package_data=True,
@@ -72,6 +69,11 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url=__url__,
+    project_urls={
+        "Documentation": "https://asciidoxy.org",
+        "Bug Tracker": "https://github.com/tomtom-international/asciidoxy/issues",
+        "Source Code": "https://github.com/tomtom-international/asciidoxy",
+    },
     version=__version__,
     zip_safe=False,
 )
