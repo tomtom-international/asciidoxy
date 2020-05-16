@@ -21,6 +21,8 @@ from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from pathlib import Path
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 from typing import MutableMapping, NamedTuple, Optional
 
 from tqdm import tqdm
@@ -29,9 +31,11 @@ from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..doxygenparser import safe_language_tag
 from ..model import ReferableElement
+from .._version import __version__
 from .context import Context
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
-                     ReferenceNotFoundError, TemplateMissingError, UnlinkableError)
+                     IncompatibleVersionError, ReferenceNotFoundError, TemplateMissingError,
+                     UnlinkableError)
 from .filters import FilterSpec, InsertionFilter
 from .navigation import DocumentTreeNode, navigation_bar, relative_path
 
@@ -417,6 +421,24 @@ class Api(object):
                            separator between the namespace and the short name.
         """
         self._context.namespace = namespace
+
+        # Prevent output of None
+        return ""
+
+    def require_version(self, specifier: str) -> str:
+        """Require a specific version of AsciiDoxy.
+
+        If the running version of AsciiDoxy does not match, an exception is thrown and generation
+        stops.
+
+        Args:
+            specifier: One or more comma-separated version specifiers matching the PEP 440
+            standard.
+        """
+        spec = SpecifierSet(specifier)
+
+        if not Version(__version__) in spec:
+            raise IncompatibleVersionError(specifier)
 
         # Prevent output of None
         return ""

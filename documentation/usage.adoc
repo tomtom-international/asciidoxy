@@ -687,6 +687,41 @@ ${api.namespace(None)}                    # <3>
 <2> Search in the C++ namespace `asciidoxy::exmaple`.
 <3> Only allow fully qualified names from now on.
 
+=== Required version
+
+Your documentation may require features of a specific version of AsciiDoxy. It may also use features
+that are changed in a future version. To make sure your documentation is always generated with a
+compatible version of AsciiDoxy, you can specify a required version or version range.
+
+[source,python]
+----
+${"""
+${api.require_version(<specifier>)}
+"""}
+----
+
+`specifier`:: One or more comma-separated version specifiers matching the PEP 440 standard.
+
+The version specifiers follow https://www.python.org/dev/peps/pep-0440/[PEP 440], which is the same
+standard for specifying python package versions installed with pip.
+
+==== Examples
+
+[source,python]
+----
+${"""
+${api.require_version("==0.5.3")}       # <1>
+${api.require_version("~=0.5.3")}       # <2>
+${api.require_version(">=0.5.3")}       # <3>
+${api.require_version(">=0.5.3,<0.7")}  # <4>
+"""}
+----
+<1> Require version 0.5.3. Allow no other versions.
+<2> Require version 0.5.3 and any newer version that is compatible. In this case patch increments
+are allowed, but minor and major increments are not.
+<3> Require version 0.5.3 and any newer version, including versions with breaking changes.
+<4> Require version 0.5.3 and above, but below version 0.7.
+
 === Reference
 
 ${api.insert("Api", members=["insert$", "filter", "link", "cross_document_ref", "include",

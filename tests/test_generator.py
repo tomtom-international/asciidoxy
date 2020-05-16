@@ -23,8 +23,9 @@ from pathlib import Path
 from asciidoxy.generator.asciidoc import Api, process_adoc
 from asciidoxy.generator.navigation import DocumentTreeNode
 from asciidoxy.generator.errors import (AmbiguousReferenceError, ConsistencyError,
-                                        IncludeFileNotFoundError, ReferenceNotFoundError,
-                                        TemplateMissingError)
+                                        IncludeFileNotFoundError, IncompatibleVersionError,
+                                        ReferenceNotFoundError, TemplateMissingError)
+from asciidoxy import __version__
 from .shared import ProgressMock
 
 
@@ -544,3 +545,54 @@ def test_process_adoc_file_warning_as_error(build_dir, test_file_name, error, si
 
     with pytest.raises(error):
         process_adoc(input_file, build_dir, api_reference, warnings_are_errors=True)
+
+
+def test_require_version__exact_match(api):
+    api.require_version(f"=={__version__}")
+
+
+def test_require_version__exact_match__fail(api):
+    version_parts = __version__.split(".")
+    version_parts[2] = str(int(version_parts[2]) + 1)
+    version = ".".join(version_parts)
+    with pytest.raises(IncompatibleVersionError):
+        api.require_version(f"=={version}")
+
+
+def test_require_version__current_is_minimum(api):
+    api.require_version(f">={__version__}")
+
+
+def test_require_version__current_is_below_minimum(api):
+    version_parts = __version__.split(".")
+    version_parts[1] = str(int(version_parts[1]) + 1)
+    version = ".".join(version_parts)
+    with pytest.raises(IncompatibleVersionError):
+        api.require_version(f">={version}")
+
+
+def test_require_version__current_is_minimum_optimistic(api):
+    api.require_version(f"~={__version__}")
+
+
+def test_require_version__current_is_below_minimum_optimistic(api):
+    version_parts = __version__.split(".")
+    version_parts[1] = str(int(version_parts[1]) + 1)
+    version = ".".join(version_parts)
+    with pytest.raises(IncompatibleVersionError):
+        api.require_version(f"~={version}")
+
+
+def test_require_version__allow_minor_increase(api):
+    version_parts = __version__.split(".")
+    version_parts[1] = str(int(version_parts[1]) - 1)
+    version = ".".join(version_parts)
+    api.require_version(f">={version}")
+
+
+def test_require_version__optimistic_no_minor_increase(api):
+    version_parts = __version__.split(".")
+    version_parts[1] = str(int(version_parts[1]) - 1)
+    version = ".".join(version_parts)
+    with pytest.raises(IncompatibleVersionError):
+        api.require_version(f"~={version}")
