@@ -1,0 +1,95 @@
+// Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= AsciiDoxy
+:notitle:
+:toc: left
+:toc-title: AsciiDoxy
+:icons: font
+:doctype: book
+:source-highlighter: highlightjs
+
+----
+    ___              _ _ ____
+   /   |  __________(_|_) __ \____  _  ____  __
+  / /| | / ___/ ___/ / / / / / __ \| |/_/ / / /
+ / ___ |(__  ) /__/ / / /_/ / /_/ />  </ /_/ /
+/_/  |_/____/\___/_/_/_____/\____/_/|_|\__, /
+                                      /____/
+----
+
+[ ${api.cross_document_ref("index.adoc", "", "Home")} |
+${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
+${api.cross_document_ref("usage.adoc", "", "Usage")} |
+${api.cross_document_ref("examples.adoc", "", "Examples")} |
+${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
+${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
+https://github.com/tomtom-international/asciidoxy[GitHub] ]
+
+= What is AsciiDoxy?
+
+In essence AsciiDoxy is a preprocessor for AsciiDoc files. It looks for specific tags in these files
+and replaces them with valid AsciiDoc syntax. The information it inserts into the AsciiDoc files
+comes from Doxygen XML output.
+
+:sectnums:
+== Collects Doxygen XML and include files
+
+Doxygen XML files are collected from remote HTTP servers, from the local file system, or a
+combination of both. What files are collected is specified in a package specification file and
+optionally a version file. See ${api.cross_document_ref("usage.adoc", "_package_specification",
+"Package specification")} for details.
+
+The packages can also contain other files that can be included in the documentation. These can be
+other AsciiDoc files, images, and other included files. The included AsciiDoc files can alo contain
+AsciiDoxy directives.
+
+== Copies files to an intermediate directory
+
+The input file and all files from the same directory and sub directories will be copied to an
+intermediate directory. After this all `adoc` directories from the downloaded archives will also be
+copied inside the intermediate directory preserving their directory structure.
+
+== Parses Doxygen XML
+
+The downloaded Doxygen XML files are parsed into an internal representation that can be converted to
+AsciiDoc on demand. References between separate packages are detected and resolved.
+
+The parsing takes the source language into account. Specific cases for each language, like the
+format of type specifications, are handled based on the language specified in the Doxygen XML files.
+
+== Preprocesses Asciidoc files
+
+The input AsciiDoc file is preprocessed using Mako. Mako looks for special syntax, the most common
+being `${"${...}"}`. Any valid python code can be placed between the braces, and will be executed by
+Mako.  For more details on the syntax, see the
+https://docs.makotemplates.org/en/latest/syntax.html[Mako syntax documentation].
+
+The code executed by Mako inserts additional AsciiDoc into the file. Methods are provided to use
+the information from the Doxygen XML files. See ${api.cross_document_ref("usage.adoc", "_usage",
+"Usage")} for more details.
+
+Consistency checking is performed to make sure links to, and between, API reference documentation
+are valid. Depending on the command line options either a warning or an error is thrown if an
+inconsistency is found.
+
+The results of preprocessing are pure AsciiDoc files. They are stored as temporary files next to the
+input files inside the intermediate directory. This should preserve all relative links to other
+files.
+
+== Invokes Asciidoctor
+
+When preprocessing is successful, Asciidoctor is invoked to generate single- or multi-paged HTML
+output depending on whether the `--multi-page` option was set.
+
+:sectnums!:
