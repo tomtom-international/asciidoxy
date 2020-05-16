@@ -338,10 +338,12 @@ ${"""
 ${api.insert(<name>,
              [kind=<kind>,]
              [lang=<language>,]
-             [leveloffset])}
-${api.insert_<kind>(<name>,
+             [leveloffset]),
+             [...]}
+${api.insert_<kind>(<name>,                   # <1>
                     [lang=<language>,]
-                    [leveloffset=<offset>])}  # <1>
+                    [leveloffset=<offset>]),
+                    [...]}
 """}
 ----
 <1> Alternative way to specify the `kind` of element to insert.
@@ -359,6 +361,10 @@ Trying to insert an unknown element will result in an error.
 
 When not specifying the language and kind, AsciiDoxy will try to find the element by name, and
 deduce the kind and language. If there are multiple matching elements, an error is raised.
+
+You can add additional options. These options are added as attributes to the inserted include
+directive for the API reference fragment. For available attributes see
+https://asciidoctor.org/docs/user-manual/#include-directive[the AsciiDoctor manual].
 
 ==== Examples
 
@@ -396,7 +402,7 @@ ${api.insert(...,
              [members=<filter_spec>,]
              [inner_classes=<filter_spec>,]
              [enum_values=<filter_spec>,]
-             [exceptions=<filter_spec>])
+             [exceptions=<filter_spec>])}
 """}
 ----
 
@@ -433,7 +439,7 @@ ${"""
 ${api.filter([members=<filter_spec>,]
              [inner_classes=<filter_spec>,]
              [enum_values=<filter_spec>,]
-             [exceptions=<filter_spec>])
+             [exceptions=<filter_spec>])}
 """}
 ----
 
@@ -490,10 +496,10 @@ ${api.link(<name>,
            [lang=<language>,]
            [text=<alt_text>,]
            [full_name=<True/False>])}
-${api.link_<kind>(<name>,
+${api.link_<kind>(<name>,                     # <1>
                   [lang=<language>,]
                   [text=<alt_text>,]
-                  [full_name=<True/False>])}  # <1>
+                  [full_name=<True/False>])}
 """}
 ----
 <1> Alternative way to specify the `kind` of element to link to.
@@ -583,7 +589,8 @@ ${api.include(<file_name>,
               [leveloffset=<offset>,]
               [link_text=<text>,]
               [link_prefix=<prefix>,]
-              [multi_page_link=<bool>])}
+              [multi_page_link=<bool>],
+              [...])}
 """}
 ----
 
@@ -605,6 +612,10 @@ numbered list of links.
 `multi_page_link`:: By default a link is inserted in multi-page mode. Set this to False to omit
 inserting the link. The included file is still processed. Use <<cross_referencing>> to insert a
 link elsewhere in the document.
+
+You can add additional options. These options are added as attributes to the inserted include
+directive for the API reference fragment. For available attributes see
+https://asciidoctor.org/docs/user-manual/#include-directive[the AsciiDoctor manual].
 
 ==== Examples
 

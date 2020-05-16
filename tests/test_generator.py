@@ -49,7 +49,8 @@ def preprocessing_api(input_file, context):
 
 
 def _check_inserted_file_contains(inserted_adoc, expected):
-    file_name = Path(inserted_adoc[9:-16])
+    start_attributes = inserted_adoc.find("[")
+    file_name = Path(inserted_adoc[9:start_attributes])
     assert file_name.is_file()
 
     content = file_name.read_text(encoding="UTF-8")
@@ -96,6 +97,13 @@ def test_insert_cpp_class_with_leveloffset(api):
     result = api.insert("asciidoxy::geometry::Coordinate", leveloffset="+3")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+3]")
+
+
+def test_insert_class_with_extra_options(api):
+    result = api.insert("asciidoxy::geometry::Coordinate", indent=2)
+    assert result.startswith("include::")
+    assert result.endswith("[indent=2,leveloffset=+1]")
+    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
 
 
 def test_insert_cpp_enum(api):
@@ -447,6 +455,18 @@ def test_include_multipage_without_link(api, context, input_file, multi_page):
 
     result = api.include(include_file_rel, link_prefix=prefix, multi_page_link=False)
     assert result == ""
+
+
+def test_include_with_extra_options(api, context, input_file):
+    include_file = input_file.parent / "includes" / "another_file.adoc"
+    include_file.parent.mkdir(parents=True)
+    include_file.touch()
+    context.current_document.children.append(
+        DocumentTreeNode(include_file, context.current_document))
+
+    result = api.include("includes/another_file.adoc", lines="1..10", indent=12)
+    assert result.startswith("include::")
+    assert result.endswith("[lines=1..10,indent=12,leveloffset=+1]")
 
 
 def test_include_error_file_not_found(api, input_file):

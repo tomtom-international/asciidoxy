@@ -173,7 +173,8 @@ class Api(object):
                enum_values: Optional[FilterSpec] = None,
                exceptions: Optional[FilterSpec] = None,
                ignore_global_filter: bool = False,
-               leveloffset: str = "+1") -> str:
+               leveloffset: str = "+1",
+               **asciidoc_options) -> str:
         """Insert API reference documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
@@ -197,6 +198,8 @@ class Api(object):
                                       to apply the filters on top of the global filter.
             leveloffset:          Offset of the top header of the inserted text from the top level
                                       header of the including document.
+            asciidoc_options:     Any additional option is added as an attribute to the include
+                                      directive in single page mode.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -211,7 +214,7 @@ class Api(object):
             insert_filter = self._context.insert_filter
 
         return self.insert_fragment(self.find_element(name, kind=kind, lang=lang), insert_filter,
-                                    leveloffset)
+                                    leveloffset, **asciidoc_options)
 
     def link(self,
              name: str,
@@ -309,7 +312,8 @@ class Api(object):
     def insert_fragment(self,
                         element,
                         insert_filter: InsertionFilter,
-                        leveloffset: str = "+1") -> str:
+                        leveloffset: str = "+1",
+                        **asciidoc_options) -> str:
         """Generate and insert a documentation fragment.
 
         Args:
@@ -317,6 +321,8 @@ class Api(object):
             insertion_filter: Filter for members to insert.
             leveloffset:      Offset of the top header of the inserted text from the top level
                                   header of the including document.
+            asciidoc_options: Any additional option is added as an attribute to the include
+                                  directive in single page mode.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -335,14 +341,17 @@ class Api(object):
             with fragment_file.open("w", encoding="utf-8") as f:
                 print(rendered_doc, file=f)
 
-        return f"include::{fragment_file}[leveloffset={leveloffset}]"
+        asciidoc_options["leveloffset"] = leveloffset
+        attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
+        return f"include::{fragment_file}[{attributes}]"
 
     def include(self,
                 file_name: str,
                 leveloffset: str = "+1",
                 link_text: str = "",
                 link_prefix: str = "",
-                multi_page_link: bool = True) -> str:
+                multi_page_link: bool = True,
+                **asciidoc_options) -> str:
         """Include another AsciiDoc file, and process it to insert API references.
 
         If the output format is multi-paged, the method will cause generation of separate output
@@ -361,6 +370,8 @@ class Api(object):
                                    list of linked subdocuments by setting it to ". ".
             multi_page_link:   True to include a link in a multi-page document (default). Otherwise
                                    the separate document is generated but not linked from here.
+            asciidoc_options:  Any additional option is added as an attribute to the include
+                                   directive in single page mode.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -389,10 +400,13 @@ class Api(object):
                 return (f"{link_prefix}"
                         f"<<{referenced_file}#,{link_text if link_text else referenced_file}>>")
             else:
-                return ("")
+                return ""
+
+        asciidoc_options["leveloffset"] = leveloffset
+        attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
         rel_path = out_file.relative_to(self._current_file.parent)
-        return f"include::{rel_path}[leveloffset={leveloffset}]"
+        return f"include::{rel_path}[{attributes}]"
 
     def language(self, lang: Optional[str]) -> str:
         """Set the default language for all following commands.

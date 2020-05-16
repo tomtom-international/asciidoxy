@@ -20,6 +20,14 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== Unreleased
+
+=== Changed
+
+  - Additional arguments for `api.include` and `api.insert` are passed as attributes of the
+    `include` directive.
+
+
 == 0.5.3 (16 May 2020)
 
 === Added
