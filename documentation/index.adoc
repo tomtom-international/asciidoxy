@@ -28,6 +28,7 @@ ${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
 ${api.cross_document_ref("usage.adoc", "", "Usage")} |
 ${api.cross_document_ref("examples.adoc", "", "Examples")} |
 ${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
+${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 image:https://img.shields.io/badge/License-Apache%202.0-green.svg[License, link=LICENSE]
@@ -77,4 +78,4 @@ ${api.include("about.adoc", multi_page_link=False)}
 ${api.include("usage.adoc", multi_page_link=False)}
 ${api.include("examples.adoc", multi_page_link=False)}
 ${api.include("contributing.adoc", multi_page_link=False)}
-
+${api.include("changelog.adoc", multi_page_link=False)}

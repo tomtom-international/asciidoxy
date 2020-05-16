@@ -33,6 +33,7 @@ ${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
 ${api.cross_document_ref("usage.adoc", "", "Usage")} |
 ${api.cross_document_ref("examples.adoc", "", "Examples")} |
 ${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
+${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = What is AsciiDoxy?

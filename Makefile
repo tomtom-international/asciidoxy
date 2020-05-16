@@ -114,6 +114,8 @@ format: ## format the code
 
 docs: ## generate documentation
 	cp -r tests/source_code documentation/source_code
+	mkdir -p documentation/copy
+	cp CHANGELOG.adoc documentation/copy/
 	mkdir -p build/doc/doxygen
 	mkdir -p build/doc/asciidoxy
 	cd documentation && doxygen

@@ -12,6 +12,7 @@
 [Usage](https://asciidoxy.org/usage.html) |
 [Examples](https://asciidoxy.org/examples.html) |
 [Contributing](https://asciidoxy.org/contributing.html) |
+[Changelog](CHANGELOG.adoc) |
 [GitHub](https://github.com/tomtom-international/asciidoxy) ]
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
