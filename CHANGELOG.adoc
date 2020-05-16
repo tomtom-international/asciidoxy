@@ -28,6 +28,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
       using api.insert().
   - Show progress bars for long running tasks.
   - Support for documenting python code with the help of doxypypy.
+  - Specify a required version of AsciiDoxy in the adoc files.
 
 === Changed
 

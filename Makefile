@@ -110,7 +110,7 @@ docker: dist ## build the docker image
 	cd docker && ./gradlew build
 
 format: ## format the code
-	yapf -r -i -p asciidoxy tests
+	yapf -r -i -p setup.py asciidoxy tests
 
 docs: ## generate documentation
 	cp -r tests/source_code documentation/source_code

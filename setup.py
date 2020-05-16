@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """The setup script."""
 
 import os
@@ -28,11 +27,23 @@ from asciidoxy._version import (__title__, __description__, __url__, __version__
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = ["mako~=1.1", "aiohttp~=3.6", "aiodns", "cchardet", "toml~=0.10", "tqdm~=4.46"]
+requirements = [
+    "mako~=1.1",
+    "aiohttp~=3.6",
+    "aiodns",
+    "cchardet",
+    "toml~=0.10",
+    "tqdm~=4.46",
+    "packaging~=20.3",
+]
 
-setup_requirements = ["pytest-runner>=5", ]
+setup_requirements = [
+    "pytest-runner>=5",
+]
 
-test_requirements = ["pytest>=4", ]
+test_requirements = [
+    "pytest>=4",
+]
 
 setup(
     author=__author__,

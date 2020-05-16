@@ -16,6 +16,7 @@
 from typing import List, Optional
 
 from ..model import Member, ReferableElement
+from .._version import __version__
 
 
 class AsciiDocError(Exception):
@@ -141,3 +142,17 @@ class ConsistencyError(AsciiDocError):
 
     def __str__(self) -> str:
         return self.msg
+
+
+class IncompatibleVersionError(AsciiDocError):
+    """The running version of AsciiDoxy is not compatible with the input file.
+
+    """
+    required_version: str
+
+    def __init__(self, required_version: str):
+        self.required_version = required_version
+
+    def __str__(self) -> str:
+        return (f"Input file requires version {self.required_version} of AsciiDoxy. "
+                f"Current version {__version__} is not compatible.")
