@@ -129,7 +129,26 @@ use https://github.com/Feneric/doxypypy[doxypypy] as a filter for Doxygen.
 
 ----
 GENERATE_XML           = YES
+FILTER_PATTERNS        = *.py="./py_filter.sh"
+----
+
+The contents of py_filter.sh should be:
+
+[source,bash]
+----
+#!/bin/bash
+doxypypy -a -c $1 | sed 's/#        /# /'
+----
+
+The `sed` command is a workaround for https://github.com/Feneric/doxypypy/issues/19[a bug in
+doxypypy].
+
+Alternatively you can disable MarkDown support and run doxypypy directly:
+
+----
+GENERATE_XML           = YES
 FILTER_PATTERNS        = *.py="doxypypy -a -c"
+MARKDOWN_SUPPORT       = NO
 ----
 
 Support for type hints in Doxygen is still limited: https://github.com/doxygen/doxygen/issues/7320.

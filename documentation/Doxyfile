@@ -60,5 +60,5 @@ RECURSIVE              = YES
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-FILTER_PATTERNS        = *.py="doxypypy -a -c"
+FILTER_PATTERNS        = *.py="./py_filter.sh"
 
