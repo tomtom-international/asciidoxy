@@ -41,6 +41,23 @@ https://github.com/tomtom-international/asciidoxy[GitHub] ]
 Instructions for how to install and use AsciiDoxy to create your own AsciiDoc API reference
 documentation.
 
+== Requirements
+
+To run AsciiDoxy you need at least:
+
+- https://www.python.org/[python 3.6, 3.7 or 3.8]
+- https://asciidoctor.org/[AsciiDoctor]
+
+To extract documentation from source code you need:
+
+- https://www.doxygen.nl/[Doxygen]
+
+AsciiDoxy has been tested with:
+
+- python: 3.6, 3.7, 3.8
+- AsciiDoctor: 2.0.10
+- Doxygen: 1.8.16
+
 == Installation
 
 The preferred way to install AsciiDoxy is to use pip:
