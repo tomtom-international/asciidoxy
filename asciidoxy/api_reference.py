@@ -141,15 +141,20 @@ class NameFilter(ElementFilter):
     """
     _name: Optional[str] = None
     _namespace: Optional[str] = None
+    _exact_namespace: bool
 
     _name_parts: NamespaceList
     _namespace_parts: NamespaceList
 
     NAMESPACE_SEPARATORS = "::", "."
 
-    def __init__(self, name: Optional[str], namespace: Optional[str] = None):
+    def __init__(self,
+                 name: Optional[str],
+                 namespace: Optional[str] = None,
+                 exact_namespace: bool = False):
         self._name = name
         self._namespace = namespace
+        self._exact_namespace = exact_namespace
 
         if name is not None and namespace is not None:
             self._name_parts = self._split_namespaces(name)
@@ -186,6 +191,9 @@ class NameFilter(ElementFilter):
             return False
 
         full_name_parts = self._split_namespaces(full_name)
+
+        if self._exact_namespace:
+            return full_name_parts == self._namespace_parts + self._name_parts
 
         if not full_name_parts.endswith(self._name_parts):
             return False
@@ -385,35 +393,37 @@ class ApiReference:
             AmbiguousLookupError: There are multiple matching elements. Make your query more narrow.
         """
         if target_id is not None:
-            return self._find(IdFilter(target_id))
+            matches = [e for e in self.elements if IdFilter(target_id)(e)]
+            if len(matches) == 1:
+                return matches[0]
+            elif len(matches) == 0:
+                return None
+            else:
+                raise AmbiguousLookupError(matches)
 
         paramtype_matcher = ParameterTypeMatcher(name)
         if paramtype_matcher.applies:
             name = paramtype_matcher.name
 
-        previous_error = None
-        if namespace is not None:
-            try:
-                element = self._find(
-                    CombinedFilter(NameFilter(name, namespace), KindFilter(kind), LangFilter(lang),
-                                   paramtype_matcher))
-                if element is not None:
-                    return element
-            except AmbiguousLookupError as e:
-                previous_error = e
+        element_filter = CombinedFilter(NameFilter(name, namespace), KindFilter(kind),
+                                        LangFilter(lang), paramtype_matcher)
 
-        element = self._find(
-            CombinedFilter(NameFilter(name), KindFilter(kind), LangFilter(lang), paramtype_matcher))
-        if element is None and previous_error is not None:
-            raise previous_error
-        return element
-
-    def _find(self, element_filter: ElementFilter):
         matches = [e for e in self.elements if element_filter(e)]
 
         if len(matches) == 1:
             return matches[0]
-        elif len(matches) > 1:
-            raise AmbiguousLookupError(matches)
-        else:
+        elif len(matches) == 0:
             return None
+
+        if namespace is not None:
+            exact_matches = [
+                e for e in matches if NameFilter(name, namespace, exact_namespace=True)(e)
+            ]
+            if len(exact_matches) == 1:
+                return exact_matches[0]
+
+            matches_without_namespace = [e for e in matches if NameFilter(name)(e)]
+            if len(matches_without_namespace) == 1:
+                return matches_without_namespace[0]
+
+        raise AmbiguousLookupError(matches)

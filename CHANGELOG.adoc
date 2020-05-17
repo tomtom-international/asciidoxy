@@ -27,6 +27,11 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Additional arguments for `api.include` and `api.insert` are passed as attributes of the
     `include` directive.
 
+=== Fixed
+
+  - Matching elements in the same namespace are now preferred over elements in a different
+    namespace. Only if all matches are in a parent namespace, the match will be ambiguous.
+
 
 == 0.5.3 (16 May 2020)
 

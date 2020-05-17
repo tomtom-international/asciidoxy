@@ -13,172 +13,7 @@
 # limitations under the License.
 """Generic tests for parsing Doxygen XML files."""
 
-import pytest
-
-from asciidoxy.api_reference import AmbiguousLookupError
-from asciidoxy.doxygenparser.parser import DoxygenXmlParser
-
 from .shared import ProgressMock
-
-
-def test_find_complete_match(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate", kind="function",
-                                     lang="cpp") is None
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate", kind="class",
-                                     lang="java") is None
-    assert parser.api_reference.find(
-        "asciidoxy::geometry::Coordinate::Coordinate", kind="class", lang="cpp") is None
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate", kind="class",
-                                     lang="cpp") is not None
-
-
-def test_find_only_by_id(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    assert parser.api_reference.find(
-        target_id="cpp-classasciidoxy_1_1geometry_1_1_coordinate") is not None
-
-
-def test_find_only_by_name(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate") is not None
-
-
-def test_find_by_name_and_kind(test_data):
-    parser = DoxygenXmlParser()
-    parser.parse(test_data / "ambiguous_names.xml")
-
-    element = parser.api_reference.find("Coordinate", kind="class")
-    assert element is not None
-    assert element.kind == "class"
-
-    element = parser.api_reference.find("Coordinate", kind="interface")
-    assert element is not None
-    assert element.kind == "interface"
-
-    assert parser.api_reference.find("Coordinate", kind="function") is None
-
-
-def test_find_by_name_and_lang(test_data):
-    parser = DoxygenXmlParser()
-    parser.parse(test_data / "ambiguous_names.xml")
-
-    element = parser.api_reference.find("BoundingBox", lang="java")
-    assert element is not None
-    assert element.language == "java"
-
-    element = parser.api_reference.find("BoundingBox", lang="objc")
-    assert element is not None
-    assert element.language == "objc"
-
-    assert parser.api_reference.find("BoundingBox", lang="cpp") is None
-
-
-def test_find_by_name_and_namespace(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                     namespace="asciidoxy") is not None
-    assert parser.api_reference.find("geometry::Coordinate", namespace="asciidoxy") is not None
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                     namespace="asciidoxy::geometry") is not None
-    assert parser.api_reference.find("geometry::Coordinate",
-                                     namespace="asciidoxy::geometry") is not None
-    assert parser.api_reference.find("Coordinate", namespace="asciidoxy::geometry") is not None
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                     namespace="asciidoxy::traffic") is not None
-    assert parser.api_reference.find("geometry::Coordinate",
-                                     namespace="asciidoxy::traffic") is not None
-
-
-def test_find_by_name__prefer_exact_match(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    assert parser.api_reference.find(
-        "asciidoxy::geometry::Coordinate::Coordinate",
-        namespace="asciidoxy").namespace == "asciidoxy::geometry::Coordinate"
-
-    with pytest.raises(AmbiguousLookupError):
-        # TODO: Unsupported case for now
-        assert parser.api_reference.find("Coordinate",
-                                         namespace="asciidoxy::geometry::Coordinate") is None
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                     namespace="asciidoxy").namespace == "asciidoxy::geometry"
-    assert parser.api_reference.find(
-        "Coordinate", namespace="asciidoxy::geometry").namespace == "asciidoxy::geometry"
-
-
-def test_find_by_name_ambiguous(test_data):
-    parser = DoxygenXmlParser()
-    parser.parse(test_data / "ambiguous_names.xml")
-
-    with pytest.raises(AmbiguousLookupError) as exception1:
-        parser.api_reference.find("BoundingBox")
-    assert len(exception1.value.candidates) == 2
-
-    with pytest.raises(AmbiguousLookupError) as exception2:
-        parser.api_reference.find("Coordinate", lang="cpp")
-    assert len(exception2.value.candidates) == 2
-
-
-def test_find_method__explicit_no_arguments(parser_factory):
-    reference = parser_factory("cpp/default").api_reference
-
-    element = reference.find("asciidoxy::geometry::Coordinate::Coordinate()")
-    assert element is not None
-
-
-def test_find_method__explicit_no_arguments__requires_no_args(parser_factory):
-    reference = parser_factory("cpp/default").api_reference
-
-    element = reference.find("asciidoxy::traffic::TrafficEvent::Update()")
-    assert element is None
-
-
-def test_find_method__select_based_on_args(parser_factory):
-    reference = parser_factory("cpp/default").api_reference
-
-    with pytest.raises(AmbiguousLookupError):
-        reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent")
-
-    element = reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent()")
-    assert element is not None
-
-    element = reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent(TrafficEventData)")
-    assert element is not None
-
-
-def test_find_method__select_based_on_args_2(parser_factory):
-    reference = parser_factory("cpp/default").api_reference
-
-    with pytest.raises(AmbiguousLookupError):
-        reference.find("asciidoxy::geometry::Coordinate::Update")
-
-    element = reference.find("asciidoxy::geometry::Coordinate::Update()")
-    assert element is None
-
-    element = reference.find("asciidoxy::geometry::Coordinate::Update(const Coordinate&)")
-    assert element is not None
-
-    element = reference.find(
-        "asciidoxy::geometry::Coordinate::Update(std::tuple< double, double, double >)")
-    assert element is not None
-
-    element = reference.find(
-        "asciidoxy::geometry::Coordinate::Update(std::tuple< double, double >)")
-    assert element is not None
-
-    element = reference.find("asciidoxy::geometry::Coordinate::Update(double, double)")
-    assert element is not None
-
-    element = reference.find("asciidoxy::geometry::Coordinate::Update(double, double, double)")
-    assert element is not None
 
 
 def test_resolve_references_for_return_types(parser_factory):
@@ -333,12 +168,61 @@ def test_resolve_partial_references_for_exceptions(parser_factory):
     assert member.exceptions[0].type.kind == "class"
 
 
+def test_resolve_references_prefer_same_namespace(parser_factory):
+    parser = parser_factory("cpp/default", "cpp/consumer")
+
+    member_a_t = parser.api_reference.find("asciidoxy::traffic::CreateConvertor",
+                                           kind="function",
+                                           lang="cpp")
+    assert member_a_t is not None
+    assert member_a_t.returns
+    assert member_a_t.returns.type
+    assert not member_a_t.returns.type.id
+    assert not member_a_t.returns.type.kind
+
+    member_a = parser.api_reference.find("asciidoxy::CreateConvertor", kind="function", lang="cpp")
+    assert member_a is not None
+    assert member_a.returns
+    assert member_a.returns.type
+    assert not member_a.returns.type.id
+    assert not member_a.returns.type.kind
+
+    member_a_g = parser.api_reference.find("asciidoxy::geometry::CreateConvertor",
+                                           kind="function",
+                                           lang="cpp")
+    assert member_a_g is not None
+    assert member_a_g.returns
+    assert member_a_g.returns.type
+    assert not member_a_g.returns.type.id
+    assert not member_a_g.returns.type.kind
+
+    parser.resolve_references()
+
+    assert member_a_t.returns
+    assert member_a_t.returns.type
+    assert member_a_t.returns.type.id == "cpp-classasciidoxy_1_1traffic_1_1_convertor"
+    assert member_a_t.returns.type.kind == "class"
+    assert member_a_t.returns.type.namespace == "asciidoxy::traffic"
+
+    assert member_a.returns
+    assert member_a.returns.type
+    assert member_a.returns.type.id == "cpp-classasciidoxy_1_1_convertor"
+    assert member_a.returns.type.kind == "class"
+    assert member_a.returns.type.namespace == "asciidoxy"
+
+    assert member_a_g.returns
+    assert member_a_g.returns.type
+    assert member_a_g.returns.type.id == "cpp-classasciidoxy_1_1geometry_1_1_convertor"
+    assert member_a_g.returns.type.kind == "class"
+    assert member_a_g.returns.type.namespace == "asciidoxy::geometry"
+
+
 def test_resolve_references_fails_when_ambiguous(parser_factory):
     # When internal resolving fails, the type will not be resolved to the exact type, and will be
     # shown in the documentation as plain text. It should not raise an error.
     parser = parser_factory("cpp/default", "cpp/consumer")
 
-    member = parser.api_reference.find("asciidoxy::traffic::CreateConvertor",
+    member = parser.api_reference.find("asciidoxy::traffic::geometry::CreateConvertor",
                                        kind="function",
                                        lang="cpp")
     assert member is not None
@@ -362,7 +246,7 @@ def test_resolve_references__report_progress(parser_factory):
     parser.resolve_references(progress=progress_mock)
 
     assert progress_mock.ready == progress_mock.total
-    assert progress_mock.total == 37
+    assert progress_mock.total == 39
 
 
 def test_force_language_java(parser_factory):

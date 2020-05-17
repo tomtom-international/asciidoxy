@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="namespacegeometry" kind="namespace" language="C++">
+    <compoundname>geometry</compoundname>
+    <innerclass refid="classgeometry_1_1_converter" prot="public">geometry::Converter</innerclass>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="same_in_multiple_namespaces.hpp" line="17" column="1"/>
+  </compounddef>
+</doxygen>

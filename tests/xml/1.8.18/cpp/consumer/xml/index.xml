@@ -19,6 +19,9 @@
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
     <member refid="use__same__from__multiple__namespaces_8hpp_1a83ef97f115a6a46b90e6f9d2055745c0" kind="function"><name>CreateConvertor</name></member>
   </compound>
+  <compound refid="namespaceasciidoxy_1_1traffic_1_1geometry" kind="namespace"><name>asciidoxy::traffic::geometry</name>
+    <member refid="use__same__from__multiple__namespaces_8hpp_1af30b1aaeff7d7434d667e176017a219e" kind="function"><name>CreateConvertor</name></member>
+  </compound>
   <compound refid="positioning_8hpp" kind="file"><name>positioning.hpp</name>
   </compound>
   <compound refid="use__same__from__multiple__namespaces_8hpp" kind="file"><name>use_same_from_multiple_namespaces.hpp</name>
