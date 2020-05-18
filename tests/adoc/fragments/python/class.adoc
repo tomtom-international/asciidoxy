@@ -38,6 +38,8 @@ Combine two coordinates.
 Check if the coordinate is valid.
 `xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe[+++from_string+++]`::
 Create a coordinate from its string representation.
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa[+++from_string_safe+++]`::
+Create a coordinate from its string representation.
 
 |===
 
@@ -89,6 +91,8 @@ include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0b
 include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891.adoc[leveloffset=+1]
 '''
 include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa.adoc[leveloffset=+1]
 '''
 
 

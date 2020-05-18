@@ -7,6 +7,7 @@
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f" kind="function"><name>__init__</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891" kind="function"><name>is_valid</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe" kind="function"><name>from_string</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa" kind="function"><name>from_string_safe</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d" kind="function"><name>combine</name></member>
   </compound>
   <compound refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kind="class"><name>asciidoxy::traffic::TrafficEvent::Severity</name>

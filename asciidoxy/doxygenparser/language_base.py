@@ -99,6 +99,7 @@ class Language(object):
             param = Parameter()
             param.type = self.parse_type(param_element.find("type"), parent)
             param.name = param_element.findtext("declname") or ""
+            self.parse_array(param_element.find("array"), param)
 
             matching_descriptions = [desc for name, desc in descriptions if name == param.name]
             if matching_descriptions:
@@ -108,6 +109,9 @@ class Language(object):
 
             params.append(param)
         return params
+
+    def parse_array(self, array_element: Optional[ET.Element], param: Parameter):
+        pass
 
     def parse_type(self,
                    type_element: Optional[ET.Element],

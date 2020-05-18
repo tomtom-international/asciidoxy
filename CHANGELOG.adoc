@@ -34,6 +34,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - For types directly included in a namespace the include file is now present.
   - C++ functions that are inserted directly, so not as part of an enclosing type, have a section
     header and include file.
+  - Nested python type hints are now detected and shown in the documentation.
 
 
 == 0.5.3 (16 May 2020)

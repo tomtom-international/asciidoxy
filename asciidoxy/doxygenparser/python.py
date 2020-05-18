@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 
 from typing import Optional
 
-from ..model import Compound, Member
+from ..model import Compound, Member, Parameter
 from .language_base import Language
 
 
@@ -60,3 +60,17 @@ class PythonLanguage(Language):
             member.returns = None
 
         return member
+
+    def parse_array(self, array_element: Optional[ET.Element], param: Parameter):
+        if array_element is None or param.type is None:
+            return
+        if not array_element.text:
+            return
+
+        # TODO: This is ugly. Type parsing needs refactoring.
+        type_element = ET.Element("type")
+        type_element.text = f"{param.type.name}{array_element.text}"
+        type_ref = self.parse_type(type_element)
+
+        if type_ref is not None and type_ref.nested:
+            param.type.nested = type_ref.nested

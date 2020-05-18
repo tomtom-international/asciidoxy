@@ -30,12 +30,14 @@ def test_parse_python_class(parser_factory):
     assert python_class.description == "A coordinate has a latitude, longitude, and an altitude."
     assert python_class.namespace == "asciidoxy.geometry"
 
-    assert len(python_class.members) == 7
+    assert len(python_class.members) == 8
     assert len(python_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in python_class.members)
-    assert member_names == sorted(
-        ["altitude", "latitude", "longitude", "is_valid", "__init__", "from_string", "combine"])
+    assert member_names == sorted([
+        "altitude", "latitude", "longitude", "is_valid", "__init__", "from_string", "combine",
+        "from_string_safe"
+    ])
 
 
 def test_parse_python_class_with_nested_class(parser_factory):
@@ -269,3 +271,49 @@ def test_parse_python_constructor(parser_factory):
     assert len(member.enumvalues) == 0
 
     assert member.returns is None
+
+
+def test_parse_python_nested_argument_and_return_type(parser_factory):
+    parser = parser_factory("python/default")
+
+    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.from_string_safe",
+                                       kind="function",
+                                       lang="python")
+
+    assert member is not None
+    assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
+                         "1a6711de457ebaf61c48358c2d2a37dbfa")
+    assert member.name == "from_string_safe"
+    assert member.prot == "public"
+    assert member.static is False
+
+    assert len(member.params) == 2
+
+    assert member.params[0].type
+    assert member.params[0].type.name == "cls"
+    assert not member.params[0].name
+    assert not member.params[0].description
+
+    assert member.params[1].type
+    assert member.params[1].type.name == "Optional"
+    assert len(member.params[1].type.nested) == 1
+    assert member.params[1].type.nested[0].name == "str"
+    assert member.params[1].name == "value"
+    assert not member.params[1].description
+
+    assert len(member.exceptions) == 0
+    assert len(member.enumvalues) == 0
+
+    assert member.returns is not None
+    assert member.returns.type is not None
+    assert not member.returns.type.id
+    assert not member.returns.type.kind
+    assert member.returns.type.language == "python"
+    assert member.returns.type.name == "Optional"
+    assert member.returns.type.namespace == "asciidoxy.geometry.Coordinate"
+    assert not member.returns.type.prefix
+    assert not member.returns.type.suffix
+    assert not member.returns.description
+    assert len(member.returns.type.nested) == 1
+    assert member.returns.type.nested[0].name == "Coordinate"
+    assert member.returns.type.nested[0].namespace == "asciidoxy.geometry.Coordinate"

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 
 class Coordinate:
     """Class to hold information about a coordinate.
@@ -50,4 +52,12 @@ class Coordinate:
     @staticmethod
     def combine(left: "Coordinate", right: "Coordinate") -> "Coordinate":
         """Combine two coordinates."""
+        ...
+
+    @classmethod
+    def from_string_safe(cls, value: Optional[str]) -> Optional["Coordinate"]:
+        """Create a coordinate from its string representation.
+
+        Accepts None as input.
+        """
         ...
