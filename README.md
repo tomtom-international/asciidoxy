@@ -28,14 +28,22 @@ Supported languages:
 - Objective C
 - Python (using [doxypypy](https://github.com/Feneric/doxypypy))
 
+Features:
+
+- API documentation generation.
+- Collecting API reference information from remote and local sources.
+- Single and multi page HTML output.
+- Single page PDF output.
+
+
 ## Credits
 
-This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the
-[audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage) project
-template.
+Inspiration for creating AsciiDoxy was found in this article by Sy Brand:
+https://devblogs.microsoft.com/cppblog/clear-functional-c-documentation-with-sphinx-breathe-doxygen-cmake/
 
-Before going public on GitHub, several TomTommers contributed to the internal version of AsciiDoxy.
-Many thanks to:
+Before going public on GitHub, several people inside [TomTom](https://www.tomtom.com) contributed to
+the internal version of AsciiDoxy. Many thanks to:
+
 - Andy Salter
 - Arkadiusz Skalski
 - Lukasz Glowcyk
@@ -43,3 +51,6 @@ Many thanks to:
 - Niels van der Schans
 - Robert Gernert
 - Tomasz Maj
+
+The python package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the
+[audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage) project template.
