@@ -31,6 +31,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
   - Matching elements in the same namespace are now preferred over elements in a different
     namespace. Only if all matches are in a parent namespace, the match will be ambiguous.
+  - For types directly included in a namespace the include file is now present.
+  - C++ functions that are inserted directly, so not as part of an enclosing type, have a section
+    header and include file.
 
 
 == 0.5.3 (16 May 2020)

@@ -234,6 +234,7 @@ class Language(object):
         member.name = self.short_name(name)
         member.full_name = self.full_name(name, parent.full_name)
         member.namespace = self.namespace(member.full_name)
+        member.include = parent.include
 
         if self.is_member_blacklisted(member.kind, member.name):
             return None
@@ -281,6 +282,7 @@ class Language(object):
         compound.name = self.short_name(name)
         compound.full_name = self.full_name(name)
         compound.namespace = self.namespace(compound.full_name)
+        compound.include = self.find_include(compounddef_element)
 
         compound.members = [
             member
@@ -294,9 +296,18 @@ class Language(object):
             self.parse_description(compounddef_element.find("briefdescription")),
             self.parse_description(compounddef_element.find("detaileddescription")))
         compound.enumvalues = self.parse_enumvalues(compounddef_element, compound.full_name)
-        compound.include = compounddef_element.findtext("includes")
 
         self._parser.register(compound)
+
+    def find_include(self, element: ET.Element) -> Optional[str]:
+        include = element.findtext("includes")
+
+        if include is None:
+            location_element = element.find("location")
+            if location_element is not None:
+                include = location_element.get("file", None)
+
+        return include
 
     def unique_id(self, id: Optional[str]) -> Optional[str]:
         if not id:

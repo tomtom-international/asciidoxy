@@ -5,6 +5,8 @@
 
 [source,java,subs="-specialchars,macros+"]
 ----
+import TrafficEvent.java
+
 enum com.asciidoxy.traffic.TrafficEvent.Severity
 ----
 

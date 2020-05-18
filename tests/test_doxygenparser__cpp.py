@@ -110,6 +110,7 @@ def test_parse_cpp_member_function_no_return_value(parser_factory):
     assert member.description == ""
     assert member.prot == "public"
     assert member.static is False
+    assert member.include == "coordinate.hpp"
     assert member.namespace == "asciidoxy::geometry::Coordinate"
 
     assert len(member.params) == 0
@@ -137,6 +138,7 @@ def test_parse_cpp_member_function_only_return_value(parser_factory):
     assert member.description == "A coordinate is valid if its values are within WGS84 bounds."
     assert member.prot == "public"
     assert member.static is False
+    assert member.include == "coordinate.hpp"
     assert member.namespace == "asciidoxy::geometry::Coordinate"
 
     assert len(member.params) == 0
@@ -175,6 +177,7 @@ def test_parse_cpp_member_function_params_and_return_value(parser_factory):
     assert member.description == "Verifies the new information before updating."
     assert member.prot == "public"
     assert member.static is False
+    assert member.include == "traffic_event.hpp"
     assert member.namespace == "asciidoxy::traffic::TrafficEvent"
 
     assert len(member.exceptions) == 0
@@ -240,6 +243,7 @@ def test_parse_cpp_member_function_with_nested_return_type(parser_factory):
     assert member.returns.type.kind is None
     assert member.returns.type.language == "cpp"
     assert member.returns.type.name == "std::shared_ptr"
+    assert member.include == "traffic_event.hpp"
     assert member.returns.type.namespace == "asciidoxy::traffic::TrafficEvent"
     assert not member.returns.type.prefix
     assert not member.returns.type.suffix
@@ -268,6 +272,7 @@ def test_parse_cpp_member_enum(parser_factory):
     assert member.brief == "Severity scale for traffic events."
     assert (member.description ==
             "The more severe the traffic event, the more likely it is to have a large delay.")
+    assert member.include == "traffic_event.hpp"
 
     assert len(member.enumvalues) == 4
     enum_value = [e for e in member.enumvalues if e.name == "High"][0]
@@ -291,6 +296,7 @@ def test_parse_cpp_member_function_with_exception(parser_factory):
     assert member is not None
     assert member.name == "CalculateDelay"
     assert member.namespace == "asciidoxy::traffic::TrafficEvent"
+    assert member.include == "traffic_event.hpp"
 
     assert len(member.exceptions) == 1
     assert member.exceptions[0].type

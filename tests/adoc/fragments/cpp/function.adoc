@@ -5,6 +5,8 @@
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
+#include &lt;traffic_event.hpp&gt;
+
  std::shared_ptr&lt;xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]&gt; SharedData()
 ----
 
