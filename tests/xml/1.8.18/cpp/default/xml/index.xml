@@ -59,6 +59,7 @@
   <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
   </compound>
   <compound refid="namespaceasciidoxy_1_1system" kind="namespace"><name>asciidoxy::system</name>
+    <member refid="service_8hpp_1a7c44d1c4b121bf30bf90a517f8ff9fbc" kind="function"><name>CreateService</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
     <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>

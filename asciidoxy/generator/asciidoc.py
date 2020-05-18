@@ -313,6 +313,7 @@ class Api(object):
                         element,
                         insert_filter: InsertionFilter,
                         leveloffset: str = "+1",
+                        kind_override: Optional[str] = None,
                         **asciidoc_options) -> str:
         """Generate and insert a documentation fragment.
 
@@ -321,6 +322,8 @@ class Api(object):
             insertion_filter: Filter for members to insert.
             leveloffset:      Offset of the top header of the inserted text from the top level
                                   header of the including document.
+            kind_override:    Override the kind of template to use. None to use the kind of
+                                  `element`.
             asciidoc_options: Any additional option is added as an attribute to the include
                                   directive in single page mode.
 
@@ -331,11 +334,15 @@ class Api(object):
         assert element.id
         fragment_file = self._context.fragment_dir / f"{element.id}.adoc"
 
-        rendered_doc = self._template(element.language,
-                                      element.kind).render(element=element,
-                                                           insert_filter=insert_filter,
-                                                           api_context=self._context,
-                                                           api=self)
+        if kind_override is None:
+            kind = element.kind
+        else:
+            kind = kind_override
+
+        rendered_doc = self._template(element.language, kind).render(element=element,
+                                                                     insert_filter=insert_filter,
+                                                                     api_context=self._context,
+                                                                     api=self)
 
         if not self._context.preprocessing_run:
             with fragment_file.open("w", encoding="utf-8") as f:

@@ -44,8 +44,10 @@
 <codeline lineno="51"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>Register(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classasciidoxy_1_1system_1_1_service" kindref="compound">Service</ref>&amp;<sp/>service);</highlight></codeline>
 <codeline lineno="52"><highlight class="normal">};</highlight></codeline>
 <codeline lineno="53"><highlight class="normal"></highlight></codeline>
-<codeline lineno="54"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>system</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="55"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="60"><highlight class="normal">std::unique_ptr&lt;Service&gt;<sp/>CreateService(std::string<sp/>name);</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>system</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="service.hpp"/>
   </compounddef>

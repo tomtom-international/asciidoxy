@@ -12,18 +12,14 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, argument_list)
+from asciidoxy.templates.helpers import (link_from_ref, type_and_name, argument_list, has)
 %>
 
-= [[${element.id},${element.full_name}]]${element.name}
+= [[${element.id},${element.name}]]
 ${api_context.insert(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-% if element.include:
-#include &lt;${element.include}&gt;
-
-% endif
 ${"static" if element.static else ""} \
 ${link_from_ref(element.returns.type, api_context) if element.returns else ""} \
 ${element.name}${argument_list(element.params, api_context)}
