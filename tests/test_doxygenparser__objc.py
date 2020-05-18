@@ -20,7 +20,7 @@ import pytest
 import xml.etree.ElementTree as ET
 
 from asciidoxy.doxygenparser.objc import ObjectiveCLanguage
-from asciidoxy.doxygenparser.parser import DoxygenXmlParser
+from asciidoxy.doxygenparser import Driver as ParserDriver
 from .shared import assert_equal_or_none_if_empty
 
 
@@ -176,7 +176,7 @@ def objc_type_suffix(request):
 
 
 def test_parse_objc_type_from_text_simple(objc_type_prefix, objc_type_suffix):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     objc = ObjectiveCLanguage(parser)
 
     type_element = ET.Element("type")
@@ -201,7 +201,7 @@ def test_parse_objc_type_from_text_simple(objc_type_prefix, objc_type_suffix):
     "signed char", "long double"
 ])
 def test_parse_objc_type_with_space(type_with_space):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     objc = ObjectiveCLanguage(parser)
 
     type_element = ET.Element("type")

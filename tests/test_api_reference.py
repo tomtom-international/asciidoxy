@@ -16,7 +16,7 @@
 import pytest
 
 from asciidoxy.api_reference import AmbiguousLookupError, NameFilter, ParameterTypeMatcher
-from asciidoxy.doxygenparser.parser import DoxygenXmlParser
+from asciidoxy.doxygenparser import Driver as ParserDriver
 
 
 def test_function_matcher__parse__no_arguments():
@@ -231,7 +231,7 @@ def test_find_only_by_name(parser_factory):
 
 
 def test_find_by_name_and_kind(test_data):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     parser.parse(test_data / "ambiguous_names.xml")
 
     element = parser.api_reference.find("Coordinate", kind="class")
@@ -246,7 +246,7 @@ def test_find_by_name_and_kind(test_data):
 
 
 def test_find_by_name_and_lang(test_data):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     parser.parse(test_data / "ambiguous_names.xml")
 
     element = parser.api_reference.find("BoundingBox", lang="java")
@@ -297,7 +297,7 @@ def test_find_by_name__prefer_exact_match(parser_factory):
 
 
 def test_find_by_name_ambiguous(test_data):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     parser.parse(test_data / "ambiguous_names.xml")
 
     with pytest.raises(AmbiguousLookupError) as exception1:

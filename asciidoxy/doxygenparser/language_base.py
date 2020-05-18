@@ -33,8 +33,8 @@ def _yes_no_to_bool(yes_no: str) -> bool:
     return False
 
 
-class ParserBase(ABC):
-    """Base class for parsers."""
+class DriverBase(ABC):
+    """Base class for drivers."""
     @abstractmethod
     def register(self, element: ReferableElement) -> None:
         """Register a new element."""
@@ -70,10 +70,10 @@ class Language(object):
     TYPE_NESTED_END: Pattern
     TYPE_NAME: Pattern
 
-    _parser: ParserBase
+    _driver: DriverBase
 
-    def __init__(self, parser: ParserBase):
-        self._parser = parser
+    def __init__(self, driver: DriverBase):
+        self._driver = driver
 
     def parse_description(self, description_element: Optional[ET.Element]) -> str:
         if description_element is None:
@@ -173,7 +173,7 @@ class Language(object):
             # this fake types should be filtered out
             if type_ref.name:
                 if not type_ref.id and not self.is_language_standard_type(type_ref.name):
-                    self._parser.unresolved_ref(type_ref)
+                    self._driver.unresolved_ref(type_ref)
 
             return type_ref, text
 
@@ -192,7 +192,7 @@ class Language(object):
             exception.type.namespace = parent.namespace
             exception.description = desc
             exceptions.append(exception)
-            self._parser.unresolved_ref(exception.type)
+            self._driver.unresolved_ref(exception.type)
         return exceptions
 
     def parse_returns(self, memberdef_element: ET.Element, parent: Member) -> Optional[ReturnValue]:
@@ -224,7 +224,7 @@ class Language(object):
                 self.parse_description(enumvalue_element.find("detaileddescription")))
 
             values.append(v)
-            self._parser.register(v)
+            self._driver.register(v)
 
         return values
 
@@ -254,7 +254,7 @@ class Language(object):
         member.enumvalues = self.parse_enumvalues(memberdef_element, member.full_name)
         member.static = _yes_no_to_bool(memberdef_element.get("static", "false"))
 
-        self._parser.register(member)
+        self._driver.register(member)
         return member
 
     def parse_innerclass(self, parent: Compound, parent_compound: ET.Element) \
@@ -273,7 +273,7 @@ class Language(object):
             inner_type.namespace = parent.full_name
 
             inner_classes.append(inner_type)
-            self._parser.unresolved_ref(inner_type)
+            self._driver.unresolved_ref(inner_type)
 
         return inner_classes
 
@@ -301,7 +301,7 @@ class Language(object):
             self.parse_description(compounddef_element.find("detaileddescription")))
         compound.enumvalues = self.parse_enumvalues(compounddef_element, compound.full_name)
 
-        self._parser.register(compound)
+        self._driver.register(compound)
 
     def find_include(self, element: ET.Element) -> Optional[str]:
         include = element.findtext("includes")

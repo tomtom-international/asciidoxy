@@ -18,7 +18,7 @@ import pytest
 from pathlib import Path
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.doxygenparser import DoxygenXmlParser
+from asciidoxy.doxygenparser import Driver as ParserDriver
 from asciidoxy.generator.asciidoc import Api, Context, DocumentTreeNode
 from asciidoxy.model import Compound, Member, ReturnValue, InnerTypeReference
 
@@ -54,7 +54,7 @@ def xml_data(doxygen_version):
 @pytest.fixture
 def parser_factory(xml_data):
     def factory(*test_dirs, force_language=None):
-        parser = DoxygenXmlParser(force_language=force_language)
+        parser = ParserDriver(force_language=force_language)
 
         for test_dir in test_dirs:
             for xml_file in (xml_data / test_dir).glob("**/*.xml"):

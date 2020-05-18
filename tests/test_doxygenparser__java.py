@@ -18,7 +18,7 @@ import pytest
 import xml.etree.ElementTree as ET
 
 from asciidoxy.doxygenparser.java import JavaLanguage
-from asciidoxy.doxygenparser.parser import DoxygenXmlParser
+from asciidoxy.doxygenparser import Driver as ParserDriver
 from tests.shared import assert_equal_or_none_if_empty
 
 
@@ -141,7 +141,7 @@ def java_type_prefix(request):
 
 
 def test_parse_java_type_from_text_simple(java_type_prefix):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     java = JavaLanguage(parser)
 
     type_element = ET.Element("type")
@@ -163,7 +163,7 @@ def test_parse_java_type_from_text_simple(java_type_prefix):
                                                           ("T extends ", "Unit "), (None, "T "),
                                                           (None, "T")])
 def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_name):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     java = JavaLanguage(parser)
 
     type_element = ET.Element("type")

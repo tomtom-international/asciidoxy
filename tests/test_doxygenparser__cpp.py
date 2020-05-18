@@ -18,7 +18,7 @@ import pytest
 import xml.etree.ElementTree as ET
 
 from asciidoxy.doxygenparser.cpp import CppLanguage
-from asciidoxy.doxygenparser.parser import DoxygenXmlParser
+from asciidoxy.doxygenparser import Driver as ParserDriver
 from tests.shared import assert_equal_or_none_if_empty, sub_element
 
 
@@ -319,7 +319,7 @@ def cpp_type_suffix(request):
 
 
 def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     cpp = CppLanguage(parser)
 
     type_element = ET.Element("type")
@@ -337,7 +337,7 @@ def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
 
 
 def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix, cpp_type_suffix):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     cpp = CppLanguage(parser)
 
     type_element = ET.Element("type")
@@ -365,7 +365,7 @@ def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix,
 
 
 def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_type_suffix):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     cpp = CppLanguage(parser)
 
     type_element = ET.Element("type")
@@ -389,7 +389,7 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_typ
 
 
 def test_parse_cpp_type_from_ref_with_nested_text_type():
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     cpp = CppLanguage(parser)
 
     type_element = ET.Element("type")
@@ -422,7 +422,7 @@ def test_parse_cpp_type_from_ref_with_nested_text_type():
 
 
 def test_parse_cpp_type_from_text_with_nested_ref_type():
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     cpp = CppLanguage(parser)
 
     type_element = ET.Element("type")
@@ -455,7 +455,7 @@ def test_parse_cpp_type_from_text_with_nested_ref_type():
 
 
 def test_parse_cpp_type_from_multiple_nested_text_and_ref():
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     cpp = CppLanguage(parser)
 
     type_element = ET.Element("type")
@@ -529,7 +529,7 @@ def test_parse_cpp_type_from_multiple_nested_text_and_ref():
 
 
 def test_parse_cpp_type_multiple_prefix_and_suffix():
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     cpp = CppLanguage(parser)
 
     type_element = ET.Element("type")
@@ -553,7 +553,7 @@ def test_parse_cpp_type_multiple_prefix_and_suffix():
     "signed char", "long double"
 ])
 def test_parse_cpp_type_with_space(cpp_type_prefix, type_with_space, cpp_type_suffix):
-    parser = DoxygenXmlParser()
+    parser = ParserDriver()
     cpp = CppLanguage(parser)
 
     type_element = ET.Element("type")

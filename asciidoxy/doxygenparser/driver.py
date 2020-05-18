@@ -23,7 +23,7 @@ from tqdm import tqdm
 
 from .cpp import CppLanguage
 from .java import JavaLanguage
-from .language_base import Language, ParserBase
+from .language_base import Language, DriverBase
 from .objc import ObjectiveCLanguage
 from .python import PythonLanguage
 from ..api_reference import AmbiguousLookupError, ApiReference
@@ -32,8 +32,8 @@ from ..model import (ReferableElement, TypeRefBase)
 logger = logging.getLogger(__name__)
 
 
-class DoxygenXmlParser(ParserBase):
-    """Parser for Doxygen XML output."""
+class Driver(DriverBase):
+    """Driver for parsing Doxygen XML output."""
     api_reference: ApiReference
     _unresolved_refs: List[TypeRefBase]
     _force_language: Optional[str]
