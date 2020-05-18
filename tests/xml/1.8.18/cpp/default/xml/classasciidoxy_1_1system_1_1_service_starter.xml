@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1system_1_1_service_starter" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::system::ServiceStarter</compoundname>
+    <includes refid="service_8hpp" local="no">service.hpp</includes>
+      <sectiondef kind="friend">
+      <memberdef kind="friend" id="classasciidoxy_1_1system_1_1_service_starter_1a6474ceb8669761e879329b39c3afb899" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>friend class</type>
+        <definition>friend class Service</definition>
+        <argsstring></argsstring>
+        <name>Service</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="service.hpp" line="46" column="3" bodyfile="service.hpp" bodystart="46" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classasciidoxy_1_1system_1_1_service_starter_1a8923b0ad14de8aa8768a1e36318b0924" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::system::ServiceStarter::Register</definition>
+        <argsstring>(const Service &amp;service)</argsstring>
+        <name>Register</name>
+        <param>
+          <type>const <ref refid="classasciidoxy_1_1system_1_1_service" kindref="compound">Service</ref> &amp;</type>
+          <declname>service</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Register a service that can be started. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="service.hpp" line="51" column="8"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Helper to start services. </para>
+    </detaileddescription>
+    <location file="service.hpp" line="45" column="1" bodyfile="service.hpp" bodystart="45" bodyend="52"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1system_1_1_service_starter_1a8923b0ad14de8aa8768a1e36318b0924" prot="private" virt="non-virtual"><scope>asciidoxy::system::ServiceStarter</scope><name>Register</name></member>
+      <member refid="classasciidoxy_1_1system_1_1_service_starter_1a6474ceb8669761e879329b39c3afb899" prot="private" virt="non-virtual"><scope>asciidoxy::system::ServiceStarter</scope><name>Service</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

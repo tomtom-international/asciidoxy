@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="dir_3b16d38c15c00c78b4ed52f839ddcd7a" kind="dir">
+    <compoundname>asciidoxy</compoundname>
+    <innerfile refid="____init_____8py">__init__.py</innerfile>
+    <innerfile refid="geometry_8py">geometry.py</innerfile>
+    <innerfile refid="traffic_8py">traffic.py</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="asciidoxy/"/>
+  </compounddef>
+</doxygen>

@@ -143,3 +143,6 @@ test_results/
 ## Files copied during documentation build
 documentation/source_code/
 documentation/copy/
+
+## macOS
+.DS_Store

@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="namespacecom_1_1asciidoxy_1_1system" kind="namespace" language="Java">
+    <compoundname>com::asciidoxy::system</compoundname>
+    <innerclass refid="interfacecom_1_1asciidoxy_1_1system_1_1_service" prot="public">com::asciidoxy::system::Service</innerclass>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="Service.java" line="17" column="15"/>
+  </compounddef>
+</doxygen>

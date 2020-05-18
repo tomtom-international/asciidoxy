@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1traffic_1_1_traffic_event" kind="class" language="Python" prot="public">
+    <compoundname>asciidoxy::traffic::TrafficEvent</compoundname>
+    <innerclass refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" prot="public">asciidoxy::traffic::TrafficEvent::Severity</innerclass>
+    <innerclass refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" prot="public">asciidoxy::traffic::TrafficEvent::TrafficEventData</innerclass>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1a32be293fd10a77aa74964459d3738726" prot="private" static="no" mutable="no">
+        <type></type>
+        <definition>asciidoxy.traffic.TrafficEvent::_data</definition>
+        <argsstring></argsstring>
+        <name>_data</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="65" column="1" bodyfile="asciidoxy/traffic.py" bodystart="65" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1ad7ebc90048fc465f046cf37cf2300d9e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def asciidoxy.traffic.TrafficEvent.__init__</definition>
+        <argsstring>(self, &quot;TrafficEvent.TrafficEventData&quot; data)</argsstring>
+        <name>__init__</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>&quot;TrafficEvent.TrafficEventData&quot;</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="64" column="1" bodyfile="asciidoxy/traffic.py" bodystart="64" bodyend="66"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition> bool asciidoxy.traffic.TrafficEvent.update</definition>
+        <argsstring>(self, int cause, int delay)</argsstring>
+        <name>update</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>cause</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>delay</declname>
+        </param>
+        <briefdescription>
+<para>Update the traffic event data. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><verbatim>   Verifies the new information before updating.
+</verbatim></para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>cause</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>New TPEG cause code. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delay</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>New delay in seconds.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>True if the update is valid. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="78" column="1" bodyfile="asciidoxy/traffic.py" bodystart="78" bodyend="80"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2a565164d3af2f5655c7ef819ff4545" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition> int asciidoxy.traffic.TrafficEvent.calculate_delay</definition>
+        <argsstring>(self)</argsstring>
+        <name>calculate_delay</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <briefdescription>
+<para>Calculate the current delay. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>The delay in seconds.</para>
+</simplesect>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>RuntimeError</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when the update encounters a critical error. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="89" column="1" bodyfile="asciidoxy/traffic.py" bodystart="89" bodyend="91"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>None</type>
+        <definition> None asciidoxy.traffic.TrafficEvent.refresh_data</definition>
+        <argsstring>(self)</argsstring>
+        <name>refresh_data</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <briefdescription>
+<para>Refresh the traffic event data. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>NoDataError</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when there is no data to refresh. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>InvalidDataError</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when the data is invalid. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="98" column="1" bodyfile="asciidoxy/traffic.py" bodystart="98" bodyend="100"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Information about a traffic event. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="asciidoxy/traffic.py" line="19" column="1" bodyfile="asciidoxy/traffic.py" bodystart="19" bodyend="100"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ad7ebc90048fc465f046cf37cf2300d9e" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>__init__</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a32be293fd10a77aa74964459d3738726" prot="private" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>_data</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2a565164d3af2f5655c7ef819ff4545" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>calculate_delay</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>refresh_data</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>update</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

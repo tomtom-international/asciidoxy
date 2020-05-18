@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="namespaceasciidoxy" kind="namespace" language="C++">
+    <compoundname>asciidoxy</compoundname>
+    <innerclass refid="classasciidoxy_1_1_convertor" prot="public">asciidoxy::Convertor</innerclass>
+    <innernamespace refid="namespaceasciidoxy_1_1geometry">asciidoxy::geometry</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1system">asciidoxy::system</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1traffic">asciidoxy::traffic</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="coordinate.hpp" line="20" column="1"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="_a_d_traffic_event_8h" kind="file" language="Objective-C">
+    <compoundname>ADTrafficEvent.h</compoundname>
+    <includes local="no">Foundation/Foundation.h</includes>
+    <incdepgraph>
+      <node id="2">
+        <label>Foundation/Foundation.h</label>
+      </node>
+      <node id="1">
+        <label>ADTrafficEvent.h</label>
+        <link refid="_a_d_traffic_event_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+    </incdepgraph>
+    <innerclass refid="interface_traffic_event_data" prot="public">TrafficEventData</innerclass>
+    <innerclass refid="protocol_a_d_traffic_event-p" prot="public">ADTrafficEvent-p</innerclass>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="_a_d_traffic_event_8h_1a929385fc78158cf2be0d44416a5df884" prot="public" static="no">
+        <type>NSInteger</type>
+        <definition>typedef NSInteger TpegCauseCode</definition>
+        <argsstring></argsstring>
+        <name>TpegCauseCode</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Type for TPEG cause codes. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADTrafficEvent.h" line="22" column="19" bodyfile="ADTrafficEvent.h" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="_a_d_traffic_event_8h_1a38c6f0aeef5e08b2f836e0dc35b02a15" prot="public" static="no">
+        <type>void(^</type>
+        <definition>typedef void(^ OnTrafficEventCallback) (id&lt; ADTrafficEvent)</definition>
+        <argsstring>)(id&lt; ADTrafficEvent)</argsstring>
+        <name>OnTrafficEventCallback</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Callback for receiving new traffic events. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADTrafficEvent.h" line="104" column="9" bodyfile="ADTrafficEvent.h" bodystart="104" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="2"><highlight class="comment"><sp/>*<sp/>Copyright<sp/>(C)<sp/>2019-2020,<sp/>TomTom<sp/>(http://tomtom.com).</highlight></codeline>
+<codeline lineno="3"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="4"><highlight class="comment"><sp/>*<sp/>Licensed<sp/>under<sp/>the<sp/>Apache<sp/>License,<sp/>Version<sp/>2.0<sp/>(the<sp/>&quot;License&quot;);</highlight></codeline>
+<codeline lineno="5"><highlight class="comment"><sp/>*<sp/>you<sp/>may<sp/>not<sp/>use<sp/>this<sp/>file<sp/>except<sp/>in<sp/>compliance<sp/>with<sp/>the<sp/>License.</highlight></codeline>
+<codeline lineno="6"><highlight class="comment"><sp/>*<sp/>You<sp/>may<sp/>obtain<sp/>a<sp/>copy<sp/>of<sp/>the<sp/>License<sp/>at</highlight></codeline>
+<codeline lineno="7"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="8"><highlight class="comment"><sp/>*<sp/><sp/><sp/>http://www.apache.org/licenses/LICENSE-2.0</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="10"><highlight class="comment"><sp/>*<sp/>Unless<sp/>required<sp/>by<sp/>applicable<sp/>law<sp/>or<sp/>agreed<sp/>to<sp/>in<sp/>writing,<sp/>software</highlight></codeline>
+<codeline lineno="11"><highlight class="comment"><sp/>*<sp/>distributed<sp/>under<sp/>the<sp/>License<sp/>is<sp/>distributed<sp/>on<sp/>an<sp/>&quot;AS<sp/>IS&quot;<sp/>BASIS,</highlight></codeline>
+<codeline lineno="12"><highlight class="comment"><sp/>*<sp/>WITHOUT<sp/>WARRANTIES<sp/>OR<sp/>CONDITIONS<sp/>OF<sp/>ANY<sp/>KIND,<sp/>either<sp/>express<sp/>or<sp/>implied.</highlight></codeline>
+<codeline lineno="13"><highlight class="comment"><sp/>*<sp/>See<sp/>the<sp/>License<sp/>for<sp/>the<sp/>specific<sp/>language<sp/>governing<sp/>permissions<sp/>and</highlight></codeline>
+<codeline lineno="14"><highlight class="comment"><sp/>*<sp/>limitations<sp/>under<sp/>the<sp/>License.</highlight></codeline>
+<codeline lineno="15"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="preprocessor">#import<sp/>&lt;Foundation/Foundation.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>NSInteger<sp/>TpegCauseCode;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29" refid="interface_traffic_event_data" refkind="compound"><highlight class="keyword">@interface<sp/></highlight><highlight class="normal"><ref refid="interface_traffic_event_data" kindref="compound">TrafficEventData</ref><sp/>:<sp/>NSObject</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36" refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273" refkind="member"><highlight class="normal">typedef<sp/>enum<sp/>{</highlight></codeline>
+<codeline lineno="40" refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414" refkind="member"><highlight class="normal"><sp/><ref refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414" kindref="member">Low</ref><sp/>=<sp/>1,</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="45" refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7" refkind="member"><highlight class="normal"><sp/><ref refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7" kindref="member">Medium</ref><sp/>=<sp/>2,</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52" refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d" refkind="member"><highlight class="normal"><sp/><ref refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d" kindref="member">High</ref><sp/>=<sp/>3,</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><ref refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff" kindref="member">Unknown</ref><sp/>=<sp/>4</highlight></codeline>
+<codeline lineno="58" refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff" refkind="member"><highlight class="normal">}<sp/>ADSeverity;</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"></highlight></codeline>
+<codeline lineno="63" refid="interface_traffic_event_data_1a8353496d09d78db82e9e62f8c2808d34" refkind="member"><highlight class="normal">TpegCauseCode<sp/><ref refid="interface_traffic_event_data_1a8353496d09d78db82e9e62f8c2808d34" kindref="member">cause</ref>;</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"></highlight></codeline>
+<codeline lineno="68" refid="interface_traffic_event_data_1ab4a315c870a75cc68f5bba648b9b8be0" refkind="member"><highlight class="normal">NSInteger<sp/><ref refid="interface_traffic_event_data_1ab4a315c870a75cc68f5bba648b9b8be0" kindref="member">delay</ref>;</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"></highlight></codeline>
+<codeline lineno="73" refid="interface_traffic_event_data_1a3136b600b8d16811c66914ff3afa48ca" refkind="member"><highlight class="normal">Severity<sp/><ref refid="interface_traffic_event_data_1a3136b600b8d16811c66914ff3afa48ca" kindref="member">severity</ref>;</highlight></codeline>
+<codeline lineno="74"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight><highlight class="keyword">@end</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight></codeline>
+<codeline lineno="80" refid="protocol_a_d_traffic_event-p" refkind="compound"><highlight class="keyword">@protocol<sp/></highlight><highlight class="normal"><ref refid="protocol_a_d_traffic_event-p" kindref="compound">ADTrafficEvent</ref><sp/>&lt;NSObject&gt;</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"></highlight></codeline>
+<codeline lineno="85" refid="protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262" refkind="member"><highlight class="keyword">@property</highlight><highlight class="normal">(nonatomic,<sp/>readonly)<sp/><ref refid="interface_traffic_event_data" kindref="compound">TrafficEventData</ref><sp/><ref refid="protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b" kindref="member">data</ref>;</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"></highlight></codeline>
+<codeline lineno="96"><highlight class="normal">-<sp/>BOOL<sp/>updateWithCause:(NSInteger)cause</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>andDelay:(NSInteger)delay;</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"></highlight></codeline>
+<codeline lineno="99"><highlight class="normal"></highlight><highlight class="keyword">@end</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="100"><highlight class="normal"></highlight></codeline>
+<codeline lineno="104"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>void<sp/>(^OnTrafficEventCallback)(</highlight><highlight class="keywordtype">id</highlight><highlight class="normal">&lt;<ref refid="protocol_a_d_traffic_event-p" kindref="compound">ADTrafficEvent</ref>);</highlight></codeline>
+    </programlisting>
+    <location file="ADTrafficEvent.h"/>
+  </compounddef>
+</doxygen>
