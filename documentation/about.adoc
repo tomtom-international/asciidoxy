@@ -51,7 +51,7 @@ optionally a version file. See ${api.cross_document_ref("usage.adoc", "_package_
 "Package specification")} for details.
 
 The packages can also contain other files that can be included in the documentation. These can be
-other AsciiDoc files, images, and other included files. The included AsciiDoc files can alo contain
+other AsciiDoc files, images, and other included files. The included AsciiDoc files can also contain
 AsciiDoxy directives.
 
 == Copies files to an intermediate directory
