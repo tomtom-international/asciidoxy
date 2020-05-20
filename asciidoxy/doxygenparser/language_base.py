@@ -46,8 +46,8 @@ class DriverBase(ABC):
         pass
 
 
-class Language(object):
-    """Definition of language support for parsing Doxygen XML output.
+class LanguageTraits(object):
+    """Traits for specific languages needed to parse their Doxyxen XML files.
 
     Attributes:
         TAG:                   Tag for identifying the language.
@@ -60,7 +60,6 @@ class Language(object):
         TYPE_NESTED_END:       Pattern matching the end of a nested type.
         TYPE_NAME:             Pattern matching a type's name.
     """
-
     TAG: str
 
     TYPE_PREFIXES: Optional[Pattern]
@@ -69,6 +68,28 @@ class Language(object):
     TYPE_NESTED_SEPARATOR: Pattern
     TYPE_NESTED_END: Pattern
     TYPE_NAME: Pattern
+
+    def is_language_standard_type(self, type_name: str) -> bool:
+        return False
+
+    def cleanup_name(self, name: str) -> str:
+        return name
+
+    def short_name(self, name: str) -> str:
+        return name
+
+    def full_name(self, name: str, parent: str = "") -> str:
+        return name
+
+    def namespace(self, full_name: str) -> Optional[str]:
+        return None
+
+    def is_member_blacklisted(self, kind: str, name: str) -> bool:
+        return False
+
+
+class ParserBase(LanguageTraits):
+    """Base functionality for language parsers."""
 
     _driver: DriverBase
 
@@ -322,21 +343,3 @@ class Language(object):
         id = id.replace("__", "-")
 
         return f"{self.TAG}-{id}"
-
-    def is_language_standard_type(self, type_name: str) -> bool:
-        return False
-
-    def cleanup_name(self, name: str) -> str:
-        return name
-
-    def short_name(self, name: str) -> str:
-        return name
-
-    def full_name(self, name: str, parent: str = "") -> str:
-        return name
-
-    def namespace(self, full_name: str) -> Optional[str]:
-        return None
-
-    def is_member_blacklisted(self, kind: str, name: str) -> bool:
-        return False

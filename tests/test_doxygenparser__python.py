@@ -13,13 +13,12 @@
 # limitations under the License.
 """Tests for parsing python from Doxygen XML files."""
 
+import pytest
 
-def test_parse_python_class(parser_factory):
-    parser = parser_factory("python/default")
 
-    python_class = parser.api_reference.find("asciidoxy.geometry.Coordinate",
-                                             kind="class",
-                                             lang="python")
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python_class(api_reference):
+    python_class = api_reference.find("asciidoxy.geometry.Coordinate", kind="class", lang="python")
     assert python_class is not None
     assert python_class.id == "python-classasciidoxy_1_1geometry_1_1_coordinate"
     assert python_class.name == "Coordinate"
@@ -40,12 +39,9 @@ def test_parse_python_class(parser_factory):
     ])
 
 
-def test_parse_python_class_with_nested_class(parser_factory):
-    parser = parser_factory("python/default")
-
-    python_class = parser.api_reference.find("asciidoxy.traffic.TrafficEvent",
-                                             kind="class",
-                                             lang="python")
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python_class_with_nested_class(api_reference):
+    python_class = api_reference.find("asciidoxy.traffic.TrafficEvent", kind="class", lang="python")
     assert python_class is not None
     assert python_class.id == "python-classasciidoxy_1_1traffic_1_1_traffic_event"
     assert python_class.namespace == "asciidoxy.traffic"
@@ -57,8 +53,11 @@ def test_parse_python_class_with_nested_class(parser_factory):
     assert nested_class.namespace == "asciidoxy.traffic.TrafficEvent"
     assert nested_class.language == "python"
     assert nested_class.id == "python-classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"
-    # referred object will be set after parsing all classes, during phase of resolving references
-    assert nested_class.referred_object is None
+
+    assert nested_class.referred_object
+    assert nested_class.referred_object.id == nested_class.id
+    assert nested_class.referred_object.name == "Severity"
+    assert nested_class.referred_object.kind == "class"
 
     nested_class = python_class.inner_classes[1]
     assert nested_class.name == "asciidoxy.traffic.TrafficEvent.TrafficEventData"
@@ -66,28 +65,18 @@ def test_parse_python_class_with_nested_class(parser_factory):
     assert nested_class.id == ("python-classasciidoxy_1_1traffic_1_1_traffic_event_1_1_"
                                "traffic_event_data")
     assert nested_class.language == "python"
-    # referred object will be set after parsing all classes, during phase of resolving references
-    assert nested_class.referred_object is None
 
-    parser.resolve_references()
-
-    nested_class = python_class.inner_classes[0]
     assert nested_class.referred_object
-    assert nested_class.referred_object.name == "Severity"
-    assert nested_class.referred_object.kind == "class"
-
-    nested_class = python_class.inner_classes[1]
-    assert nested_class.referred_object
+    assert nested_class.referred_object.id == nested_class.id
     assert nested_class.referred_object.name == "TrafficEventData"
     assert nested_class.referred_object.kind == "class"
 
 
-def test_parse_python_method(parser_factory):
-    parser = parser_factory("python/default")
-
-    member = parser.api_reference.find("asciidoxy.traffic.TrafficEvent.update",
-                                       kind="function",
-                                       lang="python")
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python_method(api_reference):
+    member = api_reference.find("asciidoxy.traffic.TrafficEvent.update",
+                                kind="function",
+                                lang="python")
 
     assert member is not None
     assert member.id == ("python-classasciidoxy_1_1traffic_1_1_traffic_event_"
@@ -137,12 +126,11 @@ def test_parse_python_method(parser_factory):
     assert member.returns.description == "True if the update is valid."
 
 
-def test_parse_python_classmethod(parser_factory):
-    parser = parser_factory("python/default")
-
-    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.from_string",
-                                       kind="function",
-                                       lang="python")
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python_classmethod(api_reference):
+    member = api_reference.find("asciidoxy.geometry.Coordinate.from_string",
+                                kind="function",
+                                lang="python")
 
     assert member is not None
     assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
@@ -168,8 +156,8 @@ def test_parse_python_classmethod(parser_factory):
 
     assert member.returns is not None
     assert member.returns.type is not None
-    assert not member.returns.type.id
-    assert not member.returns.type.kind
+    assert member.returns.type.id == "python-classasciidoxy_1_1geometry_1_1_coordinate"
+    assert member.returns.type.kind == "class"
     assert member.returns.type.language == "python"
     assert member.returns.type.name == "Coordinate"
     assert member.returns.type.namespace == "asciidoxy.geometry.Coordinate"
@@ -179,12 +167,11 @@ def test_parse_python_classmethod(parser_factory):
     assert not member.returns.description
 
 
-def test_parse_python_staticmethod(parser_factory):
-    parser = parser_factory("python/default")
-
-    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.combine",
-                                       kind="function",
-                                       lang="python")
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python_staticmethod(api_reference):
+    member = api_reference.find("asciidoxy.geometry.Coordinate.combine",
+                                kind="function",
+                                lang="python")
 
     assert member is not None
     assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
@@ -206,12 +193,11 @@ def test_parse_python_staticmethod(parser_factory):
     assert not member.params[1].description
 
 
-def test_parse_python_variable(parser_factory):
-    parser = parser_factory("python/default")
-
-    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.longitude",
-                                       kind="variable",
-                                       lang="python")
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python_variable(api_reference):
+    member = api_reference.find("asciidoxy.geometry.Coordinate.longitude",
+                                kind="variable",
+                                lang="python")
 
     assert member is not None
     assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
@@ -238,12 +224,11 @@ def test_parse_python_variable(parser_factory):
     # assert not member.returns.description
 
 
-def test_parse_python_constructor(parser_factory):
-    parser = parser_factory("python/default")
-
-    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.__init__",
-                                       kind="function",
-                                       lang="python")
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python_constructor(api_reference):
+    member = api_reference.find("asciidoxy.geometry.Coordinate.__init__",
+                                kind="function",
+                                lang="python")
 
     assert member is not None
     assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"
@@ -273,12 +258,11 @@ def test_parse_python_constructor(parser_factory):
     assert member.returns is None
 
 
-def test_parse_python_nested_argument_and_return_type(parser_factory):
-    parser = parser_factory("python/default")
-
-    member = parser.api_reference.find("asciidoxy.geometry.Coordinate.from_string_safe",
-                                       kind="function",
-                                       lang="python")
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python_nested_argument_and_return_type(api_reference):
+    member = api_reference.find("asciidoxy.geometry.Coordinate.from_string_safe",
+                                kind="function",
+                                lang="python")
 
     assert member is not None
     assert member.id == ("python-classasciidoxy_1_1geometry_1_1_coordinate_"

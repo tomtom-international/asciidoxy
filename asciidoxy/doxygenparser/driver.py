@@ -21,11 +21,11 @@ from typing import List, Mapping, Optional, Set
 
 from tqdm import tqdm
 
-from .cpp import CppLanguage
-from .java import JavaLanguage
-from .language_base import Language, DriverBase
-from .objc import ObjectiveCLanguage
-from .python import PythonLanguage
+from .cpp import CppParser
+from .java import JavaParser
+from .language_base import ParserBase, DriverBase
+from .objc import ObjectiveCParser
+from .python import PythonParser
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..model import (ReferableElement, TypeRefBase)
 
@@ -38,23 +38,23 @@ class Driver(DriverBase):
     _unresolved_refs: List[TypeRefBase]
     _force_language: Optional[str]
 
-    _languages: Mapping[str, Language]
+    _parsers: Mapping[str, ParserBase]
 
     def __init__(self, force_language: Optional[str] = None):
         self.api_reference = ApiReference()
         self._unresolved_refs = []
         self._force_language = safe_language_tag(force_language)
 
-        self._languages = {
-            CppLanguage.TAG: CppLanguage(self),
-            JavaLanguage.TAG: JavaLanguage(self),
-            ObjectiveCLanguage.TAG: ObjectiveCLanguage(self),
-            PythonLanguage.TAG: PythonLanguage(self),
+        self._parsers = {
+            CppParser.TAG: CppParser(self),
+            JavaParser.TAG: JavaParser(self),
+            ObjectiveCParser.TAG: ObjectiveCParser(self),
+            PythonParser.TAG: PythonParser(self),
         }
 
         if not self._force_language:
             self._force_language = None
-        elif self._force_language not in self._languages:
+        elif self._force_language not in self._parsers:
             logger.error(f"Unknown forced language: {self._force_language}. Falling back to auto"
                          " detection.")
             self._force_language = None
@@ -66,12 +66,12 @@ class Driver(DriverBase):
             language_tag = safe_language_tag(xml_element.get("language"))
             if not language_tag:
                 return
-            if language_tag not in self._languages:
+            if language_tag not in self._parsers:
                 logger.debug(f"Unknown language: {language_tag}")
                 return
 
         if xml_element.tag == "compounddef":
-            self._languages[language_tag].parse_compounddef(xml_element)
+            self._parsers[language_tag].parse_compounddef(xml_element)
         else:
             logger.debug(f"Unhandled element: {xml_element.tag}")
 

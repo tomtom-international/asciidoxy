@@ -19,15 +19,14 @@ import pytest
 
 import xml.etree.ElementTree as ET
 
-from asciidoxy.doxygenparser.objc import ObjectiveCLanguage
+from asciidoxy.doxygenparser.objc import ObjectiveCParser
 from asciidoxy.doxygenparser import Driver as ParserDriver
 from .shared import assert_equal_or_none_if_empty
 
 
-def test_parse_objc_interface(parser_factory):
-    parser = parser_factory("objc/default")
-
-    objc_class = parser.api_reference.find("ADCoordinate", kind="class", lang="objc")
+@pytest.mark.parametrize("api_reference_set", [["objc/default"]])
+def test_parse_objc_interface(api_reference):
+    objc_class = api_reference.find("ADCoordinate", kind="class", lang="objc")
     assert objc_class is not None
     assert objc_class.id == "objc-interface_a_d_coordinate"
     assert objc_class.name == "ADCoordinate"
@@ -52,10 +51,9 @@ def test_parse_objc_interface(parser_factory):
     ])
 
 
-def test_parse_objc_protocol(parser_factory):
-    parser = parser_factory("objc/default")
-
-    objc_class = parser.api_reference.find("ADTrafficEvent", kind="protocol", lang="objc")
+@pytest.mark.parametrize("api_reference_set", [["objc/default"]])
+def test_parse_objc_protocol(api_reference):
+    objc_class = api_reference.find("ADTrafficEvent", kind="protocol", lang="objc")
     assert objc_class is not None
     assert objc_class.id == "objc-protocol_a_d_traffic_event-p"
     assert objc_class.name == "ADTrafficEvent"
@@ -76,12 +74,11 @@ def test_parse_objc_protocol(parser_factory):
     ])
 
 
-def test_parse_objc_member_function(parser_factory):
-    parser = parser_factory("objc/default")
-
-    member = parser.api_reference.find("ADTrafficEvent.updateWithCause:andDelay:",
-                                       kind="function",
-                                       lang="objc")
+@pytest.mark.parametrize("api_reference_set", [["objc/default"]])
+def test_parse_objc_member_function(api_reference):
+    member = api_reference.find("ADTrafficEvent.updateWithCause:andDelay:",
+                                kind="function",
+                                lang="objc")
     assert member is not None
     assert member.id == "objc-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262"
     assert member.name == "updateWithCause:andDelay:"
@@ -127,10 +124,9 @@ def test_parse_objc_member_function(parser_factory):
     assert param.description == "New delay in seconds."
 
 
-def test_parse_objc_block(parser_factory):
-    parser = parser_factory("objc/default")
-
-    element = parser.api_reference.find("OnTrafficEventCallback", kind="block", lang="objc")
+@pytest.mark.parametrize("api_reference_set", [["objc/default"]])
+def test_parse_objc_block(api_reference):
+    element = api_reference.find("OnTrafficEventCallback", kind="block", lang="objc")
     assert element is not None
     assert element.kind == "block"
     assert element.language == "objc"
@@ -177,7 +173,7 @@ def objc_type_suffix(request):
 
 def test_parse_objc_type_from_text_simple(objc_type_prefix, objc_type_suffix):
     parser = ParserDriver()
-    objc = ObjectiveCLanguage(parser)
+    objc = ObjectiveCParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = f"{objc_type_prefix}NSInteger{objc_type_suffix}"
@@ -202,7 +198,7 @@ def test_parse_objc_type_from_text_simple(objc_type_prefix, objc_type_suffix):
 ])
 def test_parse_objc_type_with_space(type_with_space):
     parser = ParserDriver()
-    objc = ObjectiveCLanguage(parser)
+    objc = ObjectiveCParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = type_with_space

@@ -204,30 +204,25 @@ def test_name_filter__namespace__exact_namespace_required__same_name():
     assert nf(FullNameObject("asciidoxy::geometry::Coordinate::Coordinate")) is True
 
 
-def test_find_complete_match(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate", kind="function",
-                                     lang="cpp") is None
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate", kind="class",
-                                     lang="java") is None
-    assert parser.api_reference.find(
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_complete_match(api_reference):
+    assert api_reference.find("asciidoxy::geometry::Coordinate", kind="function",
+                              lang="cpp") is None
+    assert api_reference.find("asciidoxy::geometry::Coordinate", kind="class", lang="java") is None
+    assert api_reference.find(
         "asciidoxy::geometry::Coordinate::Coordinate", kind="class", lang="cpp") is None
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate", kind="class",
-                                     lang="cpp") is not None
+    assert api_reference.find("asciidoxy::geometry::Coordinate", kind="class",
+                              lang="cpp") is not None
 
 
-def test_find_only_by_id(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    assert parser.api_reference.find(
-        target_id="cpp-classasciidoxy_1_1geometry_1_1_coordinate") is not None
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_only_by_id(api_reference):
+    assert api_reference.find(target_id="cpp-classasciidoxy_1_1geometry_1_1_coordinate") is not None
 
 
-def test_find_only_by_name(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate") is not None
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_only_by_name(api_reference):
+    assert api_reference.find("asciidoxy::geometry::Coordinate") is not None
 
 
 def test_find_by_name_and_kind(test_data):
@@ -260,40 +255,34 @@ def test_find_by_name_and_lang(test_data):
     assert parser.api_reference.find("BoundingBox", lang="cpp") is None
 
 
-def test_find_by_name_and_namespace(parser_factory):
-    parser = parser_factory("cpp/default")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_by_name_and_namespace(api_reference):
+    assert api_reference.find("asciidoxy::geometry::Coordinate", namespace="asciidoxy") is not None
+    assert api_reference.find("geometry::Coordinate", namespace="asciidoxy") is not None
 
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                     namespace="asciidoxy") is not None
-    assert parser.api_reference.find("geometry::Coordinate", namespace="asciidoxy") is not None
+    assert api_reference.find("asciidoxy::geometry::Coordinate",
+                              namespace="asciidoxy::geometry") is not None
+    assert api_reference.find("geometry::Coordinate", namespace="asciidoxy::geometry") is not None
+    assert api_reference.find("Coordinate", namespace="asciidoxy::geometry") is not None
 
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                     namespace="asciidoxy::geometry") is not None
-    assert parser.api_reference.find("geometry::Coordinate",
-                                     namespace="asciidoxy::geometry") is not None
-    assert parser.api_reference.find("Coordinate", namespace="asciidoxy::geometry") is not None
-
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                     namespace="asciidoxy::traffic") is not None
-    assert parser.api_reference.find("geometry::Coordinate",
-                                     namespace="asciidoxy::traffic") is not None
+    assert api_reference.find("asciidoxy::geometry::Coordinate",
+                              namespace="asciidoxy::traffic") is not None
+    assert api_reference.find("geometry::Coordinate", namespace="asciidoxy::traffic") is not None
 
 
-def test_find_by_name__prefer_exact_match(parser_factory):
-    parser = parser_factory("cpp/default")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_by_name__prefer_exact_match(api_reference):
+    assert api_reference.find("asciidoxy::geometry::Coordinate::Coordinate",
+                              namespace="asciidoxy").namespace == "asciidoxy::geometry::Coordinate"
 
-    assert parser.api_reference.find(
-        "asciidoxy::geometry::Coordinate::Coordinate",
-        namespace="asciidoxy").namespace == "asciidoxy::geometry::Coordinate"
-
-    assert parser.api_reference.find(
+    assert api_reference.find(
         "Coordinate",
         namespace="asciidoxy::geometry::Coordinate").namespace == "asciidoxy::geometry::Coordinate"
 
-    assert parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                     namespace="asciidoxy").namespace == "asciidoxy::geometry"
-    assert parser.api_reference.find(
-        "Coordinate", namespace="asciidoxy::geometry").namespace == "asciidoxy::geometry"
+    assert api_reference.find("asciidoxy::geometry::Coordinate",
+                              namespace="asciidoxy").namespace == "asciidoxy::geometry"
+    assert api_reference.find("Coordinate",
+                              namespace="asciidoxy::geometry").namespace == "asciidoxy::geometry"
 
 
 def test_find_by_name_ambiguous(test_data):
@@ -309,55 +298,51 @@ def test_find_by_name_ambiguous(test_data):
     assert len(exception2.value.candidates) == 2
 
 
-def test_find_method__explicit_no_arguments(parser_factory):
-    reference = parser_factory("cpp/default").api_reference
-
-    element = reference.find("asciidoxy::geometry::Coordinate::Coordinate()")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_method__explicit_no_arguments(api_reference):
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Coordinate()")
     assert element is not None
 
 
-def test_find_method__explicit_no_arguments__requires_no_args(parser_factory):
-    reference = parser_factory("cpp/default").api_reference
-
-    element = reference.find("asciidoxy::traffic::TrafficEvent::Update()")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_method__explicit_no_arguments__requires_no_args(api_reference):
+    element = api_reference.find("asciidoxy::traffic::TrafficEvent::Update()")
     assert element is None
 
 
-def test_find_method__select_based_on_args(parser_factory):
-    reference = parser_factory("cpp/default").api_reference
-
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_method__select_based_on_args(api_reference):
     with pytest.raises(AmbiguousLookupError):
-        reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent")
+        api_reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent")
 
-    element = reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent()")
+    element = api_reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent()")
     assert element is not None
 
-    element = reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent(TrafficEventData)")
+    element = api_reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent(TrafficEventData)")
     assert element is not None
 
 
-def test_find_method__select_based_on_args_2(parser_factory):
-    reference = parser_factory("cpp/default").api_reference
-
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_method__select_based_on_args_2(api_reference):
     with pytest.raises(AmbiguousLookupError):
-        reference.find("asciidoxy::geometry::Coordinate::Update")
+        api_reference.find("asciidoxy::geometry::Coordinate::Update")
 
-    element = reference.find("asciidoxy::geometry::Coordinate::Update()")
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Update()")
     assert element is None
 
-    element = reference.find("asciidoxy::geometry::Coordinate::Update(const Coordinate&)")
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Update(const Coordinate&)")
     assert element is not None
 
-    element = reference.find(
+    element = api_reference.find(
         "asciidoxy::geometry::Coordinate::Update(std::tuple< double, double, double >)")
     assert element is not None
 
-    element = reference.find(
+    element = api_reference.find(
         "asciidoxy::geometry::Coordinate::Update(std::tuple< double, double >)")
     assert element is not None
 
-    element = reference.find("asciidoxy::geometry::Coordinate::Update(double, double)")
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Update(double, double)")
     assert element is not None
 
-    element = reference.find("asciidoxy::geometry::Coordinate::Update(double, double, double)")
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Update(double, double, double)")
     assert element is not None

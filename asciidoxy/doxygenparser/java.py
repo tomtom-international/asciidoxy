@@ -17,11 +17,11 @@ import re
 
 from typing import Optional
 
-from .language_base import Language
+from .language_base import ParserBase
 
 
-class JavaLanguage(Language):
-    """Language support for Java."""
+class JavaParser(ParserBase):
+    """Parser for Java documentation."""
     TAG: str = "java"
 
     TYPE_PREFIXES = re.compile(r"((([\w?]+?\s+extends)|final|synchronized|transient)\s*)+\s+")

@@ -17,11 +17,11 @@ import re
 
 from typing import Optional
 
-from .language_base import Language
+from .language_base import ParserBase
 
 
-class CppLanguage(Language):
-    """Language support for C++."""
+class CppParser(ParserBase):
+    """Parser for C++ documentation."""
     TAG: str = "cpp"
 
     TYPE_PREFIXES = re.compile(r"((const|volatile|constexpr|mutable|enum|class)\s*)+\s+")

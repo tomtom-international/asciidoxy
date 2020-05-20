@@ -19,12 +19,12 @@ import xml.etree.ElementTree as ET
 
 from typing import Optional
 
-from .language_base import Language
+from .language_base import ParserBase
 from ..model import Compound, Member, Parameter, ReturnValue
 
 
-class ObjectiveCLanguage(Language):
-    """Language support for Objective C."""
+class ObjectiveCParser(ParserBase):
+    """Parser for Objective C documentation."""
     TAG: str = "objc"
 
     TYPE_PREFIXES = re.compile(r"((nullable|const|__weak|__strong)\s*)+\s+")

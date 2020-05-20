@@ -16,8 +16,8 @@
 from .shared import ProgressMock
 
 
-def test_resolve_references_for_return_types(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_references_for_return_types(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member = parser.api_reference.find("asciidoxy::positioning::Positioning::CurrentPosition",
                                        kind="function",
@@ -35,8 +35,8 @@ def test_resolve_references_for_return_types(parser_factory):
     assert member.returns.type.kind == "class"
 
 
-def test_resolve_partial_references_for_return_types(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_partial_references_for_return_types(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member = parser.api_reference.find("asciidoxy::positioning::Positioning::TrafficNearby",
                                        kind="function",
@@ -56,8 +56,8 @@ def test_resolve_partial_references_for_return_types(parser_factory):
     assert member.returns.type.nested[0].kind == "class"
 
 
-def test_resolve_references_for_parameters(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_references_for_parameters(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member = parser.api_reference.find("asciidoxy::positioning::Positioning::IsNearby",
                                        kind="function",
@@ -75,8 +75,8 @@ def test_resolve_references_for_parameters(parser_factory):
     assert member.params[0].type.kind == "class"
 
 
-def test_resolve_partial_references_for_parameters(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_partial_references_for_parameters(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member = parser.api_reference.find("asciidoxy::positioning::Positioning::InTraffic",
                                        kind="function",
@@ -94,8 +94,8 @@ def test_resolve_partial_references_for_parameters(parser_factory):
     assert member.params[0].type.kind == "class"
 
 
-def test_resolve_references_for_typedefs(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_references_for_typedefs(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member = parser.api_reference.find("asciidoxy::positioning::Traffic", kind="typedef")
     assert member is not None
@@ -111,8 +111,8 @@ def test_resolve_references_for_typedefs(parser_factory):
     assert member.returns.type.kind == "class"
 
 
-def test_resolve_references_for_inner_type_reference(parser_factory):
-    parser = parser_factory("cpp/default")
+def test_resolve_references_for_inner_type_reference(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default")
 
     parent_class = parser.api_reference.find("asciidoxy::traffic::TrafficEvent",
                                              kind="class",
@@ -130,8 +130,8 @@ def test_resolve_references_for_inner_type_reference(parser_factory):
     assert nested_class.referred_object.full_name == nested_class.name
 
 
-def test_resolve_references_for_exceptions(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_references_for_exceptions(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member = parser.api_reference.find("asciidoxy::positioning::Positioning::Override",
                                        kind="function")
@@ -149,8 +149,8 @@ def test_resolve_references_for_exceptions(parser_factory):
     assert member.exceptions[0].type.kind == "class"
 
 
-def test_resolve_partial_references_for_exceptions(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_partial_references_for_exceptions(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member = parser.api_reference.find("asciidoxy::positioning::Positioning::TrafficNearby",
                                        kind="function")
@@ -168,8 +168,8 @@ def test_resolve_partial_references_for_exceptions(parser_factory):
     assert member.exceptions[0].type.kind == "class"
 
 
-def test_resolve_references_prefer_same_namespace(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_references_prefer_same_namespace(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member_a_t = parser.api_reference.find("asciidoxy::traffic::CreateConvertor",
                                            kind="function",
@@ -217,10 +217,10 @@ def test_resolve_references_prefer_same_namespace(parser_factory):
     assert member_a_g.returns.type.namespace == "asciidoxy::geometry"
 
 
-def test_resolve_references_fails_when_ambiguous(parser_factory):
+def test_resolve_references_fails_when_ambiguous(parser_driver_factory):
     # When internal resolving fails, the type will not be resolved to the exact type, and will be
     # shown in the documentation as plain text. It should not raise an error.
-    parser = parser_factory("cpp/default", "cpp/consumer")
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     member = parser.api_reference.find("asciidoxy::traffic::geometry::CreateConvertor",
                                        kind="function",
@@ -239,8 +239,8 @@ def test_resolve_references_fails_when_ambiguous(parser_factory):
     assert not member.returns.type.kind
 
 
-def test_resolve_references__report_progress(parser_factory):
-    parser = parser_factory("cpp/default", "cpp/consumer")
+def test_resolve_references__report_progress(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
     progress_mock = ProgressMock()
     parser.resolve_references(progress=progress_mock)
@@ -249,16 +249,16 @@ def test_resolve_references__report_progress(parser_factory):
     assert progress_mock.total == 39
 
 
-def test_force_language_java(parser_factory):
-    parser = parser_factory("cpp/default", force_language="java")
+def test_force_language_java(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", force_language="java")
 
     element = parser.api_reference.find("asciidoxy.traffic.TrafficEvent", kind="class", lang="java")
     assert element is not None
     assert element.language == "java"
 
 
-def test_force_language_objc(parser_factory):
-    parser = parser_factory("cpp/default", force_language="objc")
+def test_force_language_objc(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", force_language="objc")
 
     element = parser.api_reference.find("asciidoxy::traffic::TrafficEvent",
                                         kind="class",
@@ -267,8 +267,8 @@ def test_force_language_objc(parser_factory):
     assert element.language == "objc"
 
 
-def test_force_language_unknown(parser_factory):
-    parser = parser_factory("cpp/default", force_language="unknown")
+def test_force_language_unknown(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", force_language="unknown")
 
     element = parser.api_reference.find("asciidoxy::traffic::TrafficEvent",
                                         kind="class",
@@ -277,8 +277,8 @@ def test_force_language_unknown(parser_factory):
     assert element.language == "cpp"
 
 
-def test_force_language_empty(parser_factory):
-    parser = parser_factory("cpp/default", force_language="")
+def test_force_language_empty(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", force_language="")
 
     element = parser.api_reference.find("asciidoxy::traffic::TrafficEvent",
                                         kind="class",

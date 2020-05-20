@@ -17,17 +17,14 @@ import pytest
 
 import xml.etree.ElementTree as ET
 
-from asciidoxy.doxygenparser.java import JavaLanguage
+from asciidoxy.doxygenparser.java import JavaParser
 from asciidoxy.doxygenparser import Driver as ParserDriver
 from tests.shared import assert_equal_or_none_if_empty
 
 
-def test_parse_java_class(parser_factory):
-    parser = parser_factory("java/default")
-
-    java_class = parser.api_reference.find("com.asciidoxy.geometry.Coordinate",
-                                           kind="class",
-                                           lang="java")
+@pytest.mark.parametrize("api_reference_set", [["java/default"]])
+def test_parse_java_class(api_reference):
+    java_class = api_reference.find("com.asciidoxy.geometry.Coordinate", kind="class", lang="java")
     assert java_class is not None
     assert java_class.id == "java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate"
     assert java_class.name == "Coordinate"
@@ -54,12 +51,9 @@ def test_parse_java_class(parser_factory):
     ])
 
 
-def test_parse_java_class_with_nested_class(parser_factory):
-    parser = parser_factory("java/default")
-
-    java_class = parser.api_reference.find("com.asciidoxy.traffic.TrafficEvent",
-                                           kind="class",
-                                           lang="java")
+@pytest.mark.parametrize("api_reference_set", [["java/default"]])
+def test_parse_java_class_with_nested_class(api_reference):
+    java_class = api_reference.find("com.asciidoxy.traffic.TrafficEvent", kind="class", lang="java")
     assert java_class is not None
     assert java_class.id == "java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event"
     assert java_class.namespace == "com.asciidoxy.traffic"
@@ -71,8 +65,11 @@ def test_parse_java_class_with_nested_class(parser_factory):
     assert nested_class.namespace == "com.asciidoxy.traffic.TrafficEvent"
     assert nested_class.language == "java"
     assert nested_class.id == "java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"
-    # referred object will be set after parsing all classes, during phase of resolving references
-    assert nested_class.referred_object is None
+
+    assert nested_class.referred_object is not None
+    assert nested_class.referred_object.id == nested_class.id
+    assert nested_class.referred_object.name == "Severity"
+    assert nested_class.referred_object.kind == "enum"
 
     nested_class = java_class.inner_classes[1]
     assert nested_class.name == "com.asciidoxy.traffic.TrafficEvent.TrafficEventData"
@@ -80,28 +77,18 @@ def test_parse_java_class_with_nested_class(parser_factory):
     assert nested_class.id == ("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_"
                                "traffic_event_data")
     assert nested_class.language == "java"
-    # referred object will be set after parsing all classes, during phase of resolving references
-    assert nested_class.referred_object is None
 
-    parser.resolve_references()
-
-    nested_class = java_class.inner_classes[0]
-    assert nested_class.referred_object
-    assert nested_class.referred_object.name == "Severity"
-    assert nested_class.referred_object.kind == "enum"
-
-    nested_class = java_class.inner_classes[1]
-    assert nested_class.referred_object
+    assert nested_class.referred_object is not None
+    assert nested_class.referred_object.id == nested_class.id
     assert nested_class.referred_object.name == "TrafficEventData"
     assert nested_class.referred_object.kind == "class"
 
 
-def test_parse_java_method(parser_factory):
-    parser = parser_factory("java/default")
-
-    member = parser.api_reference.find("com.asciidoxy.traffic.TrafficEvent.Update",
-                                       kind="function",
-                                       lang="java")
+@pytest.mark.parametrize("api_reference_set", [["java/default"]])
+def test_parse_java_method(api_reference):
+    member = api_reference.find("com.asciidoxy.traffic.TrafficEvent.Update",
+                                kind="function",
+                                lang="java")
 
     assert member is not None
     assert member.id == ("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_"
@@ -142,7 +129,7 @@ def java_type_prefix(request):
 
 def test_parse_java_type_from_text_simple(java_type_prefix):
     parser = ParserDriver()
-    java = JavaLanguage(parser)
+    java = JavaParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}double"
@@ -164,7 +151,7 @@ def test_parse_java_type_from_text_simple(java_type_prefix):
                                                           (None, "T")])
 def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_name):
     parser = ParserDriver()
-    java = JavaLanguage(parser)
+    java = JavaParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}Position<{generic_prefix or ''}{generic_name}>"

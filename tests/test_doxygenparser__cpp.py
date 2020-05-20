@@ -17,17 +17,14 @@ import pytest
 
 import xml.etree.ElementTree as ET
 
-from asciidoxy.doxygenparser.cpp import CppLanguage
+from asciidoxy.doxygenparser.cpp import CppParser
 from asciidoxy.doxygenparser import Driver as ParserDriver
 from tests.shared import assert_equal_or_none_if_empty, sub_element
 
 
-def test_parse_cpp_class(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    cpp_class = parser.api_reference.find("asciidoxy::geometry::Coordinate",
-                                          kind="class",
-                                          lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_class(api_reference):
+    cpp_class = api_reference.find("asciidoxy::geometry::Coordinate", kind="class", lang="cpp")
     assert cpp_class is not None
     assert cpp_class.id == "cpp-classasciidoxy_1_1geometry_1_1_coordinate"
     assert cpp_class.name == "Coordinate"
@@ -60,12 +57,9 @@ def test_parse_cpp_class(parser_factory):
     ])
 
 
-def test_parse_cpp_class_with_nested_class(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    cpp_class = parser.api_reference.find("asciidoxy::traffic::TrafficEvent",
-                                          kind="class",
-                                          lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_class_with_nested_class(api_reference):
+    cpp_class = api_reference.find("asciidoxy::traffic::TrafficEvent", kind="class", lang="cpp")
     assert cpp_class is not None
     assert cpp_class.id == "cpp-classasciidoxy_1_1traffic_1_1_traffic_event"
     assert cpp_class.namespace == "asciidoxy::traffic"
@@ -77,26 +71,23 @@ def test_parse_cpp_class_with_nested_class(parser_factory):
     assert nested_class.id == ("cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_"
                                "event_data")
     assert nested_class.language == "cpp"
-    # referred object will be set after parsing all classes, during phase of resolving references
-    assert nested_class.referred_object is None
+
+    assert nested_class.referred_object is not None
+    assert nested_class.referred_object.id == nested_class.id
 
 
-def test_parse_cpp_class__ignore_friend_declarations(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    cpp_class = parser.api_reference.find("asciidoxy::system::ServiceStarter",
-                                          kind="class",
-                                          lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_class__ignore_friend_declarations(api_reference):
+    cpp_class = api_reference.find("asciidoxy::system::ServiceStarter", kind="class", lang="cpp")
     assert cpp_class is not None
     assert len([member for member in cpp_class.members if member.kind == "friend"]) == 0
 
 
-def test_parse_cpp_member_function_no_return_value(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    member = parser.api_reference.find("asciidoxy::geometry::Coordinate::Coordinate",
-                                       kind="function",
-                                       lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function_no_return_value(api_reference):
+    member = api_reference.find("asciidoxy::geometry::Coordinate::Coordinate",
+                                kind="function",
+                                lang="cpp")
     assert member is not None
     assert member.id == ("cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
                          "1a69ac21cad618c0c033815f2cbdc86318")
@@ -119,12 +110,11 @@ def test_parse_cpp_member_function_no_return_value(parser_factory):
     assert member.returns is None
 
 
-def test_parse_cpp_member_function_only_return_value(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    member = parser.api_reference.find("asciidoxy::geometry::Coordinate::IsValid",
-                                       kind="function",
-                                       lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function_only_return_value(api_reference):
+    member = api_reference.find("asciidoxy::geometry::Coordinate::IsValid",
+                                kind="function",
+                                lang="cpp")
     assert member is not None
     assert member.id == ("cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
                          "1a8d7e0eac29549fa4666093e36914deac")
@@ -158,12 +148,11 @@ def test_parse_cpp_member_function_only_return_value(parser_factory):
     assert member.returns.type.namespace == "asciidoxy::geometry::Coordinate"
 
 
-def test_parse_cpp_member_function_params_and_return_value(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    member = parser.api_reference.find("asciidoxy::traffic::TrafficEvent::Update",
-                                       kind="function",
-                                       lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function_params_and_return_value(api_reference):
+    member = api_reference.find("asciidoxy::traffic::TrafficEvent::Update",
+                                kind="function",
+                                lang="cpp")
     assert member is not None
     assert member.id == ("cpp-classasciidoxy_1_1traffic_1_1_traffic_event_"
                          "1a829eda83200a17d2d2f8a5fced5f000b")
@@ -226,12 +215,11 @@ def test_parse_cpp_member_function_params_and_return_value(parser_factory):
     assert len(member.returns.type.nested) == 0
 
 
-def test_parse_cpp_member_function_with_nested_return_type(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    member = parser.api_reference.find("asciidoxy::traffic::TrafficEvent::SharedData",
-                                       kind="function",
-                                       lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function_with_nested_return_type(api_reference):
+    member = api_reference.find("asciidoxy::traffic::TrafficEvent::SharedData",
+                                kind="function",
+                                lang="cpp")
     assert member is not None
     assert member.name == "SharedData"
     assert member.namespace == "asciidoxy::traffic::TrafficEvent"
@@ -261,12 +249,11 @@ def test_parse_cpp_member_function_with_nested_return_type(parser_factory):
     assert len(nested_type.nested) == 0
 
 
-def test_parse_cpp_member_enum(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    member = parser.api_reference.find("asciidoxy::traffic::TrafficEvent::Severity",
-                                       kind="enum",
-                                       lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_enum(api_reference):
+    member = api_reference.find("asciidoxy::traffic::TrafficEvent::Severity",
+                                kind="enum",
+                                lang="cpp")
     assert member is not None
     assert member.name == "Severity"
     assert member.brief == "Severity scale for traffic events."
@@ -287,12 +274,11 @@ def test_parse_cpp_member_enum(parser_factory):
     assert enum_value.kind == "enumvalue"
 
 
-def test_parse_cpp_member_function_with_exception(parser_factory):
-    parser = parser_factory("cpp/default")
-
-    member = parser.api_reference.find("asciidoxy::traffic::TrafficEvent::CalculateDelay()",
-                                       kind="function",
-                                       lang="cpp")
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function_with_exception(api_reference):
+    member = api_reference.find("asciidoxy::traffic::TrafficEvent::CalculateDelay()",
+                                kind="function",
+                                lang="cpp")
     assert member is not None
     assert member.name == "CalculateDelay"
     assert member.namespace == "asciidoxy::traffic::TrafficEvent"
@@ -320,7 +306,7 @@ def cpp_type_suffix(request):
 
 def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
     parser = ParserDriver()
-    cpp = CppLanguage(parser)
+    cpp = CppParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = f"{cpp_type_prefix}double{cpp_type_suffix}"
@@ -338,7 +324,7 @@ def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
 
 def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix, cpp_type_suffix):
     parser = ParserDriver()
-    cpp = CppLanguage(parser)
+    cpp = CppParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = (f"{cpp_type_prefix}Coordinate< {cpp_type_prefix}Unit{cpp_type_suffix} "
@@ -366,7 +352,7 @@ def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix,
 
 def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_type_suffix):
     parser = ParserDriver()
-    cpp = CppLanguage(parser)
+    cpp = CppParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = cpp_type_prefix
@@ -390,7 +376,7 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_typ
 
 def test_parse_cpp_type_from_ref_with_nested_text_type():
     parser = ParserDriver()
-    cpp = CppLanguage(parser)
+    cpp = CppParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = "const "
@@ -423,7 +409,7 @@ def test_parse_cpp_type_from_ref_with_nested_text_type():
 
 def test_parse_cpp_type_from_text_with_nested_ref_type():
     parser = ParserDriver()
-    cpp = CppLanguage(parser)
+    cpp = CppParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = "const std::unique_ptr< const "
@@ -456,7 +442,7 @@ def test_parse_cpp_type_from_text_with_nested_ref_type():
 
 def test_parse_cpp_type_from_multiple_nested_text_and_ref():
     parser = ParserDriver()
-    cpp = CppLanguage(parser)
+    cpp = CppParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = "const "
@@ -530,7 +516,7 @@ def test_parse_cpp_type_from_multiple_nested_text_and_ref():
 
 def test_parse_cpp_type_multiple_prefix_and_suffix():
     parser = ParserDriver()
-    cpp = CppLanguage(parser)
+    cpp = CppParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = "mutable volatile std::string * const *"
@@ -554,7 +540,7 @@ def test_parse_cpp_type_multiple_prefix_and_suffix():
 ])
 def test_parse_cpp_type_with_space(cpp_type_prefix, type_with_space, cpp_type_suffix):
     parser = ParserDriver()
-    cpp = CppLanguage(parser)
+    cpp = CppParser(parser)
 
     type_element = ET.Element("type")
     type_element.text = f"{cpp_type_prefix}{type_with_space}{cpp_type_suffix}"

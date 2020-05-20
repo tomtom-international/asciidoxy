@@ -20,11 +20,11 @@ import xml.etree.ElementTree as ET
 from typing import Optional
 
 from ..model import Compound, Member, Parameter
-from .language_base import Language
+from .language_base import ParserBase
 
 
-class PythonLanguage(Language):
-    """Language support for python."""
+class PythonParser(ParserBase):
+    """Parser for python documentation."""
     TAG: str = "python"
 
     TYPE_PREFIXES = None

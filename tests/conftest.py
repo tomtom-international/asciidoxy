@@ -52,15 +52,15 @@ def xml_data(doxygen_version):
 
 
 @pytest.fixture
-def parser_factory(xml_data):
+def parser_driver_factory(xml_data):
     def factory(*test_dirs, force_language=None):
-        parser = ParserDriver(force_language=force_language)
+        parser_driver = ParserDriver(force_language=force_language)
 
         for test_dir in test_dirs:
             for xml_file in (xml_data / test_dir).glob("**/*.xml"):
-                parser.parse(xml_file)
+                parser_driver.parse(xml_file)
 
-        return parser
+        return parser_driver
 
     return factory
 
@@ -116,10 +116,10 @@ def forced_language():
 
 
 @pytest.fixture
-def api_reference(parser_factory, api_reference_set, forced_language):
-    parser = parser_factory(*api_reference_set, force_language=forced_language)
-    parser.resolve_references()
-    return parser.api_reference
+def api_reference(parser_driver_factory, api_reference_set, forced_language):
+    driver = parser_driver_factory(*api_reference_set, force_language=forced_language)
+    driver.resolve_references()
+    return driver.api_reference
 
 
 @pytest.fixture
