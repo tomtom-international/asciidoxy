@@ -19,12 +19,13 @@ import xml.etree.ElementTree as ET
 
 from typing import Optional
 
-from .language_base import ParserBase
+from .language_traits import LanguageTraits
+from .parser_base import ParserBase
 from ..model import Compound, Member, Parameter, ReturnValue
 
 
-class ObjectiveCParser(ParserBase):
-    """Parser for Objective C documentation."""
+class ObjectiveCTraits(LanguageTraits):
+    """Traits for parsing Objective C documentation."""
     TAG: str = "objc"
 
     TYPE_PREFIXES = re.compile(r"((nullable|const|__weak|__strong)\s*)+\s+")
@@ -34,28 +35,48 @@ class ObjectiveCParser(ParserBase):
     TYPE_NESTED_END = re.compile(r"\s*>")
     TYPE_NAME = re.compile(r"((unsigned|signed|short|long)\s+)*[a-zA-Z0-9_:]+")
 
-    BLOCK = re.compile(r"typedef (.+)\(\^(.+)\)\s*\((.*)\)")
-
     LANGUAGE_BUILD_IN_TYPES = ("char", "unsigned char", "signed char", "int", "unsigned int",
                                "short", "unsigned short", "long", "unsigned long", "float",
                                "double", "long double", "void", "bool", "BOOL", "id",
                                "instancetype")
 
-    def is_language_standard_type(self, type_name: str) -> bool:
-        return type_name in self.LANGUAGE_BUILD_IN_TYPES or type_name.startswith("NS")
+    BLOCK = re.compile(r"typedef (.+)\(\^(.+)\)\s*\((.*)\)")
 
-    def cleanup_name(self, name: str) -> str:
+    @classmethod
+    def is_language_standard_type(cls, type_name: str) -> bool:
+        return type_name in cls.LANGUAGE_BUILD_IN_TYPES or type_name.startswith("NS")
+
+    @classmethod
+    def cleanup_name(cls, name: str) -> str:
         if name.endswith("-p"):
             return name[:-2]
         return name
 
-    def full_name(self, name: str, parent: str = "") -> str:
+    @classmethod
+    def full_name(cls, name: str, parent: str = "") -> str:
         if name.startswith(parent):
             return name
         if parent.endswith(".h"):
             # Parent is a header file, do not prepend
             return name
         return f"{parent}.{name}"
+
+    @classmethod
+    def namespace(cls, full_name: str) -> Optional[str]:
+        if "." in full_name:
+            namespace, _ = full_name.rsplit(".", maxsplit=1)
+            return namespace
+        else:
+            return None
+
+    @classmethod
+    def is_member_blacklisted(cls, kind: str, name: str) -> bool:
+        return kind == "function" and name == "NS_ENUM"
+
+
+class ObjectiveCParser(ParserBase):
+    """Parser for Objective C documentation."""
+    TRAITS = ObjectiveCTraits
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
         member = super().parse_member(memberdef_element, parent)
@@ -68,7 +89,7 @@ class ObjectiveCParser(ParserBase):
         return member
 
     def _redefine_as_block(self, member: Member, parent: Compound) -> None:
-        block_match = self.BLOCK.search(member.definition)
+        block_match = self.TRAITS.BLOCK.search(member.definition)
         if not block_match:
             return
 
@@ -92,13 +113,3 @@ class ObjectiveCParser(ParserBase):
                 param = Parameter()
                 param.type = type_from_text(arg.strip())
                 member.params.append(param)
-
-    def namespace(self, full_name: str) -> Optional[str]:
-        if "." in full_name:
-            namespace, _ = full_name.rsplit(".", maxsplit=1)
-            return namespace
-        else:
-            return None
-
-    def is_member_blacklisted(self, kind: str, name: str) -> bool:
-        return kind == "function" and name == "NS_ENUM"

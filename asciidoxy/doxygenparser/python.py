@@ -20,11 +20,12 @@ import xml.etree.ElementTree as ET
 from typing import Optional
 
 from ..model import Compound, Member, Parameter
-from .language_base import ParserBase
+from .language_traits import LanguageTraits
+from .parser_base import ParserBase
 
 
-class PythonParser(ParserBase):
-    """Parser for python documentation."""
+class PythonTraits(LanguageTraits):
+    """Traits for parsing python documentation."""
     TAG: str = "python"
 
     TYPE_PREFIXES = None
@@ -34,23 +35,32 @@ class PythonParser(ParserBase):
     TYPE_NESTED_END = re.compile(r"\s*\]")
     TYPE_NAME = re.compile(r"\"?[a-zA-Z0-9_.]+\"?")
 
-    def cleanup_name(self, name: str) -> str:
+    @classmethod
+    def cleanup_name(cls, name: str) -> str:
         return name.replace("::", ".").replace('"', "").strip()
 
-    def short_name(self, name: str) -> str:
+    @classmethod
+    def short_name(cls, name: str) -> str:
         return name.split(".")[-1]
 
-    def full_name(self, name: str, parent: str = "") -> str:
+    @classmethod
+    def full_name(cls, name: str, parent: str = "") -> str:
         if name.startswith(parent):
             return name
         return f"{parent}.{name}"
 
-    def namespace(self, full_name: str) -> Optional[str]:
+    @classmethod
+    def namespace(cls, full_name: str) -> Optional[str]:
         if "." in full_name:
             namespace, _ = full_name.rsplit(".", maxsplit=1)
             return namespace
         else:
             return None
+
+
+class PythonParser(ParserBase):
+    """Parser for python documentation."""
+    TRAITS = PythonTraits
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
         member = super().parse_member(memberdef_element, parent)

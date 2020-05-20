@@ -17,12 +17,14 @@ import logging
 
 import xml.etree.ElementTree as ET
 
-from abc import ABC, abstractmethod
-from typing import List, Optional, Pattern, Tuple, Union
+from abc import ABC
+from typing import List, Optional, Tuple, Type, Union
 
 from .description_parser import DescriptionParser, select_descriptions
+from .driver_base import DriverBase
+from .language_traits import LanguageTraits
 from ..model import (Compound, EnumValue, Member, Parameter, ReturnValue, ThrowsClause, TypeRef,
-                     InnerTypeReference, ReferableElement, TypeRefBase)
+                     InnerTypeReference)
 
 logger = logging.getLogger(__name__)
 
@@ -33,63 +35,9 @@ def _yes_no_to_bool(yes_no: str) -> bool:
     return False
 
 
-class DriverBase(ABC):
-    """Base class for drivers."""
-    @abstractmethod
-    def register(self, element: ReferableElement) -> None:
-        """Register a new element."""
-        pass
-
-    @abstractmethod
-    def unresolved_ref(self, ref: TypeRefBase) -> None:
-        """Register an unresolved reference."""
-        pass
-
-
-class LanguageTraits(object):
-    """Traits for specific languages needed to parse their Doxyxen XML files.
-
-    Attributes:
-        TAG:                   Tag for identifying the language.
-        TYPE_PREFIXES:         Pattern matching text that is not part of the type name, but instead
-                                   is a prefix to the type.
-        TYPE_SUFFIXES:         Pattern matching text that is not part of the type name, but instead
-                                   is a suffix to the type.
-        TYPE_NESTED_START:     Pattern matching the start of a nested type.
-        TYPE_NESTED_SEPARATOR: Pattern matching a separator between multiple nested types.
-        TYPE_NESTED_END:       Pattern matching the end of a nested type.
-        TYPE_NAME:             Pattern matching a type's name.
-    """
-    TAG: str
-
-    TYPE_PREFIXES: Optional[Pattern]
-    TYPE_SUFFIXES: Optional[Pattern]
-    TYPE_NESTED_START: Pattern
-    TYPE_NESTED_SEPARATOR: Pattern
-    TYPE_NESTED_END: Pattern
-    TYPE_NAME: Pattern
-
-    def is_language_standard_type(self, type_name: str) -> bool:
-        return False
-
-    def cleanup_name(self, name: str) -> str:
-        return name
-
-    def short_name(self, name: str) -> str:
-        return name
-
-    def full_name(self, name: str, parent: str = "") -> str:
-        return name
-
-    def namespace(self, full_name: str) -> Optional[str]:
-        return None
-
-    def is_member_blacklisted(self, kind: str, name: str) -> bool:
-        return False
-
-
-class ParserBase(LanguageTraits):
+class ParserBase(ABC):
     """Base functionality for language parsers."""
+    TRAITS: Type[LanguageTraits]
 
     _driver: DriverBase
 
@@ -100,7 +48,7 @@ class ParserBase(LanguageTraits):
         if description_element is None:
             return ""
 
-        return DescriptionParser(self.TAG).parse(description_element)
+        return DescriptionParser(self.TRAITS.TAG).parse(description_element)
 
     def parse_parameterlist(self, memberdef_element: ET.Element,
                             kind: str) -> List[Tuple[str, str]]:
@@ -149,30 +97,30 @@ class ParserBase(LanguageTraits):
             return None, text
 
         def extract_type(element_iter, text):
-            type_ref = TypeRef(self.TAG)
+            type_ref = TypeRef(self.TRAITS.TAG)
             if isinstance(parent, Compound):
                 type_ref.namespace = parent.full_name
             elif isinstance(parent, Member):
                 type_ref.namespace = parent.namespace
 
-            type_ref.prefix, text = match_and_extract(self.TYPE_PREFIXES, text)
+            type_ref.prefix, text = match_and_extract(self.TRAITS.TYPE_PREFIXES, text)
 
             if not text:
                 try:
                     element = next(element_iter)
-                    type_ref.id = self.unique_id(element.get("refid"))
+                    type_ref.id = self.TRAITS.unique_id(element.get("refid"))
                     type_ref.kind = element.get("kindref", None)
-                    type_ref.name = self.cleanup_name(element.text or "")
+                    type_ref.name = self.TRAITS.cleanup_name(element.text or "")
                     text = element.tail
 
                 except StopIteration:
                     pass
             else:
-                type_ref.name, text = match_and_extract(self.TYPE_NAME, text)
+                type_ref.name, text = match_and_extract(self.TRAITS.TYPE_NAME, text)
                 if type_ref.name is not None:
-                    type_ref.name = self.cleanup_name(type_ref.name)
+                    type_ref.name = self.TRAITS.cleanup_name(type_ref.name)
 
-            start_nested, text = match_and_extract(self.TYPE_NESTED_START, text)
+            start_nested, text = match_and_extract(self.TRAITS.TYPE_NESTED_START, text)
             if start_nested:
                 while True:
                     nested_type_ref, text = extract_type(element_iter, text)
@@ -182,18 +130,18 @@ class ParserBase(LanguageTraits):
                         # TODO Error?
                         break
 
-                    end_nested, text = match_and_extract(self.TYPE_NESTED_END, text)
+                    end_nested, text = match_and_extract(self.TRAITS.TYPE_NESTED_END, text)
                     if end_nested:
                         break
 
-                    _, text = match_and_extract(self.TYPE_NESTED_SEPARATOR, text)
+                    _, text = match_and_extract(self.TRAITS.TYPE_NESTED_SEPARATOR, text)
 
-            type_ref.suffix, text = match_and_extract(self.TYPE_SUFFIXES, text)
+            type_ref.suffix, text = match_and_extract(self.TRAITS.TYPE_SUFFIXES, text)
 
             # doxygen inserts empty <type> tag for return value in constructors,
             # this fake types should be filtered out
             if type_ref.name:
-                if not type_ref.id and not self.is_language_standard_type(type_ref.name):
+                if not type_ref.id and not self.TRAITS.is_language_standard_type(type_ref.name):
                     self._driver.unresolved_ref(type_ref)
 
             return type_ref, text
@@ -208,8 +156,8 @@ class ParserBase(LanguageTraits):
     def parse_exceptions(self, memberdef_element: ET.Element, parent: Member) -> List[ThrowsClause]:
         exceptions = []
         for name, desc in self.parse_parameterlist(memberdef_element, "exception"):
-            exception = ThrowsClause(self.TAG)
-            exception.type = TypeRef(name=name, language=self.TAG)
+            exception = ThrowsClause(self.TRAITS.TAG)
+            exception.type = TypeRef(name=name, language=self.TRAITS.TAG)
             exception.type.namespace = parent.namespace
             exception.description = desc
             exceptions.append(exception)
@@ -232,12 +180,12 @@ class ParserBase(LanguageTraits):
     def parse_enumvalues(self, container_element: ET.Element, parent_name: str) -> List[EnumValue]:
         values = []
         for enumvalue_element in container_element.iterfind("enumvalue"):
-            v = EnumValue(self.TAG)
-            v.id = self.unique_id(enumvalue_element.get("id"))
+            v = EnumValue(self.TRAITS.TAG)
+            v.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
 
-            name = self.cleanup_name(enumvalue_element.findtext("name", ""))
-            v.name = self.short_name(name)
-            v.full_name = self.full_name(name, parent_name)
+            name = self.TRAITS.cleanup_name(enumvalue_element.findtext("name", ""))
+            v.name = self.TRAITS.short_name(name)
+            v.full_name = self.TRAITS.full_name(name, parent_name)
 
             v.initializer = enumvalue_element.findtext("initializer", "")
             v.brief, v.description = select_descriptions(
@@ -250,18 +198,18 @@ class ParserBase(LanguageTraits):
         return values
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
-        member = Member(self.TAG)
-        member.id = self.unique_id(memberdef_element.get("id"))
+        member = Member(self.TRAITS.TAG)
+        member.id = self.TRAITS.unique_id(memberdef_element.get("id"))
         member.kind = memberdef_element.get("kind", "")
         member.prot = memberdef_element.get("prot", "")
 
-        name = self.cleanup_name(memberdef_element.findtext("name", ""))
-        member.name = self.short_name(name)
-        member.full_name = self.full_name(name, parent.full_name)
-        member.namespace = self.namespace(member.full_name)
+        name = self.TRAITS.cleanup_name(memberdef_element.findtext("name", ""))
+        member.name = self.TRAITS.short_name(name)
+        member.full_name = self.TRAITS.full_name(name, parent.full_name)
+        member.namespace = self.TRAITS.namespace(member.full_name)
         member.include = parent.include
 
-        if self.is_member_blacklisted(member.kind, member.name):
+        if self.TRAITS.is_member_blacklisted(member.kind, member.name):
             return None
 
         member.definition = memberdef_element.findtext("definition", "")
@@ -288,9 +236,9 @@ class ParserBase(LanguageTraits):
                 continue
 
             inner_type = InnerTypeReference(parent.language)
-            inner_type.id = self.unique_id(xml_inner_class.get("refid"))
+            inner_type.id = self.TRAITS.unique_id(xml_inner_class.get("refid"))
             inner_type.name = \
-                self.cleanup_name(xml_inner_class.text if xml_inner_class.text else "")
+                self.TRAITS.cleanup_name(xml_inner_class.text if xml_inner_class.text else "")
             inner_type.namespace = parent.full_name
 
             inner_classes.append(inner_type)
@@ -299,14 +247,14 @@ class ParserBase(LanguageTraits):
         return inner_classes
 
     def parse_compounddef(self, compounddef_element: ET.Element) -> None:
-        compound = Compound(self.TAG)
-        compound.id = self.unique_id(compounddef_element.get("id"))
+        compound = Compound(self.TRAITS.TAG)
+        compound.id = self.TRAITS.unique_id(compounddef_element.get("id"))
         compound.kind = compounddef_element.get("kind", "")
 
-        name = self.cleanup_name(compounddef_element.findtext("compoundname", ""))
-        compound.name = self.short_name(name)
-        compound.full_name = self.full_name(name)
-        compound.namespace = self.namespace(compound.full_name)
+        name = self.TRAITS.cleanup_name(compounddef_element.findtext("compoundname", ""))
+        compound.name = self.TRAITS.short_name(name)
+        compound.full_name = self.TRAITS.full_name(name)
+        compound.namespace = self.TRAITS.namespace(compound.full_name)
         compound.include = self.find_include(compounddef_element)
 
         compound.members = [
@@ -333,13 +281,3 @@ class ParserBase(LanguageTraits):
                 include = location_element.get("file", None)
 
         return include
-
-    def unique_id(self, id: Optional[str]) -> Optional[str]:
-        if not id:
-            return None
-
-        # Workaround a bug in asciidoctor: if there is an occurrence of __ the anchor is not parsed
-        # correctly: #2746
-        id = id.replace("__", "-")
-
-        return f"{self.TAG}-{id}"

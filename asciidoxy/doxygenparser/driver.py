@@ -22,9 +22,10 @@ from typing import List, Mapping, Optional, Set
 from tqdm import tqdm
 
 from .cpp import CppParser
+from .driver_base import DriverBase
 from .java import JavaParser
-from .language_base import ParserBase, DriverBase
 from .objc import ObjectiveCParser
+from .parser_base import ParserBase
 from .python import PythonParser
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..model import (ReferableElement, TypeRefBase)
@@ -46,10 +47,10 @@ class Driver(DriverBase):
         self._force_language = safe_language_tag(force_language)
 
         self._parsers = {
-            CppParser.TAG: CppParser(self),
-            JavaParser.TAG: JavaParser(self),
-            ObjectiveCParser.TAG: ObjectiveCParser(self),
-            PythonParser.TAG: PythonParser(self),
+            CppParser.TRAITS.TAG: CppParser(self),
+            JavaParser.TRAITS.TAG: JavaParser(self),
+            ObjectiveCParser.TRAITS.TAG: ObjectiveCParser(self),
+            PythonParser.TRAITS.TAG: PythonParser(self),
         }
 
         if not self._force_language:

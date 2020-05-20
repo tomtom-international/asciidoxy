@@ -17,11 +17,12 @@ import re
 
 from typing import Optional
 
-from .language_base import ParserBase
+from .language_traits import LanguageTraits
+from .parser_base import ParserBase
 
 
-class CppParser(ParserBase):
-    """Parser for C++ documentation."""
+class CppTraits(LanguageTraits):
+    """Traits for parsing C++ documentation."""
     TAG: str = "cpp"
 
     TYPE_PREFIXES = re.compile(r"((const|volatile|constexpr|mutable|enum|class)\s*)+\s+")
@@ -41,23 +42,33 @@ class CppParser(ParserBase):
                                "signed long long", "signed long long int", "unsigned long long",
                                "unsigned long long int")
 
-    def is_language_standard_type(self, type_name: str) -> bool:
-        return type_name in self.LANGUAGE_BUILD_IN_TYPES or type_name.startswith("std::")
+    @classmethod
+    def is_language_standard_type(cls, type_name: str) -> bool:
+        return type_name in cls.LANGUAGE_BUILD_IN_TYPES or type_name.startswith("std::")
 
-    def short_name(self, name: str) -> str:
+    @classmethod
+    def short_name(cls, name: str) -> str:
         return name.split("::")[-1]
 
-    def full_name(self, name: str, parent: str = "") -> str:
+    @classmethod
+    def full_name(cls, name: str, parent: str = "") -> str:
         if name.startswith(parent):
             return name
         return f"{parent}::{name}"
 
-    def namespace(self, full_name: str) -> Optional[str]:
+    @classmethod
+    def namespace(cls, full_name: str) -> Optional[str]:
         if "::" in full_name:
             namespace, _ = full_name.rsplit("::", maxsplit=1)
             return namespace
         else:
             return None
 
-    def is_member_blacklisted(self, kind: str, name: str) -> bool:
+    @classmethod
+    def is_member_blacklisted(cls, kind: str, name: str) -> bool:
         return kind == "friend"
+
+
+class CppParser(ParserBase):
+    """Parser for C++ documentation."""
+    TRAITS = CppTraits
