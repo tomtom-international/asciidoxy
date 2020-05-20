@@ -41,7 +41,9 @@ def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = f"{cpp_type_prefix}double{cpp_type_suffix}"
 
-    type_ref = parse_type(CppTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
     assert type_ref.id is None
@@ -58,7 +60,11 @@ def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix,
     type_element.text = (f"{cpp_type_prefix}Coordinate< {cpp_type_prefix}Unit{cpp_type_suffix} "
                          f">{cpp_type_suffix}")
 
-    type_ref = parse_type(CppTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(CppTraits, driver_mock, type_element)
+
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["Coordinate", "Unit"]))
 
     assert type_ref is not None
     assert type_ref.id is None
@@ -89,7 +95,9 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_typ
                 text="Coordinate",
                 tail=cpp_type_suffix)
 
-    type_ref = parse_type(CppTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
     assert type_ref.id == "cpp-tomtom_coordinate"
@@ -111,7 +119,10 @@ def test_parse_cpp_type_from_ref_with_nested_text_type():
                 text="Coordinate",
                 tail="< const Unit > &")
 
-    type_ref = parse_type(CppTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    assert (sorted([args[0].name
+                    for args, _ in driver_mock.unresolved_ref.call_args_list]) == sorted(["Unit"]))
 
     assert type_ref is not None
     assert type_ref.id == "cpp-tomtom_coordinate"
@@ -142,7 +153,9 @@ def test_parse_cpp_type_from_text_with_nested_ref_type():
                 text="Coordinate",
                 tail=" & > *")
 
-    type_ref = parse_type(CppTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
     assert not type_ref.id
@@ -185,7 +198,9 @@ def test_parse_cpp_type_from_multiple_nested_text_and_ref():
                 text="Point",
                 tail=" < const std::string & > >")
 
-    type_ref = parse_type(CppTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
     assert type_ref.id == "cpp-tomtom_coordinate"
@@ -239,7 +254,9 @@ def test_parse_cpp_type_multiple_prefix_and_suffix():
     type_element = ET.Element("type")
     type_element.text = "mutable volatile std::string * const *"
 
-    type_ref = parse_type(CppTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
     assert not type_ref.id
@@ -261,7 +278,9 @@ def test_parse_cpp_type_with_space(cpp_type_prefix, type_with_space, cpp_type_su
     type_element = ET.Element("type")
     type_element.text = f"{cpp_type_prefix}{type_with_space}{cpp_type_suffix}"
 
-    type_ref = parse_type(CppTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
     assert not type_ref.id

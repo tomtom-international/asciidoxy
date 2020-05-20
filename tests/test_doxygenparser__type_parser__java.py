@@ -33,7 +33,9 @@ def test_parse_java_type_from_text_simple(java_type_prefix):
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}double"
 
-    type_ref = parse_type(JavaTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(JavaTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
     assert type_ref.id is None
@@ -53,7 +55,8 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}Position<{generic_prefix or ''}{generic_name}>"
 
-    type_ref = parse_type(JavaTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(JavaTraits, driver_mock, type_element)
 
     assert type_ref is not None
     assert not type_ref.id
@@ -66,3 +69,10 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
     assert type_ref.nested[0].prefix == generic_prefix
     assert type_ref.nested[0].name == generic_name.strip()
     assert not type_ref.nested[0].suffix
+
+    if generic_name.strip() == "T":
+        driver_mock.unresolved_ref.assert_called_with(type_ref)
+        assert driver_mock.unresolved_ref.call_count == 1
+    else:
+        assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                        ]) == sorted(["Position", generic_name.strip()]))

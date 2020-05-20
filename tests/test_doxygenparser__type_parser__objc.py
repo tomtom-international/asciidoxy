@@ -46,7 +46,9 @@ def test_parse_objc_type_from_text_simple(objc_type_prefix, objc_type_suffix):
     type_element = ET.Element("type")
     type_element.text = f"{objc_type_prefix}NSInteger{objc_type_suffix}"
 
-    type_ref = parse_type(ObjectiveCTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(ObjectiveCTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
     assert type_ref.id is None
@@ -59,17 +61,36 @@ def test_parse_objc_type_from_text_simple(objc_type_prefix, objc_type_suffix):
 
 
 @pytest.mark.parametrize("type_with_space", [
-    "short int", "signed short", "signed short int", "unsigned short", "unsigned short int",
-    "signed int", "signed", "unsigned", "unsigned int", "long int", "signed long",
-    "signed long int", "unsigned long", "unsigned long int", "long long", "long long int",
-    "signed long long", "signed long long int", "unsigned long long", "unsigned long long int",
-    "signed char", "long double"
+    "short int",
+    "signed short",
+    "signed short int",
+    "unsigned short",
+    "unsigned short int",
+    "signed int",
+    "unsigned int",
+    "long int",
+    "signed long",
+    "signed long int",
+    "unsigned long",
+    "unsigned long int",
+    "long long",
+    "long long int",
+    "signed long long",
+    "signed long long int",
+    "unsigned long long",
+    "unsigned long long int",
+    "signed char",
+    "long double",
+    "unsigned char",
+    "signed char",
 ])
 def test_parse_objc_type_with_space(type_with_space):
     type_element = ET.Element("type")
     type_element.text = type_with_space
 
-    type_ref = parse_type(ObjectiveCTraits, MagicMock(), type_element)
+    driver_mock = MagicMock()
+    type_ref = parse_type(ObjectiveCTraits, driver_mock, type_element)
+    driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
     assert not type_ref.id

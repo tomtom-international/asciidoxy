@@ -35,10 +35,14 @@ class ObjectiveCTraits(LanguageTraits):
     TYPE_NESTED_END = re.compile(r"\s*>")
     TYPE_NAME = re.compile(r"((unsigned|signed|short|long)\s+)*[a-zA-Z0-9_:]+")
 
-    LANGUAGE_BUILD_IN_TYPES = ("char", "unsigned char", "signed char", "int", "unsigned int",
-                               "short", "unsigned short", "long", "unsigned long", "float",
-                               "double", "long double", "void", "bool", "BOOL", "id",
-                               "instancetype")
+    LANGUAGE_BUILD_IN_TYPES = ("char", "unsigned char", "signed char", "int", "short", "long",
+                               "float", "double", "void", "bool", "BOOL", "id", "instancetype",
+                               "short int", "signed short", "signed short int", "unsigned short",
+                               "unsigned short int", "signed int", "unsigned int", "long int",
+                               "signed long", "signed long int", "unsigned long",
+                               "unsigned long int", "long long", "long long int",
+                               "signed long long", "signed long long int", "unsigned long long",
+                               "unsigned long long int", "signed char", "long double")
 
     BLOCK = re.compile(r"typedef (.+)\(\^(.+)\)\s*\((.*)\)")
 
