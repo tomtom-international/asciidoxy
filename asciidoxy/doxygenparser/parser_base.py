@@ -23,6 +23,7 @@ from typing import List, Optional, Tuple, Type, Union
 from .description_parser import DescriptionParser, select_descriptions
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
+from .type_parser import parse_type
 from ..model import (Compound, EnumValue, Member, Parameter, ReturnValue, ThrowsClause, TypeRef,
                      InnerTypeReference)
 
@@ -88,67 +89,9 @@ class ParserBase(ABC):
         if type_element is None:
             return None
 
-        def match_and_extract(regex, text):
-            if regex is not None and text:
-                match = regex.match(text)
-                if match:
-                    return match.group(0), text[match.end():]
+        type_ref = parse_type(self.TRAITS, self._driver, type_element, parent)
 
-            return None, text
-
-        def extract_type(element_iter, text):
-            type_ref = TypeRef(self.TRAITS.TAG)
-            if isinstance(parent, Compound):
-                type_ref.namespace = parent.full_name
-            elif isinstance(parent, Member):
-                type_ref.namespace = parent.namespace
-
-            type_ref.prefix, text = match_and_extract(self.TRAITS.TYPE_PREFIXES, text)
-
-            if not text:
-                try:
-                    element = next(element_iter)
-                    type_ref.id = self.TRAITS.unique_id(element.get("refid"))
-                    type_ref.kind = element.get("kindref", None)
-                    type_ref.name = self.TRAITS.cleanup_name(element.text or "")
-                    text = element.tail
-
-                except StopIteration:
-                    pass
-            else:
-                type_ref.name, text = match_and_extract(self.TRAITS.TYPE_NAME, text)
-                if type_ref.name is not None:
-                    type_ref.name = self.TRAITS.cleanup_name(type_ref.name)
-
-            start_nested, text = match_and_extract(self.TRAITS.TYPE_NESTED_START, text)
-            if start_nested:
-                while True:
-                    nested_type_ref, text = extract_type(element_iter, text)
-                    if nested_type_ref and nested_type_ref.name:
-                        type_ref.nested.append(nested_type_ref)
-                    else:
-                        # TODO Error?
-                        break
-
-                    end_nested, text = match_and_extract(self.TRAITS.TYPE_NESTED_END, text)
-                    if end_nested:
-                        break
-
-                    _, text = match_and_extract(self.TRAITS.TYPE_NESTED_SEPARATOR, text)
-
-            type_ref.suffix, text = match_and_extract(self.TRAITS.TYPE_SUFFIXES, text)
-
-            # doxygen inserts empty <type> tag for return value in constructors,
-            # this fake types should be filtered out
-            if type_ref.name:
-                if not type_ref.id and not self.TRAITS.is_language_standard_type(type_ref.name):
-                    self._driver.unresolved_ref(type_ref)
-
-            return type_ref, text
-
-        type_ref, _ = extract_type(type_element.iter("ref"), type_element.text)
-
-        if type_ref.name:
+        if type_ref is not None and type_ref.name:
             return type_ref
         else:
             return None

@@ -15,12 +15,6 @@
 
 import pytest
 
-import xml.etree.ElementTree as ET
-
-from asciidoxy.doxygenparser.java import JavaParser
-from asciidoxy.doxygenparser import Driver as ParserDriver
-from tests.shared import assert_equal_or_none_if_empty
-
 
 @pytest.mark.parametrize("api_reference_set", [["java/default"]])
 def test_parse_java_class(api_reference):
@@ -120,51 +114,3 @@ def test_parse_java_method(api_reference):
     assert not member.returns.type.suffix
     assert len(member.returns.type.nested) == 0
     assert member.returns.description == "True if the update is valid."
-
-
-@pytest.fixture(params=["", "final ", "synchronized ", "synchronized final "])
-def java_type_prefix(request):
-    return request.param
-
-
-def test_parse_java_type_from_text_simple(java_type_prefix):
-    parser = ParserDriver()
-    java = JavaParser(parser)
-
-    type_element = ET.Element("type")
-    type_element.text = f"{java_type_prefix}double"
-
-    type_ref = java.parse_type(type_element)
-    assert type_ref is not None
-    assert type_ref.id is None
-    assert type_ref.kind is None
-    assert type_ref.language == "java"
-    assert type_ref.name == "double"
-    assert_equal_or_none_if_empty(type_ref.prefix, java_type_prefix)
-    assert not type_ref.suffix
-    assert len(type_ref.nested) == 0
-
-
-@pytest.mark.parametrize("generic_prefix, generic_name", [("? extends ", "Unit"),
-                                                          ("T extends ", "Unit"),
-                                                          ("T extends ", "Unit "), (None, "T "),
-                                                          (None, "T")])
-def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_name):
-    parser = ParserDriver()
-    java = JavaParser(parser)
-
-    type_element = ET.Element("type")
-    type_element.text = f"{java_type_prefix}Position<{generic_prefix or ''}{generic_name}>"
-
-    type_ref = java.parse_type(type_element)
-    assert type_ref is not None
-    assert not type_ref.id
-    assert not type_ref.kind
-    assert type_ref.language == "java"
-    assert type_ref.name == "Position"
-    assert_equal_or_none_if_empty(type_ref.prefix, java_type_prefix)
-    assert not type_ref.suffix
-    assert len(type_ref.nested) == 1
-    assert type_ref.nested[0].prefix == generic_prefix
-    assert type_ref.nested[0].name == generic_name.strip()
-    assert not type_ref.nested[0].suffix
