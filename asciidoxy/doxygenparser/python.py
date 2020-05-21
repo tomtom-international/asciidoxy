@@ -19,12 +19,13 @@ import xml.etree.ElementTree as ET
 
 from typing import Optional
 
-from ..model import Compound, Member
-from .language_base import Language
+from ..model import Compound, Member, Parameter
+from .language_traits import LanguageTraits
+from .parser_base import ParserBase
 
 
-class PythonLanguage(Language):
-    """Language support for python."""
+class PythonTraits(LanguageTraits):
+    """Traits for parsing python documentation."""
     TAG: str = "python"
 
     TYPE_PREFIXES = None
@@ -34,23 +35,32 @@ class PythonLanguage(Language):
     TYPE_NESTED_END = re.compile(r"\s*\]")
     TYPE_NAME = re.compile(r"\"?[a-zA-Z0-9_.]+\"?")
 
-    def cleanup_name(self, name: str) -> str:
+    @classmethod
+    def cleanup_name(cls, name: str) -> str:
         return name.replace("::", ".").replace('"', "").strip()
 
-    def short_name(self, name: str) -> str:
+    @classmethod
+    def short_name(cls, name: str) -> str:
         return name.split(".")[-1]
 
-    def full_name(self, name: str, parent: str = "") -> str:
+    @classmethod
+    def full_name(cls, name: str, parent: str = "") -> str:
         if name.startswith(parent):
             return name
         return f"{parent}.{name}"
 
-    def namespace(self, full_name: str) -> Optional[str]:
+    @classmethod
+    def namespace(cls, full_name: str) -> Optional[str]:
         if "." in full_name:
             namespace, _ = full_name.rsplit(".", maxsplit=1)
             return namespace
         else:
             return None
+
+
+class PythonParser(ParserBase):
+    """Parser for python documentation."""
+    TRAITS = PythonTraits
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
         member = super().parse_member(memberdef_element, parent)
@@ -60,3 +70,17 @@ class PythonLanguage(Language):
             member.returns = None
 
         return member
+
+    def parse_array(self, array_element: Optional[ET.Element], param: Parameter):
+        if array_element is None or param.type is None:
+            return
+        if not array_element.text:
+            return
+
+        # TODO: This is ugly. Type parsing needs refactoring.
+        type_element = ET.Element("type")
+        type_element.text = f"{param.type.name}{array_element.text}"
+        type_ref = self.parse_type(type_element)
+
+        if type_ref is not None and type_ref.nested:
+            param.type.nested = type_ref.nested

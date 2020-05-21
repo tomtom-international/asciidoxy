@@ -4,6 +4,8 @@
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
+#import &lt;ADTrafficEvent.h&gt;
+
 enum TrafficEventData.ADSeverity
 ----
 

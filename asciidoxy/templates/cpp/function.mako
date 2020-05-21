@@ -12,50 +12,20 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, type_and_name, argument_list, has)
+from asciidoxy.templates.helpers import (link_from_ref, argument_list)
 %>
 
-= [[${element.id},${element.name}]]
+= [[${element.id},${element.full_name}]]${element.name}
 ${api_context.insert(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
+% if element.include:
+#include &lt;${element.include}&gt;
+
+% endif
 ${"static" if element.static else ""} \
 ${link_from_ref(element.returns.type, api_context) if element.returns else ""} \
 ${element.name}${argument_list(element.params, api_context)}
 ----
-
-${element.brief}
-
-${element.description}
-
-% if has(element.params) or has(insert_filter.exceptions(element)) or element.returns:
-[cols='h,5a']
-|===
-% if has(element.params):
-| Parameters
-|
-% for param in element.params:
-`${type_and_name(param, api_context)}`::
-${param.description}
-
-% endfor
-% endif
-% if element.returns and element.returns.type.name != "void":
-| Returns
-|
-`${link_from_ref(element.returns.type, api_context)}`::
-${element.returns.description}
-
-% endif
-% if has(insert_filter.exceptions(element)):
-| Throws
-|
-% for exception in insert_filter.exceptions(element):
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
+<%include file="/cpp/_function.mako"/>

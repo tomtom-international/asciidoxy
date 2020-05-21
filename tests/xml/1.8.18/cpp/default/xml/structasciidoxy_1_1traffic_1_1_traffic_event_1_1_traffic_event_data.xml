@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kind="struct" language="C++" prot="public">
+    <compoundname>asciidoxy::traffic::TrafficEvent::TrafficEventData</compoundname>
+    <includes refid="traffic__event_8hpp" local="no">traffic_event.hpp</includes>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675" prot="public" static="no" mutable="no">
+        <type>TpegCauseCode</type>
+        <definition>TpegCauseCode asciidoxy::traffic::TrafficEvent::TrafficEventData::cause</definition>
+        <argsstring></argsstring>
+        <name>cause</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>TPEG cause code. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="68" column="19" bodyfile="traffic_event.hpp" bodystart="68" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af2d0e5eae81af06962dd53271c8dc70d" prot="public" static="no" mutable="no">
+        <type>Delay</type>
+        <definition>Delay asciidoxy::traffic::TrafficEvent::TrafficEventData::delay</definition>
+        <argsstring></argsstring>
+        <name>delay</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Delay caused by the traffic event in seconds. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="73" column="11" bodyfile="traffic_event.hpp" bodystart="73" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68" prot="public" static="no" mutable="no">
+        <type><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9" kindref="member">Severity</ref></type>
+        <definition>Severity asciidoxy::traffic::TrafficEvent::TrafficEventData::severity</definition>
+        <argsstring></argsstring>
+        <name>severity</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Severity of the event. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="78" column="14" bodyfile="traffic_event.hpp" bodystart="78" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Details about a traffic event.</para>
+<para>Use the cause and delay to properly inform your users. </para>
+    </detaileddescription>
+    <location file="traffic_event.hpp" line="64" column="3" bodyfile="traffic_event.hpp" bodystart="64" bodyend="79"/>
+    <listofallmembers>
+      <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>cause</name></member>
+      <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af2d0e5eae81af06962dd53271c8dc70d" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>delay</name></member>
+      <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>severity</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -20,6 +20,24 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.5.4 (21 May 2020)
+
+=== Changed
+
+  - Additional arguments for `api.include` and `api.insert` are passed as attributes of the
+    `include` directive.
+  - Improved performance in resolving references and looking up elements to link to and insert.
+
+=== Fixed
+
+  - Matching elements in the same namespace are now preferred over elements in a different
+    namespace. Only if all matches are in a parent namespace, the match will be ambiguous.
+  - For types directly included in a namespace the include file is now present.
+  - C++ functions that are inserted directly, so not as part of an enclosing type, have a section
+    header and include file.
+  - Nested python type hints are now detected and shown in the documentation.
+
+
 == 0.5.3 (16 May 2020)
 
 === Added

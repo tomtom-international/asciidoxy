@@ -1,10 +1,12 @@
 
 
-= [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,SharedData]]
+= [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,asciidoxy::traffic::TrafficEvent::SharedData]]SharedData
 
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
+#include &lt;traffic_event.hpp&gt;
+
  std::shared_ptr&lt;xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]&gt; SharedData()
 ----
 
@@ -25,4 +27,5 @@ The shared pointer.
 Thrown when the event data is invalid.
 
 |===
+
 

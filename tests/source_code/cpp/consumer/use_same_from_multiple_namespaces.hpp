@@ -39,6 +39,14 @@ namespace traffic {
  */
 Convertor CreateConvertor();
 
+namespace geometry {
+
+/**
+ * Create a convertor in a namespace without its own convertor. Ambiguous reference to return type.
+ */
+Convertor CreateConvertor();
+
+}  // namespace geometry
 }  // namespace traffic
 }  // namespace asciidoxy
 

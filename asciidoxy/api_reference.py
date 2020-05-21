@@ -16,7 +16,8 @@
 import re
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Tuple
+from collections import defaultdict
+from typing import Dict, List, Optional, Tuple
 
 from .model import Member, ReferableElement
 
@@ -117,11 +118,6 @@ class SimpleAttributeFilter(ElementFilter):
         return self._value is not None
 
 
-class IdFilter(SimpleAttributeFilter):
-    """Filter on the unique id."""
-    ATTR_NAME = "id"
-
-
 class NamespaceList(list):
     def startswith(self, other: list) -> bool:
         if len(self) < len(other):
@@ -141,15 +137,20 @@ class NameFilter(ElementFilter):
     """
     _name: Optional[str] = None
     _namespace: Optional[str] = None
+    _exact_namespace: bool
 
     _name_parts: NamespaceList
     _namespace_parts: NamespaceList
 
     NAMESPACE_SEPARATORS = "::", "."
 
-    def __init__(self, name: Optional[str], namespace: Optional[str] = None):
+    def __init__(self,
+                 name: Optional[str],
+                 namespace: Optional[str] = None,
+                 exact_namespace: bool = False):
         self._name = name
         self._namespace = namespace
+        self._exact_namespace = exact_namespace
 
         if name is not None and namespace is not None:
             self._name_parts = self._split_namespaces(name)
@@ -186,6 +187,9 @@ class NameFilter(ElementFilter):
             return False
 
         full_name_parts = self._split_namespaces(full_name)
+
+        if self._exact_namespace:
+            return full_name_parts == self._namespace_parts + self._name_parts
 
         if not full_name_parts.endswith(self._name_parts):
             return False
@@ -350,9 +354,23 @@ class ApiReference:
         elements: All contained API reference elements.
     """
     elements: List[ReferableElement]
+    _id_index: Dict[str, ReferableElement]
+    _name_index: Dict[str, List[ReferableElement]]
 
     def __init__(self):
         self.elements = []
+        self._id_index = {}
+        self._name_index = defaultdict(list)
+
+    def append(self, element: ReferableElement) -> None:
+        self.elements.append(element)
+
+        assert element.id
+        # TODO assert element.id not in self._id_index
+        self._id_index[element.id] = element
+
+        assert element.name
+        self._name_index[element.name].append(element)
 
     def find(self,
              name: Optional[str] = None,
@@ -385,35 +403,44 @@ class ApiReference:
             AmbiguousLookupError: There are multiple matching elements. Make your query more narrow.
         """
         if target_id is not None:
-            return self._find(IdFilter(target_id))
+            return self._id_index.get(target_id, None)
+        elif name is None:
+            return None
 
         paramtype_matcher = ParameterTypeMatcher(name)
         if paramtype_matcher.applies:
             name = paramtype_matcher.name
 
-        previous_error = None
-        if namespace is not None:
-            try:
-                element = self._find(
-                    CombinedFilter(NameFilter(name, namespace), KindFilter(kind), LangFilter(lang),
-                                   paramtype_matcher))
-                if element is not None:
-                    return element
-            except AmbiguousLookupError as e:
-                previous_error = e
+        for separator in NameFilter.NAMESPACE_SEPARATORS:
+            if separator in name:
+                _, short_name = name.rsplit(separator, maxsplit=1)
+                break
+        else:
+            short_name = name
 
-        element = self._find(
-            CombinedFilter(NameFilter(name), KindFilter(kind), LangFilter(lang), paramtype_matcher))
-        if element is None and previous_error is not None:
-            raise previous_error
-        return element
+        potential_matches = self._name_index[short_name]
+        if len(potential_matches) == 0:
+            return None
 
-    def _find(self, element_filter: ElementFilter):
-        matches = [e for e in self.elements if element_filter(e)]
+        element_filter = CombinedFilter(NameFilter(name, namespace), KindFilter(kind),
+                                        LangFilter(lang), paramtype_matcher)
+
+        matches = [e for e in potential_matches if element_filter(e)]
 
         if len(matches) == 1:
             return matches[0]
-        elif len(matches) > 1:
-            raise AmbiguousLookupError(matches)
-        else:
+        elif len(matches) == 0:
             return None
+
+        if namespace is not None:
+            exact_matches = [
+                e for e in matches if NameFilter(name, namespace, exact_namespace=True)(e)
+            ]
+            if len(exact_matches) == 1:
+                return exact_matches[0]
+
+            matches_without_namespace = [e for e in matches if NameFilter(name)(e)]
+            if len(matches_without_namespace) == 1:
+                return matches_without_namespace[0]
+
+        raise AmbiguousLookupError(matches)

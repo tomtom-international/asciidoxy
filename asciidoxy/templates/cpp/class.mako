@@ -99,7 +99,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 
 ################################################################################### Constructors ##
 % for constructor in public_constructors(element, insert_filter):
-${api.insert_fragment(constructor, insert_filter)}
+${api.insert_fragment(constructor, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Variables ##
@@ -120,12 +120,12 @@ ${variable.description}
 % endfor
 ################################################################################# Static methods ##
 % for method in public_static_methods(element, insert_filter):
-${api.insert_fragment(method, insert_filter)}
+${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 ######################################################################################## Methods ##
 % for method in public_methods(element, insert_filter):
-${api.insert_fragment(method, insert_filter)}
+${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 

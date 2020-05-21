@@ -51,5 +51,13 @@ class ServiceStarter {
   void Register(const Service& service);
 };
 
+/**
+ * Create a new service.
+ *
+ * \param name Name of the service to create.
+ * \returns The new service, or an empty pointer if it could not be created.
+ */
+std::unique_ptr<Service> CreateService(std::string name);
+
 }  // namespace system
 }  // namespace asciidoxy

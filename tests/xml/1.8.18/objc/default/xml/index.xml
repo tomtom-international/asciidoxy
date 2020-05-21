@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.18">
+  <compound refid="interface_a_d_coordinate" kind="class"><name>ADCoordinate</name>
+    <member refid="interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94" kind="property"><name>latitude</name></member>
+    <member refid="interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e" kind="property"><name>longitude</name></member>
+    <member refid="interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2" kind="property"><name>altitude</name></member>
+    <member refid="interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321" kind="function"><name>isValid</name></member>
+    <member refid="interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22" kind="function"><name>init</name></member>
+  </compound>
+  <compound refid="protocol_a_d_traffic_event-p" kind="protocol"><name>ADTrafficEvent-p</name>
+    <member refid="protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b" kind="property"><name>data</name></member>
+    <member refid="protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262" kind="function"><name>updateWithCause:andDelay:</name></member>
+  </compound>
+  <compound refid="interface_traffic_event_data" kind="class"><name>TrafficEventData</name>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273" kind="enum"><name>ADSeverity</name></member>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414" kind="enumvalue"><name>Low</name></member>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7" kind="enumvalue"><name>Medium</name></member>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d" kind="enumvalue"><name>High</name></member>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff" kind="enumvalue"><name>Unknown</name></member>
+    <member refid="interface_traffic_event_data_1a8353496d09d78db82e9e62f8c2808d34" kind="variable"><name>cause</name></member>
+    <member refid="interface_traffic_event_data_1ab4a315c870a75cc68f5bba648b9b8be0" kind="variable"><name>delay</name></member>
+    <member refid="interface_traffic_event_data_1a3136b600b8d16811c66914ff3afa48ca" kind="variable"><name>severity</name></member>
+  </compound>
+  <compound refid="_a_d_coordinate_8h" kind="file"><name>ADCoordinate.h</name>
+  </compound>
+  <compound refid="_a_d_traffic_event_8h" kind="file"><name>ADTrafficEvent.h</name>
+    <member refid="_a_d_traffic_event_8h_1a929385fc78158cf2be0d44416a5df884" kind="typedef"><name>TpegCauseCode</name></member>
+    <member refid="_a_d_traffic_event_8h_1a38c6f0aeef5e08b2f836e0dc35b02a15" kind="typedef"><name>OnTrafficEventCallback</name></member>
+  </compound>
+</doxygenindex>

@@ -1,0 +1,256 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1traffic_1_1_traffic_event" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::traffic::TrafficEvent</compoundname>
+    <includes refid="traffic__event_8hpp" local="no">traffic_event.hpp</includes>
+    <innerclass refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" prot="public">asciidoxy::traffic::TrafficEvent::TrafficEventData</innerclass>
+      <sectiondef kind="public-type">
+      <memberdef kind="enum" id="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9" prot="public" static="no" strong="yes">
+        <type></type>
+        <name>Severity</name>
+        <enumvalue id="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a28d0edd045e05cf5af64e35ae0c4c6ef" prot="public">
+          <name>Low</name>
+          <initializer>= 1</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>Low severity. </para>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a87f8a6ab85c9ced3702b4ea641ad4bb5" prot="public">
+          <name>Medium</name>
+          <initializer>= 2</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>Medium severity. </para>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a655d20c1ca69519ca647684edbb2db35" prot="public">
+          <name>High</name>
+          <initializer>= 3</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>High severity.</para>
+<para>Better stay away here. </para>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a88183b946cc5f0e8c96b2e66e1c74a7e" prot="public">
+          <name>Unknown</name>
+          <initializer>= 4</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>Severity unknown. </para>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Severity scale for traffic events.</para>
+<para>The more severe the traffic event, the more likely it is to have a large delay. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="35" column="4" bodyfile="traffic_event.hpp" bodystart="35" bodyend="57"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad" prot="private" static="no" mutable="no">
+        <type><ref refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref></type>
+        <definition>TrafficEventData asciidoxy::traffic::TrafficEvent::data_</definition>
+        <argsstring></argsstring>
+        <name>data_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="131" column="20" bodyfile="traffic_event.hpp" bodystart="131" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>asciidoxy::traffic::TrafficEvent::TrafficEvent</definition>
+        <argsstring>()</argsstring>
+        <name>TrafficEvent</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Default constructor. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="84" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>asciidoxy::traffic::TrafficEvent::TrafficEvent</definition>
+        <argsstring>(TrafficEventData data)</argsstring>
+        <name>TrafficEvent</name>
+        <param>
+          <type><ref refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref></type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Construct a traffic event from data.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>data</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The data to contain. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="91" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>const <ref refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref> &amp;</type>
+        <definition>const TrafficEventData&amp; asciidoxy::traffic::TrafficEvent::Data</definition>
+        <argsstring>() const</argsstring>
+        <name>Data</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the traffic event details.</para>
+<para><simplesect kind="return"><para>Traffic event details. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="98" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool asciidoxy::traffic::TrafficEvent::Update</definition>
+        <argsstring>(int cause, int delay)</argsstring>
+        <name>Update</name>
+        <param>
+          <type>int</type>
+          <declname>cause</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>delay</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Update the traffic event data.</para>
+<para>Verifies the new information before updating.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>cause</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>New TPEG cause code. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delay</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>New delay in seconds. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>True if the update is valid. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="109" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>std::shared_ptr&lt; <ref refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref> &gt;</type>
+        <definition>std::shared_ptr&lt;TrafficEventData&gt; asciidoxy::traffic::TrafficEvent::SharedData</definition>
+        <argsstring>() const</argsstring>
+        <name>SharedData</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get a shared pointer to a copy of the data.</para>
+<para>Not sure why you want this.</para>
+<para><simplesect kind="return"><para>The shared pointer. </para>
+</simplesect>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>std::runtime_exception</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown if no copy of the data is available. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>InvalidEventError</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when the event data is invalid. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="120" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>long</type>
+        <definition>long asciidoxy::traffic::TrafficEvent::CalculateDelay</definition>
+        <argsstring>()</argsstring>
+        <name>CalculateDelay</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Calculate the current delay.</para>
+<para><simplesect kind="return"><para>The delay in seconds. </para>
+</simplesect>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>std::runtime_exception</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown when the update encounters a critical error. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="128" column="8"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Information about a traffic event. </para>
+    </detaileddescription>
+    <location file="traffic_event.hpp" line="28" column="1" bodyfile="traffic_event.hpp" bodystart="28" bodyend="132"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>CalculateDelay</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>Data</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad" prot="private" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>data_</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>Severity</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>SharedData</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>TrafficEvent</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>TrafficEvent</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>Update</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kind="class" language="Python" prot="public">
+    <compoundname>asciidoxy::traffic::TrafficEvent::TrafficEventData</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a7a93792cb0d89c430b35d085f36e804e" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>asciidoxy.traffic.TrafficEvent.TrafficEventData::cause</definition>
+        <argsstring></argsstring>
+        <name>cause</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>TPEG cause code. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="60" column="1" bodyfile="asciidoxy/traffic.py" bodystart="60" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1ad2dcca5c153fdd8bd97d8424bb13c003" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>asciidoxy.traffic.TrafficEvent.TrafficEventData::delay</definition>
+        <argsstring></argsstring>
+        <name>delay</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Delay caused by the traffic event in seconds. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="61" column="1" bodyfile="asciidoxy/traffic.py" bodystart="61" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a9601be1f4871fbf57154f5a061e0f784" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>asciidoxy.traffic.TrafficEvent.TrafficEventData::severity</definition>
+        <argsstring></argsstring>
+        <name>severity</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kindref="compound">Severity</ref> of the event. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="62" column="1" bodyfile="asciidoxy/traffic.py" bodystart="62" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1ae909c5f0bb40589e4977cd48accf3d6d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def asciidoxy.traffic.TrafficEvent.TrafficEventData.__init__</definition>
+        <argsstring>(self)</argsstring>
+        <name>__init__</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="59" column="1" bodyfile="asciidoxy/traffic.py" bodystart="59" bodyend="64"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Details about a traffic event. </para>
+    </briefdescription>
+    <detaileddescription>
+<para><verbatim>   Use the cause and delay to properly inform you users.
+</verbatim> </para>
+    </detaileddescription>
+    <location file="asciidoxy/traffic.py" line="45" column="1" bodyfile="asciidoxy/traffic.py" bodystart="45" bodyend="63"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1ae909c5f0bb40589e4977cd48accf3d6d" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>__init__</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a7a93792cb0d89c430b35d085f36e804e" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>cause</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1ad2dcca5c153fdd8bd97d8424bb13c003" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>delay</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a9601be1f4871fbf57154f5a061e0f784" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>severity</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

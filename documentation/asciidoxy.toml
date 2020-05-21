@@ -27,16 +27,16 @@ package_dir = "../build/doc/doxygen"
 
 [packages.cppexamples]
 source = "local"
-package_dir = "../tests/xml/1.8.17/cpp/default"
+package_dir = "../tests/xml/1.8.18/cpp/default"
 
 [packages.javaexamples]
 source = "local"
-package_dir = "../tests/xml/1.8.17/java/default"
+package_dir = "../tests/xml/1.8.18/java/default"
 
 [packages.objcexamples]
 source = "local"
-package_dir = "../tests/xml/1.8.17/objc/default"
+package_dir = "../tests/xml/1.8.18/objc/default"
 
 [packages.pythoncexamples]
 source = "local"
-package_dir = "../tests/xml/1.8.17/python/default"
+package_dir = "../tests/xml/1.8.18/python/default"

@@ -1,0 +1,31 @@
+
+
+= [[cpp-service_8hpp_1a7c44d1c4b121bf30bf90a517f8ff9fbc,asciidoxy::system::CreateService]]CreateService
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;service.hpp&gt;
+
+ std::unique_ptr&lt;xref:cpp-classasciidoxy_1_1system_1_1_service[Service]&gt; CreateService(std::string name)
+----
+
+Create a new service.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`std::string name`::
+Name of the service to create.
+
+| Returns
+|
+`std::unique_ptr&lt;xref:cpp-classasciidoxy_1_1system_1_1_service[Service]&gt;`::
+The new service, or an empty pointer if it could not be created.
+
+|===
+
+

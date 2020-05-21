@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.18">
+  <compound refid="classasciidoxy_1_1positioning_1_1_positioning" kind="class"><name>asciidoxy::positioning::Positioning</name>
+    <member refid="classasciidoxy_1_1positioning_1_1_positioning_1a247800ba0e71099b54c958f764f29917" kind="function"><name>CurrentPosition</name></member>
+    <member refid="classasciidoxy_1_1positioning_1_1_positioning_1a8f374afbae18da9cbb1198f99d9f0cc8" kind="function"><name>IsNearby</name></member>
+    <member refid="classasciidoxy_1_1positioning_1_1_positioning_1af0fb232aa368c066236edf2bab3fa323" kind="function"><name>Override</name></member>
+    <member refid="classasciidoxy_1_1positioning_1_1_positioning_1aeb978fa087b26c153150d3e5a93c5121" kind="function"><name>TrafficNearby</name></member>
+    <member refid="classasciidoxy_1_1positioning_1_1_positioning_1af799f1baf9c2ea33f106a9484d2ce2ea" kind="function"><name>InTraffic</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy" kind="namespace"><name>asciidoxy</name>
+    <member refid="use__same__from__multiple__namespaces_8hpp_1a6429f99aedd2660dc8352f7179acfef0" kind="function"><name>CreateConvertor</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
+    <member refid="use__same__from__multiple__namespaces_8hpp_1afffb6cb2a65dc7d02965d575a0ce8864" kind="function"><name>CreateConvertor</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1positioning" kind="namespace"><name>asciidoxy::positioning</name>
+    <member refid="positioning_8hpp_1a0f8564df8a29ae75727fca0d3bf0c2ee" kind="typedef"><name>Traffic</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
+    <member refid="use__same__from__multiple__namespaces_8hpp_1a83ef97f115a6a46b90e6f9d2055745c0" kind="function"><name>CreateConvertor</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1traffic_1_1geometry" kind="namespace"><name>asciidoxy::traffic::geometry</name>
+    <member refid="use__same__from__multiple__namespaces_8hpp_1af30b1aaeff7d7434d667e176017a219e" kind="function"><name>CreateConvertor</name></member>
+  </compound>
+  <compound refid="positioning_8hpp" kind="file"><name>positioning.hpp</name>
+  </compound>
+  <compound refid="use__same__from__multiple__namespaces_8hpp" kind="file"><name>use_same_from_multiple_namespaces.hpp</name>
+  </compound>
+</doxygenindex>

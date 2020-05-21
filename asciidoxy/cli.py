@@ -28,7 +28,7 @@ from mako.exceptions import RichTraceback
 from tqdm import tqdm
 
 from .collect import collect, specs_from_file, CollectError, SpecificationError
-from .doxygenparser import DoxygenXmlParser
+from .doxygenparser import Driver as ParserDriver
 from .generator import process_adoc, AsciiDocError
 from .model import json_repr
 from ._version import __version__
@@ -172,7 +172,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     logger.info("Loading packages")
     include_dirs: List[Path] = []
-    xml_parser = DoxygenXmlParser(force_language=args.force_language)
+    xml_parser = ParserDriver(force_language=args.force_language)
     for pkg in tqdm(packages, desc="Loading API reference", unit="pkg"):
         include_dirs.extend(pkg.include_dirs)
         for xml_dir in pkg.xml_dirs:

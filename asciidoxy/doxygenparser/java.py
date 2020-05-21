@@ -17,11 +17,12 @@ import re
 
 from typing import Optional
 
-from .language_base import Language
+from .language_traits import LanguageTraits
+from .parser_base import ParserBase
 
 
-class JavaLanguage(Language):
-    """Language support for Java."""
+class JavaTraits(LanguageTraits):
+    """Traits for parsing Java documentation."""
     TAG: str = "java"
 
     TYPE_PREFIXES = re.compile(r"((([\w?]+?\s+extends)|final|synchronized|transient)\s*)+\s+")
@@ -35,25 +36,35 @@ class JavaLanguage(Language):
                                "double", "String")
     COMMON_GENERIC_NAMES = ("T", "?", "T ", "? ")
 
-    def is_language_standard_type(self, type_name: str) -> bool:
-        return (type_name in self.LANGUAGE_BUILD_IN_TYPES or type_name in self.COMMON_GENERIC_NAMES
+    @classmethod
+    def is_language_standard_type(cls, type_name: str) -> bool:
+        return (type_name in cls.LANGUAGE_BUILD_IN_TYPES or type_name in cls.COMMON_GENERIC_NAMES
                 or type_name.startswith("java.") or type_name.startswith("android.")
                 or type_name.startswith("native "))
 
-    def cleanup_name(self, name: str) -> str:
+    @classmethod
+    def cleanup_name(cls, name: str) -> str:
         return name.replace("::", ".").strip()
 
-    def short_name(self, name: str) -> str:
+    @classmethod
+    def short_name(cls, name: str) -> str:
         return name.split(".")[-1]
 
-    def full_name(self, name: str, parent: str = "") -> str:
+    @classmethod
+    def full_name(cls, name: str, parent: str = "") -> str:
         if name.startswith(parent):
             return name
         return f"{parent}.{name}"
 
-    def namespace(self, full_name: str) -> Optional[str]:
+    @classmethod
+    def namespace(cls, full_name: str) -> Optional[str]:
         if "." in full_name:
             namespace, _ = full_name.rsplit(".", maxsplit=1)
             return namespace
         else:
             return None
+
+
+class JavaParser(ParserBase):
+    """Parser for Java documentation."""
+    TRAITS = JavaTraits

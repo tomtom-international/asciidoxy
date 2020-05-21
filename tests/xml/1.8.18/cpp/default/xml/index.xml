@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.18">
+  <compound refid="classasciidoxy_1_1_convertor" kind="class"><name>asciidoxy::Convertor</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1geometry_1_1_convertor" kind="class"><name>asciidoxy::geometry::Convertor</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1traffic_1_1_convertor" kind="class"><name>asciidoxy::traffic::Convertor</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1geometry_1_1_coordinate" kind="class"><name>asciidoxy::geometry::Coordinate</name>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a52b32f5ac1d5690a56645ba6cc45ed3d" kind="variable"><name>latitude_</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1aa1f1fa30bae57977d397929654496270" kind="variable"><name>longitude_</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ac5f3b7b213473d7fedbdc7ccda7816f6" kind="variable"><name>altitude_</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318" kind="function"><name>Coordinate</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11" kind="function"><name>Latitude</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1" kind="function"><name>Longitude</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483" kind="function"><name>Altitude</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac" kind="function"><name>IsValid</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a" kind="function"><name>Update</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45" kind="function"><name>Update</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779" kind="function"><name>Update</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3" kind="function"><name>Update</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891" kind="function"><name>Update</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate" kind="class"><name>asciidoxy::geometry::InvalidCoordinate</name>
+    <member refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate_1a3b0057e2237f2ecfe3ebc94ca2ba6a12" kind="function"><name>what</name></member>
+  </compound>
+  <compound refid="class_logger" kind="class"><name>Logger</name>
+    <member refid="class_logger_1adfed6b5c5cb7fab63527144e705c1fa8" kind="function"><name>Log</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1system_1_1_service" kind="interface"><name>asciidoxy::system::Service</name>
+    <member refid="classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8" kind="function"><name>Start</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0" kind="function"><name>Stop</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1system_1_1_service_starter" kind="class"><name>asciidoxy::system::ServiceStarter</name>
+    <member refid="classasciidoxy_1_1system_1_1_service_starter_1a6474ceb8669761e879329b39c3afb899" kind="friend"><name>Service</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_service_starter_1a8923b0ad14de8aa8768a1e36318b0924" kind="function"><name>Register</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1traffic_1_1_traffic_event" kind="class"><name>asciidoxy::traffic::TrafficEvent</name>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9" kind="enum"><name>Severity</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a28d0edd045e05cf5af64e35ae0c4c6ef" kind="enumvalue"><name>Low</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a87f8a6ab85c9ced3702b4ea641ad4bb5" kind="enumvalue"><name>Medium</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a655d20c1ca69519ca647684edbb2db35" kind="enumvalue"><name>High</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a88183b946cc5f0e8c96b2e66e1c74a7e" kind="enumvalue"><name>Unknown</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad" kind="variable"><name>data_</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41" kind="function"><name>TrafficEvent</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc" kind="function"><name>TrafficEvent</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28" kind="function"><name>Data</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b" kind="function"><name>Update</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf" kind="function"><name>SharedData</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" kind="function"><name>CalculateDelay</name></member>
+  </compound>
+  <compound refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kind="struct"><name>asciidoxy::traffic::TrafficEvent::TrafficEventData</name>
+    <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675" kind="variable"><name>cause</name></member>
+    <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af2d0e5eae81af06962dd53271c8dc70d" kind="variable"><name>delay</name></member>
+    <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68" kind="variable"><name>severity</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy" kind="namespace"><name>asciidoxy</name>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1system" kind="namespace"><name>asciidoxy::system</name>
+    <member refid="service_8hpp_1a7c44d1c4b121bf30bf90a517f8ff9fbc" kind="function"><name>CreateService</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
+    <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>
+    <member refid="traffic__event_8hpp_1adb4a21783ecb2c7bf30726a36c61a502" kind="typedef"><name>Delay</name></member>
+  </compound>
+  <compound refid="coordinate_8hpp" kind="file"><name>coordinate.hpp</name>
+  </compound>
+  <compound refid="logger_8hpp" kind="file"><name>logger.hpp</name>
+  </compound>
+  <compound refid="same__in__multiple__namespaces_8hpp" kind="file"><name>same_in_multiple_namespaces.hpp</name>
+  </compound>
+  <compound refid="service_8hpp" kind="file"><name>service.hpp</name>
+  </compound>
+  <compound refid="traffic__event_8hpp" kind="file"><name>traffic_event.hpp</name>
+  </compound>
+</doxygenindex>

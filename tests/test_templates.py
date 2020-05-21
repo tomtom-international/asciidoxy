@@ -40,6 +40,7 @@ def _read_fragment(include_statement: str) -> str:
      ("asciidoxy::traffic::TpegCauseCode", "cpp", "fragments/cpp/typedef.adoc"),
      ("asciidoxy::traffic::TrafficEvent", "cpp", "fragments/cpp/nested.adoc"),
      ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", "fragments/cpp/function.adoc"),
+     ("asciidoxy::system::CreateService", "cpp", "fragments/cpp/free_function.adoc"),
      ("com.asciidoxy.geometry.Coordinate", "java", "fragments/java/class.adoc"),
      ("com.asciidoxy.traffic.TrafficEvent.Severity", "java", "fragments/java/enum.adoc"),
      ("com.asciidoxy.system.Service", "java", "fragments/java/interface.adoc"),
