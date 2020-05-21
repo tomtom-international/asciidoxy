@@ -567,7 +567,7 @@ package_dir = "{package_dir}"
 
 def test_specs_from_file__local_package_no_package_dir(tmp_path):
     spec_file = tmp_path / "spec.toml"
-    spec_file.write_text(f"""
+    spec_file.write_text("""
 [packages]
 
 [packages.test]

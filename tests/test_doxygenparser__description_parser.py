@@ -64,7 +64,7 @@ def test_single_para():
     description = ET.Element("description")
     sub_element(description, "para", text="Actual description text.")
     result = DescriptionParser("lang").parse(description)
-    assert result == f"Actual description text."
+    assert result == "Actual description text."
 
 
 def test_multiple_para():

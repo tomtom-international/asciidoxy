@@ -204,11 +204,11 @@ def test_insert_error_when_ambiguous(api):
         api.insert_function("asciidoxy::traffic::TrafficEvent::TrafficEvent")
     assert len(exception.value.candidates) == 2
     exception_message = str(exception.value)
-    assert (
-        "Multiple matches for asciidoxy::traffic::TrafficEvent::TrafficEvent" in exception_message)
+    assert ("Multiple matches for asciidoxy::traffic::TrafficEvent::TrafficEvent"
+            in exception_message)
     assert "cpp function asciidoxy::traffic::TrafficEvent::TrafficEvent()" in exception_message
-    assert ("cpp function asciidoxy::traffic::TrafficEvent::TrafficEvent(TrafficEventData)" in
-            exception_message)
+    assert ("cpp function asciidoxy::traffic::TrafficEvent::TrafficEvent(TrafficEventData)"
+            in exception_message)
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
