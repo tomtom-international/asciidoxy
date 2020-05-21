@@ -96,7 +96,7 @@ class Driver(DriverBase):
         return True
 
     def register(self, element: ReferableElement) -> None:
-        self.api_reference.elements.append(element)
+        self.api_reference.append(element)
 
     def unresolved_ref(self, ref: TypeRefBase) -> None:
         self._unresolved_refs.append(ref)

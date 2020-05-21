@@ -26,6 +26,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
   - Additional arguments for `api.include` and `api.insert` are passed as attributes of the
     `include` directive.
+  - Improved performance in resolving references and looking up elements to link to and insert.
 
 === Fixed
 

@@ -260,9 +260,7 @@ def test_force_language_java(parser_driver_factory):
 def test_force_language_objc(parser_driver_factory):
     parser = parser_driver_factory("cpp/default", force_language="objc")
 
-    element = parser.api_reference.find("asciidoxy::traffic::TrafficEvent",
-                                        kind="class",
-                                        lang="objc")
+    element = parser.api_reference.find("Logger", kind="class", lang="objc")
     assert element is not None
     assert element.language == "objc"
 

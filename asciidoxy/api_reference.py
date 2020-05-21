@@ -16,7 +16,8 @@
 import re
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Tuple
+from collections import defaultdict
+from typing import Dict, List, Optional, Tuple
 
 from .model import Member, ReferableElement
 
@@ -115,11 +116,6 @@ class SimpleAttributeFilter(ElementFilter):
     @property
     def applies(self) -> bool:
         return self._value is not None
-
-
-class IdFilter(SimpleAttributeFilter):
-    """Filter on the unique id."""
-    ATTR_NAME = "id"
 
 
 class NamespaceList(list):
@@ -358,9 +354,23 @@ class ApiReference:
         elements: All contained API reference elements.
     """
     elements: List[ReferableElement]
+    _id_index: Dict[str, ReferableElement]
+    _name_index: Dict[str, List[ReferableElement]]
 
     def __init__(self):
         self.elements = []
+        self._id_index = {}
+        self._name_index = defaultdict(list)
+
+    def append(self, element: ReferableElement) -> None:
+        self.elements.append(element)
+
+        assert element.id
+        # TODO assert element.id not in self._id_index
+        self._id_index[element.id] = element
+
+        assert element.name
+        self._name_index[element.name].append(element)
 
     def find(self,
              name: Optional[str] = None,
@@ -393,22 +403,29 @@ class ApiReference:
             AmbiguousLookupError: There are multiple matching elements. Make your query more narrow.
         """
         if target_id is not None:
-            matches = [e for e in self.elements if IdFilter(target_id)(e)]
-            if len(matches) == 1:
-                return matches[0]
-            elif len(matches) == 0:
-                return None
-            else:
-                raise AmbiguousLookupError(matches)
+            return self._id_index.get(target_id, None)
+        elif name is None:
+            return None
 
         paramtype_matcher = ParameterTypeMatcher(name)
         if paramtype_matcher.applies:
             name = paramtype_matcher.name
 
+        for separator in NameFilter.NAMESPACE_SEPARATORS:
+            if separator in name:
+                _, short_name = name.rsplit(separator, maxsplit=1)
+                break
+        else:
+            short_name = name
+
+        potential_matches = self._name_index[short_name]
+        if len(potential_matches) == 0:
+            return None
+
         element_filter = CombinedFilter(NameFilter(name, namespace), KindFilter(kind),
                                         LangFilter(lang), paramtype_matcher)
 
-        matches = [e for e in self.elements if element_filter(e)]
+        matches = [e for e in potential_matches if element_filter(e)]
 
         if len(matches) == 1:
             return matches[0]
