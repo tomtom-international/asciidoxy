@@ -16,9 +16,33 @@
 import logging
 
 from abc import ABC
-from typing import Optional, Pattern
+from enum import Enum, auto
+from typing import Optional, Pattern, Sequence
 
 logger = logging.getLogger(__name__)
+
+
+class TokenType(Enum):
+    """Types of tokens in a language grammer.
+
+    Attributes:
+        UNKNOWN:          Unidentified token.
+        WHITESPACE:       Whitespace between other tokens.
+        QUALIFIER:        Type qualifiers.
+        OPERATOR:         Operators applied to the type.
+        NAME:             Name of the type.
+        NESTED_START:     Start of list of nested types.
+        NESTED_SEPARATOR: Separator between multiple nested types.
+        NESTED_END:       End of list of nested types.
+    """
+    UNKNOWN = auto()
+    WHITESPACE = auto()
+    QUALIFIER = auto()
+    OPERATOR = auto()
+    NAME = auto()
+    NESTED_START = auto()
+    NESTED_SEPARATOR = auto()
+    NESTED_END = auto()
 
 
 class LanguageTraits(ABC):
@@ -34,6 +58,19 @@ class LanguageTraits(ABC):
         TYPE_NESTED_SEPARATOR: Pattern matching a separator between multiple nested types.
         TYPE_NESTED_END:       Pattern matching the end of a nested type.
         TYPE_NAME:             Pattern matching a type's name.
+        NESTED_STARTS:         Tokens indicating the start of a list of nested types. Results in
+                                   token type NESTED_START.
+        NESTED_ENDS:           Tokens indicating the end of a list of nested types. Results in
+                                   token type NESTED_END.
+        NESTED_SEPARATORS:     Tokens separating multiple nested types. Results in token type
+                                   NESTED_SEPARATOR.
+        OPERATORS:             Tokens for type operators. Results in token type OPERATOR.
+        QUALIFIERS:            Tokens for type qualifiers. Results in token type QUALIFIER.
+        TOKEN_BOUNDARIES:      Characters that indicate the boundary between tokens. Token
+                                   boundaries are considered tokens themselves as well.
+        ALLOWED_PREFIXES:      Token types that are allowed in type prefixes.
+        ALLOWED_SUFFIXES:      Token types that are allowed in type suffixes.
+        ALLOWED_NAMES:         Token types that are allowed in type names.
     """
     TAG: str
 
@@ -43,6 +80,18 @@ class LanguageTraits(ABC):
     TYPE_NESTED_SEPARATOR: Pattern
     TYPE_NESTED_END: Pattern
     TYPE_NAME: Pattern
+
+    NESTED_STARTS: Sequence[str]
+    NESTED_ENDS: Sequence[str]
+    NESTED_SEPARATORS: Sequence[str]
+    OPERATORS: Sequence[str]
+    QUALIFIERS: Sequence[str]
+
+    TOKEN_BOUNDARIES: Sequence[str]
+
+    ALLOWED_PREFIXES: Sequence[TokenType]
+    ALLOWED_SUFFIXES: Sequence[TokenType]
+    ALLOWED_NAMES: Sequence[TokenType]
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:

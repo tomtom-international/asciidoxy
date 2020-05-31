@@ -14,14 +14,36 @@
 """General tests for type parsing."""
 
 import pytest
+import string
 
 import xml.etree.ElementTree as ET
 
 from typing import List, NamedTuple, Optional
 
-from asciidoxy.doxygenparser.type_parser import (Token, Tokenizer, TokenType, TypeProducer,
-                                                 TypeParseError)
+from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenType
+from asciidoxy.doxygenparser.type_parser import Token, TypeParser, TypeParseError
 from .shared import sub_element
+
+
+class TestTraits(LanguageTraits):
+    TAG = "mylang"
+
+    NESTED_STARTS = "<", "[",
+    NESTED_ENDS = ">", "]",
+    NESTED_SEPARATORS = ",", ";",
+    OPERATORS = "*", "&",
+    QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
+
+    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
+    ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
+    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
+
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
+                        tuple(string.whitespace))
+
+
+class TestParser(TypeParser):
+    TRAITS = TestTraits
 
 
 def whitespace(text: str) -> Token:
@@ -175,13 +197,13 @@ def ref(text: str, refid: str, kind: Optional[str] = None) -> Token:
     ]),
 ])
 def test_tokenizer__tokenize_text(text, tokens):
-    assert Tokenizer.tokenize_text(text) == tokens
+    assert TestParser.tokenize_text(text) == tokens
 
 
 def test_tokenizer__tokenize_xml__text_only():
     element = ET.Element("type")
     element.text = "const MyType&"
-    assert Tokenizer.tokenize_xml(element) == [
+    assert TestParser.tokenize_xml(element) == [
         qualifier("const"), whitespace(" "),
         name("MyType"), operator("&")
     ]
@@ -190,7 +212,7 @@ def test_tokenizer__tokenize_xml__text_only():
 def test_tokenizer__tokenize_xml__simple_element():
     element = ET.Element("type")
     sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
-    assert Tokenizer.tokenize_xml(element) == [
+    assert TestParser.tokenize_xml(element) == [
         ref("MyType", refid="my_type", kind="compound"),
     ]
 
@@ -198,7 +220,7 @@ def test_tokenizer__tokenize_xml__simple_element():
 def test_tokenizer__tokenize_xml__simple_element__kind_is_optional():
     element = ET.Element("type")
     sub_element(element, "ref", text="MyType", refid="my_type")
-    assert Tokenizer.tokenize_xml(element) == [
+    assert TestParser.tokenize_xml(element) == [
         ref("MyType", refid="my_type"),
     ]
 
@@ -207,7 +229,7 @@ def test_tokenizer__tokenize_xml__prefix_suffix():
     element = ET.Element("type")
     element.text = "const "
     sub_element(element, "ref", text="MyType", refid="my_type", kind="compound", tail=" *")
-    assert Tokenizer.tokenize_xml(element) == [
+    assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
         whitespace(" "),
         ref("MyType", refid="my_type", kind="compound"),
@@ -220,7 +242,7 @@ def test_tokenizer__tokenize_xml__text_type_with_nested_xml():
     element = ET.Element("type")
     element.text = "const MyType<"
     sub_element(element, "ref", text="OtherType", refid="other_type", kind="compound", tail=">")
-    assert Tokenizer.tokenize_xml(element) == [
+    assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
         whitespace(" "),
         name("MyType"),
@@ -240,7 +262,7 @@ def test_tokenizer__tokenize_xml__xml_type_with_nested_xml_and_text():
                 kind="compound",
                 tail="<NestedType, ")
     sub_element(element, "ref", text="OtherType", refid="other_type", kind="compound", tail=">")
-    assert Tokenizer.tokenize_xml(element) == [
+    assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
         whitespace(" "),
         ref("MyType", refid="my_type", kind="compound"),
@@ -390,13 +412,13 @@ def nested_types(request):
 
 
 def test_type_producer__type_from_tokens(prefixes, names, nested_types, suffixes):
-    type_ref = TypeProducer.type_from_tokens(prefixes + names.tokens + nested_types.tokens +
-                                             suffixes)
+    type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens + suffixes)
     assert type_ref.prefix == "".join(p.text for p in prefixes)
     assert type_ref.name == names.expected_types[0].name
     assert type_ref.kind == names.expected_types[0].kind
     assert type_ref.id == names.expected_types[0].refid
     assert type_ref.suffix == "".join(s.text for s in suffixes)
+    assert type_ref.language == "mylang"
 
     if nested_types.expected_types:
         assert len(nested_types.expected_types) == len(type_ref.nested)
@@ -408,6 +430,7 @@ def test_type_producer__type_from_tokens(prefixes, names, nested_types, suffixes
             assert actual.kind == expected.kind
             assert actual.id == expected.refid
             assert not actual.nested
+            assert actual.language == "mylang"
 
 
 def test_type_producer__type_from_tokens__deep_nested_type():
@@ -424,7 +447,7 @@ def test_type_producer__type_from_tokens__deep_nested_type():
         name("OtherType"),
         nested_end(">")
     ]
-    type_ref = TypeProducer.type_from_tokens(tokens)
+    type_ref = TestParser.type_from_tokens(tokens)
 
     assert type_ref.name == "MyType"
     assert len(type_ref.nested) == 2
@@ -461,4 +484,4 @@ def test_type_producer__type_from_tokens__deep_nested_type():
                          ids=lambda ps: "".join(p.text for p in ps))
 def test_type_producer__type_from_tokens__invalid_token_sequence(tokens):
     with pytest.raises(TypeParseError):
-        TypeProducer.type_from_tokens(tokens)
+        TestParser.type_from_tokens(tokens)
