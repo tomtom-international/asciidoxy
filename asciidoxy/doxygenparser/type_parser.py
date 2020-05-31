@@ -127,6 +127,14 @@ class TypeParser:
     TRAITS: Type[LanguageTraits]
 
     @classmethod
+    def parse_xml(cls,
+                  type_element: ET.Element,
+                  driver: Optional[DriverBase] = None,
+                  parent: Optional[Union[Compound, Member]] = None):
+        tokens = cls.tokenize_xml(type_element)
+        return cls.type_from_tokens(tokens, driver, parent)
+
+    @classmethod
     def tokenize_text(cls, text: str) -> List[Token]:
         tokens: List[Token] = []
 
@@ -196,7 +204,10 @@ class TypeParser:
         return tokens
 
     @classmethod
-    def type_from_tokens(cls, tokens: List[Token]) -> TypeRef:
+    def type_from_tokens(cls,
+                         tokens: List[Token],
+                         driver: Optional[DriverBase] = None,
+                         parent: Optional[Union[Compound, Member]] = None) -> TypeRef:
         original_tokens = tokens
         tokens = tokens[:]
 
@@ -208,7 +219,7 @@ class TypeParser:
             raise TypeParseError(f"No name found"
                                  f" in `{''.join(t.text for t in original_tokens)}`")
 
-        nested_types, tokens = cls.nested_types(tokens)
+        nested_types, tokens = cls.nested_types(tokens, driver, parent)
         suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
 
         if tokens:
@@ -222,6 +233,16 @@ class TypeParser:
         type_ref.nested = nested_types or []
         type_ref.id = names[0].refid
         type_ref.kind = names[0].kind
+
+        if isinstance(parent, Compound):
+            type_ref.namespace = parent.full_name
+        elif isinstance(parent, Member):
+            type_ref.namespace = parent.namespace
+
+        if (driver is not None and type_ref.name and not type_ref.id
+                and not cls.TRAITS.is_language_standard_type(type_ref.name)):
+            driver.unresolved_ref(type_ref)
+
         return type_ref
 
     @staticmethod
@@ -239,7 +260,12 @@ class TypeParser:
         return ret
 
     @classmethod
-    def nested_types(cls, tokens: List[Token]) -> Tuple[Optional[List[TypeRef]], List[Token]]:
+    def nested_types(
+        cls,
+        tokens: List[Token],
+        driver: Optional[DriverBase] = None,
+        parent: Optional[Union[Compound, Member]] = None
+    ) -> Tuple[Optional[List[TypeRef]], List[Token]]:
         original_tokens = tokens
         tokens = tokens[:]
         nested_types = []
@@ -263,7 +289,7 @@ class TypeParser:
                 elif level > 0 and t.type_ == TokenType.NESTED_END:
                     level -= 1
                 elif level == 0 and t.type_ in (TokenType.NESTED_SEPARATOR, TokenType.NESTED_END):
-                    nested_type = cls.type_from_tokens(tokens[:i])
+                    nested_type = cls.type_from_tokens(tokens[:i], driver, parent)
                     nested_types.append(nested_type)
                     tokens = tokens[i + 1:]
 

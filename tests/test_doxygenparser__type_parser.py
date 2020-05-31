@@ -19,9 +19,11 @@ import string
 import xml.etree.ElementTree as ET
 
 from typing import List, NamedTuple, Optional
+from unittest.mock import MagicMock
 
 from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenType
 from asciidoxy.doxygenparser.type_parser import Token, TypeParser, TypeParseError
+from asciidoxy.model import Compound, Member
 from .shared import sub_element
 
 
@@ -40,6 +42,10 @@ class TestTraits(LanguageTraits):
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
                         tuple(string.whitespace))
+
+    @classmethod
+    def is_language_standard_type(cls, type_name: str) -> bool:
+        return type_name.startswith("Builtin")
 
 
 class TestParser(TypeParser):
@@ -196,11 +202,11 @@ def ref(text: str, refid: str, kind: Optional[str] = None) -> Token:
         operator("&")
     ]),
 ])
-def test_tokenizer__tokenize_text(text, tokens):
+def test_type_parser__tokenize_text(text, tokens):
     assert TestParser.tokenize_text(text) == tokens
 
 
-def test_tokenizer__tokenize_xml__text_only():
+def test_type_parser__tokenize_xml__text_only():
     element = ET.Element("type")
     element.text = "const MyType&"
     assert TestParser.tokenize_xml(element) == [
@@ -209,7 +215,7 @@ def test_tokenizer__tokenize_xml__text_only():
     ]
 
 
-def test_tokenizer__tokenize_xml__simple_element():
+def test_type_parser__tokenize_xml__simple_element():
     element = ET.Element("type")
     sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
     assert TestParser.tokenize_xml(element) == [
@@ -217,7 +223,7 @@ def test_tokenizer__tokenize_xml__simple_element():
     ]
 
 
-def test_tokenizer__tokenize_xml__simple_element__kind_is_optional():
+def test_type_parser__tokenize_xml__simple_element__kind_is_optional():
     element = ET.Element("type")
     sub_element(element, "ref", text="MyType", refid="my_type")
     assert TestParser.tokenize_xml(element) == [
@@ -225,7 +231,7 @@ def test_tokenizer__tokenize_xml__simple_element__kind_is_optional():
     ]
 
 
-def test_tokenizer__tokenize_xml__prefix_suffix():
+def test_type_parser__tokenize_xml__prefix_suffix():
     element = ET.Element("type")
     element.text = "const "
     sub_element(element, "ref", text="MyType", refid="my_type", kind="compound", tail=" *")
@@ -238,7 +244,7 @@ def test_tokenizer__tokenize_xml__prefix_suffix():
     ]
 
 
-def test_tokenizer__tokenize_xml__text_type_with_nested_xml():
+def test_type_parser__tokenize_xml__text_type_with_nested_xml():
     element = ET.Element("type")
     element.text = "const MyType<"
     sub_element(element, "ref", text="OtherType", refid="other_type", kind="compound", tail=">")
@@ -252,7 +258,7 @@ def test_tokenizer__tokenize_xml__text_type_with_nested_xml():
     ]
 
 
-def test_tokenizer__tokenize_xml__xml_type_with_nested_xml_and_text():
+def test_type_parser__tokenize_xml__xml_type_with_nested_xml_and_text():
     element = ET.Element("type")
     element.text = "const "
     sub_element(element,
@@ -411,8 +417,10 @@ def nested_types(request):
     return request.param
 
 
-def test_type_producer__type_from_tokens(prefixes, names, nested_types, suffixes):
-    type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens + suffixes)
+def test_type_parser__type_from_tokens(prefixes, names, nested_types, suffixes):
+    driver_mock = MagicMock()
+    type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens + suffixes,
+                                           driver_mock)
     assert type_ref.prefix == "".join(p.text for p in prefixes)
     assert type_ref.name == names.expected_types[0].name
     assert type_ref.kind == names.expected_types[0].kind
@@ -432,8 +440,17 @@ def test_type_producer__type_from_tokens(prefixes, names, nested_types, suffixes
             assert not actual.nested
             assert actual.language == "mylang"
 
+    unresolved_types = []
+    if not names.expected_types[0].refid:
+        unresolved_types.append(names.expected_types[0].name)
+    for expected_type in nested_types.expected_types:
+        if not expected_type.refid:
+            unresolved_types.append(expected_type.name)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(unresolved_types))
 
-def test_type_producer__type_from_tokens__deep_nested_type():
+
+def test_type_parser__type_from_tokens__deep_nested_type():
     tokens = [
         name("MyType"),
         nested_start("<"),
@@ -461,6 +478,98 @@ def test_type_producer__type_from_tokens__deep_nested_type():
     assert not type_ref.nested[1].nested
 
 
+def test_type_parser__type_from_tokens__namespace_from_compound():
+    tokens = [
+        name("MyType"),
+        nested_start("<"),
+        name("NestedType"),
+        nested_start("<"),
+        name("OtherType"),
+        nested_sep(","),
+        name("MyType"),
+        nested_end(">"),
+        nested_sep(","),
+        name("OtherType"),
+        nested_end(">")
+    ]
+
+    parent = Compound("mylang")
+    parent.full_name = "asciidoxy::test"
+    parent.namespace = "asciidoxy"
+
+    type_ref = TestParser.type_from_tokens(tokens, parent=parent)
+
+    assert type_ref.name == "MyType"
+    assert type_ref.namespace == "asciidoxy::test"
+    assert len(type_ref.nested) == 2
+    assert type_ref.nested[0].name == "NestedType"
+    assert type_ref.nested[0].namespace == "asciidoxy::test"
+    assert len(type_ref.nested[0].nested) == 2
+    assert type_ref.nested[0].nested[0].name == "OtherType"
+    assert type_ref.nested[0].nested[0].namespace == "asciidoxy::test"
+    assert type_ref.nested[0].nested[1].name == "MyType"
+    assert type_ref.nested[0].nested[1].namespace == "asciidoxy::test"
+    assert type_ref.nested[1].name == "OtherType"
+    assert type_ref.nested[1].namespace == "asciidoxy::test"
+
+
+def test_type_parser__type_from_tokens__namespace_from_member():
+    tokens = [
+        name("MyType"),
+        nested_start("<"),
+        name("NestedType"),
+        nested_start("<"),
+        name("OtherType"),
+        nested_sep(","),
+        name("MyType"),
+        nested_end(">"),
+        nested_sep(","),
+        name("OtherType"),
+        nested_end(">")
+    ]
+
+    parent = Member("mylang")
+    parent.full_name = "asciidoxy::test"
+    parent.namespace = "asciidoxy"
+
+    type_ref = TestParser.type_from_tokens(tokens, parent=parent)
+
+    assert type_ref.name == "MyType"
+    assert type_ref.namespace == "asciidoxy"
+    assert len(type_ref.nested) == 2
+    assert type_ref.nested[0].name == "NestedType"
+    assert type_ref.nested[0].namespace == "asciidoxy"
+    assert len(type_ref.nested[0].nested) == 2
+    assert type_ref.nested[0].nested[0].name == "OtherType"
+    assert type_ref.nested[0].nested[0].namespace == "asciidoxy"
+    assert type_ref.nested[0].nested[1].name == "MyType"
+    assert type_ref.nested[0].nested[1].namespace == "asciidoxy"
+    assert type_ref.nested[1].name == "OtherType"
+    assert type_ref.nested[1].namespace == "asciidoxy"
+
+
+def test_type_parser__type_from_tokens__do_not_register_builtin_types():
+    tokens = [
+        name("BuiltinType"),
+        nested_start("<"),
+        name("BuiltinType2"),
+        nested_start("<"),
+        name("OtherType"),
+        nested_sep(","),
+        name("MyType"),
+        nested_end(">"),
+        nested_sep(","),
+        name("OtherType"),
+        nested_end(">")
+    ]
+
+    driver_mock = MagicMock()
+    type_ref = TestParser.type_from_tokens(tokens, driver=driver_mock)
+    assert type_ref.name == "BuiltinType"
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["OtherType", "MyType", "OtherType"]))
+
+
 @pytest.mark.parametrize("tokens", [
     [],
     [nested_start("<")],
@@ -482,6 +591,64 @@ def test_type_producer__type_from_tokens__deep_nested_type():
     [name("MyType"), nested_sep(","), name("OtherType")],
 ],
                          ids=lambda ps: "".join(p.text for p in ps))
-def test_type_producer__type_from_tokens__invalid_token_sequence(tokens):
+def test_type_parser__type_from_tokens__invalid_token_sequence(tokens):
     with pytest.raises(TypeParseError):
         TestParser.type_from_tokens(tokens)
+
+
+def test_type_parser__parse_xml__simple_element():
+    element = ET.Element("type")
+    sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
+
+    type_ref = TestParser.parse_xml(element)
+
+    assert type_ref.name == "MyType"
+    assert type_ref.id == "my_type"
+    assert type_ref.kind == "compound"
+    assert not type_ref.nested
+
+
+def test_type_parser__parse_xml__unresolved_ref_with_driver():
+    element = ET.Element("type")
+    element.text = "MyType"
+
+    driver_mock = MagicMock()
+    type_ref = TestParser.parse_xml(element, driver_mock)
+    driver_mock.unresolved_ref.assert_called_once_with(type_ref)
+
+    assert type_ref.name == "MyType"
+    assert not type_ref.id
+    assert not type_ref.kind
+    assert not type_ref.nested
+
+
+def test_type_parser__parse_xml__do_not_register_ref_with_id():
+    element = ET.Element("type")
+    sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
+
+    driver_mock = MagicMock()
+    type_ref = TestParser.parse_xml(element, driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+
+    assert type_ref.name == "MyType"
+    assert type_ref.id == "my_type"
+    assert type_ref.kind == "compound"
+    assert not type_ref.nested
+
+
+def test_type_parser__parse_xml__namespace_from_parent():
+    element = ET.Element("type")
+    sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
+
+    parent = Compound("mylang")
+    parent.full_name = "asciidoxy::test"
+
+    driver_mock = MagicMock()
+    type_ref = TestParser.parse_xml(element, driver_mock, parent)
+    driver_mock.unresolved_ref.assert_not_called()
+
+    assert type_ref.name == "MyType"
+    assert type_ref.id == "my_type"
+    assert type_ref.kind == "compound"
+    assert type_ref.namespace == "asciidoxy::test"
+    assert not type_ref.nested
