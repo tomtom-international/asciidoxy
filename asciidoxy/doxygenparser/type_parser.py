@@ -104,23 +104,22 @@ class TokenType(Enum):
 
 class Token:
     type_: TokenType
+    refid: Optional[str]
+    kind: Optional[str]
 
-    def __init__(self, type_: TokenType = TokenType.UNKNOWN):
+    def __init__(self,
+                 text: str,
+                 type_: TokenType = TokenType.UNKNOWN,
+                 refid: Optional[str] = None,
+                 kind: Optional[str] = None):
         self.type_ = type_
-
-    def __eq__(self, other) -> bool:
-        return self.type_ == other.type_
-
-
-class TextToken(Token):
-    text: str
-
-    def __init__(self, text: str, type_: TokenType = TokenType.UNKNOWN):
-        super().__init__(type_)
         self.text = text
+        self.refid = refid
+        self.kind = kind
 
     def __eq__(self, other) -> bool:
-        return super().__eq__(other) and self.text == other.text
+        return ((self.type_, self.text, self.refid, self.kind) == (other.type_, other.text,
+                                                                   other.refid, other.kind))
 
     def __str__(self) -> str:
         return f"{self.type_}: {repr(self.text)}"
@@ -149,8 +148,8 @@ class Tokenizer:
     QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
 
     @classmethod
-    def tokenize_text(cls, text: str) -> List[TextToken]:
-        tokens: List[TextToken] = []
+    def tokenize_text(cls, text: str) -> List[Token]:
+        tokens: List[Token] = []
 
         def append_token(text: str) -> None:
             # TODO Maybe simplify and do not care about multiple white space tokens?
@@ -175,7 +174,7 @@ class Tokenizer:
         return tokens
 
     @classmethod
-    def make_text_token(cls, text: str) -> TextToken:
+    def make_text_token(cls, text: str) -> Token:
         if text.isspace():
             type_ = TokenType.WHITESPACE
         elif text in cls.NESTED_STARTS:
@@ -191,7 +190,31 @@ class Tokenizer:
         else:
             type_ = TokenType.NAME
 
-        return TextToken(text, type_)
+        return Token(text, type_)
+
+    @classmethod
+    def tokenize_xml(cls, element: ET.Element) -> List[Token]:
+        tokens = []
+
+        if element.tag == "ref":
+            name = element.text
+            refid = element.get("refid", None)
+            kind = element.get("kind", None)
+
+            if not name or not refid:
+                raise TypeParseError("Encountered reference XML element without name or id.")
+
+            tokens.append(Token(name, refid=refid, kind=kind, type_=TokenType.NAME))
+
+        elif element.text:
+            tokens.extend(cls.tokenize_text(element.text))
+
+        for child in element:
+            tokens.extend(cls.tokenize_xml(child))
+        if element.tail:
+            tokens.extend(cls.tokenize_text(element.tail))
+
+        return tokens
 
 
 class TypeProducer:
@@ -200,7 +223,7 @@ class TypeProducer:
     ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
     @classmethod
-    def type_from_tokens(cls, tokens: List[TextToken]) -> TypeRef:
+    def type_from_tokens(cls, tokens: List[Token]) -> TypeRef:
         original_tokens = tokens
         tokens = tokens[:]
 
@@ -224,25 +247,26 @@ class TypeProducer:
         type_ref.prefix = "".join(p.text for p in prefixes)
         type_ref.suffix = "".join(s.text for s in suffixes)
         type_ref.nested = nested_types or []
+        type_ref.id = names[0].refid
+        type_ref.kind = names[0].kind
         return type_ref
 
     @staticmethod
-    def select_tokens(tokens, types) -> Tuple[List[TextToken], List[TextToken]]:
+    def select_tokens(tokens, types) -> Tuple[List[Token], List[Token]]:
         for i, t in enumerate(tokens):
             if t.type_ not in types:
                 return tokens[:i], tokens[i:]
         return tokens, []
 
     @staticmethod
-    def remove_trailing_whitespace(tokens) -> List[TextToken]:
+    def remove_trailing_whitespace(tokens) -> List[Token]:
         ret = []
         while tokens and tokens[-1].type_ == TokenType.WHITESPACE:
             ret.append(tokens.pop(-1))
         return ret
 
     @classmethod
-    def nested_types(cls,
-                     tokens: List[TextToken]) -> Tuple[Optional[List[TypeRef]], List[TextToken]]:
+    def nested_types(cls, tokens: List[Token]) -> Tuple[Optional[List[TypeRef]], List[Token]]:
         original_tokens = tokens
         tokens = tokens[:]
         nested_types = []
