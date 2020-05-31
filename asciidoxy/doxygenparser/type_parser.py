@@ -13,15 +13,12 @@
 # limitations under the License.
 """Parsing of types from strings and XML."""
 
-import string
-
 import xml.etree.ElementTree as ET
 
-from enum import Enum, auto
 from typing import List, Optional, Tuple, Type, Union
 
 from .driver_base import DriverBase
-from .language_traits import LanguageTraits
+from .language_traits import LanguageTraits, TokenType
 from ..model import Compound, Member, TypeRef
 
 
@@ -91,17 +88,6 @@ def parse_type(traits: Type[LanguageTraits],
     return type_ref
 
 
-class TokenType(Enum):
-    UNKNOWN = auto()
-    WHITESPACE = auto()
-    QUALIFIER = auto()
-    OPERATOR = auto()
-    NAME = auto()
-    NESTED_START = auto()
-    NESTED_END = auto()
-    NESTED_SEPARATOR = auto()
-
-
 class Token:
     type_: TokenType
     refid: Optional[str]
@@ -137,15 +123,8 @@ class TypeParseError(Exception):
         return f"Failed to parse type: {self.msg}"
 
 
-class Tokenizer:
-    NESTED_STARTS = "<", "[",
-    NESTED_ENDS = ">", "]",
-    NESTED_SEPARATORS = ",", ";",
-    OPERATORS = "*", "&",
-    BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
-                  tuple(string.whitespace))
-
-    QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
+class TypeParser:
+    TRAITS: Type[LanguageTraits]
 
     @classmethod
     def tokenize_text(cls, text: str) -> List[Token]:
@@ -161,7 +140,7 @@ class Tokenizer:
 
         while text:
             for i, c in enumerate(text):
-                if c in cls.BOUNDARIES:
+                if c in cls.TRAITS.TOKEN_BOUNDARIES:
                     if i > 0:
                         append_token(text[:i])
                     append_token(text[i])
@@ -177,15 +156,15 @@ class Tokenizer:
     def make_text_token(cls, text: str) -> Token:
         if text.isspace():
             type_ = TokenType.WHITESPACE
-        elif text in cls.NESTED_STARTS:
+        elif text in cls.TRAITS.NESTED_STARTS:
             type_ = TokenType.NESTED_START
-        elif text in cls.NESTED_ENDS:
+        elif text in cls.TRAITS.NESTED_ENDS:
             type_ = TokenType.NESTED_END
-        elif text in cls.NESTED_SEPARATORS:
+        elif text in cls.TRAITS.NESTED_SEPARATORS:
             type_ = TokenType.NESTED_SEPARATOR
-        elif text in cls.OPERATORS:
+        elif text in cls.TRAITS.OPERATORS:
             type_ = TokenType.OPERATOR
-        elif text in cls.QUALIFIERS:
+        elif text in cls.TRAITS.QUALIFIERS:
             type_ = TokenType.QUALIFIER
         else:
             type_ = TokenType.NAME
@@ -216,19 +195,13 @@ class Tokenizer:
 
         return tokens
 
-
-class TypeProducer:
-    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-    ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
-
     @classmethod
     def type_from_tokens(cls, tokens: List[Token]) -> TypeRef:
         original_tokens = tokens
         tokens = tokens[:]
 
-        prefixes, tokens = cls.select_tokens(tokens, cls.ALLOWED_PREFIXES)
-        names, tokens = cls.select_tokens(tokens, cls.ALLOWED_NAMES)
+        prefixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_PREFIXES)
+        names, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_NAMES)
         tokens[:0] = cls.remove_trailing_whitespace(names)
 
         if not names:
@@ -236,13 +209,13 @@ class TypeProducer:
                                  f" in `{''.join(t.text for t in original_tokens)}`")
 
         nested_types, tokens = cls.nested_types(tokens)
-        suffixes, tokens = cls.select_tokens(tokens, cls.ALLOWED_SUFFIXES)
+        suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
 
         if tokens:
             raise TypeParseError(f"Unexpected characters `{''.join(t.text for t in tokens)}`"
                                  f" in `{''.join(t.text for t in original_tokens)}`")
 
-        type_ref = TypeRef("lang")
+        type_ref = TypeRef(cls.TRAITS.TAG)
         type_ref.name = "".join(n.text for n in names)
         type_ref.prefix = "".join(p.text for p in prefixes)
         type_ref.suffix = "".join(s.text for s in suffixes)
