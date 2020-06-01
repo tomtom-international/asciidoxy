@@ -19,7 +19,7 @@ from typing import List, Optional
 
 from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
-from .type_parser import TypeParser, Token
+from .type_parser import TypeParser, TypeParseError, Token
 
 
 class JavaTraits(LanguageTraits):
@@ -75,6 +75,28 @@ class JavaTraits(LanguageTraits):
 class JavaTypeParser(TypeParser):
     """Parser for Java types."""
     TRAITS = JavaTraits
+
+    @classmethod
+    def adapt_tokens(cls, tokens: List[Token]) -> List[Token]:
+        adapted = []
+        for token in tokens:
+            if token.type_ == TokenType.QUALIFIER and token.text == "extends":
+                texts = ["extends"]
+                while adapted:
+                    last_token = adapted.pop(-1)
+                    texts.append(last_token.text)
+                    if last_token.type_ == TokenType.NAME:
+                        break
+                else:
+                    raise TypeParseError("Invalid use of `extends` in type"
+                                         "".join(t.text for t in tokens))
+
+                new_token = Token("".join(reversed(texts)), TokenType.QUALIFIER)
+                adapted.append(new_token)
+            else:
+                adapted.append(token)
+
+        return adapted
 
 
 class JavaParser(ParserBase):

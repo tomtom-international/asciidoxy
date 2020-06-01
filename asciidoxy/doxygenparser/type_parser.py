@@ -66,7 +66,12 @@ class TypeParser:
                   driver: Optional[DriverBase] = None,
                   parent: Optional[Union[Compound, Member]] = None):
         tokens = cls.tokenize_xml(type_element)
+        tokens = cls.adapt_tokens(tokens)
         return cls.type_from_tokens(tokens, driver, parent)
+
+    @classmethod
+    def adapt_tokens(cls, tokens: List[Token]) -> List[Token]:
+        return tokens
 
     @classmethod
     def tokenize_text(cls, text: str) -> List[Token]:
