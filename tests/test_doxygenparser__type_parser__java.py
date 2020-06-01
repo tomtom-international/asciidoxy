@@ -19,7 +19,9 @@ import xml.etree.ElementTree as ET
 
 from unittest.mock import MagicMock
 
+from asciidoxy.doxygenparser.language_traits import TokenType
 from asciidoxy.doxygenparser.java import JavaTypeParser
+from asciidoxy.doxygenparser.type_parser import Token, TypeParseError
 from tests.shared import assert_equal_or_none_if_empty
 
 
@@ -48,8 +50,8 @@ def test_parse_java_type_from_text_simple(java_type_prefix):
 
 @pytest.mark.parametrize("generic_prefix, generic_name", [("? extends ", "Unit"),
                                                           ("T extends ", "Unit"),
-                                                          ("T extends ", "Unit "), (None, "T "),
-                                                          (None, "T")])
+                                                          ("T extends ", "Unit "), ("", "T "),
+                                                          ("", "T")])
 def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_name):
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}Position<{generic_prefix or ''}{generic_name}>"
@@ -75,3 +77,62 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
     else:
         assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
                         ]) == sorted(["Position", generic_name.strip()]))
+
+
+@pytest.mark.parametrize("tokens,expected", [
+    ([
+        Token("?", TokenType.NAME),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ], [
+        Token("? extends", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ]),
+    ([
+        Token("T", TokenType.NAME),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ], [
+        Token("T extends", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ]),
+    ([
+        Token("Type", TokenType.NAME),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ], [
+        Token("Type extends", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ]),
+], ids=lambda tokens: "".join(t.text for t in tokens))
+def test_java_type_parser__adapt_tokens__extends(tokens, expected):
+    assert JavaTypeParser.adapt_tokens(tokens) == expected
+
+
+@pytest.mark.parametrize("tokens", [
+    [
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ],
+    [
+        Token("final", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.QUALIFIER),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ],
+], ids=lambda tokens: "".join(t.text for t in tokens))
+def test_java_type_parser__adapt_tokens__extends__error(tokens):
+    with pytest.raises(TypeParseError):
+        JavaTypeParser.adapt_tokens(tokens)
