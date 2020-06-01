@@ -139,10 +139,9 @@ class TypeParser:
         tokens: List[Token] = []
 
         def append_token(text: str) -> None:
-            # TODO Maybe simplify and do not care about multiple white space tokens?
             token = cls.make_text_token(text)
             if token.type_ == TokenType.WHITESPACE and tokens and tokens[-1].type_ == token.type_:
-                tokens[-1].text += text
+                pass
             else:
                 tokens.append(token)
 
@@ -164,6 +163,7 @@ class TypeParser:
     def make_text_token(cls, text: str) -> Token:
         if text.isspace():
             type_ = TokenType.WHITESPACE
+            text = " "
         elif text in cls.TRAITS.NESTED_STARTS:
             type_ = TokenType.NESTED_START
         elif text in cls.TRAITS.NESTED_ENDS:
@@ -212,6 +212,7 @@ class TypeParser:
         tokens = tokens[:]
 
         prefixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_PREFIXES)
+        cls.remove_leading_whitespace(prefixes)
         names, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_NAMES)
         tokens[:0] = cls.remove_trailing_whitespace(names)
 
@@ -221,6 +222,7 @@ class TypeParser:
 
         nested_types, tokens = cls.nested_types(tokens, driver, parent)
         suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
+        cls.remove_trailing_whitespace(suffixes)
 
         if tokens:
             raise TypeParseError(f"Unexpected characters `{''.join(t.text for t in tokens)}`"
@@ -252,11 +254,19 @@ class TypeParser:
                 return tokens[:i], tokens[i:]
         return tokens, []
 
+    @classmethod
+    def remove_leading_whitespace(cls, tokens) -> List[Token]:
+        return cls.remove_whitespace(tokens, 0)
+
+    @classmethod
+    def remove_trailing_whitespace(cls, tokens) -> List[Token]:
+        return cls.remove_whitespace(tokens, -1)
+
     @staticmethod
-    def remove_trailing_whitespace(tokens) -> List[Token]:
+    def remove_whitespace(tokens, location) -> List[Token]:
         ret = []
-        while tokens and tokens[-1].type_ == TokenType.WHITESPACE:
-            ret.append(tokens.pop(-1))
+        while tokens and tokens[location].type_ == TokenType.WHITESPACE:
+            ret.append(tokens.pop(location))
         return ret
 
     @classmethod
