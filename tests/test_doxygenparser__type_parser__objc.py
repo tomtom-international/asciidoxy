@@ -96,5 +96,5 @@ def test_parse_objc_type_with_space(type_with_space):
     assert not type_ref.kind
     assert type_ref.language == "objc"
     assert type_ref.name == type_with_space
-    assert type_ref.prefix is None
-    assert type_ref.suffix is None
+    assert not type_ref.prefix
+    assert not type_ref.suffix
