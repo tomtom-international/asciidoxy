@@ -186,7 +186,7 @@ class TypeParser:
         if element.tag == "ref":
             name = element.text
             refid = element.get("refid", None)
-            kind = element.get("kind", None)
+            kind = element.get("kindref", None)
 
             if not name or not refid:
                 raise TypeParseError("Encountered reference XML element without name or id.")

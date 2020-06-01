@@ -242,7 +242,7 @@ def test_type_parser__tokenize_xml__text_only():
 
 def test_type_parser__tokenize_xml__simple_element():
     element = ET.Element("type")
-    sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
+    sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
     assert TestParser.tokenize_xml(element) == [
         ref("MyType", refid="my_type", kind="compound"),
     ]
@@ -259,7 +259,7 @@ def test_type_parser__tokenize_xml__simple_element__kind_is_optional():
 def test_type_parser__tokenize_xml__prefix_suffix():
     element = ET.Element("type")
     element.text = "const "
-    sub_element(element, "ref", text="MyType", refid="my_type", kind="compound", tail=" *")
+    sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound", tail=" *")
     assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
         whitespace(" "),
@@ -272,7 +272,7 @@ def test_type_parser__tokenize_xml__prefix_suffix():
 def test_type_parser__tokenize_xml__text_type_with_nested_xml():
     element = ET.Element("type")
     element.text = "const MyType<"
-    sub_element(element, "ref", text="OtherType", refid="other_type", kind="compound", tail=">")
+    sub_element(element, "ref", text="OtherType", refid="other_type", kindref="compound", tail=">")
     assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
         whitespace(" "),
@@ -290,9 +290,9 @@ def test_type_parser__tokenize_xml__xml_type_with_nested_xml_and_text():
                 "ref",
                 text="MyType",
                 refid="my_type",
-                kind="compound",
+                kindref="compound",
                 tail="<NestedType, ")
-    sub_element(element, "ref", text="OtherType", refid="other_type", kind="compound", tail=">")
+    sub_element(element, "ref", text="OtherType", refid="other_type", kindref="compound", tail=">")
     assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
         whitespace(" "),
@@ -646,7 +646,7 @@ def test_type_parser__type_from_tokens__invalid_token_sequence(tokens):
 
 def test_type_parser__parse_xml__simple_element():
     element = ET.Element("type")
-    sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
+    sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
 
     type_ref = TestParser.parse_xml(element)
 
@@ -672,7 +672,7 @@ def test_type_parser__parse_xml__unresolved_ref_with_driver():
 
 def test_type_parser__parse_xml__do_not_register_ref_with_id():
     element = ET.Element("type")
-    sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
+    sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
 
     driver_mock = MagicMock()
     type_ref = TestParser.parse_xml(element, driver_mock)
@@ -686,7 +686,7 @@ def test_type_parser__parse_xml__do_not_register_ref_with_id():
 
 def test_type_parser__parse_xml__namespace_from_parent():
     element = ET.Element("type")
-    sub_element(element, "ref", text="MyType", refid="my_type", kind="compound")
+    sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
 
     parent = Compound("mylang")
     parent.full_name = "asciidoxy::test"
