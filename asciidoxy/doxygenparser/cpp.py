@@ -14,11 +14,13 @@
 """Support for parsing C++ documentation."""
 
 import re
+import string
 
 from typing import Optional
 
-from .language_traits import LanguageTraits
+from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
+from .type_parser import TypeParser
 
 
 class CppTraits(LanguageTraits):
@@ -41,6 +43,19 @@ class CppTraits(LanguageTraits):
                                "unsigned long int", "long long", "long long int",
                                "signed long long", "signed long long int", "unsigned long long",
                                "unsigned long long int")
+
+    NESTED_STARTS = "<",
+    NESTED_ENDS = ">",
+    NESTED_SEPARATORS = ",",
+    OPERATORS = "*", "&",
+    QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
+
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
+                        tuple(string.whitespace))
+
+    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
+    ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
+    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -69,6 +84,12 @@ class CppTraits(LanguageTraits):
         return kind == "friend"
 
 
+class CppTypeParser(TypeParser):
+    """Parser for C++ types."""
+    TRAITS = CppTraits
+
+
 class CppParser(ParserBase):
     """Parser for C++ documentation."""
     TRAITS = CppTraits
+    TYPE_PARSER = CppTypeParser

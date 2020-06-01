@@ -132,7 +132,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="asciidoxy/geometry.py" line="68" column="1" bodyfile="asciidoxy/geometry.py" bodystart="68" bodyend="71"/>
+        <location file="asciidoxy/geometry.py" line="68" column="1" bodyfile="asciidoxy/geometry.py" bodystart="68" bodyend="70"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-static-func">
@@ -165,7 +165,7 @@
     <detaileddescription>
 <para>A coordinate has a latitude, longitude, and an altitude. </para>
     </detaileddescription>
-    <location file="asciidoxy/geometry.py" line="24" column="1" bodyfile="asciidoxy/geometry.py" bodystart="24" bodyend="71"/>
+    <location file="asciidoxy/geometry.py" line="24" column="1" bodyfile="asciidoxy/geometry.py" bodystart="24" bodyend="70"/>
     <listofallmembers>
       <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>__init__</name></member>
       <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ad238c9c268dc5518859400dc9c857fe3" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>altitude</name></member>

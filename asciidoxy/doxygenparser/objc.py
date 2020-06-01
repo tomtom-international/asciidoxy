@@ -14,13 +14,15 @@
 """Support for Objective-C documentation."""
 
 import re
+import string
 
 import xml.etree.ElementTree as ET
 
 from typing import Optional
 
-from .language_traits import LanguageTraits
+from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
+from .type_parser import TypeParser
 from ..model import Compound, Member, Parameter, ReturnValue
 
 
@@ -45,6 +47,19 @@ class ObjectiveCTraits(LanguageTraits):
                                "unsigned long long int", "signed char", "long double")
 
     BLOCK = re.compile(r"typedef (.+)\(\^(.+)\)\s*\((.*)\)")
+
+    NESTED_STARTS = "<",
+    NESTED_ENDS = ">",
+    NESTED_SEPARATORS = ",",
+    OPERATORS = "*",
+    QUALIFIERS = "nullable", "const", "__weak", "__strong",
+
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
+                        tuple(string.whitespace))
+
+    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.QUALIFIER,
+    ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR
+    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -78,9 +93,15 @@ class ObjectiveCTraits(LanguageTraits):
         return kind == "function" and name == "NS_ENUM"
 
 
+class ObjectiveCTypeParser(TypeParser):
+    "Parser for Objective C types." ""
+    TRAITS = ObjectiveCTraits
+
+
 class ObjectiveCParser(ParserBase):
     """Parser for Objective C documentation."""
     TRAITS = ObjectiveCTraits
+    TYPE_PARSER = ObjectiveCTypeParser
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
         member = super().parse_member(memberdef_element, parent)
