@@ -14,6 +14,7 @@
 """General tests for type parsing."""
 
 import pytest
+import random
 import string
 
 import xml.etree.ElementTree as ET
@@ -146,11 +147,11 @@ def ref(text: str, refid: str, kind: Optional[str] = None) -> Token:
     ]),
     ("MyType  <  OtherType  >", [
         name("MyType"),
-        whitespace("  "),
+        whitespace(" "),
         nested_start("<"),
-        whitespace("  "),
+        whitespace(" "),
         name("OtherType"),
-        whitespace("  "),
+        whitespace(" "),
         nested_end(">")
     ]),
     ("const MyType<const OtherType> &", [
@@ -203,6 +204,30 @@ def ref(text: str, refid: str, kind: Optional[str] = None) -> Token:
     ]),
 ])
 def test_type_parser__tokenize_text(text, tokens):
+    assert TestParser.tokenize_text(text) == tokens
+
+
+def _generate_whitespace_data():
+    whitespace_chars = tuple(string.whitespace)
+    return ["".join(random.choices(whitespace_chars, k=random.randrange(1, 10))) for _ in range(20)]
+
+
+@pytest.mark.parametrize("text", _generate_whitespace_data())
+def test_type_parser__tokenize_text__whitespace_only(text):
+    assert TestParser.tokenize_text(text) == [whitespace(" ")]
+
+
+@pytest.mark.parametrize("text,tokens", [
+    (" \t\nMyType\n ", [whitespace(" "), name("MyType"),
+                        whitespace(" ")]),
+    ("  const  \tMyType",
+     [whitespace(" "), qualifier("const"),
+      whitespace(" "), name("MyType")]),
+    ("\nMyType\n\t&",
+     [whitespace(" "), name("MyType"),
+      whitespace(" "), operator("&")]),
+])
+def test_type_parser__tokenize_text__reduce_whitespace(text, tokens):
     assert TestParser.tokenize_text(text) == tokens
 
 
@@ -283,9 +308,7 @@ def test_type_parser__tokenize_xml__xml_type_with_nested_xml_and_text():
 
 @pytest.fixture(params=[
     [],
-    [whitespace(" ")],
     [qualifier("const"), whitespace(" ")],
-    [whitespace(" "), qualifier("const"), whitespace(" ")],
     [qualifier("const"), operator("*"), whitespace(" ")],
     [qualifier("const"),
      whitespace(" "),
@@ -300,7 +323,6 @@ def prefixes(request):
 
 @pytest.fixture(params=[
     [],
-    [whitespace(" ")],
     [whitespace(" "), qualifier("const")],
     [whitespace(" "), operator("&")],
     [operator("&")],
@@ -373,7 +395,7 @@ def names(request):
          name("NestedType"),
          whitespace(" "),
          nested_end(">")], [
-             ExpectedType(" ", "NestedType", " "),
+             ExpectedType("", "NestedType", ""),
          ]),
     TypeTestData([
         nested_start("<"),
@@ -394,8 +416,8 @@ def names(request):
         name("OtherType"),
         nested_end(">"),
     ], [
-        ExpectedType("", "NestedType", " ", refid="lang-nestedtype"),
-        ExpectedType(" ", "OtherType", ""),
+        ExpectedType("", "NestedType", "", refid="lang-nestedtype"),
+        ExpectedType("", "OtherType", ""),
     ]),
     TypeTestData([
         nested_start("<"),
@@ -409,7 +431,7 @@ def names(request):
         nested_end(">"),
     ], [
         ExpectedType("", "NestedType", "&"),
-        ExpectedType(" const ", "OtherType", ""),
+        ExpectedType("const ", "OtherType", ""),
     ]),
 ],
                 ids=lambda ps: "".join(p.text for p in ps[0]))
@@ -448,6 +470,26 @@ def test_type_parser__type_from_tokens(prefixes, names, nested_types, suffixes):
             unresolved_types.append(expected_type.name)
     assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
                     ]) == sorted(unresolved_types))
+
+
+@pytest.mark.parametrize("tokens,expected_type", [
+    ([whitespace(" "), name("MyType"), whitespace(" ")], ExpectedType("", "MyType", "")),
+    ([whitespace(" "),
+      qualifier("const"),
+      whitespace(" "),
+      name("MyType"),
+      whitespace(" ")], ExpectedType("const ", "MyType", "")),
+    ([whitespace(" "),
+      name("MyType"),
+      whitespace(" "),
+      operator("*"),
+      whitespace(" ")], ExpectedType("", "MyType", " *")),
+])
+def test_type_parser__type_from_tokens__strip_whitespace(tokens, expected_type):
+    type_ref = TestParser.type_from_tokens(tokens)
+    assert type_ref.prefix == expected_type.prefix
+    assert type_ref.name == expected_type.name
+    assert type_ref.suffix == expected_type.suffix
 
 
 def test_type_parser__type_from_tokens__deep_nested_type():
