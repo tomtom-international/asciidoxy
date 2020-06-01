@@ -19,8 +19,7 @@ import xml.etree.ElementTree as ET
 
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.java import JavaTraits
-from asciidoxy.doxygenparser.type_parser import parse_type
+from asciidoxy.doxygenparser.java import JavaTypeParser
 from tests.shared import assert_equal_or_none_if_empty
 
 
@@ -34,7 +33,7 @@ def test_parse_java_type_from_text_simple(java_type_prefix):
     type_element.text = f"{java_type_prefix}double"
 
     driver_mock = MagicMock()
-    type_ref = parse_type(JavaTraits, driver_mock, type_element)
+    type_ref = JavaTypeParser.parse_xml(type_element, driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
@@ -56,7 +55,7 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
     type_element.text = f"{java_type_prefix}Position<{generic_prefix or ''}{generic_name}>"
 
     driver_mock = MagicMock()
-    type_ref = parse_type(JavaTraits, driver_mock, type_element)
+    type_ref = JavaTypeParser.parse_xml(type_element, driver_mock)
 
     assert type_ref is not None
     assert not type_ref.id

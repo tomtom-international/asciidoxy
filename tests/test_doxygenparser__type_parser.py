@@ -648,8 +648,13 @@ def test_type_parser__type_from_tokens__invalid_token_sequence(tokens):
 
 
 def test_type_parser__type_from_tokens__calls_cleanup_name():
-    tokens = [qualifier('"const"'), whitespace(" "), name('"MyType"'), whitespace(" "),
-              qualifier('"const"')]
+    tokens = [
+        qualifier('"const"'),
+        whitespace(" "),
+        name('"MyType"'),
+        whitespace(" "),
+        qualifier('"const"')
+    ]
     type_ref = TestParser.type_from_tokens(tokens)
     assert type_ref.prefix == '"const" '
     assert type_ref.name == 'MyType'

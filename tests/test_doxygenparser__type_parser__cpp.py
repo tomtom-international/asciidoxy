@@ -19,8 +19,7 @@ import xml.etree.ElementTree as ET
 
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.cpp import CppTraits
-from asciidoxy.doxygenparser.type_parser import parse_type
+from asciidoxy.doxygenparser.cpp import CppTypeParser
 from tests.shared import assert_equal_or_none_if_empty, sub_element
 
 
@@ -42,7 +41,7 @@ def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
     type_element.text = f"{cpp_type_prefix}double{cpp_type_suffix}"
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
@@ -61,7 +60,7 @@ def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix,
                          f">{cpp_type_suffix}")
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver_mock)
 
     assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
                     ]) == sorted(["Coordinate", "Unit"]))
@@ -96,7 +95,7 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_typ
                 tail=cpp_type_suffix)
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
@@ -120,7 +119,7 @@ def test_parse_cpp_type_from_ref_with_nested_text_type():
                 tail="< const Unit > &")
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver_mock)
     assert (sorted([args[0].name
                     for args, _ in driver_mock.unresolved_ref.call_args_list]) == sorted(["Unit"]))
 
@@ -154,7 +153,7 @@ def test_parse_cpp_type_from_text_with_nested_ref_type():
                 tail=" & > *")
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
@@ -199,7 +198,7 @@ def test_parse_cpp_type_from_multiple_nested_text_and_ref():
                 tail=" < const std::string & > >")
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
@@ -255,7 +254,7 @@ def test_parse_cpp_type_multiple_prefix_and_suffix():
     type_element.text = "mutable volatile std::string * const *"
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
@@ -279,7 +278,7 @@ def test_parse_cpp_type_with_space(cpp_type_prefix, type_with_space, cpp_type_su
     type_element.text = f"{cpp_type_prefix}{type_with_space}{cpp_type_suffix}"
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None

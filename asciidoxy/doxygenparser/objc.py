@@ -30,13 +30,6 @@ class ObjectiveCTraits(LanguageTraits):
     """Traits for parsing Objective C documentation."""
     TAG: str = "objc"
 
-    TYPE_PREFIXES = re.compile(r"((nullable|const|__weak|__strong)\s*)+\s+")
-    TYPE_SUFFIXES = re.compile(r"(\s*\*\s*?)+")
-    TYPE_NESTED_START = re.compile(r"\s*<\s*")
-    TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
-    TYPE_NESTED_END = re.compile(r"\s*>")
-    TYPE_NAME = re.compile(r"((unsigned|signed|short|long)\s+)*[a-zA-Z0-9_:]+")
-
     LANGUAGE_BUILD_IN_TYPES = ("char", "unsigned char", "signed char", "int", "short", "long",
                                "float", "double", "void", "bool", "BOOL", "id", "instancetype",
                                "short int", "signed short", "signed short int", "unsigned short",

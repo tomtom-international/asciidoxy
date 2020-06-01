@@ -17,7 +17,7 @@ import logging
 
 from abc import ABC
 from enum import Enum, auto
-from typing import Optional, Pattern, Sequence
+from typing import Optional, Sequence
 
 logger = logging.getLogger(__name__)
 
@@ -50,14 +50,6 @@ class LanguageTraits(ABC):
 
     Attributes:
         TAG:                   Tag for identifying the language.
-        TYPE_PREFIXES:         Pattern matching text that is not part of the type name, but instead
-                                   is a prefix to the type.
-        TYPE_SUFFIXES:         Pattern matching text that is not part of the type name, but instead
-                                   is a suffix to the type.
-        TYPE_NESTED_START:     Pattern matching the start of a nested type.
-        TYPE_NESTED_SEPARATOR: Pattern matching a separator between multiple nested types.
-        TYPE_NESTED_END:       Pattern matching the end of a nested type.
-        TYPE_NAME:             Pattern matching a type's name.
         NESTED_STARTS:         Tokens indicating the start of a list of nested types. Results in
                                    token type NESTED_START.
         NESTED_ENDS:           Tokens indicating the end of a list of nested types. Results in
@@ -73,13 +65,6 @@ class LanguageTraits(ABC):
         ALLOWED_NAMES:         Token types that are allowed in type names.
     """
     TAG: str
-
-    TYPE_PREFIXES: Optional[Pattern]
-    TYPE_SUFFIXES: Optional[Pattern]
-    TYPE_NESTED_START: Pattern
-    TYPE_NESTED_SEPARATOR: Pattern
-    TYPE_NESTED_END: Pattern
-    TYPE_NAME: Pattern
 
     NESTED_STARTS: Sequence[str]
     NESTED_ENDS: Sequence[str]
