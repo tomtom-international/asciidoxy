@@ -13,7 +13,6 @@
 # limitations under the License.
 """Support for parsing python documentation."""
 
-import re
 import string
 
 import xml.etree.ElementTree as ET
@@ -29,13 +28,6 @@ from .type_parser import TypeParser
 class PythonTraits(LanguageTraits):
     """Traits for parsing python documentation."""
     TAG: str = "python"
-
-    TYPE_PREFIXES = None
-    TYPE_SUFFIXES = None
-    TYPE_NESTED_START = re.compile(r"\s*\[\s*")
-    TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
-    TYPE_NESTED_END = re.compile(r"\s*\]")
-    TYPE_NAME = re.compile(r"\"?[a-zA-Z0-9_.]+\"?")
 
     NESTED_STARTS = "[",
     NESTED_ENDS = "]",

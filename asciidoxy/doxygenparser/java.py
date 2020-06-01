@@ -13,26 +13,18 @@
 # limitations under the License.
 """Support for Java documentation."""
 
-import re
 import string
 
-from typing import Optional
+from typing import List, Optional
 
 from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
-from .type_parser import TypeParser
+from .type_parser import TypeParser, Token
 
 
 class JavaTraits(LanguageTraits):
     """Traits for parsing Java documentation."""
     TAG: str = "java"
-
-    TYPE_PREFIXES = re.compile(r"((([\w?]+?\s+extends)|final|synchronized|transient)\s*)+\s+")
-    TYPE_SUFFIXES = re.compile(r"")
-    TYPE_NESTED_START = re.compile(r"\s*<\s*")
-    TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
-    TYPE_NESTED_END = re.compile(r"\s*>")
-    TYPE_NAME = re.compile(r"[a-zA-Z0-9_:\.? ]+")
 
     LANGUAGE_BUILD_IN_TYPES = ("void", "long", "int", "boolean", "byte", "char", "short", "float",
                                "double", "String")
@@ -42,7 +34,7 @@ class JavaTraits(LanguageTraits):
     NESTED_ENDS = ">",
     NESTED_SEPARATORS = ",",
     OPERATORS = tuple()
-    QUALIFIERS = "final", "synchronized", "transient",
+    QUALIFIERS = "final", "synchronized", "transient", "extends",
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
                         tuple(string.whitespace))

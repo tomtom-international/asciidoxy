@@ -13,7 +13,6 @@
 # limitations under the License.
 """Support for parsing C++ documentation."""
 
-import re
 import string
 
 from typing import Optional
@@ -26,13 +25,6 @@ from .type_parser import TypeParser
 class CppTraits(LanguageTraits):
     """Traits for parsing C++ documentation."""
     TAG: str = "cpp"
-
-    TYPE_PREFIXES = re.compile(r"((const|volatile|constexpr|mutable|enum|class)\s*)+\s+")
-    TYPE_SUFFIXES = re.compile(r"(\s*(\*|&|const))+")
-    TYPE_NESTED_START = re.compile(r"\s*<\s*")
-    TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
-    TYPE_NESTED_END = re.compile(r"\s*>")
-    TYPE_NAME = re.compile(r"((unsigned|signed|short|long)\s+)*(?:(?!\bconst)[a-zA-Z0-9_:])+")
 
     LANGUAGE_BUILD_IN_TYPES = ("void", "bool", "signed char", "unsigned char", "char", "wchar_t",
                                "char16_t", "char32_t", "char8_t", "float", "double", "long double",
