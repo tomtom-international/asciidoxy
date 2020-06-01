@@ -233,7 +233,7 @@ class TypeParser:
         type_ref.prefix = "".join(p.text for p in prefixes)
         type_ref.suffix = "".join(s.text for s in suffixes)
         type_ref.nested = nested_types or []
-        type_ref.id = names[0].refid
+        type_ref.id = cls.TRAITS.unique_id(names[0].refid)
         type_ref.kind = names[0].kind
 
         if isinstance(parent, Compound):

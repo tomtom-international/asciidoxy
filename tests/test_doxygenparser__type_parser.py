@@ -354,15 +354,15 @@ class TypeTestData(NamedTuple):
                   name("long"),
                   whitespace(" "),
                   name("long")]),
-    TypeTestData([ref("MyType", refid="lang-mytype", kind="compound")],
-                 [ExpectedType("", "MyType", "", kind="compound", refid="lang-mytype")]),
-    TypeTestData([ref("MyType", refid="lang-mytype")],
-                 [ExpectedType("", "MyType", "", refid="lang-mytype")]),
+    TypeTestData([ref("MyType", refid="mytype", kind="compound")],
+                 [ExpectedType("", "MyType", "", kind="compound", refid="mytype")]),
+    TypeTestData([ref("MyType", refid="mytype")],
+                 [ExpectedType("", "MyType", "", refid="mytype")]),
     TypeTestData([
-        ref("MyType", refid="lang-mytype", kind="compound"),
+        ref("MyType", refid="mytype", kind="compound"),
         whitespace(" "),
-        ref("OtherType", refid="lang-othertype", kind="compound")
-    ], [ExpectedType("", "MyType OtherType", "", kind="compound", refid="lang-mytype")]),
+        ref("OtherType", refid="othertype", kind="compound")
+    ], [ExpectedType("", "MyType OtherType", "", kind="compound", refid="mytype")]),
 ],
                 ids=lambda ps: "".join(p.text for p in ps[0]))
 def names(request):
@@ -401,22 +401,22 @@ def names(request):
         nested_start("<"),
         name("NestedType"),
         nested_sep(","),
-        ref("OtherType", refid="lang-othertype", kind="compound"),
+        ref("OtherType", refid="othertype", kind="compound"),
         nested_end(">")
     ], [
         ExpectedType("", "NestedType", ""),
-        ExpectedType("", "OtherType", "", refid="lang-othertype", kind="compound"),
+        ExpectedType("", "OtherType", "", refid="othertype", kind="compound"),
     ]),
     TypeTestData([
         nested_start("<"),
-        ref("NestedType", refid="lang-nestedtype"),
+        ref("NestedType", refid="nestedtype"),
         whitespace(" "),
         nested_sep(","),
         whitespace(" "),
         name("OtherType"),
         nested_end(">"),
     ], [
-        ExpectedType("", "NestedType", "", refid="lang-nestedtype"),
+        ExpectedType("", "NestedType", "", refid="nestedtype"),
         ExpectedType("", "OtherType", ""),
     ]),
     TypeTestData([
@@ -446,7 +446,10 @@ def test_type_parser__type_from_tokens(prefixes, names, nested_types, suffixes):
     assert type_ref.prefix == "".join(p.text for p in prefixes)
     assert type_ref.name == names.expected_types[0].name
     assert type_ref.kind == names.expected_types[0].kind
-    assert type_ref.id == names.expected_types[0].refid
+    if names.expected_types[0].refid is None:
+        assert type_ref.id is None
+    else:
+        assert type_ref.id == f"mylang-{names.expected_types[0].refid}"
     assert type_ref.suffix == "".join(s.text for s in suffixes)
     assert type_ref.language == "mylang"
 
@@ -458,7 +461,10 @@ def test_type_parser__type_from_tokens(prefixes, names, nested_types, suffixes):
             assert actual.name == expected.name
             assert actual.suffix == expected.suffix
             assert actual.kind == expected.kind
-            assert actual.id == expected.refid
+            if expected.refid is None:
+                assert actual.id is None
+            else:
+                assert actual.id == f"mylang-{expected.refid}"
             assert not actual.nested
             assert actual.language == "mylang"
 
@@ -645,7 +651,7 @@ def test_type_parser__parse_xml__simple_element():
     type_ref = TestParser.parse_xml(element)
 
     assert type_ref.name == "MyType"
-    assert type_ref.id == "my_type"
+    assert type_ref.id == "mylang-my_type"
     assert type_ref.kind == "compound"
     assert not type_ref.nested
 
@@ -673,7 +679,7 @@ def test_type_parser__parse_xml__do_not_register_ref_with_id():
     driver_mock.unresolved_ref.assert_not_called()
 
     assert type_ref.name == "MyType"
-    assert type_ref.id == "my_type"
+    assert type_ref.id == "mylang-my_type"
     assert type_ref.kind == "compound"
     assert not type_ref.nested
 
@@ -690,7 +696,7 @@ def test_type_parser__parse_xml__namespace_from_parent():
     driver_mock.unresolved_ref.assert_not_called()
 
     assert type_ref.name == "MyType"
-    assert type_ref.id == "my_type"
+    assert type_ref.id == "mylang-my_type"
     assert type_ref.kind == "compound"
     assert type_ref.namespace == "asciidoxy::test"
     assert not type_ref.nested
