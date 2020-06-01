@@ -48,6 +48,10 @@ class TestTraits(LanguageTraits):
     def is_language_standard_type(cls, type_name: str) -> bool:
         return type_name.startswith("Builtin")
 
+    @classmethod
+    def cleanup_name(cls, name: str) -> str:
+        return name.replace('"', "")
+
 
 class TestParser(TypeParser):
     TRAITS = TestTraits
@@ -641,6 +645,15 @@ def test_type_parser__type_from_tokens__do_not_register_builtin_types():
 def test_type_parser__type_from_tokens__invalid_token_sequence(tokens):
     with pytest.raises(TypeParseError):
         TestParser.type_from_tokens(tokens)
+
+
+def test_type_parser__type_from_tokens__calls_cleanup_name():
+    tokens = [qualifier('"const"'), whitespace(" "), name('"MyType"'), whitespace(" "),
+              qualifier('"const"')]
+    type_ref = TestParser.type_from_tokens(tokens)
+    assert type_ref.prefix == '"const" '
+    assert type_ref.name == 'MyType'
+    assert type_ref.suffix == ' "const"'
 
 
 def test_type_parser__parse_xml__simple_element():

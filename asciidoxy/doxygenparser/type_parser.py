@@ -229,7 +229,7 @@ class TypeParser:
                                  f" in `{''.join(t.text for t in original_tokens)}`")
 
         type_ref = TypeRef(cls.TRAITS.TAG)
-        type_ref.name = "".join(n.text for n in names)
+        type_ref.name = cls.TRAITS.cleanup_name("".join(n.text for n in names))
         type_ref.prefix = "".join(p.text for p in prefixes)
         type_ref.suffix = "".join(s.text for s in suffixes)
         type_ref.nested = nested_types or []
