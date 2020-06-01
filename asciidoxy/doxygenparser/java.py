@@ -14,11 +14,13 @@
 """Support for Java documentation."""
 
 import re
+import string
 
 from typing import Optional
 
-from .language_traits import LanguageTraits
+from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
+from .type_parser import TypeParser
 
 
 class JavaTraits(LanguageTraits):
@@ -35,6 +37,19 @@ class JavaTraits(LanguageTraits):
     LANGUAGE_BUILD_IN_TYPES = ("void", "long", "int", "boolean", "byte", "char", "short", "float",
                                "double", "String")
     COMMON_GENERIC_NAMES = ("T", "?", "T ", "? ")
+
+    NESTED_STARTS = "<",
+    NESTED_ENDS = ">",
+    NESTED_SEPARATORS = ",",
+    OPERATORS = tuple()
+    QUALIFIERS = "final", "synchronized", "transient",
+
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
+                        tuple(string.whitespace))
+
+    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
+    ALLOWED_SUFFIXES = TokenType.WHITESPACE,
+    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -65,6 +80,12 @@ class JavaTraits(LanguageTraits):
             return None
 
 
+class JavaTypeParser(TypeParser):
+    """Parser for Java types."""
+    TRAITS = JavaTraits
+
+
 class JavaParser(ParserBase):
     """Parser for Java documentation."""
     TRAITS = JavaTraits
+    TYPE_PARSER = JavaTypeParser

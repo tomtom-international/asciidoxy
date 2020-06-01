@@ -356,8 +356,7 @@ class TypeTestData(NamedTuple):
                   name("long")]),
     TypeTestData([ref("MyType", refid="mytype", kind="compound")],
                  [ExpectedType("", "MyType", "", kind="compound", refid="mytype")]),
-    TypeTestData([ref("MyType", refid="mytype")],
-                 [ExpectedType("", "MyType", "", refid="mytype")]),
+    TypeTestData([ref("MyType", refid="mytype")], [ExpectedType("", "MyType", "", refid="mytype")]),
     TypeTestData([
         ref("MyType", refid="mytype", kind="compound"),
         whitespace(" "),

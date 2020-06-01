@@ -23,7 +23,7 @@ from typing import List, Optional, Tuple, Type, Union
 from .description_parser import DescriptionParser, select_descriptions
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
-from .type_parser import parse_type
+from .type_parser import TypeParser, TypeParseError
 from ..model import (Compound, EnumValue, Member, Parameter, ReturnValue, ThrowsClause, TypeRef,
                      InnerTypeReference)
 
@@ -39,6 +39,7 @@ def _yes_no_to_bool(yes_no: str) -> bool:
 class ParserBase(ABC):
     """Base functionality for language parsers."""
     TRAITS: Type[LanguageTraits]
+    TYPE_PARSER: Type[TypeParser]
 
     _driver: DriverBase
 
@@ -89,7 +90,11 @@ class ParserBase(ABC):
         if type_element is None:
             return None
 
-        type_ref = parse_type(self.TRAITS, self._driver, type_element, parent)
+        try:
+            type_ref = self.TYPE_PARSER.parse_xml(type_element, self._driver, parent)
+        except TypeParseError:
+            logger.exception("Failed to parse type.")
+            return None
 
         if type_ref is not None and type_ref.name:
             return type_ref

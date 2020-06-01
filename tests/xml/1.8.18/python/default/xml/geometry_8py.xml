@@ -72,7 +72,6 @@
 <codeline lineno="61"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Accepts<sp/>None<sp/>as<sp/>input.</highlight></codeline>
 <codeline lineno="62"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>...</highlight></codeline>
-<codeline lineno="64"><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="asciidoxy/geometry.py"/>
   </compounddef>

@@ -14,14 +14,16 @@
 """Support for parsing python documentation."""
 
 import re
+import string
 
 import xml.etree.ElementTree as ET
 
 from typing import Optional
 
 from ..model import Compound, Member, Parameter
-from .language_traits import LanguageTraits
+from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
+from .type_parser import TypeParser
 
 
 class PythonTraits(LanguageTraits):
@@ -34,6 +36,18 @@ class PythonTraits(LanguageTraits):
     TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
     TYPE_NESTED_END = re.compile(r"\s*\]")
     TYPE_NAME = re.compile(r"\"?[a-zA-Z0-9_.]+\"?")
+
+    NESTED_STARTS = "[",
+    NESTED_ENDS = "]",
+    NESTED_SEPARATORS = ",",
+    OPERATORS = tuple()
+    QUALIFIERS = tuple()
+
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
+
+    ALLOWED_PREFIXES = TokenType.WHITESPACE,
+    ALLOWED_SUFFIXES = TokenType.WHITESPACE,
+    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
     @classmethod
     def cleanup_name(cls, name: str) -> str:
@@ -58,9 +72,15 @@ class PythonTraits(LanguageTraits):
             return None
 
 
+class PythonTypeParser(TypeParser):
+    """Parser for python types."""
+    TRAITS = PythonTraits
+
+
 class PythonParser(ParserBase):
     """Parser for python documentation."""
     TRAITS = PythonTraits
+    TYPE_PARSER = PythonTypeParser
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
         member = super().parse_member(memberdef_element, parent)
