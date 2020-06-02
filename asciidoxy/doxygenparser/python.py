@@ -32,13 +32,13 @@ class PythonTraits(LanguageTraits):
     NESTED_STARTS = "[",
     NESTED_ENDS = "]",
     NESTED_SEPARATORS = ",",
-    OPERATORS = tuple()
-    QUALIFIERS = tuple()
+    OPERATORS = None
+    QUALIFIERS = None
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
 
-    ALLOWED_PREFIXES = TokenType.WHITESPACE,
-    ALLOWED_SUFFIXES = TokenType.WHITESPACE,
+    ALLOWED_PREFIXES = None
+    ALLOWED_SUFFIXES = None
     ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
     @classmethod

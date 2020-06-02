@@ -33,11 +33,10 @@ class JavaTraits(LanguageTraits):
     NESTED_STARTS = "<",
     NESTED_ENDS = ">",
     NESTED_SEPARATORS = ",",
-    OPERATORS = tuple()
+    OPERATORS = None
     QUALIFIERS = "final", "synchronized", "transient", "extends",
 
-    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
-                        tuple(string.whitespace))
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
 
     ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
     ALLOWED_SUFFIXES = TokenType.WHITESPACE,
@@ -78,7 +77,7 @@ class JavaTypeParser(TypeParser):
 
     @classmethod
     def adapt_tokens(cls, tokens: List[Token]) -> List[Token]:
-        adapted = []
+        adapted: List[Token] = []
         for token in tokens:
             if token.type_ == TokenType.QUALIFIER and token.text == "extends":
                 texts = ["extends"]

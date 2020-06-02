@@ -66,16 +66,16 @@ class LanguageTraits(ABC):
     """
     TAG: str
 
-    NESTED_STARTS: Sequence[str]
-    NESTED_ENDS: Sequence[str]
-    NESTED_SEPARATORS: Sequence[str]
-    OPERATORS: Sequence[str]
-    QUALIFIERS: Sequence[str]
+    NESTED_STARTS: Optional[Sequence[str]]
+    NESTED_ENDS: Optional[Sequence[str]]
+    NESTED_SEPARATORS: Optional[Sequence[str]]
+    OPERATORS: Optional[Sequence[str]]
+    QUALIFIERS: Optional[Sequence[str]]
 
     TOKEN_BOUNDARIES: Sequence[str]
 
-    ALLOWED_PREFIXES: Sequence[TokenType]
-    ALLOWED_SUFFIXES: Sequence[TokenType]
+    ALLOWED_PREFIXES: Optional[Sequence[TokenType]]
+    ALLOWED_SUFFIXES: Optional[Sequence[TokenType]]
     ALLOWED_NAMES: Sequence[TokenType]
 
     @classmethod

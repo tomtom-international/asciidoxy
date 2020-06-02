@@ -15,7 +15,7 @@
 
 import xml.etree.ElementTree as ET
 
-from typing import List, Optional, Tuple, Type, Union
+from typing import List, Optional, Sequence, Tuple, Type, Union
 
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenType
@@ -103,15 +103,15 @@ class TypeParser:
         if text.isspace():
             type_ = TokenType.WHITESPACE
             text = " "
-        elif text in cls.TRAITS.NESTED_STARTS:
+        elif cls.TRAITS.NESTED_STARTS and text in cls.TRAITS.NESTED_STARTS:
             type_ = TokenType.NESTED_START
-        elif text in cls.TRAITS.NESTED_ENDS:
+        elif cls.TRAITS.NESTED_ENDS and text in cls.TRAITS.NESTED_ENDS:
             type_ = TokenType.NESTED_END
-        elif text in cls.TRAITS.NESTED_SEPARATORS:
+        elif cls.TRAITS.NESTED_SEPARATORS and text in cls.TRAITS.NESTED_SEPARATORS:
             type_ = TokenType.NESTED_SEPARATOR
-        elif text in cls.TRAITS.OPERATORS:
+        elif cls.TRAITS.OPERATORS and text in cls.TRAITS.OPERATORS:
             type_ = TokenType.OPERATOR
-        elif text in cls.TRAITS.QUALIFIERS:
+        elif cls.TRAITS.QUALIFIERS and text in cls.TRAITS.QUALIFIERS:
             type_ = TokenType.QUALIFIER
         else:
             type_ = TokenType.NAME
@@ -152,18 +152,20 @@ class TypeParser:
 
         prefixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_PREFIXES)
         cls.remove_leading_whitespace(prefixes)
+
         names, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_NAMES)
+        cls.remove_leading_whitespace(names)
         tokens[:0] = cls.remove_trailing_whitespace(names)
+
+        nested_types, tokens = cls.nested_types(tokens, driver, parent)
+
+        suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
+        cls.remove_trailing_whitespace(suffixes)
 
         if not names:
             raise TypeParseError(f"No name found"
                                  f" in `{''.join(t.text for t in original_tokens)}`")
-
-        nested_types, tokens = cls.nested_types(tokens, driver, parent)
-        suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
-        cls.remove_trailing_whitespace(suffixes)
-
-        if tokens:
+        if tokens and any(t.type_ != TokenType.WHITESPACE for t in tokens):
             raise TypeParseError(f"Unexpected characters `{''.join(t.text for t in tokens)}`"
                                  f" in `{''.join(t.text for t in original_tokens)}`")
 
@@ -187,11 +189,15 @@ class TypeParser:
         return type_ref
 
     @staticmethod
-    def select_tokens(tokens, types) -> Tuple[List[Token], List[Token]]:
-        for i, t in enumerate(tokens):
-            if t.type_ not in types:
-                return tokens[:i], tokens[i:]
-        return tokens, []
+    def select_tokens(tokens: List[Token],
+                      types: Optional[Sequence[TokenType]]) -> Tuple[List[Token], List[Token]]:
+        if types:
+            for i, t in enumerate(tokens):
+                if t.type_ not in types:
+                    return tokens[:i], tokens[i:]
+            return tokens, []
+        else:
+            return [], tokens
 
     @classmethod
     def remove_leading_whitespace(cls, tokens) -> List[Token]:
