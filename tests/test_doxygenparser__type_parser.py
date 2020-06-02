@@ -667,6 +667,7 @@ def test_type_parser__parse_xml__simple_element():
 
     type_ref = TestParser.parse_xml(element)
 
+    assert type_ref is not None
     assert type_ref.name == "MyType"
     assert type_ref.id == "mylang-my_type"
     assert type_ref.kind == "compound"
@@ -681,6 +682,7 @@ def test_type_parser__parse_xml__unresolved_ref_with_driver():
     type_ref = TestParser.parse_xml(element, driver_mock)
     driver_mock.unresolved_ref.assert_called_once_with(type_ref)
 
+    assert type_ref is not None
     assert type_ref.name == "MyType"
     assert not type_ref.id
     assert not type_ref.kind
@@ -695,6 +697,7 @@ def test_type_parser__parse_xml__do_not_register_ref_with_id():
     type_ref = TestParser.parse_xml(element, driver_mock)
     driver_mock.unresolved_ref.assert_not_called()
 
+    assert type_ref is not None
     assert type_ref.name == "MyType"
     assert type_ref.id == "mylang-my_type"
     assert type_ref.kind == "compound"
@@ -712,8 +715,20 @@ def test_type_parser__parse_xml__namespace_from_parent():
     type_ref = TestParser.parse_xml(element, driver_mock, parent)
     driver_mock.unresolved_ref.assert_not_called()
 
+    assert type_ref is not None
     assert type_ref.name == "MyType"
     assert type_ref.id == "mylang-my_type"
     assert type_ref.kind == "compound"
     assert type_ref.namespace == "asciidoxy::test"
     assert not type_ref.nested
+
+
+def test_type_parser__parse_xml__empty_tag():
+    element = ET.Element("type")
+    assert TestParser.parse_xml(element) is None
+
+
+def test_type_parser__parse_xml__whitespace_only():
+    element = ET.Element("type")
+    element.text = "  \n\t  \n  "
+    assert TestParser.parse_xml(element) is None
