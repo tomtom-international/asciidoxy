@@ -64,8 +64,10 @@ class TypeParser:
     def parse_xml(cls,
                   type_element: ET.Element,
                   driver: Optional[DriverBase] = None,
-                  parent: Optional[Union[Compound, Member]] = None):
+                  parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
         tokens = cls.tokenize_xml(type_element)
+        if len(tokens) == 0 or all(token.type_ == TokenType.WHITESPACE for token in tokens):
+            return None
         tokens = cls.adapt_tokens(tokens)
         return cls.type_from_tokens(tokens, driver, parent)
 
