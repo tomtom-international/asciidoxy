@@ -113,7 +113,8 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ]),
-], ids=lambda tokens: "".join(t.text for t in tokens))
+],
+                         ids=lambda tokens: "".join(t.text for t in tokens))
 def test_java_type_parser__adapt_tokens__extends(tokens, expected):
     assert JavaTypeParser.adapt_tokens(tokens) == expected
 
@@ -132,7 +133,8 @@ def test_java_type_parser__adapt_tokens__extends(tokens, expected):
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ],
-], ids=lambda tokens: "".join(t.text for t in tokens))
+],
+                         ids=lambda tokens: "".join(t.text for t in tokens))
 def test_java_type_parser__adapt_tokens__extends__error(tokens):
     with pytest.raises(TypeParseError):
         JavaTypeParser.adapt_tokens(tokens)
