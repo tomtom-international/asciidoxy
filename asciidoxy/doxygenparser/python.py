@@ -17,12 +17,12 @@ import string
 
 import xml.etree.ElementTree as ET
 
-from typing import Optional
+from typing import List, Optional
 
-from ..model import Compound, Member, Parameter
+from ..model import Parameter
 from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
-from .type_parser import TypeParser
+from .type_parser import Token, TypeParser
 
 
 class PythonTraits(LanguageTraits):
@@ -68,20 +68,18 @@ class PythonTypeParser(TypeParser):
     """Parser for python types."""
     TRAITS = PythonTraits
 
+    @classmethod
+    def adapt_tokens(cls, tokens: List[Token]) -> List[Token]:
+        # Workaround for Doxygen issue
+        tokens = [t for t in tokens if t.text != "def"]
+
+        return tokens
+
 
 class PythonParser(ParserBase):
     """Parser for python documentation."""
     TRAITS = PythonTraits
     TYPE_PARSER = PythonTypeParser
-
-    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
-        member = super().parse_member(memberdef_element, parent)
-
-        if member and member.returns and member.returns.type and member.returns.type.name == "def":
-            # Workaround for Doxygen issue
-            member.returns = None
-
-        return member
 
     def parse_array(self, array_element: Optional[ET.Element], param: Parameter):
         if array_element is None or param.type is None:
