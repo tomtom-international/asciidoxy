@@ -68,9 +68,10 @@ class ParserBase(ABC):
         params = []
         for param_element in memberdef_element.iterfind("param"):
             param = Parameter()
-            param.type = self.parse_type(param_element.find("type"), parent)
+            param.type = self.parse_type(param_element.find("type"),
+                                         param_element.find("array"),
+                                         parent=parent)
             param.name = param_element.findtext("declname") or ""
-            self.parse_array(param_element.find("array"), param)
 
             matching_descriptions = [desc for name, desc in descriptions if name == param.name]
             if matching_descriptions:
@@ -81,19 +82,21 @@ class ParserBase(ABC):
             params.append(param)
         return params
 
-    def parse_array(self, array_element: Optional[ET.Element], param: Parameter):
-        pass
-
     def parse_type(self,
                    type_element: Optional[ET.Element],
+                   array_element: Optional[ET.Element] = None,
                    parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
         if type_element is None:
             return None
 
         try:
-            type_ref = self.TYPE_PARSER.parse_xml(type_element, self._driver, parent)
+            type_ref = self.TYPE_PARSER.parse_xml(type_element,
+                                                  array_element,
+                                                  driver=self._driver,
+                                                  parent=parent)
         except TypeParseError:
-            logger.exception("Failed to parse type.")
+            logger.exception(
+                f"Failed to parse type {ET.tostring(type_element, encoding='unicode')}.")
             return None
 
         if type_ref is not None and type_ref.name:
@@ -114,7 +117,7 @@ class ParserBase(ABC):
 
     def parse_returns(self, memberdef_element: ET.Element, parent: Member) -> Optional[ReturnValue]:
         returns = ReturnValue()
-        returns.type = self.parse_type(memberdef_element.find("type"), parent)
+        returns.type = self.parse_type(memberdef_element.find("type"), parent=parent)
 
         description = memberdef_element.find("detaileddescription/para/simplesect[@kind='return']")
         if description:

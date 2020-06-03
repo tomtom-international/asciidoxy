@@ -445,7 +445,7 @@ def nested_types(request):
 def test_type_parser__type_from_tokens(prefixes, names, nested_types, suffixes):
     driver_mock = MagicMock()
     type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens + suffixes,
-                                           driver_mock)
+                                           driver=driver_mock)
     assert type_ref.prefix == "".join(p.text for p in prefixes)
     assert type_ref.name == names.expected_types[0].name
     assert type_ref.kind == names.expected_types[0].kind
@@ -679,7 +679,7 @@ def test_type_parser__parse_xml__unresolved_ref_with_driver():
     element.text = "MyType"
 
     driver_mock = MagicMock()
-    type_ref = TestParser.parse_xml(element, driver_mock)
+    type_ref = TestParser.parse_xml(element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_called_once_with(type_ref)
 
     assert type_ref is not None
@@ -694,7 +694,7 @@ def test_type_parser__parse_xml__do_not_register_ref_with_id():
     sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
 
     driver_mock = MagicMock()
-    type_ref = TestParser.parse_xml(element, driver_mock)
+    type_ref = TestParser.parse_xml(element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()
 
     assert type_ref is not None
@@ -712,7 +712,7 @@ def test_type_parser__parse_xml__namespace_from_parent():
     parent.full_name = "asciidoxy::test"
 
     driver_mock = MagicMock()
-    type_ref = TestParser.parse_xml(element, driver_mock, parent)
+    type_ref = TestParser.parse_xml(element, driver=driver_mock, parent=parent)
     driver_mock.unresolved_ref.assert_not_called()
 
     assert type_ref is not None

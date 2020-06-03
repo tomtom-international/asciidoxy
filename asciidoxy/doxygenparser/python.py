@@ -15,11 +15,8 @@
 
 import string
 
-import xml.etree.ElementTree as ET
-
 from typing import List, Optional
 
-from ..model import Parameter
 from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser
@@ -69,7 +66,23 @@ class PythonTypeParser(TypeParser):
     TRAITS = PythonTraits
 
     @classmethod
-    def adapt_tokens(cls, tokens: List[Token]) -> List[Token]:
+    def adapt_tokens(cls,
+                     tokens: List[Token],
+                     array_tokens: Optional[List[Token]] = None) -> List[Token]:
+        if not tokens:
+            return []
+
+        # Nested type hints are stored as arrays in a separate element.
+        if array_tokens:
+            # There is a bug where the last closing bracket is stored in the type name. We need to
+            # insert the nested types in front of that bracket
+            if tokens[-1].type_ == TokenType.WHITESPACE:
+                tokens.pop(-1)
+            if tokens[-1].type_ == TokenType.NESTED_END:
+                tokens[-1:-1] = array_tokens
+            else:
+                tokens.extend(array_tokens)
+
         # Workaround for Doxygen issue
         tokens = [t for t in tokens if t.text != "def"]
 
@@ -80,17 +93,3 @@ class PythonParser(ParserBase):
     """Parser for python documentation."""
     TRAITS = PythonTraits
     TYPE_PARSER = PythonTypeParser
-
-    def parse_array(self, array_element: Optional[ET.Element], param: Parameter):
-        if array_element is None or param.type is None:
-            return
-        if not array_element.text:
-            return
-
-        # TODO: This is ugly. Type parsing needs refactoring.
-        type_element = ET.Element("type")
-        type_element.text = f"{param.type.name}{array_element.text}"
-        type_ref = self.parse_type(type_element)
-
-        if type_ref is not None and type_ref.nested:
-            param.type.nested = type_ref.nested

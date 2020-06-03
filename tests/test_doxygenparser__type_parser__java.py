@@ -35,7 +35,7 @@ def test_parse_java_type_from_text_simple(java_type_prefix):
     type_element.text = f"{java_type_prefix}double"
 
     driver_mock = MagicMock()
-    type_ref = JavaTypeParser.parse_xml(type_element, driver_mock)
+    type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
@@ -57,7 +57,7 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
     type_element.text = f"{java_type_prefix}Position<{generic_prefix or ''}{generic_name}>"
 
     driver_mock = MagicMock()
-    type_ref = JavaTypeParser.parse_xml(type_element, driver_mock)
+    type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
 
     assert type_ref is not None
     assert not type_ref.id

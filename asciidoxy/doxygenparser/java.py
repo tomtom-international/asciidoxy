@@ -76,7 +76,9 @@ class JavaTypeParser(TypeParser):
     TRAITS = JavaTraits
 
     @classmethod
-    def adapt_tokens(cls, tokens: List[Token]) -> List[Token]:
+    def adapt_tokens(cls,
+                     tokens: List[Token],
+                     array_tokens: Optional[List[Token]] = None) -> List[Token]:
         adapted: List[Token] = []
         for token in tokens:
             if token.type_ == TokenType.QUALIFIER and token.text == "extends":

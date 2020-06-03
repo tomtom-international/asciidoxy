@@ -121,7 +121,7 @@ class ObjectiveCParser(ParserBase):
         def type_from_text(text):
             type_element = ET.Element("type")
             type_element.text = text
-            return self.parse_type(type_element, member)
+            return self.parse_type(type_element, parent=member)
 
         member.returns = ReturnValue()
         member.returns.type = type_from_text(return_type)

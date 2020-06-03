@@ -40,3 +40,65 @@ def test_adapt_tokens__remove_def():
         Token("]", TokenType.NESTED_END),
         Token(" ", TokenType.WHITESPACE),
     ]
+
+
+def test_adapt_tokens__add_nested_type_hint():
+    assert PythonTypeParser.adapt_tokens([
+        Token("Type", TokenType.NAME),
+    ], [
+        Token("[", TokenType.NESTED_START),
+        Token("NestedType", TokenType.NAME),
+        Token("]", TokenType.NESTED_END),
+    ]) == [
+        Token("Type", TokenType.NAME),
+        Token("[", TokenType.NESTED_START),
+        Token("NestedType", TokenType.NAME),
+        Token("]", TokenType.NESTED_END),
+    ]
+
+
+def test_adapt_tokens__add_nested_type_hint__double_nested():
+    assert PythonTypeParser.adapt_tokens(
+        [
+            Token("Type", TokenType.NAME),
+            Token("]", TokenType.NESTED_END),  # Bug in Doxygen
+        ],
+        [
+            Token("[", TokenType.NESTED_START),
+            Token("NestedType", TokenType.NAME),
+            Token("[", TokenType.NESTED_START),
+            Token("DoubleNestedType", TokenType.NAME),
+            Token("]", TokenType.NESTED_END),
+        ]) == [
+            Token("Type", TokenType.NAME),
+            Token("[", TokenType.NESTED_START),
+            Token("NestedType", TokenType.NAME),
+            Token("[", TokenType.NESTED_START),
+            Token("DoubleNestedType", TokenType.NAME),
+            Token("]", TokenType.NESTED_END),
+            Token("]", TokenType.NESTED_END),
+        ]
+
+
+def test_adapt_tokens__add_nested_type_hint__double_nested_with_whitespace():
+    assert PythonTypeParser.adapt_tokens(
+        [
+            Token("Type", TokenType.NAME),
+            Token("]", TokenType.NESTED_END),  # Bug in Doxygen
+            Token(" ", TokenType.WHITESPACE),
+        ],
+        [
+            Token("[", TokenType.NESTED_START),
+            Token("NestedType", TokenType.NAME),
+            Token("[", TokenType.NESTED_START),
+            Token("DoubleNestedType", TokenType.NAME),
+            Token("]", TokenType.NESTED_END),
+        ]) == [
+            Token("Type", TokenType.NAME),
+            Token("[", TokenType.NESTED_START),
+            Token("NestedType", TokenType.NAME),
+            Token("[", TokenType.NESTED_START),
+            Token("DoubleNestedType", TokenType.NAME),
+            Token("]", TokenType.NESTED_END),
+            Token("]", TokenType.NESTED_END),
+        ]
