@@ -46,7 +46,7 @@ def test_parse_objc_type_from_text_simple(objc_type_prefix, objc_type_suffix):
     type_element.text = f"{objc_type_prefix}NSInteger{objc_type_suffix}"
 
     driver_mock = MagicMock()
-    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver_mock)
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
@@ -88,7 +88,7 @@ def test_parse_objc_type_with_space(type_with_space):
     type_element.text = type_with_space
 
     driver_mock = MagicMock()
-    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver_mock)
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
