@@ -23,7 +23,7 @@ ${api_context.insert(element)}
 ----
 ${"@staticmethod\n" if element.static else ""}\
 def ${element.name}${argument_list(element.params, api_context)} \
--> ${link_from_ref(element.returns.type, api_context) if element.returns else "None"}
+-> ${link_from_ref(element.returns.type, api_context, '[', ']') if element.returns else "None"}
 ----
 
 ${element.brief}
@@ -45,7 +45,7 @@ ${param.description}
 % if element.returns and element.returns.type.name != "None":
 | Returns
 |
-`${link_from_ref(element.returns.type, api_context)}`::
+`${link_from_ref(element.returns.type, api_context, '[', ']')}`::
 ${element.returns.description}
 
 % endif
