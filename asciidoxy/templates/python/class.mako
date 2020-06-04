@@ -100,7 +100,7 @@ ${api_context.insert(variable)}
 [source,python,subs="-specialchars,macros+"]
 ----
 % if variable.returns is not None:
-${variable.name}: ${link_from_ref(variable.returns.type, api_context)}
+${variable.name}: ${link_from_ref(variable.returns.type, api_context, '[', ']')}
 % else:
 ${variable.name}
 % endif
