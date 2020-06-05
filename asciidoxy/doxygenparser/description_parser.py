@@ -57,6 +57,7 @@ class DescriptionParser(object):
     def __init__(self, language: str):
         self.language = language
         self._parts = []
+        self._in_entry = False
 
     def parse(self, element: ET.Element) -> str:
         """Parse a description from XML and convert it to AsciiDoc.
@@ -100,13 +101,19 @@ class DescriptionParser(object):
             return None
         return re.sub("\n$", " ", text, flags=re.MULTILINE)
 
-    parse_para = functools.partialmethod(_default_parse, suffix="\n\n")
     parse_itemizedlist = functools.partialmethod(_default_parse, prefix="\n\n", suffix="\n")
     parse_listitem = functools.partialmethod(_default_parse, prefix="* ")
     parse_bold = functools.partialmethod(_default_parse, prefix="**", suffix="**")
     parse_computeroutput = functools.partialmethod(_default_parse, prefix="`", suffix="`")
     parse_codeline = functools.partialmethod(_default_parse, suffix="\n")
     parse_sp = functools.partialmethod(_default_parse, prefix=" ")
+    parse_row = functools.partialmethod(_default_parse, prefix="\n")
+
+    def parse_para(self, element: ET.Element) -> None:
+        suffix = None
+        if not self._in_entry:
+            suffix = "\n\n"
+        self._default_parse(element, suffix=suffix)
 
     def parse_ulink(self, element: ET.Element) -> None:
         self._default_parse(element, prefix=f"{element.get('url')}[", suffix="]")
@@ -132,6 +139,30 @@ class DescriptionParser(object):
             self._default_parse(element)
         else:
             self._default_parse(element, prefix="__", suffix="__")
+
+    def parse_table(self, element: ET.Element) -> None:
+        caption_prefix = ""
+        caption = element.find('caption')
+        if caption is not None:
+            caption_prefix = f".{caption.text}\n"
+
+        header_option = ""
+        first_row = element.find('row')
+        if first_row is not None:
+            first_entry = first_row.find('entry')
+            if first_entry is not None and first_entry.get('thead') == 'yes':
+                header_option = "%header,"
+
+        prefix = f"\n\n{caption_prefix}[{header_option}cols={element.get('cols')}*]\n|==="
+        self._default_parse(element, prefix=prefix, suffix="|===\n")
+
+    def parse_caption(self, element: ET.Element) -> None:
+        pass
+
+    def parse_entry(self, element: ET.Element) -> None:
+        self._in_entry = True
+        self._default_parse(element, prefix="|", suffix="\n")
+        self._in_entry = False
 
     def __getattr__(self, name):
         return self._default_parse

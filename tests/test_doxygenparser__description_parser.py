@@ -262,3 +262,80 @@ def test_remove_single_leading_space():
     assert result == """Actual description text.
 
 And some more text."""
+
+def test_table():
+    description = ET.Element("description")
+    para = sub_element(description, "para")
+    table = sub_element(para, "table", rows="2", cols="2")
+    for r in range(0, 2):
+        next_row = sub_element(table, "row")
+        for c in range(0, 2):
+            next_entry = sub_element(next_row, "entry")
+            sub_element(next_entry, "para", text=f"col={c},row={r}", thead="no")    # TODO Nested formatting?
+
+    result = DescriptionParser("lang").parse(description)
+    assert result == """[cols=2*]
+|===
+|col=0,row=0
+|col=1,row=0
+
+|col=0,row=1
+|col=1,row=1
+|==="""
+
+def test_para_outside_of_table():
+    description = ET.Element("description")
+    para = sub_element(description, "para")
+    table = sub_element(para, "table", rows="1", cols="1")
+    caption = sub_element(table, "caption", text="Caption")
+    row = sub_element(table, "row")
+    entry = sub_element(row, "entry")
+    sub_element(entry, "para", text="text")
+    sub_element(description, "para", text="Text outside")
+    sub_element(description, "para", text="Text outside")
+
+    result = DescriptionParser("lang").parse(description)
+    assert result == """.Caption
+[cols=1*]
+|===
+|text
+|===
+
+Text outside
+
+Text outside"""
+
+def test_table_with_header():
+    description = ET.Element("description")
+    para = sub_element(description, "para")
+    table = sub_element(para, "table", rows="2", cols="1")
+    first_row = sub_element(table, "row")
+    first_entry = sub_element(first_row, "entry", thead="yes")
+    sub_element(first_entry, "para", text="header")
+    second_row = sub_element(table, "row")
+    second_entry = sub_element(second_row, "entry", thead="no")
+    sub_element(second_entry, "para", text="content")
+
+    result = DescriptionParser("lang").parse(description)
+    assert result == """[%header,cols=1*]
+|===
+|header
+
+|content
+|==="""
+
+def test_table_with_caption():
+    description = ET.Element("description")
+    para = sub_element(description, "para")
+    table = sub_element(para, "table", rows="1", cols="1")
+    caption = sub_element(table, "caption", text="Caption")
+    row = sub_element(table, "row")
+    entry = sub_element(row, "entry")
+    sub_element(entry, "para", text="text")
+
+    result = DescriptionParser("lang").parse(description)
+    assert result == """.Caption
+[cols=1*]
+|===
+|text
+|==="""
