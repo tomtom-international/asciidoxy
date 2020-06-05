@@ -78,6 +78,33 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
                         ]) == sorted(["Position", generic_name.strip()]))
 
 
+def test_parse_java_type_with_nested_wildcard_generic():
+    type_element = ET.Element("type")
+    type_element.text = f"Position<? extends Getter<?>>"
+
+    driver_mock = MagicMock()
+    type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
+
+    assert type_ref is not None
+    assert type_ref.language == "java"
+    assert not type_ref.prefix
+    assert type_ref.name == "Position"
+    assert not type_ref.suffix
+    assert len(type_ref.nested) == 1
+
+    assert type_ref.nested[0].prefix == "? extends "
+    assert type_ref.nested[0].name == "Getter"
+    assert not type_ref.nested[0].suffix
+    assert len(type_ref.nested[0].nested) == 1
+
+    assert not type_ref.nested[0].nested[0].prefix
+    assert type_ref.nested[0].nested[0].name == "?"
+    assert not type_ref.nested[0].nested[0].suffix
+
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["Position", "Getter"]))
+
+
 @pytest.mark.parametrize("tokens,expected", [
     ([
         Token("?", TokenType.WILDCARD),
