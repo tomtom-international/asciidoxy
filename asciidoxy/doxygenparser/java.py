@@ -33,12 +33,23 @@ class JavaTraits(LanguageTraits):
     NESTED_STARTS = "<",
     NESTED_ENDS = ">",
     NESTED_SEPARATORS = ",",
-    OPERATORS = None
-    QUALIFIERS = "final", "synchronized", "transient", "extends",
+    QUALIFIERS = "final", "synchronized", "transient",
+    WILDCARDS = "?",
+    WILDCARD_BOUNDS = "extends", "super",
+
+    TOKENS = {
+        TokenType.NESTED_START: NESTED_STARTS,
+        TokenType.NESTED_END: NESTED_ENDS,
+        TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
+        TokenType.QUALIFIER: QUALIFIERS,
+        TokenType.WILDCARD: WILDCARDS,
+        TokenType.WILDCARD_BOUNDS: WILDCARD_BOUNDS,
+    }
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
 
-    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
+    ALLOWED_PREFIXES = (TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
+                        TokenType.WILDCARD, TokenType.WILDCARD_BOUNDS)
     ALLOWED_SUFFIXES = TokenType.WHITESPACE,
     ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
@@ -81,21 +92,18 @@ class JavaTypeParser(TypeParser):
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
         adapted: List[Token] = []
         for token in tokens:
-            if token.type_ == TokenType.QUALIFIER and token.text == "extends":
-                texts = ["extends"]
-                while adapted:
-                    last_token = adapted.pop(-1)
-                    texts.append(last_token.text)
-                    if last_token.type_ == TokenType.NAME:
+            if token.type_ == TokenType.WILDCARD_BOUNDS:
+                for prev_token in reversed(adapted):
+                    if prev_token.type_ == TokenType.WILDCARD:
+                        break
+                    elif prev_token.type_ == TokenType.NAME:
+                        prev_token.type_ = TokenType.WILDCARD
                         break
                 else:
-                    raise TypeParseError("Invalid use of `extends` in type"
+                    raise TypeParseError("Invalid use of wildcard bounds in type"
                                          "".join(t.text for t in tokens))
 
-                new_token = Token("".join(reversed(texts)), TokenType.QUALIFIER)
-                adapted.append(new_token)
-            else:
-                adapted.append(token)
+            adapted.append(token)
 
         return adapted
 

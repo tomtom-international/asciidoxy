@@ -48,10 +48,9 @@ def test_parse_java_type_from_text_simple(java_type_prefix):
     assert len(type_ref.nested) == 0
 
 
-@pytest.mark.parametrize("generic_prefix, generic_name", [("? extends ", "Unit"),
-                                                          ("T extends ", "Unit"),
-                                                          ("T extends ", "Unit "), ("", "T "),
-                                                          ("", "T")])
+@pytest.mark.parametrize("generic_prefix, generic_name",
+                         [("? extends ", "Unit"), ("T extends ", "Unit"), ("T extends ", "Unit "),
+                          ("? super ", "Unit"), ("T super ", "Unit"), ("", "T "), ("", "T")])
 def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_name):
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}Position<{generic_prefix or ''}{generic_name}>"
@@ -81,35 +80,41 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
 
 @pytest.mark.parametrize("tokens,expected", [
     ([
-        Token("?", TokenType.NAME),
+        Token("?", TokenType.WILDCARD),
         Token(" ", TokenType.WHITESPACE),
-        Token("extends", TokenType.QUALIFIER),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ], [
-        Token("? extends", TokenType.QUALIFIER),
+        Token("?", TokenType.WILDCARD),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ]),
     ([
         Token("T", TokenType.NAME),
         Token(" ", TokenType.WHITESPACE),
-        Token("extends", TokenType.QUALIFIER),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ], [
-        Token("T extends", TokenType.QUALIFIER),
+        Token("T", TokenType.WILDCARD),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ]),
     ([
         Token("Type", TokenType.NAME),
         Token(" ", TokenType.WHITESPACE),
-        Token("extends", TokenType.QUALIFIER),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ], [
-        Token("Type extends", TokenType.QUALIFIER),
+        Token("Type", TokenType.WILDCARD),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ]),
@@ -122,14 +127,14 @@ def test_java_type_parser__adapt_tokens__extends(tokens, expected):
 @pytest.mark.parametrize("tokens", [
     [
         Token(" ", TokenType.WHITESPACE),
-        Token("extends", TokenType.QUALIFIER),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ],
     [
         Token("final", TokenType.QUALIFIER),
         Token(" ", TokenType.WHITESPACE),
-        Token("extends", TokenType.QUALIFIER),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
         Token(" ", TokenType.WHITESPACE),
         Token("MyType", TokenType.NAME),
     ],

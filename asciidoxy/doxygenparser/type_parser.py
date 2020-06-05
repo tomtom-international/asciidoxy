@@ -109,18 +109,13 @@ class TypeParser:
         if text.isspace():
             type_ = TokenType.WHITESPACE
             text = " "
-        elif cls.TRAITS.NESTED_STARTS and text in cls.TRAITS.NESTED_STARTS:
-            type_ = TokenType.NESTED_START
-        elif cls.TRAITS.NESTED_ENDS and text in cls.TRAITS.NESTED_ENDS:
-            type_ = TokenType.NESTED_END
-        elif cls.TRAITS.NESTED_SEPARATORS and text in cls.TRAITS.NESTED_SEPARATORS:
-            type_ = TokenType.NESTED_SEPARATOR
-        elif cls.TRAITS.OPERATORS and text in cls.TRAITS.OPERATORS:
-            type_ = TokenType.OPERATOR
-        elif cls.TRAITS.QUALIFIERS and text in cls.TRAITS.QUALIFIERS:
-            type_ = TokenType.QUALIFIER
         else:
-            type_ = TokenType.NAME
+            for token_type, tokens in cls.TRAITS.TOKENS.items():
+                if text in tokens:
+                    type_ = token_type
+                    break
+            else:
+                type_ = TokenType.NAME
 
         return Token(text, type_)
 

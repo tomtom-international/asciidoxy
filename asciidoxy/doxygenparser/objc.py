@@ -47,6 +47,14 @@ class ObjectiveCTraits(LanguageTraits):
     OPERATORS = "*",
     QUALIFIERS = "nullable", "const", "__weak", "__strong",
 
+    TOKENS = {
+        TokenType.NESTED_START: NESTED_STARTS,
+        TokenType.NESTED_END: NESTED_ENDS,
+        TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
+        TokenType.OPERATOR: OPERATORS,
+        TokenType.QUALIFIER: QUALIFIERS,
+    }
+
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
                         tuple(string.whitespace))
 

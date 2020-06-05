@@ -29,8 +29,12 @@ class PythonTraits(LanguageTraits):
     NESTED_STARTS = "[",
     NESTED_ENDS = "]",
     NESTED_SEPARATORS = ",",
-    OPERATORS = None
-    QUALIFIERS = None
+
+    TOKENS = {
+        TokenType.NESTED_START: NESTED_STARTS,
+        TokenType.NESTED_END: NESTED_ENDS,
+        TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
+    }
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
 
