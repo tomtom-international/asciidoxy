@@ -37,6 +37,14 @@ class TestTraits(LanguageTraits):
     OPERATORS = "*", "&",
     QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
 
+    TOKENS = {
+        TokenType.NESTED_START: NESTED_STARTS,
+        TokenType.NESTED_END: NESTED_ENDS,
+        TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
+        TokenType.OPERATOR: OPERATORS,
+        TokenType.QUALIFIER: QUALIFIERS,
+    }
+
     ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
     ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
     ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,

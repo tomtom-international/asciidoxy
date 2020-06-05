@@ -17,7 +17,7 @@ import logging
 
 from abc import ABC
 from enum import Enum, auto
-from typing import Optional, Sequence
+from typing import Mapping, Optional, Sequence
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +34,8 @@ class TokenType(Enum):
         NESTED_START:     Start of list of nested types.
         NESTED_SEPARATOR: Separator between multiple nested types.
         NESTED_END:       End of list of nested types.
+        WILDCARD:         Type wildcard.
+        WILDCARD_BOUNDS:  Bounds limiting a wildcard.
     """
     UNKNOWN = auto()
     WHITESPACE = auto()
@@ -43,6 +45,8 @@ class TokenType(Enum):
     NESTED_START = auto()
     NESTED_SEPARATOR = auto()
     NESTED_END = auto()
+    WILDCARD = auto()
+    WILDCARD_BOUNDS = auto()
 
 
 class LanguageTraits(ABC):
@@ -50,14 +54,7 @@ class LanguageTraits(ABC):
 
     Attributes:
         TAG:                   Tag for identifying the language.
-        NESTED_STARTS:         Tokens indicating the start of a list of nested types. Results in
-                                   token type NESTED_START.
-        NESTED_ENDS:           Tokens indicating the end of a list of nested types. Results in
-                                   token type NESTED_END.
-        NESTED_SEPARATORS:     Tokens separating multiple nested types. Results in token type
-                                   NESTED_SEPARATOR.
-        OPERATORS:             Tokens for type operators. Results in token type OPERATOR.
-        QUALIFIERS:            Tokens for type qualifiers. Results in token type QUALIFIER.
+        TOKENS:                The allowed tokens for each supported token type.
         TOKEN_BOUNDARIES:      Characters that indicate the boundary between tokens. Token
                                    boundaries are considered tokens themselves as well.
         ALLOWED_PREFIXES:      Token types that are allowed in type prefixes.
@@ -66,12 +63,7 @@ class LanguageTraits(ABC):
     """
     TAG: str
 
-    NESTED_STARTS: Optional[Sequence[str]]
-    NESTED_ENDS: Optional[Sequence[str]]
-    NESTED_SEPARATORS: Optional[Sequence[str]]
-    OPERATORS: Optional[Sequence[str]]
-    QUALIFIERS: Optional[Sequence[str]]
-
+    TOKENS: Mapping[TokenType, Sequence[str]]
     TOKEN_BOUNDARIES: Sequence[str]
 
     ALLOWED_PREFIXES: Optional[Sequence[TokenType]]
