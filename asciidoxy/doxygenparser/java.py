@@ -34,7 +34,6 @@ class JavaTraits(LanguageTraits):
     NESTED_ENDS = ">",
     NESTED_SEPARATORS = ",",
     QUALIFIERS = "final", "synchronized", "transient",
-    WILDCARDS = "?",
     WILDCARD_BOUNDS = "extends", "super",
 
     TOKENS = {
@@ -42,7 +41,6 @@ class JavaTraits(LanguageTraits):
         TokenType.NESTED_END: NESTED_ENDS,
         TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
         TokenType.QUALIFIER: QUALIFIERS,
-        TokenType.WILDCARD: WILDCARDS,
         TokenType.WILDCARD_BOUNDS: WILDCARD_BOUNDS,
     }
 
