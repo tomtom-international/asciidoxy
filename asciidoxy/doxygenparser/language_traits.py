@@ -36,6 +36,7 @@ class TokenType(Enum):
         NESTED_END:       End of list of nested types.
         WILDCARD:         Type wildcard.
         WILDCARD_BOUNDS:  Bounds limiting a wildcard.
+        INVALID:          Invalid tokens. Require a workaround.
     """
     UNKNOWN = auto()
     WHITESPACE = auto()
@@ -47,6 +48,7 @@ class TokenType(Enum):
     NESTED_END = auto()
     WILDCARD = auto()
     WILDCARD_BOUNDS = auto()
+    INVALID = auto()
 
 
 class LanguageTraits(ABC):

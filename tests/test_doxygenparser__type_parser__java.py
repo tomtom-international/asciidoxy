@@ -105,6 +105,23 @@ def test_parse_java_type_with_nested_wildcard_generic():
                     ]) == sorted(["Position", "Getter"]))
 
 
+def test_parse_java_type_with_separate_wildcard_bounds():
+    type_element = ET.Element("type")
+    type_element.text = f"<T extends Getter<?>> T"
+
+    driver_mock = MagicMock()
+    type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
+
+    assert type_ref is not None
+    assert type_ref.language == "java"
+    assert type_ref.prefix == "<T extends Getter<?>> "
+    assert type_ref.name == "T"
+    assert not type_ref.suffix
+    assert len(type_ref.nested) == 0
+
+    driver_mock.unresolved_ref.assert_not_called()
+
+
 @pytest.mark.parametrize("tokens,expected", [
     ([
         Token("?", TokenType.WILDCARD),
@@ -147,7 +164,7 @@ def test_parse_java_type_with_nested_wildcard_generic():
     ]),
 ],
                          ids=lambda tokens: "".join(t.text for t in tokens))
-def test_java_type_parser__adapt_tokens__extends(tokens, expected):
+def test_java_type_parser__adapt_tokens__wildcard_bounds(tokens, expected):
     assert JavaTypeParser.adapt_tokens(tokens) == expected
 
 
@@ -167,6 +184,77 @@ def test_java_type_parser__adapt_tokens__extends(tokens, expected):
     ],
 ],
                          ids=lambda tokens: "".join(t.text for t in tokens))
-def test_java_type_parser__adapt_tokens__extends__error(tokens):
+def test_java_type_parser__adapt_tokens__wildcard_bounds__error(tokens):
     with pytest.raises(TypeParseError):
         JavaTypeParser.adapt_tokens(tokens)
+
+
+@pytest.mark.parametrize("tokens,expected", [
+    ([
+        Token("private", TokenType.INVALID),
+        Token(" ", TokenType.WHITESPACE),
+        Token("private", TokenType.INVALID),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+        Token("private", TokenType.INVALID),
+    ], [
+        Token(" ", TokenType.WHITESPACE),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+    ]),
+],
+                         ids=lambda tokens: "".join(t.text for t in tokens))
+def test_java_type_parser__adapt_tokens__invalid_tokens(tokens, expected):
+    assert JavaTypeParser.adapt_tokens(tokens) == expected
+
+
+@pytest.mark.parametrize("tokens,expected", [
+    ([
+        Token("<", TokenType.NESTED_START),
+        Token("?", TokenType.WILDCARD),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+        Token(">", TokenType.NESTED_END),
+        Token(" ", TokenType.WHITESPACE),
+        Token("T", TokenType.NAME),
+    ], [
+        Token("<", TokenType.UNKNOWN),
+        Token("?", TokenType.UNKNOWN),
+        Token(" ", TokenType.UNKNOWN),
+        Token("extends", TokenType.UNKNOWN),
+        Token(" ", TokenType.UNKNOWN),
+        Token("MyType", TokenType.UNKNOWN),
+        Token(">", TokenType.UNKNOWN),
+        Token(" ", TokenType.WHITESPACE),
+        Token("T", TokenType.NAME),
+    ]),
+    ([
+        Token("private", TokenType.INVALID),
+        Token(" ", TokenType.WHITESPACE),
+        Token("<", TokenType.NESTED_START),
+        Token("T", TokenType.NAME),
+        Token(" ", TokenType.WHITESPACE),
+        Token("extends", TokenType.WILDCARD_BOUNDS),
+        Token(" ", TokenType.WHITESPACE),
+        Token("MyType", TokenType.NAME),
+        Token(">", TokenType.NESTED_END),
+        Token(" ", TokenType.WHITESPACE),
+        Token("T", TokenType.NAME),
+    ], [
+        Token(" ", TokenType.WHITESPACE),
+        Token("<", TokenType.UNKNOWN),
+        Token("T", TokenType.UNKNOWN),
+        Token(" ", TokenType.UNKNOWN),
+        Token("extends", TokenType.UNKNOWN),
+        Token(" ", TokenType.UNKNOWN),
+        Token("MyType", TokenType.UNKNOWN),
+        Token(">", TokenType.UNKNOWN),
+        Token(" ", TokenType.WHITESPACE),
+        Token("T", TokenType.NAME),
+    ]),
+],
+                         ids=lambda tokens: "".join(t.text for t in tokens))
+def test_java_type_parser__adapt_tokens__separate_wildcard_bounds_are_ignored(tokens, expected):
+    assert JavaTypeParser.adapt_tokens(tokens) == expected

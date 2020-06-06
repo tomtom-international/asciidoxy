@@ -35,6 +35,7 @@ class JavaTraits(LanguageTraits):
     NESTED_SEPARATORS = ",",
     QUALIFIERS = "final", "synchronized", "transient",
     WILDCARD_BOUNDS = "extends", "super",
+    INVALID = "private",
 
     TOKENS = {
         TokenType.NESTED_START: NESTED_STARTS,
@@ -42,12 +43,13 @@ class JavaTraits(LanguageTraits):
         TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
         TokenType.QUALIFIER: QUALIFIERS,
         TokenType.WILDCARD_BOUNDS: WILDCARD_BOUNDS,
+        TokenType.INVALID: INVALID,
     }
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
 
     ALLOWED_PREFIXES = (TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-                        TokenType.WILDCARD, TokenType.WILDCARD_BOUNDS)
+                        TokenType.WILDCARD, TokenType.WILDCARD_BOUNDS, TokenType.UNKNOWN)
     ALLOWED_SUFFIXES = TokenType.WHITESPACE,
     ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
@@ -89,8 +91,21 @@ class JavaTypeParser(TypeParser):
                      tokens: List[Token],
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
         adapted: List[Token] = []
+        name_found = False
+        invalid_nested = 0
+
         for token in tokens:
-            if token.type_ == TokenType.WILDCARD_BOUNDS:
+            skip_token = False
+
+            if invalid_nested > 0:
+                # Separate wildcard bounds are not supported yet
+                if token.type_ == TokenType.NESTED_START:
+                    invalid_nested += 1
+                elif token.type_ == TokenType.NESTED_END:
+                    invalid_nested -= 1
+                token.type_ = TokenType.UNKNOWN
+
+            elif token.type_ == TokenType.WILDCARD_BOUNDS:
                 for prev_token in reversed(adapted):
                     if prev_token.type_ == TokenType.WILDCARD:
                         break
@@ -100,8 +115,17 @@ class JavaTypeParser(TypeParser):
                 else:
                     raise TypeParseError("Invalid use of wildcard bounds in type"
                                          "".join(t.text for t in tokens))
+            elif token.type_ == TokenType.INVALID:
+                skip_token = True
+            elif token.type_ == TokenType.NAME:
+                name_found = True
+            elif not name_found and token.type_ == TokenType.NESTED_START:
+                # Separate wildcard bounds are not supported yet
+                invalid_nested += 1
+                token.type_ = TokenType.UNKNOWN
 
-            adapted.append(token)
+            if not skip_token:
+                adapted.append(token)
 
         return adapted
 
