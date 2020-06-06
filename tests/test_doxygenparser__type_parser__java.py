@@ -80,7 +80,7 @@ def test_parse_java_type_with_generic(java_type_prefix, generic_prefix, generic_
 
 def test_parse_java_type_with_nested_wildcard_generic():
     type_element = ET.Element("type")
-    type_element.text = f"Position<? extends Getter<?>>"
+    type_element.text = "Position<? extends Getter<?>>"
 
     driver_mock = MagicMock()
     type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
@@ -107,7 +107,7 @@ def test_parse_java_type_with_nested_wildcard_generic():
 
 def test_parse_java_type_with_separate_wildcard_bounds():
     type_element = ET.Element("type")
-    type_element.text = f"<T extends Getter<?>> T"
+    type_element.text = "<T extends Getter<?>> T"
 
     driver_mock = MagicMock()
     type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
