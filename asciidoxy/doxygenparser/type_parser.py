@@ -165,10 +165,10 @@ class TypeParser:
 
         if not names:
             raise TypeParseError(f"No name found"
-                                 f" in `{''.join(t.text for t in original_tokens)}`")
+                                 f" in `{'`,`'.join(t.text for t in original_tokens)}`")
         if tokens and any(t.type_ != TokenType.WHITESPACE for t in tokens):
-            raise TypeParseError(f"Unexpected characters `{''.join(t.text for t in tokens)}`"
-                                 f" in `{''.join(t.text for t in original_tokens)}`")
+            raise TypeParseError(f"Unexpected token(s) `{'`,`'.join(t.text for t in tokens)}`"
+                                 f" in `{'`,`'.join(t.text for t in original_tokens)}`")
 
         type_ref = TypeRef(cls.TRAITS.TAG)
         type_ref.name = cls.TRAITS.cleanup_name("".join(n.text for n in names))
