@@ -288,3 +288,27 @@ def test_parse_cpp_type_with_space(cpp_type_prefix, type_with_space, cpp_type_su
     assert type_ref.name == type_with_space
     assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
     assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
+
+
+def test_parse_cpp_type_with_member():
+    type_element = ET.Element("type")
+    type_element.text = "MyType<NestedType>::member"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType", "NestedType"]))
+
+    assert type_ref is not None
+    assert not type_ref.id
+    assert not type_ref.kind
+    assert type_ref.language == "cpp"
+    assert type_ref.name == "MyType"
+    assert not type_ref.prefix
+    assert type_ref.suffix == "::member"
+    assert len(type_ref.nested) == 1
+
+    assert type_ref.nested[0].name == "NestedType"
+    assert not type_ref.nested[0].prefix
+    assert not type_ref.nested[0].suffix
+    assert not type_ref.nested[0].nested

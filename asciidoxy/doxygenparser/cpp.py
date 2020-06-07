@@ -39,7 +39,8 @@ class CppTraits(LanguageTraits):
     NESTED_STARTS = "<",
     NESTED_ENDS = ">",
     NESTED_SEPARATORS = ",",
-    OPERATORS = "*", "&",
+    NAMESPACE_SEPARATORS = ":",
+    OPERATORS = "*", "&", "...",
     QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
 
     TOKENS = {
@@ -51,11 +52,12 @@ class CppTraits(LanguageTraits):
     }
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
-                        tuple(string.whitespace))
+                        NAMESPACE_SEPARATORS + tuple(string.whitespace))
 
     ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-    ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
+    ALLOWED_SUFFIXES = (TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
+                        TokenType.NAME, TokenType.NAMESPACE_SEPARATOR)
+    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME, TokenType.NAMESPACE_SEPARATOR,
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
