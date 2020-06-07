@@ -26,17 +26,18 @@ class TokenType(Enum):
     """Types of tokens in a language grammer.
 
     Attributes:
-        UNKNOWN:          Unidentified token.
-        WHITESPACE:       Whitespace between other tokens.
-        QUALIFIER:        Type qualifiers.
-        OPERATOR:         Operators applied to the type.
-        NAME:             Name of the type.
-        NESTED_START:     Start of list of nested types.
-        NESTED_SEPARATOR: Separator between multiple nested types.
-        NESTED_END:       End of list of nested types.
-        WILDCARD:         Type wildcard.
-        WILDCARD_BOUNDS:  Bounds limiting a wildcard.
-        INVALID:          Invalid tokens. Require a workaround.
+        UNKNOWN:             Unidentified token.
+        WHITESPACE:          Whitespace between other tokens.
+        QUALIFIER:           Type qualifiers.
+        OPERATOR:            Operators applied to the type.
+        NAME:                Name of the type.
+        NESTED_START:        Start of list of nested types.
+        NESTED_SEPARATOR:    Separator between multiple nested types.
+        NESTED_END:          End of list of nested types.
+        WILDCARD:            Type wildcard.
+        WILDCARD_BOUNDS:     Bounds limiting a wildcard.
+        INVALID:             Invalid tokens. Require a workaround.
+        NAMESPACE_SEPARATOR: Separator between namespaces.
     """
     UNKNOWN = auto()
     WHITESPACE = auto()
@@ -49,6 +50,7 @@ class TokenType(Enum):
     WILDCARD = auto()
     WILDCARD_BOUNDS = auto()
     INVALID = auto()
+    NAMESPACE_SEPARATOR = auto()
 
 
 class LanguageTraits(ABC):
