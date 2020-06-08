@@ -263,7 +263,8 @@ def test_remove_single_leading_space():
 
 And some more text."""
 
-def test_table():
+@pytest.mark.parametrize("nested_elements, nested_result", nested_formatting())
+def test_table(nested_elements, nested_result):
     description = ET.Element("description")
     para = sub_element(description, "para")
     table = sub_element(para, "table", rows="2", cols="2")
@@ -271,39 +272,23 @@ def test_table():
         next_row = sub_element(table, "row")
         for c in range(0, 2):
             next_entry = sub_element(next_row, "entry")
-            sub_element(next_entry, "para", text=f"col={c},row={r}", thead="no")    # TODO Nested formatting?
+            cell = sub_element(next_entry, "para", text=f"col={c},row={r}", thead="no")
+            cell.extend(nested_elements)
 
     result = DescriptionParser("lang").parse(description)
-    assert result == """[cols=2*]
-|===
-|col=0,row=0
-|col=1,row=0
-
-|col=0,row=1
-|col=1,row=1
-|==="""
-
-def test_para_outside_of_table():
-    description = ET.Element("description")
-    para = sub_element(description, "para")
-    table = sub_element(para, "table", rows="1", cols="1")
-    caption = sub_element(table, "caption", text="Caption")
-    row = sub_element(table, "row")
-    entry = sub_element(row, "entry")
-    sub_element(entry, "para", text="text")
-    sub_element(description, "para", text="Text outside")
-    sub_element(description, "para", text="Text outside")
-
-    result = DescriptionParser("lang").parse(description)
-    assert result == """.Caption
-[cols=1*]
-|===
-|text
+    assert result == re.sub(
+        "\n{3,}", "\n\n", f"""[cols=2*]
 |===
 
-Text outside
+|col=0,row=0{nested_result}
 
-Text outside"""
+|col=1,row=0{nested_result}
+
+|col=0,row=1{nested_result}
+
+|col=1,row=1{nested_result}
+
+|===""")
 
 def test_table_with_header():
     description = ET.Element("description")
@@ -319,9 +304,11 @@ def test_table_with_header():
     result = DescriptionParser("lang").parse(description)
     assert result == """[%header,cols=1*]
 |===
+
 |header
 
 |content
+
 |==="""
 
 def test_table_with_caption():
@@ -337,5 +324,7 @@ def test_table_with_caption():
     assert result == """.Caption
 [cols=1*]
 |===
+
 |text
+
 |==="""
