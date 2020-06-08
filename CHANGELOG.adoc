@@ -20,6 +20,13 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.5.5 (8 Jun 2020)
+
+=== Fixed
+
+  - Support for HTML/markdown tables in description parser.
+
+
 == 0.5.4 (21 May 2020)
 
 === Changed
