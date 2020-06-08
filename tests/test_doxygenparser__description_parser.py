@@ -263,6 +263,7 @@ def test_remove_single_leading_space():
 
 And some more text."""
 
+
 @pytest.mark.parametrize("nested_elements, nested_result", nested_formatting())
 def test_table(nested_elements, nested_result):
     description = ET.Element("description")
@@ -289,6 +290,7 @@ def test_table(nested_elements, nested_result):
 |col=1,row=1{nested_result}
 
 |===""")
+
 
 def test_table_with_nested_itemizedlist():
     description = ET.Element("description")
@@ -317,6 +319,7 @@ def test_table_with_nested_itemizedlist():
 
 |==="""
 
+
 def test_table_with_header():
     description = ET.Element("description")
     para = sub_element(description, "para")
@@ -337,6 +340,7 @@ def test_table_with_header():
 |content
 
 |==="""
+
 
 def test_table_with_caption():
     description = ET.Element("description")
