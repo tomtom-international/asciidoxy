@@ -262,3 +262,100 @@ def test_remove_single_leading_space():
     assert result == """Actual description text.
 
 And some more text."""
+
+
+@pytest.mark.parametrize("nested_elements, nested_result", nested_formatting())
+def test_table(nested_elements, nested_result):
+    description = ET.Element("description")
+    para = sub_element(description, "para")
+    table = sub_element(para, "table", rows="2", cols="2")
+    for r in range(0, 2):
+        next_row = sub_element(table, "row")
+        for c in range(0, 2):
+            next_entry = sub_element(next_row, "entry")
+            cell = sub_element(next_entry, "para", text=f"col={c},row={r}", thead="no")
+            cell.extend(nested_elements)
+
+    result = DescriptionParser("lang").parse(description)
+    assert result == re.sub(
+        "\n{3,}", "\n\n", f"""[cols=2*]
+|===
+
+|col=0,row=0{nested_result}
+
+|col=1,row=0{nested_result}
+
+|col=0,row=1{nested_result}
+
+|col=1,row=1{nested_result}
+
+|===""")
+
+
+def test_table_with_nested_itemizedlist():
+    description = ET.Element("description")
+    para = sub_element(description, "para")
+    table = sub_element(para, "table", rows="1", cols="1")
+    row = sub_element(table, "row")
+    entry = sub_element(row, "entry", thead="no")
+    para = sub_element(entry, "para", text="This is a list of items:")
+    itemized_list = sub_element(para, "itemizedlist")
+
+    list_item_1 = sub_element(itemized_list, "listitem")
+    para_1 = sub_element(list_item_1, "para", text="List item 1")
+
+    list_item_2 = sub_element(itemized_list, "listitem")
+    sub_element(list_item_2, "para", text="List item 2")
+
+    result = DescriptionParser("lang").parse(description)
+    assert result == """[cols=1*]
+|===
+
+|This is a list of items:
+
+* List item 1
+
+* List item 2
+
+|==="""
+
+
+def test_table_with_header():
+    description = ET.Element("description")
+    para = sub_element(description, "para")
+    table = sub_element(para, "table", rows="2", cols="1")
+    first_row = sub_element(table, "row")
+    first_entry = sub_element(first_row, "entry", thead="yes")
+    sub_element(first_entry, "para", text="header")
+    second_row = sub_element(table, "row")
+    second_entry = sub_element(second_row, "entry", thead="no")
+    sub_element(second_entry, "para", text="content")
+
+    result = DescriptionParser("lang").parse(description)
+    assert result == """[%header,cols=1*]
+|===
+
+|header
+
+|content
+
+|==="""
+
+
+def test_table_with_caption():
+    description = ET.Element("description")
+    para = sub_element(description, "para")
+    table = sub_element(para, "table", rows="1", cols="1")
+    caption = sub_element(table, "caption", text="Caption")
+    row = sub_element(table, "row")
+    entry = sub_element(row, "entry")
+    sub_element(entry, "para", text="text")
+
+    result = DescriptionParser("lang").parse(description)
+    assert result == """.Caption
+[cols=1*]
+|===
+
+|text
+
+|==="""

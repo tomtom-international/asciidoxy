@@ -107,6 +107,8 @@ class DescriptionParser(object):
     parse_computeroutput = functools.partialmethod(_default_parse, prefix="`", suffix="`")
     parse_codeline = functools.partialmethod(_default_parse, suffix="\n")
     parse_sp = functools.partialmethod(_default_parse, prefix=" ")
+    parse_row = functools.partialmethod(_default_parse, prefix="\n\n", suffix="\n")
+    parse_entry = functools.partialmethod(_default_parse, prefix="|")
 
     def parse_ulink(self, element: ET.Element) -> None:
         self._default_parse(element, prefix=f"{element.get('url')}[", suffix="]")
@@ -132,6 +134,25 @@ class DescriptionParser(object):
             self._default_parse(element)
         else:
             self._default_parse(element, prefix="__", suffix="__")
+
+    def parse_table(self, element: ET.Element) -> None:
+        caption_prefix = ""
+        caption = element.find('caption')
+        if caption is not None:
+            caption_prefix = f".{caption.text}\n"
+
+        header_option = ""
+        first_row = element.find('row')
+        if first_row is not None:
+            first_entry = first_row.find('entry')
+            if first_entry is not None and first_entry.get('thead') == 'yes':
+                header_option = "%header,"
+
+        prefix = f"\n\n{caption_prefix}[{header_option}cols={element.get('cols')}*]\n|===\n"
+        self._default_parse(element, prefix=prefix, suffix="|===\n")
+
+    def parse_caption(self, element: ET.Element) -> None:
+        pass
 
     def __getattr__(self, name):
         return self._default_parse
