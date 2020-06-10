@@ -45,7 +45,7 @@ class ObjectiveCTraits(LanguageTraits):
     NESTED_ENDS = ">",
     NESTED_SEPARATORS = ",",
     OPERATORS = "*",
-    QUALIFIERS = "nullable", "const", "__weak", "__strong",
+    QUALIFIERS = "nullable", "const", "__weak", "__strong", "__nonnull", "_Nullable", "_Nonnull",
 
     TOKENS = {
         TokenType.NESTED_START: NESTED_STARTS,
@@ -59,7 +59,7 @@ class ObjectiveCTraits(LanguageTraits):
                         tuple(string.whitespace))
 
     ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.QUALIFIER,
-    ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR
+    ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
     ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
 
     @classmethod
