@@ -31,12 +31,15 @@ from .shared import assert_equal_or_none_if_empty
     "__strong ",
     "nullable __weak ",
     "nullable __strong ",
+    "_Nonnull ",
+    "_Nullable ",
+    "__nonnull ",
 ])
 def objc_type_prefix(request):
     return request.param
 
 
-@pytest.fixture(params=["", " *", " **", " * *"])
+@pytest.fixture(params=["", " *", " **", " * *", " * _Nonnull", " * _Nullable"])
 def objc_type_suffix(request):
     return request.param
 
