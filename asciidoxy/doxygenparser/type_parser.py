@@ -183,7 +183,10 @@ class TypeParser:
     def type_from_tokens(cls,
                          tokens: List[Token],
                          driver: Optional[DriverBase] = None,
-                         parent: Optional[Union[Compound, Member]] = None) -> TypeRef:
+                         parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
+        if not tokens or all(t.type_ == TokenType.WHITESPACE for t in tokens):
+            return None
+
         original_tokens = tokens
         tokens = tokens[:]
 
@@ -211,8 +214,8 @@ class TypeParser:
         type_ref.name = cls.TRAITS.cleanup_name("".join(n.text for n in names))
         type_ref.prefix = "".join(p.text for p in prefixes)
         type_ref.suffix = "".join(s.text for s in suffixes)
-        type_ref.nested = nested_types or []
-        type_ref.args = arg_types or []
+        type_ref.nested = nested_types
+        type_ref.args = arg_types
         type_ref.id = cls.TRAITS.unique_id(names[0].refid)
         type_ref.kind = names[0].kind
 
@@ -255,36 +258,47 @@ class TypeParser:
 
     @classmethod
     def nested_types(
-            cls,
-            tokens: List[Token],
-            driver: Optional[DriverBase] = None,
-            parent: Optional[Union[Compound, Member]] = None) -> Tuple[List[TypeRef], List[Token]]:
+        cls,
+        tokens: List[Token],
+        driver: Optional[DriverBase] = None,
+        parent: Optional[Union[Compound, Member]] = None
+    ) -> Tuple[Optional[List[TypeRef]], List[Token]]:
 
         nested_type_tokens, tokens = cls.select_nested_tokens(tokens, TokenType.NESTED_START,
                                                               TokenType.NESTED_END,
                                                               TokenType.NESTED_SEPARATOR)
-        return [cls.type_from_tokens(ntt, driver, parent) for ntt in nested_type_tokens], tokens
+        if nested_type_tokens is None:
+            return None, tokens
+        types = (cls.type_from_tokens(ntt, driver, parent) for ntt in nested_type_tokens)
+        return [t for t in types if t is not None], tokens
 
     @classmethod
     def arg_types(
-            cls,
-            tokens: List[Token],
-            driver: Optional[DriverBase] = None,
-            parent: Optional[Union[Compound,
-                                   Member]] = None) -> Tuple[List[Parameter], List[Token]]:
+        cls,
+        tokens: List[Token],
+        driver: Optional[DriverBase] = None,
+        parent: Optional[Union[Compound, Member]] = None
+    ) -> Tuple[Optional[List[Parameter]], List[Token]]:
 
         nested_type_tokens, tokens = cls.select_nested_tokens(tokens, TokenType.ARGS_START,
                                                               TokenType.ARGS_END,
                                                               TokenType.ARGS_SEPARATOR)
-        return [cls.arg_from_tokens(ntt, driver, parent) for ntt in nested_type_tokens], tokens
+        if nested_type_tokens is None:
+            return None, tokens
+
+        args = (cls.arg_from_tokens(ntt, driver, parent) for ntt in nested_type_tokens)
+        return [a for a in args if a is not None], tokens
 
     @classmethod
     def arg_from_tokens(cls,
                         tokens: List[Token],
                         driver: Optional[DriverBase] = None,
-                        parent: Optional[Union[Compound, Member]] = None) -> Parameter:
+                        parent: Optional[Union[Compound, Member]] = None) -> Optional[Parameter]:
+        if not tokens or all(t.type_ == TokenType.WHITESPACE for t in tokens):
+            return None
+
         name_tokens: List[Token] = []
-        while tokens[-1].type_ == TokenType.ARG_NAME:
+        while tokens and tokens[-1].type_ == TokenType.ARG_NAME:
             name_tokens.insert(0, tokens.pop(-1))
 
         arg = Parameter()
@@ -293,8 +307,9 @@ class TypeParser:
         return arg
 
     @classmethod
-    def select_nested_tokens(cls, tokens: List[Token], start_token: TokenType, end_token: TokenType,
-                             separator_token: TokenType) -> Tuple[List[List[Token]], List[Token]]:
+    def select_nested_tokens(
+            cls, tokens: List[Token], start_token: TokenType, end_token: TokenType,
+            separator_token: TokenType) -> Tuple[Optional[List[List[Token]]], List[Token]]:
         original_tokens = tokens
         tokens = tokens[:]
         nested_type_tokens = []
@@ -306,9 +321,9 @@ class TypeParser:
                 tokens = tokens[i + 1:]
                 break
             else:
-                return [], tokens
+                return None, tokens
         else:
-            return [], tokens
+            return None, tokens
 
         level = 0
         while tokens:

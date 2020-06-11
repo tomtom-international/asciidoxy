@@ -122,7 +122,7 @@ def test_parse_python_method(api_reference):
     assert member.returns.type.namespace == "asciidoxy.traffic.TrafficEvent"
     assert not member.returns.type.prefix
     assert not member.returns.type.suffix
-    assert len(member.returns.type.nested) == 0
+    assert not member.returns.type.nested
     assert member.returns.description == "True if the update is valid."
 
 
@@ -163,7 +163,7 @@ def test_parse_python_classmethod(api_reference):
     assert member.returns.type.namespace == "asciidoxy.geometry.Coordinate"
     assert not member.returns.type.prefix
     assert not member.returns.type.suffix
-    assert len(member.returns.type.nested) == 0
+    assert not member.returns.type.nested
     assert not member.returns.description
 
 
@@ -220,7 +220,7 @@ def test_parse_python_variable(api_reference):
     # assert member.returns.type.namespace == "asciidoxy.geometry.Coordinate"
     # assert not member.returns.type.prefix
     # assert not member.returns.type.suffix
-    # assert len(member.returns.type.nested) == 0
+    # assert not member.returns.type.nested
     # assert not member.returns.description
 
 

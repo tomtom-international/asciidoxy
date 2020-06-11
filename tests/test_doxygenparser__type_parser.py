@@ -738,20 +738,15 @@ def test_type_parser__type_from_tokens__do_not_register_builtin_types():
 
 
 @pytest.mark.parametrize("tokens", [
-    [],
     [nested_start()],
     [nested_sep()],
     [nested_end()],
     [qualifier("const")],
     [operator("*")],
-    [whitespace()],
     [name("MyType"), nested_start()],
     [name("MyType"), nested_start(), name("OtherType")],
     [name("MyType"), nested_start(),
      name("OtherType"), nested_sep()],
-    [name("MyType"), nested_start(),
-     name("OtherType"),
-     nested_sep(), nested_end()],
     [name("MyType"), nested_end()],
     [name("MyType"), nested_sep(), name("OtherType")],
 ],
@@ -840,6 +835,74 @@ def test_type_parser__type_from_tokens__calls_cleanup_name():
                          ids=lambda ps: "".join(p.text for p in ps))
 def test_type_parser__adapt_separators(tokens, expected):
     assert TestParser.adapt_separators(tokens) == expected
+
+
+@pytest.mark.parametrize("tokens, expected", [
+    ([], (None, [])),
+    ([
+        whitespace(),
+    ], (None, [
+        whitespace(),
+    ])),
+    ([
+        args_start(),
+        args_end(),
+    ], ([], [])),
+    ([
+        args_start(),
+        whitespace(),
+        args_end(),
+    ], ([], [])),
+    ([
+        args_start(),
+        args_sep(),
+        args_end(),
+    ], ([], [])),
+    ([
+        args_start(),
+        whitespace(),
+        args_sep(),
+        whitespace(),
+        args_end(),
+    ], ([], [])),
+],
+                         ids=lambda ts: "".join(t.text for t in ts if hasattr(t, "text")))
+def test_type_parser__arg_types__empty(tokens, expected):
+    assert TestParser.arg_types(tokens) == expected
+
+
+@pytest.mark.parametrize("tokens, expected", [
+    ([], (None, [])),
+    ([
+        whitespace(),
+    ], (None, [
+        whitespace(),
+    ])),
+    ([
+        nested_start(),
+        nested_end(),
+    ], ([], [])),
+    ([
+        nested_start(),
+        whitespace(),
+        nested_end(),
+    ], ([], [])),
+    ([
+        nested_start(),
+        nested_sep(),
+        nested_end(),
+    ], ([], [])),
+    ([
+        nested_start(),
+        whitespace(),
+        nested_sep(),
+        whitespace(),
+        nested_end(),
+    ], ([], [])),
+],
+                         ids=lambda ts: "".join(t.text for t in ts if hasattr(t, "text")))
+def test_type_parser__nested_types__empty(tokens, expected):
+    assert TestParser.nested_types(tokens) == expected
 
 
 def test_type_parser__parse_xml__simple_element():

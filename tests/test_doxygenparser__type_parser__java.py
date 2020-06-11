@@ -45,7 +45,7 @@ def test_parse_java_type_from_text_simple(java_type_prefix):
     assert type_ref.name == "double"
     assert_equal_or_none_if_empty(type_ref.prefix, java_type_prefix)
     assert not type_ref.suffix
-    assert len(type_ref.nested) == 0
+    assert not type_ref.nested
 
 
 @pytest.mark.parametrize("generic_prefix, generic_name",
@@ -117,7 +117,7 @@ def test_parse_java_type_with_separate_wildcard_bounds():
     assert type_ref.prefix == "<T extends Getter<?>> "
     assert type_ref.name == "T"
     assert not type_ref.suffix
-    assert len(type_ref.nested) == 0
+    assert not type_ref.nested
 
     driver_mock.unresolved_ref.assert_not_called()
 

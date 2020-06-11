@@ -59,7 +59,7 @@ def test_parse_objc_type_from_text_simple(objc_type_prefix, objc_type_suffix):
     assert type_ref.name == "NSInteger"
     assert_equal_or_none_if_empty(type_ref.prefix, objc_type_prefix)
     assert_equal_or_none_if_empty(type_ref.suffix, objc_type_suffix)
-    assert len(type_ref.nested) == 0
+    assert not type_ref.nested
 
 
 @pytest.mark.parametrize("type_with_space", [

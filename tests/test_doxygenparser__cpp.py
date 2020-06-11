@@ -138,7 +138,7 @@ def test_parse_cpp_member_function_only_return_value(api_reference):
     assert member.returns.type.name == "bool"
     assert not member.returns.type.prefix
     assert not member.returns.type.suffix
-    assert len(member.returns.type.nested) == 0
+    assert not member.returns.type.nested
     assert member.returns.type.namespace == "asciidoxy::geometry::Coordinate"
 
 
@@ -181,7 +181,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
 
     assert not param1.type.prefix
     assert not param1.type.suffix
-    assert len(param1.type.nested) == 0
+    assert not param1.type.nested
 
     assert param2.name == "delay"
     assert param2.description == "New delay in seconds."
@@ -194,7 +194,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
     assert param2.type.namespace == "asciidoxy::traffic::TrafficEvent"
     assert not param2.type.prefix
     assert not param2.type.suffix
-    assert len(param2.type.nested) == 0
+    assert not param2.type.nested
 
     assert member.returns is not None
     assert member.returns.description == "True if the update is valid."
@@ -206,7 +206,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
     assert member.returns.type.namespace == "asciidoxy::traffic::TrafficEvent"
     assert not member.returns.type.prefix
     assert not member.returns.type.suffix
-    assert len(member.returns.type.nested) == 0
+    assert not member.returns.type.nested
 
 
 @pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
@@ -240,7 +240,7 @@ def test_parse_cpp_member_function_with_nested_return_type(api_reference):
     assert nested_type.namespace == "asciidoxy::traffic::TrafficEvent"
     assert not nested_type.prefix
     assert not nested_type.suffix
-    assert len(nested_type.nested) == 0
+    assert not nested_type.nested
 
 
 @pytest.mark.parametrize("api_reference_set", [["cpp/default"]])

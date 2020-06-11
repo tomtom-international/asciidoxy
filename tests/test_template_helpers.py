@@ -99,6 +99,18 @@ def test_link_from_ref__nested_types(context_mock):
          call(ref.id, ref.name)])
 
 
+def test_link_from_ref__empty_nested_types(context_mock):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = []
+
+    assert link_from_ref(ref, context_mock) == "const xref:lang-tomtom_1_MyType[MyType]&lt;&gt; &"
+    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+
+
 def test_link_from_ref__args(context_mock):
     arg1_type = TypeRef("lang")
     arg1_type.name = "ArgType1"
@@ -124,6 +136,18 @@ def test_link_from_ref__args(context_mock):
     context_mock.link_to_element.assert_has_calls(
         [call(arg1_type.id, arg1_type.name),
          call(ref.id, ref.name)])
+
+
+def test_link_from_ref__empty_args(context_mock):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = []
+
+    assert link_from_ref(ref, context_mock) == "const xref:lang-tomtom_1_MyType[MyType]() &"
+    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
 def test_link_from_ref__nested_and_args_custom_start_and_end(context_mock):
@@ -206,6 +230,17 @@ def test_print_ref__nested_types():
     assert print_ref(ref) == "const MyType&lt;Nested1, Nested2&gt; &"
 
 
+def test_print_ref__empty_nested_types():
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = []
+
+    assert print_ref(ref) == "const MyType&lt;&gt; &"
+
+
 def test_print_ref__args():
     arg1_type = TypeRef("lang")
     arg1_type.name = "ArgType1"
@@ -227,6 +262,17 @@ def test_print_ref__args():
     ref.args = [arg1, arg2]
 
     assert print_ref(ref) == "MyType(ArgType1, ArgType2 value)"
+
+
+def test_print_ref__empty_args():
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = []
+
+    assert print_ref(ref) == "const MyType() &"
 
 
 def test_print_ref__nested_and_args_custom_start_and_end():
