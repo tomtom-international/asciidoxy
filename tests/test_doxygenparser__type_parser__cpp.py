@@ -266,16 +266,20 @@ def test_parse_cpp_type_multiple_prefix_and_suffix():
     assert type_ref.suffix == " * const *"
 
 
-@pytest.mark.parametrize("type_with_space", [
+@pytest.fixture(params=[
     "short int", "signed short", "signed short int", "unsigned short", "unsigned short int",
     "signed int", "signed", "unsigned", "unsigned int", "long int", "signed long",
     "signed long int", "unsigned long", "unsigned long int", "long long", "long long int",
     "signed long long", "signed long long int", "unsigned long long", "unsigned long long int",
     "signed char", "long double"
 ])
-def test_parse_cpp_type_with_space(cpp_type_prefix, type_with_space, cpp_type_suffix):
+def cpp_type_with_space(request):
+    return request.param
+
+
+def test_parse_cpp_type_with_space(cpp_type_prefix, cpp_type_with_space, cpp_type_suffix):
     type_element = ET.Element("type")
-    type_element.text = f"{cpp_type_prefix}{type_with_space}{cpp_type_suffix}"
+    type_element.text = f"{cpp_type_prefix}{cpp_type_with_space}{cpp_type_suffix}"
 
     driver_mock = MagicMock()
     type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
@@ -285,7 +289,7 @@ def test_parse_cpp_type_with_space(cpp_type_prefix, type_with_space, cpp_type_su
     assert not type_ref.id
     assert not type_ref.kind
     assert type_ref.language == "cpp"
-    assert type_ref.name == type_with_space
+    assert type_ref.name == cpp_type_with_space
     assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
     assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
 
@@ -312,3 +316,62 @@ def test_parse_cpp_type_with_member():
     assert not type_ref.nested[0].prefix
     assert not type_ref.nested[0].suffix
     assert not type_ref.nested[0].nested
+
+
+def test_parse_cpp_type_with_function_arguments():
+    type_element = ET.Element("type")
+    type_element.text = "MyType(const Message&, ErrorCode code)"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType", "Message", "ErrorCode"]))
+
+    assert type_ref is not None
+    assert not type_ref.id
+    assert not type_ref.kind
+    assert type_ref.language == "cpp"
+    assert type_ref.name == "MyType"
+    assert not type_ref.prefix
+    assert not type_ref.suffix
+    assert not type_ref.nested
+    assert len(type_ref.args) == 2
+
+    assert not type_ref.args[0].name
+    assert type_ref.args[0].type.name == "Message"
+    assert type_ref.args[0].type.prefix == "const "
+    assert type_ref.args[0].type.suffix == "&"
+    assert not type_ref.args[0].type.nested
+
+    assert type_ref.args[1].name == "code"
+    assert type_ref.args[1].type.name == "ErrorCode"
+    assert not type_ref.args[1].type.prefix
+    assert not type_ref.args[1].type.suffix
+    assert not type_ref.args[1].type.nested
+
+
+@pytest.mark.parametrize("arg_name", ["", " value"])
+def test_parse_cpp_type_with_function_arguments_with_space_in_type(cpp_type_with_space, arg_name):
+    type_element = ET.Element("type")
+    type_element.text = f"MyType({cpp_type_with_space}{arg_name})"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+
+    assert type_ref is not None
+    assert not type_ref.id
+    assert not type_ref.kind
+    assert type_ref.language == "cpp"
+    assert type_ref.name == "MyType"
+    assert not type_ref.prefix
+    assert not type_ref.suffix
+    assert not type_ref.nested
+    assert len(type_ref.args) == 1
+
+    assert_equal_or_none_if_empty(type_ref.args[0].name, arg_name.strip())
+    assert type_ref.args[0].type.name == cpp_type_with_space
+    assert not type_ref.args[0].type.prefix
+    assert not type_ref.args[0].type.suffix
+    assert not type_ref.args[0].type.nested

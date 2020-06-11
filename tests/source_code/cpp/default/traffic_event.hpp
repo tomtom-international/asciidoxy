@@ -127,6 +127,13 @@ class TrafficEvent {
    */
   long CalculateDelay();
 
+  /**
+   * Register a callback to receive updates for the traffic event.
+   *
+   * @param callback A function to call on updates.
+   */
+  void RegisterTrafficCallback(std::function<void(const TrafficEventData&, int delay)> callback);
+
  private:
   TrafficEventData data_;
 };

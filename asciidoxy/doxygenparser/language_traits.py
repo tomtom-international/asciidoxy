@@ -45,6 +45,7 @@ class TokenType(Enum):
         SEPARATOR:           Generic separator. Used if the same character is used for different
                                  kinds of separators. Use `adapt_separators` to select the right
                                  kind.
+        BUILT_IN_NAME:       Type name that is built-in in the language.
     """
     UNKNOWN = auto()
     WHITESPACE = auto()
@@ -63,6 +64,7 @@ class TokenType(Enum):
     ARGS_END = auto()
     ARG_NAME = auto()
     SEPARATOR = auto()
+    BUILT_IN_NAME = auto()
 
 
 class LanguageTraits(ABC):
