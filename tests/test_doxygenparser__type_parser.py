@@ -25,7 +25,7 @@ from unittest.mock import MagicMock
 from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenType
 from asciidoxy.doxygenparser.type_parser import Token, TypeParser, TypeParseError
 from asciidoxy.model import Compound, Member
-from .shared import sub_element
+from .shared import assert_equal_or_none_if_empty, sub_element
 
 
 class TestTraits(LanguageTraits):
@@ -33,24 +33,28 @@ class TestTraits(LanguageTraits):
 
     NESTED_STARTS = "<", "[",
     NESTED_ENDS = ">", "]",
-    NESTED_SEPARATORS = ",", ";",
     OPERATORS = "*", "&",
     QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
+    ARGS_STARTS = "(",
+    ARGS_ENDS = ")",
+    SEPARATORS = ",", ";",
 
     TOKENS = {
         TokenType.NESTED_START: NESTED_STARTS,
         TokenType.NESTED_END: NESTED_ENDS,
-        TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
         TokenType.OPERATOR: OPERATORS,
         TokenType.QUALIFIER: QUALIFIERS,
+        TokenType.ARGS_START: ARGS_STARTS,
+        TokenType.ARGS_END: ARGS_ENDS,
+        TokenType.SEPARATOR: SEPARATORS,
     }
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + OPERATORS + ARGS_STARTS + ARGS_ENDS +
+                        SEPARATORS + tuple(string.whitespace))
+    SEPARATOR_TOKENS_OVERLAP = True
 
     ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
     ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
     ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
-
-    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + OPERATORS +
-                        tuple(string.whitespace))
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -64,8 +68,20 @@ class TestTraits(LanguageTraits):
 class TestParser(TypeParser):
     TRAITS = TestTraits
 
+    @classmethod
+    def adapt_tokens(cls,
+                     tokens: List[Token],
+                     array_tokens: Optional[List[Token]] = None) -> List[Token]:
+        tokens = super().adapt_tokens(tokens, array_tokens)
 
-def whitespace(text: str) -> Token:
+        for token in tokens:
+            if token.text.startswith("arg_"):
+                token.type_ = TokenType.ARG_NAME
+
+        return tokens
+
+
+def whitespace(text: str = " ") -> Token:
     return Token(text, TokenType.WHITESPACE)
 
 
@@ -81,15 +97,15 @@ def name(text: str) -> Token:
     return Token(text, TokenType.NAME)
 
 
-def nested_start(text: str) -> Token:
+def nested_start(text: str = "<") -> Token:
     return Token(text, TokenType.NESTED_START)
 
 
-def nested_end(text: str) -> Token:
+def nested_end(text: str = ">") -> Token:
     return Token(text, TokenType.NESTED_END)
 
 
-def nested_sep(text: str) -> Token:
+def nested_sep(text: str = ",") -> Token:
     return Token(text, TokenType.NESTED_SEPARATOR)
 
 
@@ -97,122 +113,162 @@ def ref(text: str, refid: str, kind: Optional[str] = None) -> Token:
     return Token(text, refid=refid, type_=TokenType.NAME, kind=kind)
 
 
+def args_start(text: str = "(") -> Token:
+    return Token(text, TokenType.ARGS_START)
+
+
+def args_end(text: str = ")") -> Token:
+    return Token(text, TokenType.ARGS_END)
+
+
+def args_sep(text: str = ",") -> Token:
+    return Token(text, TokenType.ARGS_SEPARATOR)
+
+
+def arg_name(text: str) -> Token:
+    return Token(text, TokenType.ARG_NAME)
+
+
+def sep(text: str = ",") -> Token:
+    return Token(text, TokenType.SEPARATOR)
+
+
 @pytest.mark.parametrize("text,tokens", [
     ("MyType", [name("MyType")]),
-    ("const MyType", [qualifier("const"), whitespace(" "),
+    ("const MyType", [qualifier("const"), whitespace(),
                       name("MyType")]),
     ("MyType<OtherType>",
-     [name("MyType"), nested_start("<"),
-      name("OtherType"), nested_end(">")]),
+     [name("MyType"), nested_start(),
+      name("OtherType"), nested_end()]),
     ("const MyType<OtherType>&", [
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         name("OtherType"),
-        nested_end(">"),
+        nested_end(),
         operator("&")
     ]),
     ("const MyType<OtherType> &", [
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         name("OtherType"),
-        nested_end(">"),
-        whitespace(" "),
+        nested_end(),
+        whitespace(),
         operator("&")
     ]),
     ("const * const MyType", [
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         operator("*"),
-        whitespace(" "),
+        whitespace(),
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("MyType")
     ]),
     ("const* const MyType", [
         qualifier("const"),
         operator("*"),
-        whitespace(" "),
+        whitespace(),
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("MyType")
     ]),
     ("MyType*", [name("MyType"), operator("*")]),
-    ("MyType *", [name("MyType"), whitespace(" "), operator("*")]),
+    ("MyType *", [name("MyType"), whitespace(), operator("*")]),
     ("MyType <OtherType>",
-     [name("MyType"),
-      whitespace(" "),
-      nested_start("<"),
-      name("OtherType"),
-      nested_end(">")]),
+     [name("MyType"), whitespace(),
+      nested_start(), name("OtherType"),
+      nested_end()]),
     ("MyType < OtherType >", [
         name("MyType"),
-        whitespace(" "),
-        nested_start("<"),
-        whitespace(" "),
+        whitespace(),
+        nested_start(),
+        whitespace(),
         name("OtherType"),
-        whitespace(" "),
-        nested_end(">")
+        whitespace(),
+        nested_end()
     ]),
     ("MyType  <  OtherType  >", [
         name("MyType"),
-        whitespace(" "),
-        nested_start("<"),
-        whitespace(" "),
+        whitespace(),
+        nested_start(),
+        whitespace(),
         name("OtherType"),
-        whitespace(" "),
-        nested_end(">")
+        whitespace(),
+        nested_end()
     ]),
     ("const MyType<const OtherType> &", [
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("OtherType"),
-        nested_end(">"),
-        whitespace(" "),
+        nested_end(),
+        whitespace(),
         operator("&")
     ]),
     ("const MyType<const OtherType, YetAnotherType&> &", [
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("OtherType"),
-        nested_sep(","),
-        whitespace(" "),
+        sep(),
+        whitespace(),
         name("YetAnotherType"),
         operator("&"),
-        nested_end(">"),
-        whitespace(" "),
+        nested_end(),
+        whitespace(),
         operator("&")
     ]),
     ("MyType<const OtherType, <YetAnotherType&,const OtherType>> &", [
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("OtherType"),
-        nested_sep(","),
-        whitespace(" "),
-        nested_start("<"),
+        sep(),
+        whitespace(),
+        nested_start(),
         name("YetAnotherType"),
         operator("&"),
-        nested_sep(","),
+        sep(),
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("OtherType"),
-        nested_end(">"),
-        nested_end(">"),
-        whitespace(" "),
+        nested_end(),
+        nested_end(),
+        whitespace(),
         operator("&")
+    ]),
+    ("MyType(const RefType&)", [
+        name("MyType"),
+        args_start(),
+        qualifier("const"),
+        whitespace(),
+        name("RefType"),
+        operator("&"),
+        args_end()
+    ]),
+    ("MyType(const RefType&, OtherType*)", [
+        name("MyType"),
+        args_start(),
+        qualifier("const"),
+        whitespace(),
+        name("RefType"),
+        operator("&"),
+        sep(),
+        whitespace(),
+        name("OtherType"),
+        operator("*"),
+        args_end()
     ]),
 ])
 def test_type_parser__tokenize_text(text, tokens):
@@ -226,18 +282,16 @@ def _generate_whitespace_data():
 
 @pytest.mark.parametrize("text", _generate_whitespace_data())
 def test_type_parser__tokenize_text__whitespace_only(text):
-    assert TestParser.tokenize_text(text) == [whitespace(" ")]
+    assert TestParser.tokenize_text(text) == [whitespace()]
 
 
 @pytest.mark.parametrize("text,tokens", [
-    (" \t\nMyType\n ", [whitespace(" "), name("MyType"),
-                        whitespace(" ")]),
+    (" \t\nMyType\n ", [whitespace(), name("MyType"), whitespace()]),
     ("  const  \tMyType",
-     [whitespace(" "), qualifier("const"),
-      whitespace(" "), name("MyType")]),
-    ("\nMyType\n\t&",
-     [whitespace(" "), name("MyType"),
-      whitespace(" "), operator("&")]),
+     [whitespace(), qualifier("const"),
+      whitespace(), name("MyType")]),
+    ("\nMyType\n\t&", [whitespace(), name("MyType"),
+                       whitespace(), operator("&")]),
 ])
 def test_type_parser__tokenize_text__reduce_whitespace(text, tokens):
     assert TestParser.tokenize_text(text) == tokens
@@ -247,7 +301,7 @@ def test_type_parser__tokenize_xml__text_only():
     element = ET.Element("type")
     element.text = "const MyType&"
     assert TestParser.tokenize_xml(element) == [
-        qualifier("const"), whitespace(" "),
+        qualifier("const"), whitespace(),
         name("MyType"), operator("&")
     ]
 
@@ -274,9 +328,9 @@ def test_type_parser__tokenize_xml__prefix_suffix():
     sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound", tail=" *")
     assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         ref("MyType", refid="my_type", kind="compound"),
-        whitespace(" "),
+        whitespace(),
         operator("*"),
     ]
 
@@ -287,11 +341,11 @@ def test_type_parser__tokenize_xml__text_type_with_nested_xml():
     sub_element(element, "ref", text="OtherType", refid="other_type", kindref="compound", tail=">")
     assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         ref("OtherType", refid="other_type", kind="compound"),
-        nested_end(">"),
+        nested_end(),
     ]
 
 
@@ -307,26 +361,26 @@ def test_type_parser__tokenize_xml__xml_type_with_nested_xml_and_text():
     sub_element(element, "ref", text="OtherType", refid="other_type", kindref="compound", tail=">")
     assert TestParser.tokenize_xml(element) == [
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         ref("MyType", refid="my_type", kind="compound"),
-        nested_start("<"),
+        nested_start(),
         name("NestedType"),
-        nested_sep(","),
-        whitespace(" "),
+        sep(),
+        whitespace(),
         ref("OtherType", refid="other_type", kind="compound"),
-        nested_end(">"),
+        nested_end(),
     ]
 
 
 @pytest.fixture(params=[
     [],
-    [qualifier("const"), whitespace(" ")],
-    [qualifier("const"), operator("*"), whitespace(" ")],
+    [qualifier("const"), whitespace()],
+    [qualifier("const"), operator("*"), whitespace()],
     [qualifier("const"),
-     whitespace(" "),
+     whitespace(),
      qualifier("const"),
      operator("*"),
-     whitespace(" ")],
+     whitespace()],
 ],
                 ids=lambda ps: "".join(p.text for p in ps))
 def prefixes(request):
@@ -335,8 +389,8 @@ def prefixes(request):
 
 @pytest.fixture(params=[
     [],
-    [whitespace(" "), qualifier("const")],
-    [whitespace(" "), operator("&")],
+    [whitespace(), qualifier("const")],
+    [whitespace(), operator("&")],
     [operator("&")],
 ],
                 ids=lambda ps: "".join(p.text for p in ps))
@@ -350,6 +404,7 @@ class ExpectedType(NamedTuple):
     suffix: str
     kind: Optional[str] = None
     refid: Optional[str] = None
+    arg_name: Optional[str] = None
 
 
 class TypeTestData(NamedTuple):
@@ -360,18 +415,18 @@ class TypeTestData(NamedTuple):
 @pytest.fixture(params=[
     TypeTestData([name("MyType")]),
     TypeTestData([name("long")]),
-    TypeTestData([name("unsigned"), whitespace(" "), name("int")]),
+    TypeTestData([name("unsigned"), whitespace(), name("int")]),
     TypeTestData([name("unsigned"),
-                  whitespace(" "),
+                  whitespace(),
                   name("long"),
-                  whitespace(" "),
+                  whitespace(),
                   name("long")]),
     TypeTestData([ref("MyType", refid="mytype", kind="compound")],
                  [ExpectedType("", "MyType", "", kind="compound", refid="mytype")]),
     TypeTestData([ref("MyType", refid="mytype")], [ExpectedType("", "MyType", "", refid="mytype")]),
     TypeTestData([
         ref("MyType", refid="mytype", kind="compound"),
-        whitespace(" "),
+        whitespace(),
         ref("OtherType", refid="othertype", kind="compound")
     ], [ExpectedType("", "MyType OtherType", "", kind="compound", refid="mytype")]),
 ],
@@ -386,60 +441,58 @@ def names(request):
 
 @pytest.fixture(params=[
     TypeTestData([], []),
-    TypeTestData([nested_start("<"), name("NestedType"),
-                  nested_end(">")], [
-                      ExpectedType("", "NestedType", ""),
-                  ]),
+    TypeTestData(
+        [nested_start(), name("NestedType"), nested_end()], [
+            ExpectedType("", "NestedType", ""),
+        ]),
     TypeTestData([
-        nested_start("<"),
+        nested_start(),
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("NestedType"),
         operator("*"),
-        nested_end(">")
+        nested_end()
     ], [
         ExpectedType("const ", "NestedType", "*"),
     ]),
     TypeTestData(
-        [nested_start("<"),
-         whitespace(" "),
-         name("NestedType"),
-         whitespace(" "),
-         nested_end(">")], [
+        [nested_start(),
+         whitespace(), name("NestedType"),
+         whitespace(), nested_end()], [
              ExpectedType("", "NestedType", ""),
          ]),
     TypeTestData([
-        nested_start("<"),
+        nested_start(),
         name("NestedType"),
-        nested_sep(","),
+        nested_sep(),
         ref("OtherType", refid="othertype", kind="compound"),
-        nested_end(">")
+        nested_end()
     ], [
         ExpectedType("", "NestedType", ""),
         ExpectedType("", "OtherType", "", refid="othertype", kind="compound"),
     ]),
     TypeTestData([
-        nested_start("<"),
+        nested_start(),
         ref("NestedType", refid="nestedtype"),
-        whitespace(" "),
-        nested_sep(","),
-        whitespace(" "),
+        whitespace(),
+        nested_sep(),
+        whitespace(),
         name("OtherType"),
-        nested_end(">"),
+        nested_end(),
     ], [
         ExpectedType("", "NestedType", "", refid="nestedtype"),
         ExpectedType("", "OtherType", ""),
     ]),
     TypeTestData([
-        nested_start("<"),
+        nested_start(),
         name("NestedType"),
         operator("&"),
-        nested_sep(","),
-        whitespace(" "),
+        nested_sep(),
+        whitespace(),
         qualifier("const"),
-        whitespace(" "),
+        whitespace(),
         name("OtherType"),
-        nested_end(">"),
+        nested_end(),
     ], [
         ExpectedType("", "NestedType", "&"),
         ExpectedType("const ", "OtherType", ""),
@@ -450,9 +503,63 @@ def nested_types(request):
     return request.param
 
 
-def test_type_parser__type_from_tokens(prefixes, names, nested_types, suffixes):
+@pytest.fixture(params=[
+    TypeTestData([], []),
+    TypeTestData([
+        args_start(),
+        qualifier("const"),
+        whitespace(),
+        name("ArgType"),
+        args_sep(),
+        whitespace(),
+        name("AnotherType"),
+        operator("&"),
+        args_end(),
+    ], [
+        ExpectedType("const ", "ArgType", ""),
+        ExpectedType("", "AnotherType", "&"),
+    ]),
+    TypeTestData([
+        args_start(),
+        qualifier("const"),
+        whitespace(),
+        name("ArgType"),
+        whitespace(),
+        arg_name("name"),
+        args_sep(),
+        whitespace(),
+        name("AnotherType"),
+        operator("&"),
+        whitespace(),
+        arg_name("other"),
+        args_end(),
+    ], [
+        ExpectedType("const ", "ArgType", "", arg_name="name"),
+        ExpectedType("", "AnotherType", "&", arg_name="other"),
+    ]),
+],
+                ids=lambda ps: "".join(p.text for p in ps[0]))
+def arg_types(request):
+    return request.param
+
+
+def _match_type(actual, expected):
+    assert actual.prefix == expected.prefix
+    assert actual.name == expected.name
+    assert actual.suffix == expected.suffix
+    assert actual.kind == expected.kind
+    if expected.refid is None:
+        assert actual.id is None
+    else:
+        assert actual.id == f"mylang-{expected.refid}"
+    assert not actual.nested
+    assert actual.language == "mylang"
+
+
+def test_type_parser__type_from_tokens(prefixes, names, nested_types, arg_types, suffixes):
     driver_mock = MagicMock()
-    type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens + suffixes,
+    type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens +
+                                           arg_types.tokens + suffixes,
                                            driver=driver_mock)
     assert type_ref.prefix == "".join(p.text for p in prefixes)
     assert type_ref.name == names.expected_types[0].name
@@ -468,16 +575,18 @@ def test_type_parser__type_from_tokens(prefixes, names, nested_types, suffixes):
         assert len(nested_types.expected_types) == len(type_ref.nested)
 
         for actual, expected in zip(type_ref.nested, nested_types.expected_types):
-            assert actual.prefix == expected.prefix
-            assert actual.name == expected.name
-            assert actual.suffix == expected.suffix
-            assert actual.kind == expected.kind
-            if expected.refid is None:
-                assert actual.id is None
-            else:
-                assert actual.id == f"mylang-{expected.refid}"
-            assert not actual.nested
-            assert actual.language == "mylang"
+            _match_type(actual, expected)
+    else:
+        assert not type_ref.nested
+
+    if arg_types.expected_types:
+        assert len(arg_types.expected_types) == len(type_ref.args)
+
+        for actual, expected in zip(type_ref.args, arg_types.expected_types):
+            assert_equal_or_none_if_empty(actual.name, expected.arg_name)
+            _match_type(actual.type, expected)
+    else:
+        assert not type_ref.args
 
     unresolved_types = []
     if not names.expected_types[0].refid:
@@ -485,22 +594,21 @@ def test_type_parser__type_from_tokens(prefixes, names, nested_types, suffixes):
     for expected_type in nested_types.expected_types:
         if not expected_type.refid:
             unresolved_types.append(expected_type.name)
+    for expected_type in arg_types.expected_types:
+        if not expected_type.refid:
+            unresolved_types.append(expected_type.name)
     assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
                     ]) == sorted(unresolved_types))
 
 
 @pytest.mark.parametrize("tokens,expected_type", [
-    ([whitespace(" "), name("MyType"), whitespace(" ")], ExpectedType("", "MyType", "")),
-    ([whitespace(" "),
-      qualifier("const"),
-      whitespace(" "),
-      name("MyType"),
-      whitespace(" ")], ExpectedType("const ", "MyType", "")),
-    ([whitespace(" "),
-      name("MyType"),
-      whitespace(" "),
-      operator("*"),
-      whitespace(" ")], ExpectedType("", "MyType", " *")),
+    ([whitespace(), name("MyType"), whitespace()], ExpectedType("", "MyType", "")),
+    ([whitespace(), qualifier("const"),
+      whitespace(), name("MyType"),
+      whitespace()], ExpectedType("const ", "MyType", "")),
+    ([whitespace(), name("MyType"),
+      whitespace(), operator("*"),
+      whitespace()], ExpectedType("", "MyType", " *")),
 ])
 def test_type_parser__type_from_tokens__strip_whitespace(tokens, expected_type):
     type_ref = TestParser.type_from_tokens(tokens)
@@ -512,16 +620,16 @@ def test_type_parser__type_from_tokens__strip_whitespace(tokens, expected_type):
 def test_type_parser__type_from_tokens__deep_nested_type():
     tokens = [
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         name("NestedType"),
-        nested_start("<"),
+        nested_start(),
         name("OtherType"),
-        nested_sep(","),
+        nested_sep(),
         name("MyType"),
-        nested_end(">"),
-        nested_sep(","),
+        nested_end(),
+        nested_sep(),
         name("OtherType"),
-        nested_end(">")
+        nested_end()
     ]
     type_ref = TestParser.type_from_tokens(tokens)
 
@@ -540,16 +648,16 @@ def test_type_parser__type_from_tokens__deep_nested_type():
 def test_type_parser__type_from_tokens__namespace_from_compound():
     tokens = [
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         name("NestedType"),
-        nested_start("<"),
+        nested_start(),
         name("OtherType"),
-        nested_sep(","),
+        nested_sep(),
         name("MyType"),
-        nested_end(">"),
-        nested_sep(","),
+        nested_end(),
+        nested_sep(),
         name("OtherType"),
-        nested_end(">")
+        nested_end()
     ]
 
     parent = Compound("mylang")
@@ -575,16 +683,16 @@ def test_type_parser__type_from_tokens__namespace_from_compound():
 def test_type_parser__type_from_tokens__namespace_from_member():
     tokens = [
         name("MyType"),
-        nested_start("<"),
+        nested_start(),
         name("NestedType"),
-        nested_start("<"),
+        nested_start(),
         name("OtherType"),
-        nested_sep(","),
+        nested_sep(),
         name("MyType"),
-        nested_end(">"),
-        nested_sep(","),
+        nested_end(),
+        nested_sep(),
         name("OtherType"),
-        nested_end(">")
+        nested_end()
     ]
 
     parent = Member("mylang")
@@ -610,16 +718,16 @@ def test_type_parser__type_from_tokens__namespace_from_member():
 def test_type_parser__type_from_tokens__do_not_register_builtin_types():
     tokens = [
         name("BuiltinType"),
-        nested_start("<"),
+        nested_start(),
         name("BuiltinType2"),
-        nested_start("<"),
+        nested_start(),
         name("OtherType"),
-        nested_sep(","),
+        nested_sep(),
         name("MyType"),
-        nested_end(">"),
-        nested_sep(","),
+        nested_end(),
+        nested_sep(),
         name("OtherType"),
-        nested_end(">")
+        nested_end()
     ]
 
     driver_mock = MagicMock()
@@ -631,23 +739,21 @@ def test_type_parser__type_from_tokens__do_not_register_builtin_types():
 
 @pytest.mark.parametrize("tokens", [
     [],
-    [nested_start("<")],
-    [nested_sep(",")],
-    [nested_end(">")],
+    [nested_start()],
+    [nested_sep()],
+    [nested_end()],
     [qualifier("const")],
     [operator("*")],
-    [whitespace(" ")],
-    [name("MyType"), nested_start("<")],
-    [name("MyType"), nested_start("<"), name("OtherType")],
-    [name("MyType"), nested_start("<"),
-     name("OtherType"), nested_sep(",")],
-    [name("MyType"),
-     nested_start("<"),
+    [whitespace()],
+    [name("MyType"), nested_start()],
+    [name("MyType"), nested_start(), name("OtherType")],
+    [name("MyType"), nested_start(),
+     name("OtherType"), nested_sep()],
+    [name("MyType"), nested_start(),
      name("OtherType"),
-     nested_sep(","),
-     nested_end(">")],
-    [name("MyType"), nested_end(">")],
-    [name("MyType"), nested_sep(","), name("OtherType")],
+     nested_sep(), nested_end()],
+    [name("MyType"), nested_end()],
+    [name("MyType"), nested_sep(), name("OtherType")],
 ],
                          ids=lambda ps: "".join(p.text for p in ps))
 def test_type_parser__type_from_tokens__invalid_token_sequence(tokens):
@@ -658,15 +764,82 @@ def test_type_parser__type_from_tokens__invalid_token_sequence(tokens):
 def test_type_parser__type_from_tokens__calls_cleanup_name():
     tokens = [
         qualifier('"const"'),
-        whitespace(" "),
+        whitespace(),
         name('"MyType"'),
-        whitespace(" "),
+        whitespace(),
         qualifier('"const"')
     ]
     type_ref = TestParser.type_from_tokens(tokens)
     assert type_ref.prefix == '"const" '
     assert type_ref.name == 'MyType'
     assert type_ref.suffix == ' "const"'
+
+
+@pytest.mark.parametrize("tokens,expected", [
+    ([name("Type")], [name("Type")]),
+    ([
+        nested_start(),
+        name("Type"),
+        sep(),
+        name("Type2"),
+        nested_end(),
+    ], [
+        nested_start(),
+        name("Type"),
+        nested_sep(),
+        name("Type2"),
+        nested_end(),
+    ]),
+    ([
+        args_start(),
+        name("Type"),
+        sep(),
+        name("Type2"),
+        args_end(),
+    ], [
+        args_start(),
+        name("Type"),
+        args_sep(),
+        name("Type2"),
+        args_end(),
+    ]),
+    ([
+        nested_start(),
+        name("Type"),
+        sep(),
+        name("Type2"),
+        nested_end(),
+        args_start(),
+        name("Type"),
+        nested_start(),
+        name("Type"),
+        sep(),
+        name("Type2"),
+        nested_end(),
+        sep(),
+        name("Type2"),
+        args_end(),
+    ], [
+        nested_start(),
+        name("Type"),
+        nested_sep(),
+        name("Type2"),
+        nested_end(),
+        args_start(),
+        name("Type"),
+        nested_start(),
+        name("Type"),
+        nested_sep(),
+        name("Type2"),
+        nested_end(),
+        args_sep(),
+        name("Type2"),
+        args_end(),
+    ]),
+],
+                         ids=lambda ps: "".join(p.text for p in ps))
+def test_type_parser__adapt_separators(tokens, expected):
+    assert TestParser.adapt_separators(tokens) == expected
 
 
 def test_type_parser__parse_xml__simple_element():
@@ -740,3 +913,52 @@ def test_type_parser__parse_xml__whitespace_only():
     element = ET.Element("type")
     element.text = "  \n\t  \n  "
     assert TestParser.parse_xml(element) is None
+
+
+def test_type_parser__parse_xml__nested_types_and_args():
+    element = ET.Element("type")
+    element.text = "const "
+    sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound", tail="<")
+    sub_element(element,
+                "ref",
+                text="NestedType",
+                refid="nested_type",
+                kindref="compound",
+                tail=", OtherNestedType>(const std::string& arg_name, int arg_value)")
+
+    type_ref = TestParser.parse_xml(element)
+
+    assert type_ref is not None
+    assert type_ref.prefix == "const "
+    assert type_ref.name == "MyType"
+    assert not type_ref.suffix
+    assert type_ref.id == "mylang-my_type"
+    assert type_ref.kind == "compound"
+    assert len(type_ref.nested) == 2
+    assert len(type_ref.args) == 2
+
+    assert not type_ref.nested[0].prefix
+    assert type_ref.nested[0].name == "NestedType"
+    assert not type_ref.nested[0].suffix
+    assert type_ref.nested[0].id == "mylang-nested_type"
+    assert type_ref.nested[0].kind == "compound"
+
+    assert not type_ref.nested[1].prefix
+    assert type_ref.nested[1].name == "OtherNestedType"
+    assert not type_ref.nested[1].suffix
+    assert not type_ref.nested[1].id
+    assert not type_ref.nested[1].kind
+
+    assert type_ref.args[0].name == "arg_name"
+    assert type_ref.args[0].type.prefix == "const "
+    assert type_ref.args[0].type.name == "std::string"
+    assert type_ref.args[0].type.suffix == "&"
+    assert not type_ref.args[0].type.id
+    assert not type_ref.args[0].type.kind
+
+    assert type_ref.args[1].name == "arg_value"
+    assert not type_ref.args[1].type.prefix
+    assert type_ref.args[1].type.name == "int"
+    assert not type_ref.args[1].type.suffix
+    assert not type_ref.args[1].type.id
+    assert not type_ref.args[1].type.kind
