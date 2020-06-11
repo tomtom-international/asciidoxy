@@ -38,6 +38,13 @@ class TokenType(Enum):
         WILDCARD_BOUNDS:     Bounds limiting a wildcard.
         INVALID:             Invalid tokens. Require a workaround.
         NAMESPACE_SEPARATOR: Separator between namespaces.
+        ARGS_START:          Start of a list of argument types.
+        ARGS_SEPARATOR:      Separator between multiple argument types.
+        ARGS_END:            End of a list of argument types.
+        ARG_NAME:            Name of an argument.
+        SEPARATOR:           Generic separator. Used if the same character is used for different
+                                 kinds of separators. Use `adapt_separators` to select the right
+                                 kind.
     """
     UNKNOWN = auto()
     WHITESPACE = auto()
@@ -51,24 +58,31 @@ class TokenType(Enum):
     WILDCARD_BOUNDS = auto()
     INVALID = auto()
     NAMESPACE_SEPARATOR = auto()
+    ARGS_START = auto()
+    ARGS_SEPARATOR = auto()
+    ARGS_END = auto()
+    ARG_NAME = auto()
+    SEPARATOR = auto()
 
 
 class LanguageTraits(ABC):
     """Traits for specific languages needed to parse their Doxyxen XML files.
 
     Attributes:
-        TAG:                   Tag for identifying the language.
-        TOKENS:                The allowed tokens for each supported token type.
-        TOKEN_BOUNDARIES:      Characters that indicate the boundary between tokens. Token
-                                   boundaries are considered tokens themselves as well.
-        ALLOWED_PREFIXES:      Token types that are allowed in type prefixes.
-        ALLOWED_SUFFIXES:      Token types that are allowed in type suffixes.
-        ALLOWED_NAMES:         Token types that are allowed in type names.
+        TAG:                      Tag for identifying the language.
+        TOKENS:                   The allowed tokens for each supported token type.
+        TOKEN_BOUNDARIES:         Characters that indicate the boundary between tokens. Token
+                                      boundaries are considered tokens themselves as well.
+        SEPARATOR_TOKENS_OVERLAP: Tokens for different separators overlap, and need to be adapted.
+        ALLOWED_PREFIXES:         Token types that are allowed in type prefixes.
+        ALLOWED_SUFFIXES:         Token types that are allowed in type suffixes.
+        ALLOWED_NAMES:            Token types that are allowed in type names.
     """
     TAG: str
 
     TOKENS: Mapping[TokenType, Sequence[str]]
     TOKEN_BOUNDARIES: Sequence[str]
+    SEPARATOR_TOKENS_OVERLAP: bool = False
 
     ALLOWED_PREFIXES: Optional[Sequence[TokenType]]
     ALLOWED_SUFFIXES: Optional[Sequence[TokenType]]

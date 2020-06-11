@@ -82,6 +82,7 @@ class TypeRef(TypeRefBase):
         prefix:    Qualifiers prefixing the type.
         suffix:    Qualifiers suffixing the type.
         nested:    List of nested types.
+        args:      Arguments for function like types.
     """
 
     # doxygen based fields
@@ -90,18 +91,23 @@ class TypeRef(TypeRefBase):
     prefix: Optional[str] = None
     suffix: Optional[str] = None
     nested: List["TypeRef"]
+    args: List["Parameter"]
 
     def __init__(self, language: str, name: str = ""):
         super().__init__(language, name)
         self.name = name
         self.language = language
         self.nested = []
+        self.args = []
 
     def __str__(self) -> str:
         nested_str = ""
         if self.nested:
             nested_str = f"< {', '.join(str(t) for t in self.nested)} >"
-        return f"{self.prefix or ''}{self.name}{nested_str}{self.suffix or ''}"
+        args_str = ""
+        if self.args:
+            args_str = f"({', '.join(f'{p.type} {p.name}' for p in self.args)})"
+        return f"{self.prefix or ''}{self.name}{nested_str}{args_str}{self.suffix or ''}"
 
     def resolve(self, reference_target: ReferableElement) -> None:
         self.id = reference_target.id
