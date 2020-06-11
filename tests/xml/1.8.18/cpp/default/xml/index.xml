@@ -48,6 +48,7 @@
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b" kind="function"><name>Update</name></member>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf" kind="function"><name>SharedData</name></member>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" kind="function"><name>CalculateDelay</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0" kind="function"><name>RegisterTrafficCallback</name></member>
   </compound>
   <compound refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kind="struct"><name>asciidoxy::traffic::TrafficEvent::TrafficEventData</name>
     <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675" kind="variable"><name>cause</name></member>
