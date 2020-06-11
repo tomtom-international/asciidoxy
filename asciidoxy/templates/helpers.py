@@ -32,17 +32,22 @@ def link_from_ref(ref,
     if ref is None:
         return ""
 
-    if ref.nested:
-        nested = (f"{nested_start}"
-                  f"{', '.join(link_from_ref(r, context) for r in ref.nested)}"
-                  f"{nested_end}")
+    if ref.nested is not None:
+        if len(ref.nested) > 0:
+            nested = (f"{nested_start}"
+                      f"{', '.join(link_from_ref(r, context) for r in ref.nested)}"
+                      f"{nested_end}")
+        else:
+            nested = f"{nested_start}{nested_end}"
     else:
         nested = ""
 
-    if ref.args:
-        args = (f"{args_start}"
-                f"{', '.join(link_from_ref(a.type, context) + _arg_name(a) for a in ref.args)}"
-                f"{args_end}")
+    if ref.args is not None:
+        if len(ref.args) > 0:
+            arg_parts = [f"{link_from_ref(a.type, context)}{_arg_name(a)}" for a in ref.args]
+            args = f"{args_start}{', '.join(arg_parts)}{args_end}"
+        else:
+            args = f"{args_start}{args_end}"
     else:
         args = ""
 
@@ -57,15 +62,20 @@ def print_ref(ref, nested_start="&lt;", nested_end="&gt;", args_start="(", args_
     if ref is None:
         return ""
 
-    if ref.nested:
-        nested = f"{nested_start}{', '.join(print_ref(r) for r in ref.nested)}{nested_end}"
+    if ref.nested is not None:
+        if len(ref.nested) > 0:
+            nested = f"{nested_start}{', '.join(print_ref(r) for r in ref.nested)}{nested_end}"
+        else:
+            nested = f"{nested_start}{nested_end}"
     else:
         nested = ""
 
-    if ref.args:
-        args = (f"{args_start}"
-                f"{', '.join(print_ref(a.type) + _arg_name(a) for a in ref.args)}"
-                f"{args_end}")
+    if ref.args is not None:
+        if len(ref.args) > 0:
+            arg_parts = [f"{print_ref(a.type)}{_arg_name(a)}" for a in ref.args]
+            args = f"{args_start}{', '.join(arg_parts)}{args_end}"
+        else:
+            args = f"{args_start}{args_end}"
     else:
         args = ""
 

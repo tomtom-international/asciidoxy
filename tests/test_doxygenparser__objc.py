@@ -100,7 +100,7 @@ def test_parse_objc_member_function(api_reference):
     assert param.type.namespace == "ADTrafficEvent"
     assert not param.type.prefix
     assert not param.type.suffix
-    assert len(param.type.nested) == 0
+    assert not param.type.nested
     assert param.name == "cause"
     assert param.description == "New TPEG cause code."
 
@@ -113,7 +113,7 @@ def test_parse_objc_member_function(api_reference):
     assert param.type.namespace == "ADTrafficEvent"
     assert not param.type.prefix
     assert not param.type.suffix
-    assert len(param.type.nested) == 0
+    assert not param.type.nested
     assert param.name == "delay"
     assert param.description == "New delay in seconds."
 

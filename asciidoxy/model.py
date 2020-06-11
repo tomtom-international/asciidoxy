@@ -81,8 +81,9 @@ class TypeRef(TypeRefBase):
         kind:      Kind of language element.
         prefix:    Qualifiers prefixing the type.
         suffix:    Qualifiers suffixing the type.
-        nested:    List of nested types.
-        args:      Arguments for function like types.
+        nested:    List of nested types. None if no arguments, an empty list if zero arguments.
+        args:      Arguments for function like types. None if no arguments, an empty list if zero
+                       arguments.
     """
 
     # doxygen based fields
@@ -90,15 +91,13 @@ class TypeRef(TypeRefBase):
     # custom fields
     prefix: Optional[str] = None
     suffix: Optional[str] = None
-    nested: List["TypeRef"]
-    args: List["Parameter"]
+    nested: Optional[List["TypeRef"]] = None
+    args: Optional[List["Parameter"]] = None
 
     def __init__(self, language: str, name: str = ""):
         super().__init__(language, name)
         self.name = name
         self.language = language
-        self.nested = []
-        self.args = []
 
     def __str__(self) -> str:
         nested_str = ""

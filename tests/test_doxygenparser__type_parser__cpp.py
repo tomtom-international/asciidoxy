@@ -51,7 +51,7 @@ def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
     assert type_ref.name == "double"
     assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
     assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
-    assert len(type_ref.nested) == 0
+    assert not type_ref.nested
 
 
 def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix, cpp_type_suffix):
@@ -105,7 +105,7 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_typ
     assert type_ref.name == "Coordinate"
     assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
     assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
-    assert len(type_ref.nested) == 0
+    assert not type_ref.nested
 
 
 def test_parse_cpp_type_from_ref_with_nested_text_type():
