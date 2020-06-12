@@ -23,7 +23,7 @@ from typing import List, NamedTuple, Optional
 from unittest.mock import MagicMock
 
 from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenType
-from asciidoxy.doxygenparser.type_parser import Token, TypeParser, TypeParseError
+from asciidoxy.doxygenparser.type_parser import Token, TypeParser, TypeParseError, find_tokens
 from asciidoxy.model import Compound, Member
 from .shared import assert_equal_or_none_if_empty, sub_element
 
@@ -1025,3 +1025,73 @@ def test_type_parser__parse_xml__nested_types_and_args():
     assert not type_ref.args[1].type.suffix
     assert not type_ref.args[1].type.id
     assert not type_ref.args[1].type.kind
+
+
+@pytest.mark.parametrize("tokens, pattern, expected", [
+    ([], [], []),
+    ([
+        whitespace(),
+    ], [
+        [TokenType.WHITESPACE],
+        [TokenType.WHITESPACE],
+    ], []),
+    ([
+        name("Type"),
+        whitespace(),
+        name("Arg"),
+    ], [
+        [TokenType.WHITESPACE],
+        [TokenType.NAME],
+    ], [[
+        whitespace(),
+        name("Arg"),
+    ]]),
+    ([
+        name("Type"),
+        whitespace(),
+        name("Arg"),
+    ], [
+        [TokenType.NAME],
+        [TokenType.NAME],
+    ], []),
+    ([
+        name("Type"),
+        whitespace(),
+        name("Arg"),
+    ], [
+        [TokenType.WHITESPACE, TokenType.NAME],
+        [TokenType.NAME, TokenType.WHITESPACE],
+    ], [[
+        name("Type"),
+        whitespace(),
+    ], [
+        whitespace(),
+        name("Arg"),
+    ]]),
+    ([
+        name("Type"),
+        whitespace(),
+        name("Arg"),
+    ], [
+        [TokenType.NAME],
+        [TokenType.WHITESPACE, None],
+        [TokenType.NAME],
+    ], [[
+        name("Type"),
+        whitespace(),
+        name("Arg"),
+    ]]),
+    ([
+        name("Type"),
+        name("Arg"),
+    ], [
+        [TokenType.NAME],
+        [TokenType.WHITESPACE, None],
+        [TokenType.NAME],
+    ], [[
+        name("Type"),
+        name("Arg"),
+    ]]),
+])
+def test_find_tokens(tokens, pattern, expected):
+    assert list(find_tokens(tokens, pattern)) == expected

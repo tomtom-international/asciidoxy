@@ -20,7 +20,10 @@ import xml.etree.ElementTree as ET
 from unittest.mock import MagicMock
 
 from asciidoxy.doxygenparser.cpp import CppTypeParser
+from asciidoxy.doxygenparser.language_traits import TokenType
+from asciidoxy.doxygenparser.type_parser import Token
 from tests.shared import assert_equal_or_none_if_empty, sub_element
+from .test_doxygenparser__type_parser import name, args_start, whitespace, args_end, arg_name
 
 
 @pytest.fixture(params=[
@@ -375,3 +378,78 @@ def test_parse_cpp_type_with_function_arguments_with_space_in_type(cpp_type_with
     assert not type_ref.args[0].type.prefix
     assert not type_ref.args[0].type.suffix
     assert not type_ref.args[0].type.nested
+
+
+def namespace_sep(text: str = ":") -> Token:
+    return Token(text, TokenType.NAMESPACE_SEPARATOR)
+
+
+@pytest.mark.parametrize("tokens, expected", [
+    ([], []),
+    ([
+        name("Type"),
+        args_start(),
+        name("ArgType"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("ArgType"),
+        args_end(),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("ArgType"),
+        whitespace(),
+        name("arg"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("ArgType"),
+        whitespace(),
+        arg_name("arg"),
+        args_end(),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("std"),
+        namespace_sep(),
+        namespace_sep(),
+        name("vector"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("std"),
+        namespace_sep(),
+        namespace_sep(),
+        name("vector"),
+        args_end(),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("std"),
+        namespace_sep(),
+        namespace_sep(),
+        name("vector"),
+        whitespace(),
+        name("list"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("std"),
+        namespace_sep(),
+        namespace_sep(),
+        name("vector"),
+        whitespace(),
+        arg_name("list"),
+        args_end(),
+    ]),
+])
+def test_cpp_type_parser__adapt_tokens(tokens, expected):
+    assert CppTypeParser.adapt_tokens(tokens) == expected

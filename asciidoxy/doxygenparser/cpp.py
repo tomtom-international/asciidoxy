@@ -19,7 +19,7 @@ from typing import List, Optional
 
 from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
-from .type_parser import Token, TypeParser
+from .type_parser import Token, TypeParser, find_tokens
 
 
 class CppTraits(LanguageTraits):
@@ -104,25 +104,14 @@ class CppTypeParser(TypeParser):
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
         tokens = super().adapt_tokens(tokens, array_tokens)
 
-        scope_types = []
-        name_tokens: List[Token] = []
-        for i, token in enumerate(tokens):
-            if token.type_ in (TokenType.NESTED_START, TokenType.ARGS_START):
-                scope_types.append(token.type_)
-
-            if token.type_ in (TokenType.ARGS_SEPARATOR, TokenType.ARGS_END):
-                if len(name_tokens) > 1 and name_tokens[-1].type_ != TokenType.BUILT_IN_NAME:
-                    name_tokens[-1].type_ = TokenType.ARG_NAME
-
-            if token.type_ in (TokenType.ARGS_SEPARATOR, TokenType.ARGS_START):
-                name_tokens.clear()
-
-            if (token.type_ in (TokenType.NAME, TokenType.BUILT_IN_NAME) and scope_types
-                    and scope_types[-1] == TokenType.ARGS_START):
-                name_tokens.append(token)
-
-            if token.type_ in (TokenType.NESTED_END, TokenType.ARGS_END):
-                scope_types.pop(-1)
+        for match in find_tokens(tokens, [
+            (TokenType.NESTED_END, TokenType.NESTED_START) + cls.TRAITS.ALLOWED_NAMES,
+            [TokenType.WHITESPACE],
+            [TokenType.NAME],
+            [TokenType.WHITESPACE, None],
+            [TokenType.ARGS_END, TokenType.ARGS_SEPARATOR],
+        ]):
+            match[2].type_ = TokenType.ARG_NAME
 
         return tokens
 
