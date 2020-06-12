@@ -21,7 +21,7 @@ from unittest.mock import MagicMock
 
 from asciidoxy.doxygenparser.language_traits import TokenType
 from asciidoxy.doxygenparser.java import JavaTypeParser
-from asciidoxy.doxygenparser.type_parser import Token, TypeParseError
+from asciidoxy.doxygenparser.type_parser import Token
 from tests.shared import assert_equal_or_none_if_empty
 
 
@@ -166,27 +166,6 @@ def test_parse_java_type_with_separate_wildcard_bounds():
                          ids=lambda tokens: "".join(t.text for t in tokens))
 def test_java_type_parser__adapt_tokens__wildcard_bounds(tokens, expected):
     assert JavaTypeParser.adapt_tokens(tokens) == expected
-
-
-@pytest.mark.parametrize("tokens", [
-    [
-        Token(" ", TokenType.WHITESPACE),
-        Token("extends", TokenType.WILDCARD_BOUNDS),
-        Token(" ", TokenType.WHITESPACE),
-        Token("MyType", TokenType.NAME),
-    ],
-    [
-        Token("final", TokenType.QUALIFIER),
-        Token(" ", TokenType.WHITESPACE),
-        Token("extends", TokenType.WILDCARD_BOUNDS),
-        Token(" ", TokenType.WHITESPACE),
-        Token("MyType", TokenType.NAME),
-    ],
-],
-                         ids=lambda tokens: "".join(t.text for t in tokens))
-def test_java_type_parser__adapt_tokens__wildcard_bounds__error(tokens):
-    with pytest.raises(TypeParseError):
-        JavaTypeParser.adapt_tokens(tokens)
 
 
 @pytest.mark.parametrize("tokens,expected", [

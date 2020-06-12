@@ -19,7 +19,7 @@ from typing import List, Optional
 
 from .language_traits import LanguageTraits, TokenType
 from .parser_base import ParserBase
-from .type_parser import TypeParser, TypeParseError, Token
+from .type_parser import TypeParser, Token, find_tokens
 
 
 class JavaTraits(LanguageTraits):
@@ -90,44 +90,42 @@ class JavaTypeParser(TypeParser):
     def adapt_tokens(cls,
                      tokens: List[Token],
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
-        adapted: List[Token] = []
-        name_found = False
-        invalid_nested = 0
+        tokens = [t for t in tokens if t.type_ != TokenType.INVALID]
+        tokens = cls.mark_separate_wildcard_bounds(tokens)
+        tokens = cls.detect_wildcards(tokens)
+        return tokens
 
+    @staticmethod
+    def mark_separate_wildcard_bounds(tokens: List[Token]) -> List[Token]:
+
+        # Separate wildcard bounds are not supported yet
+        nested = 0
         for token in tokens:
-            skip_token = False
+            if nested == 0 and token.type_ == TokenType.NAME:
+                break
 
-            if invalid_nested > 0:
-                # Separate wildcard bounds are not supported yet
-                if token.type_ == TokenType.NESTED_START:
-                    invalid_nested += 1
-                elif token.type_ == TokenType.NESTED_END:
-                    invalid_nested -= 1
+            elif token.type_ == TokenType.NESTED_START:
+                nested += 1
                 token.type_ = TokenType.UNKNOWN
 
-            elif token.type_ == TokenType.WILDCARD_BOUNDS:
-                for prev_token in reversed(adapted):
-                    if prev_token.type_ == TokenType.WILDCARD:
-                        break
-                    elif prev_token.type_ == TokenType.NAME:
-                        prev_token.type_ = TokenType.WILDCARD
-                        break
-                else:
-                    raise TypeParseError("Invalid use of wildcard bounds in type"
-                                         "".join(t.text for t in tokens))
-            elif token.type_ == TokenType.INVALID:
-                skip_token = True
-            elif token.type_ == TokenType.NAME:
-                name_found = True
-            elif not name_found and token.type_ == TokenType.NESTED_START:
-                # Separate wildcard bounds are not supported yet
-                invalid_nested += 1
+            elif token.type_ == TokenType.NESTED_END:
+                nested -= 1
                 token.type_ = TokenType.UNKNOWN
 
-            if not skip_token:
-                adapted.append(token)
+            elif nested > 0:
+                token.type_ = TokenType.UNKNOWN
 
-        return adapted
+        return tokens
+
+    @staticmethod
+    def detect_wildcards(tokens: List[Token]) -> List[Token]:
+        for match in find_tokens(tokens, [
+            [TokenType.NAME],
+            [TokenType.WHITESPACE],
+            [TokenType.WILDCARD_BOUNDS],
+        ]):
+            match[0].type_ = TokenType.WILDCARD
+        return tokens
 
 
 class JavaParser(ParserBase):
