@@ -15,7 +15,7 @@
 
 import xml.etree.ElementTree as ET
 
-from typing import List, Optional, Sequence, Tuple, Type, Union
+from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union
 
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenType
@@ -345,3 +345,25 @@ class TypeParser:
 
         raise TypeParseError("Unexpected end of nested types:"
                              f" `{''.join(t.text for t in original_tokens)}`")
+
+
+def find_tokens(
+        tokens: Sequence[Token],
+        search_pattern: Sequence[Sequence[Optional[TokenType]]]) -> Iterator[Sequence[Token]]:
+    for search_start in range(len(tokens)):
+        search_index = search_start
+
+        for types in search_pattern:
+            if search_index >= len(tokens):
+                break
+
+            if tokens[search_index].type_ in types:
+                search_index += 1
+            elif None in types:
+                continue
+            else:
+                break
+        else:
+            yield tokens[search_start:search_index]
+
+    return None
