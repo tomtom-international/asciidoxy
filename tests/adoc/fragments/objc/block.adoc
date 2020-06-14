@@ -1,12 +1,12 @@
 
 
-= [[objc-_a_d_traffic_event_8h_1a6bf6df9e53c3257f02374792e42bca61,OnTrafficEventCallback]]OnTrafficEventCallback
+= [[objc-_a_d_traffic_event_8h_1ac1569299203e247cb766d015774a764e,OnTrafficEventCallback]]OnTrafficEventCallback
 
 
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-typedef void(^ OnTrafficEventCallback) (id&lt;xref:objc-protocol_a_d_traffic_event-p[ADTrafficEvent]&gt;)
+typedef void(^ OnTrafficEventCallback) (id&lt;xref:objc-protocol_a_d_traffic_event-p[ADTrafficEvent]&gt;, NSInteger delay)
 ----
 Callback for receiving new traffic events.
 

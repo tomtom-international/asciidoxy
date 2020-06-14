@@ -28,7 +28,8 @@ def link_from_ref(ref,
                   nested_start="&lt;",
                   nested_end="&gt;",
                   args_start="(",
-                  args_end=")"):
+                  args_end=")",
+                  skip_args=False):
     if ref is None:
         return ""
 
@@ -42,7 +43,7 @@ def link_from_ref(ref,
     else:
         nested = ""
 
-    if ref.args is not None:
+    if not skip_args and ref.args is not None:
         if len(ref.args) > 0:
             arg_parts = [f"{link_from_ref(a.type, context)}{_arg_name(a)}" for a in ref.args]
             args = f"{args_start}{', '.join(arg_parts)}{args_end}"

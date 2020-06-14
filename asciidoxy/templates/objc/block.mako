@@ -13,7 +13,8 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import argument_list, link_from_ref
+from asciidoxy.templates.helpers import link_from_ref
+from asciidoxy.templates.objc.helpers import objc_block_definition
 %>
 = [[${element.id},${element.full_name}]]${element.name}
 ${api_context.insert(element)}
@@ -21,7 +22,7 @@ ${api_context.insert(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-typedef ${link_from_ref(element.returns.type, api_context)}(^ ${element.name}) ${argument_list(element.params, api_context)}
+${objc_block_definition(element, api_context)}
 ----
 ${element.brief}
 

@@ -21,6 +21,8 @@ from unittest.mock import MagicMock
 
 from asciidoxy.doxygenparser.objc import ObjectiveCTypeParser
 from .shared import assert_equal_or_none_if_empty
+from .test_doxygenparser__type_parser import (qualifier, whitespace, name, operator, arg_name,
+                                              args_start, args_end, sep, args_sep)
 
 
 @pytest.fixture(params=[
@@ -101,3 +103,94 @@ def test_parse_objc_type_with_space(type_with_space):
     assert type_ref.name == type_with_space
     assert not type_ref.prefix
     assert not type_ref.suffix
+
+
+@pytest.mark.parametrize("tokens, expected", [
+    ([], []),
+    ([
+        qualifier("nullable"),
+        whitespace(),
+        name("Type"),
+        whitespace(),
+        operator("*"),
+    ], [
+        qualifier("nullable"),
+        whitespace(),
+        name("Type"),
+        whitespace(),
+        operator("*"),
+    ]),
+    ([
+        name("Type"),
+        whitespace(),
+        name("value"),
+    ], [
+        name("Type"),
+        whitespace(),
+        name("value"),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("OtherType"),
+        whitespace(),
+        name("value"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("OtherType"),
+        whitespace(),
+        arg_name("value"),
+        args_end(),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("OtherType"),
+        whitespace(),
+        operator("*"),
+        name("value"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("OtherType"),
+        whitespace(),
+        operator("*"),
+        arg_name("value"),
+        args_end(),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("OtherType"),
+        whitespace(),
+        operator("*"),
+        name("value"),
+        sep(),
+        name("CoolType"),
+        whitespace(),
+        qualifier("nullable"),
+        whitespace(),
+        name("null_value"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("OtherType"),
+        whitespace(),
+        operator("*"),
+        arg_name("value"),
+        args_sep(),
+        name("CoolType"),
+        whitespace(),
+        qualifier("nullable"),
+        whitespace(),
+        arg_name("null_value"),
+        args_end(),
+    ]),
+],
+                         ids=lambda ts: "".join(t.text for t in ts))
+def test_objc_type_parser__adapt_tokens(tokens, expected):
+    assert ObjectiveCTypeParser.adapt_tokens(tokens) == expected
