@@ -13,92 +13,92 @@
 # limitations under the License.
 """Tests for parsing python types."""
 
-from asciidoxy.doxygenparser.language_traits import TokenType
+from asciidoxy.doxygenparser.language_traits import TokenCategory
 from asciidoxy.doxygenparser.python import PythonTypeParser
 from asciidoxy.doxygenparser.type_parser import Token
 
 
 def test_adapt_tokens__remove_def():
     assert PythonTypeParser.adapt_tokens([
-        Token(" ", TokenType.WHITESPACE),
-        Token("def", TokenType.NAME),
-        Token(" ", TokenType.WHITESPACE),
-        Token("Type", TokenType.NAME),
-        Token("[", TokenType.NESTED_START),
-        Token("def", TokenType.NAME),
-        Token(",", TokenType.NESTED_SEPARATOR),
-        Token("OtherType", TokenType.NAME),
-        Token("]", TokenType.NESTED_END),
-        Token(" ", TokenType.WHITESPACE),
+        Token(" ", TokenCategory.WHITESPACE),
+        Token("def", TokenCategory.NAME),
+        Token(" ", TokenCategory.WHITESPACE),
+        Token("Type", TokenCategory.NAME),
+        Token("[", TokenCategory.NESTED_START),
+        Token("def", TokenCategory.NAME),
+        Token(",", TokenCategory.NESTED_SEPARATOR),
+        Token("OtherType", TokenCategory.NAME),
+        Token("]", TokenCategory.NESTED_END),
+        Token(" ", TokenCategory.WHITESPACE),
     ]) == [
-        Token(" ", TokenType.WHITESPACE),
-        Token(" ", TokenType.WHITESPACE),
-        Token("Type", TokenType.NAME),
-        Token("[", TokenType.NESTED_START),
-        Token(",", TokenType.NESTED_SEPARATOR),
-        Token("OtherType", TokenType.NAME),
-        Token("]", TokenType.NESTED_END),
-        Token(" ", TokenType.WHITESPACE),
+        Token(" ", TokenCategory.WHITESPACE),
+        Token(" ", TokenCategory.WHITESPACE),
+        Token("Type", TokenCategory.NAME),
+        Token("[", TokenCategory.NESTED_START),
+        Token(",", TokenCategory.NESTED_SEPARATOR),
+        Token("OtherType", TokenCategory.NAME),
+        Token("]", TokenCategory.NESTED_END),
+        Token(" ", TokenCategory.WHITESPACE),
     ]
 
 
 def test_adapt_tokens__add_nested_type_hint():
     assert PythonTypeParser.adapt_tokens([
-        Token("Type", TokenType.NAME),
+        Token("Type", TokenCategory.NAME),
     ], [
-        Token("[", TokenType.NESTED_START),
-        Token("NestedType", TokenType.NAME),
-        Token("]", TokenType.NESTED_END),
+        Token("[", TokenCategory.NESTED_START),
+        Token("NestedType", TokenCategory.NAME),
+        Token("]", TokenCategory.NESTED_END),
     ]) == [
-        Token("Type", TokenType.NAME),
-        Token("[", TokenType.NESTED_START),
-        Token("NestedType", TokenType.NAME),
-        Token("]", TokenType.NESTED_END),
+        Token("Type", TokenCategory.NAME),
+        Token("[", TokenCategory.NESTED_START),
+        Token("NestedType", TokenCategory.NAME),
+        Token("]", TokenCategory.NESTED_END),
     ]
 
 
 def test_adapt_tokens__add_nested_type_hint__double_nested():
     assert PythonTypeParser.adapt_tokens(
         [
-            Token("Type", TokenType.NAME),
-            Token("]", TokenType.NESTED_END),  # Bug in Doxygen
+            Token("Type", TokenCategory.NAME),
+            Token("]", TokenCategory.NESTED_END),  # Bug in Doxygen
         ],
         [
-            Token("[", TokenType.NESTED_START),
-            Token("NestedType", TokenType.NAME),
-            Token("[", TokenType.NESTED_START),
-            Token("DoubleNestedType", TokenType.NAME),
-            Token("]", TokenType.NESTED_END),
+            Token("[", TokenCategory.NESTED_START),
+            Token("NestedType", TokenCategory.NAME),
+            Token("[", TokenCategory.NESTED_START),
+            Token("DoubleNestedType", TokenCategory.NAME),
+            Token("]", TokenCategory.NESTED_END),
         ]) == [
-            Token("Type", TokenType.NAME),
-            Token("[", TokenType.NESTED_START),
-            Token("NestedType", TokenType.NAME),
-            Token("[", TokenType.NESTED_START),
-            Token("DoubleNestedType", TokenType.NAME),
-            Token("]", TokenType.NESTED_END),
-            Token("]", TokenType.NESTED_END),
+            Token("Type", TokenCategory.NAME),
+            Token("[", TokenCategory.NESTED_START),
+            Token("NestedType", TokenCategory.NAME),
+            Token("[", TokenCategory.NESTED_START),
+            Token("DoubleNestedType", TokenCategory.NAME),
+            Token("]", TokenCategory.NESTED_END),
+            Token("]", TokenCategory.NESTED_END),
         ]
 
 
 def test_adapt_tokens__add_nested_type_hint__double_nested_with_whitespace():
     assert PythonTypeParser.adapt_tokens(
         [
-            Token("Type", TokenType.NAME),
-            Token("]", TokenType.NESTED_END),  # Bug in Doxygen
-            Token(" ", TokenType.WHITESPACE),
+            Token("Type", TokenCategory.NAME),
+            Token("]", TokenCategory.NESTED_END),  # Bug in Doxygen
+            Token(" ", TokenCategory.WHITESPACE),
         ],
         [
-            Token("[", TokenType.NESTED_START),
-            Token("NestedType", TokenType.NAME),
-            Token("[", TokenType.NESTED_START),
-            Token("DoubleNestedType", TokenType.NAME),
-            Token("]", TokenType.NESTED_END),
+            Token("[", TokenCategory.NESTED_START),
+            Token("NestedType", TokenCategory.NAME),
+            Token("[", TokenCategory.NESTED_START),
+            Token("DoubleNestedType", TokenCategory.NAME),
+            Token("]", TokenCategory.NESTED_END),
         ]) == [
-            Token("Type", TokenType.NAME),
-            Token("[", TokenType.NESTED_START),
-            Token("NestedType", TokenType.NAME),
-            Token("[", TokenType.NESTED_START),
-            Token("DoubleNestedType", TokenType.NAME),
-            Token("]", TokenType.NESTED_END),
-            Token("]", TokenType.NESTED_END),
+            Token("Type", TokenCategory.NAME),
+            Token("[", TokenCategory.NESTED_START),
+            Token("NestedType", TokenCategory.NAME),
+            Token("[", TokenCategory.NESTED_START),
+            Token("DoubleNestedType", TokenCategory.NAME),
+            Token("]", TokenCategory.NESTED_END),
+            Token("]", TokenCategory.NESTED_END),
         ]

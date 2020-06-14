@@ -20,38 +20,52 @@ import xml.etree.ElementTree as ET
 from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union
 
 from .driver_base import DriverBase
-from .language_traits import LanguageTraits, TokenType
+from .language_traits import LanguageTraits, TokenCategory
 from ..model import Compound, Member, Parameter, TypeRef
 
 logger = logging.getLogger(__name__)
 
 
 class Token:
-    type_: TokenType
+    """A single token in a language grammar.
+
+    Attributes:
+        category: Category of the token in the langugage grammar.
+        refid:    If available, a unique identifier for the element the token symbolizes.
+        kind:     If available, the kind of element the token symbolizes.
+    """
+    category: TokenCategory
     refid: Optional[str]
     kind: Optional[str]
 
     def __init__(self,
                  text: str,
-                 type_: TokenType = TokenType.UNKNOWN,
+                 category: TokenCategory = TokenCategory.UNKNOWN,
                  refid: Optional[str] = None,
                  kind: Optional[str] = None):
-        self.type_ = type_
+        self.category = category
         self.text = text
         self.refid = refid
         self.kind = kind
 
     def __eq__(self, other) -> bool:
-        return ((self.type_, self.text, self.refid, self.kind) == (other.type_, other.text,
-                                                                   other.refid, other.kind))
+        return ((self.category, self.text, self.refid, self.kind) == (other.category, other.text,
+                                                                      other.refid, other.kind))
 
     def __str__(self) -> str:
-        return f"{self.type_}: {repr(self.text)}"
+        return f"{self.category}: {repr(self.text)}"
 
     __repr__ = __str__
 
 
 class TypeParseError(Exception):
+    """Error raised when type parsing fails.
+
+    This exception is still caught internally to trigger fallback to unparsed types.
+
+    Attributes:
+        msg: Message explaining the parser error.
+    """
     msg: str
 
     def __init__(self, msg: str):
@@ -62,6 +76,14 @@ class TypeParseError(Exception):
 
 
 class TypeParser:
+    """Generic type parser from XML and plain text.
+
+    The parser is anemic by design: it has no internal state. Functionality is implemented in class
+    and static methods.
+
+    Attributes:
+        TRAITS: Specifics for the language grammar to parse.
+    """
     TRAITS: Type[LanguageTraits]
 
     @classmethod
@@ -70,10 +92,22 @@ class TypeParser:
                   array_element: Optional[ET.Element] = None,
                   driver: Optional[DriverBase] = None,
                   parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
+        """Parse a type from an XML element.
+
+        Information from the Doxygen `<type>` and `<array>` elements are combined if needed.
+
+        Arguments:
+            type_element:  The `<type>` element from Doxygen.
+            array_element: The `<array>` element from Doxygen, if available.
+            driver:        Driver to register types without refids with.
+            parent:        Parent element for resolving the namespace.
+        Returns:
+            A `TypeRef` for the type, or None if there is no type information.
+        """
         tokens = cls.tokenize_xml(type_element)
         array_tokens = cls.tokenize_xml(array_element) if array_element is not None else []
         tokens = cls.adapt_tokens(tokens, array_tokens)
-        if len(tokens) == 0 or all(token.type_ == TokenType.WHITESPACE for token in tokens):
+        if len(tokens) == 0 or all(token.category == TokenCategory.WHITESPACE for token in tokens):
             return None
         return cls.type_from_tokens(tokens, driver, parent)
 
@@ -81,56 +115,60 @@ class TypeParser:
     def adapt_tokens(cls,
                      tokens: List[Token],
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
+        """Adapt tokens using language specific rules."""
         if cls.TRAITS.SEPARATOR_TOKENS_OVERLAP:
             tokens = cls.adapt_separators(tokens)
         return tokens
 
     @classmethod
     def adapt_separators(cls, tokens: List[Token]) -> List[Token]:
+        """Set the correct category for separator tokens."""
         scope_types = []
         for i, token in enumerate(tokens):
-            if token.type_ in (TokenType.NESTED_START, TokenType.NESTED_END, TokenType.ARGS_START,
-                               TokenType.ARGS_END):
-                scope_types.append(token.type_)
+            if token.category in (TokenCategory.NESTED_START, TokenCategory.NESTED_END,
+                                  TokenCategory.ARGS_START, TokenCategory.ARGS_END):
+                scope_types.append(token.category)
 
-            elif token.type_ in (TokenType.SEPARATOR, TokenType.NESTED_SEPARATOR,
-                                 TokenType.ARGS_SEPARATOR):
+            elif token.category in (TokenCategory.SEPARATOR, TokenCategory.NESTED_SEPARATOR,
+                                    TokenCategory.ARGS_SEPARATOR):
                 try:
-                    token.type_ = cls._determine_separator_type(scope_types)
+                    token.category = cls._determine_separator_category(scope_types)
                 except TypeParseError:
                     logger.warning(f"Cannot determine type of separator of token {i} in"
                                    f"{''.join(t.text for t in tokens)}")
-                    token.type_ = TokenType.UNKNOWN
+                    token.category = TokenCategory.UNKNOWN
         return tokens
 
     @staticmethod
-    def _determine_separator_type(scope_types: List[TokenType]) -> TokenType:
+    def _determine_separator_category(scope_types: List[TokenCategory]) -> TokenCategory:
         nested_ends = 0
         args_ends = 0
         for scope_type in reversed(scope_types):
-            if scope_type == TokenType.NESTED_END:
+            if scope_type == TokenCategory.NESTED_END:
                 nested_ends += 1
-            elif scope_type == TokenType.ARGS_END:
+            elif scope_type == TokenCategory.ARGS_END:
                 args_ends += 1
-            elif scope_type == TokenType.NESTED_START:
+            elif scope_type == TokenCategory.NESTED_START:
                 if nested_ends == 0:
-                    return TokenType.NESTED_SEPARATOR
+                    return TokenCategory.NESTED_SEPARATOR
                 else:
                     nested_ends -= 1
-            elif scope_type == TokenType.ARGS_START:
+            elif scope_type == TokenCategory.ARGS_START:
                 if args_ends == 0:
-                    return TokenType.ARGS_SEPARATOR
+                    return TokenCategory.ARGS_SEPARATOR
                 else:
                     args_ends -= 1
         raise TypeParseError("Cannot determine type of separator.")
 
     @classmethod
     def tokenize_text(cls, text: str) -> List[Token]:
+        """Split a text into language grammar tokens."""
         tokens: List[Token] = []
 
         def append_token(text: str) -> None:
             token = cls.make_text_token(text)
-            if token.type_ == TokenType.WHITESPACE and tokens and tokens[-1].type_ == token.type_:
+            if token.category == TokenCategory.WHITESPACE and tokens and tokens[
+                    -1].category == token.category:
                 pass
             else:
                 tokens.append(token)
@@ -151,21 +189,23 @@ class TypeParser:
 
     @classmethod
     def make_text_token(cls, text: str) -> Token:
+        """Determine the token category for a text and create a token for it."""
         if text.isspace():
-            type_ = TokenType.WHITESPACE
+            category = TokenCategory.WHITESPACE
             text = " "
         else:
             for token_type, tokens in cls.TRAITS.TOKENS.items():
                 if text in tokens:
-                    type_ = token_type
+                    category = token_type
                     break
             else:
-                type_ = TokenType.NAME
+                category = TokenCategory.NAME
 
-        return Token(text, type_)
+        return Token(text, category)
 
     @classmethod
     def tokenize_xml(cls, element: ET.Element) -> List[Token]:
+        """Split an XML element and its contents into language grammar tokens."""
         tokens = []
 
         if element.tag == "ref":
@@ -178,7 +218,7 @@ class TypeParser:
                              f"{ET.tostring(element, encoding='utf-8')}")
 
             if name:
-                tokens.append(Token(name, refid=refid, kind=kind, type_=TokenType.NAME))
+                tokens.append(Token(name, refid=refid, kind=kind, category=TokenCategory.NAME))
 
         elif element.text:
             tokens.extend(cls.tokenize_text(element.text))
@@ -195,7 +235,12 @@ class TypeParser:
                          tokens: List[Token],
                          driver: Optional[DriverBase] = None,
                          parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
-        if not tokens or all(t.type_ == TokenType.WHITESPACE for t in tokens):
+        """Create a `TypeRef` from a sequence of tokens.
+
+        Returns:
+            A `TypeRef` if sufficient tokens are present, or None if all tokens are whitespace.
+        """
+        if not tokens or all(t.category == TokenCategory.WHITESPACE for t in tokens):
             return None
 
         original_tokens = tokens
@@ -223,7 +268,7 @@ class TypeParser:
             logger.warning(f"No name found in `{'`,`'.join(t.text for t in original_tokens)}`")
             return TypeRef(cls.TRAITS.TAG, "".join(t.text for t in original_tokens))
 
-        if tokens and any(t.type_ != TokenType.WHITESPACE for t in tokens):
+        if tokens and any(t.category != TokenCategory.WHITESPACE for t in tokens):
             logger.warning(f"Unexpected trailing token(s) `{'`,`'.join(t.text for t in tokens)}`"
                            f" in `{'`,`'.join(t.text for t in original_tokens)}`")
             suffixes.extend(tokens)
@@ -249,11 +294,24 @@ class TypeParser:
         return type_ref
 
     @staticmethod
-    def select_tokens(tokens: List[Token],
-                      types: Optional[Sequence[TokenType]]) -> Tuple[List[Token], List[Token]]:
-        if types:
+    def select_tokens(
+            tokens: List[Token],
+            categories: Optional[Sequence[TokenCategory]]) -> Tuple[List[Token], List[Token]]:
+        """Select all tokens matching a sequence of categories.
+
+        Picks tokens from the front of `tokens` until a token of another category is encountered.
+
+        Args:
+            tokens:     Tokens to select from.
+            categories: Categories for which the tokens needs to be selected. Can be None to not
+                            select any tokens.
+        Returns:
+            Tokens matching the categories.
+            Tokens left-over after removing the matching tokens.
+        """
+        if categories:
             for i, t in enumerate(tokens):
-                if t.type_ not in types:
+                if t.category not in categories:
                     return tokens[:i], tokens[i:]
             return tokens, []
         else:
@@ -261,16 +319,18 @@ class TypeParser:
 
     @classmethod
     def remove_leading_whitespace(cls, tokens) -> List[Token]:
-        return cls.remove_whitespace(tokens, 0)
+        """Remove leading whitespace from `tokens` and return it."""
+        return cls._remove_whitespace(tokens, 0)
 
     @classmethod
     def remove_trailing_whitespace(cls, tokens) -> List[Token]:
-        return cls.remove_whitespace(tokens, -1)
+        """Remove trailing whitespace from `tokens` and return it."""
+        return cls._remove_whitespace(tokens, -1)
 
     @staticmethod
-    def remove_whitespace(tokens, location) -> List[Token]:
+    def _remove_whitespace(tokens, location) -> List[Token]:
         ret = []
-        while tokens and tokens[location].type_ == TokenType.WHITESPACE:
+        while tokens and tokens[location].category == TokenCategory.WHITESPACE:
             ret.append(tokens.pop(location))
         return ret
 
@@ -281,10 +341,16 @@ class TypeParser:
         driver: Optional[DriverBase] = None,
         parent: Optional[Union[Compound, Member]] = None
     ) -> Tuple[Optional[List[TypeRef]], List[Token]]:
+        """Parse nested types from tokens if present.
 
-        nested_type_tokens, tokens = cls.select_nested_tokens(tokens, TokenType.NESTED_START,
-                                                              TokenType.NESTED_END,
-                                                              TokenType.NESTED_SEPARATOR)
+        Returns:
+            A list of `TypeRef` for each nested type, an empty list if a nested block is present
+                without types, or None if there is no nested block.
+        """
+
+        nested_type_tokens, tokens = cls.select_nested_tokens(tokens, TokenCategory.NESTED_START,
+                                                              TokenCategory.NESTED_END,
+                                                              TokenCategory.NESTED_SEPARATOR)
         if nested_type_tokens is None:
             return None, tokens
         types = (cls.type_from_tokens(ntt, driver, parent) for ntt in nested_type_tokens)
@@ -297,10 +363,16 @@ class TypeParser:
         driver: Optional[DriverBase] = None,
         parent: Optional[Union[Compound, Member]] = None
     ) -> Tuple[Optional[List[Parameter]], List[Token]]:
+        """Parse function argument types from tokens if present.
 
-        nested_type_tokens, tokens = cls.select_nested_tokens(tokens, TokenType.ARGS_START,
-                                                              TokenType.ARGS_END,
-                                                              TokenType.ARGS_SEPARATOR)
+        Returns:
+            A list of `Parameter` for each argument, an empty list if an argument block is present
+                without arguments, or None if there is no argument block.
+        """
+
+        nested_type_tokens, tokens = cls.select_nested_tokens(tokens, TokenCategory.ARGS_START,
+                                                              TokenCategory.ARGS_END,
+                                                              TokenCategory.ARGS_SEPARATOR)
         if nested_type_tokens is None:
             return None, tokens
 
@@ -312,11 +384,16 @@ class TypeParser:
                         tokens: List[Token],
                         driver: Optional[DriverBase] = None,
                         parent: Optional[Union[Compound, Member]] = None) -> Optional[Parameter]:
-        if not tokens or all(t.type_ == TokenType.WHITESPACE for t in tokens):
+        """Parse an argument definition from a sequence of tokens.
+
+        Returns:
+            The argument definition, or None if there is only whitespace.
+        """
+        if not tokens or all(t.category == TokenCategory.WHITESPACE for t in tokens):
             return None
 
         name_tokens: List[Token] = []
-        while tokens and tokens[-1].type_ == TokenType.ARG_NAME:
+        while tokens and tokens[-1].category == TokenCategory.ARG_NAME:
             name_tokens.insert(0, tokens.pop(-1))
 
         arg = Parameter()
@@ -326,16 +403,26 @@ class TypeParser:
 
     @classmethod
     def select_nested_tokens(
-            cls, tokens: List[Token], start_token: TokenType, end_token: TokenType,
-            separator_token: TokenType) -> Tuple[Optional[List[List[Token]]], List[Token]]:
+            cls, tokens: List[Token], start_token: TokenCategory, end_token: TokenCategory,
+            separator_token: TokenCategory) -> Tuple[Optional[List[List[Token]]], List[Token]]:
+        """Find a nested block using specific start, end and separator tokens.
+
+        Returns:
+            A sequence of tokens for each entry in a nested block. The separator is used to return
+                multiple token sequences per nested block. An empty list if the nested block is
+                present but empty. None if no nested block is found.
+            Left-over tokens after removing the nested block.
+        Raises:
+            TypeParseError The nested block is not terminated correctly.
+        """
         original_tokens = tokens
         tokens = tokens[:]
         nested_type_tokens = []
 
         for i, t in enumerate(tokens):
-            if t.type_ == TokenType.WHITESPACE:
+            if t.category == TokenCategory.WHITESPACE:
                 continue
-            elif t.type_ == start_token:
+            elif t.category == start_token:
                 tokens = tokens[i + 1:]
                 break
             else:
@@ -346,15 +433,15 @@ class TypeParser:
         level = 0
         while tokens:
             for i, t in enumerate(tokens):
-                if t.type_ == start_token:
+                if t.category == start_token:
                     level += 1
-                elif level > 0 and t.type_ == end_token:
+                elif level > 0 and t.category == end_token:
                     level -= 1
-                elif level == 0 and t.type_ in (separator_token, end_token):
+                elif level == 0 and t.category in (separator_token, end_token):
                     nested_type_tokens.append(tokens[:i])
                     tokens = tokens[i + 1:]
 
-                    if t.type_ == end_token:
+                    if t.category == end_token:
                         return nested_type_tokens, tokens
                     else:
                         break
@@ -367,17 +454,29 @@ class TypeParser:
 
 def find_tokens(
         tokens: Sequence[Token],
-        search_pattern: Sequence[Sequence[Optional[TokenType]]]) -> Iterator[Sequence[Token]]:
+        search_pattern: Sequence[Sequence[Optional[TokenCategory]]]) -> Iterator[Sequence[Token]]:
+    """Find a sequence of tokens matching a sequence of categories.
+
+    The `search_pattern` is a sequence of sequences of categories to match. Tokens need to match at
+    least one of the categories in each sequence, in order. If `None` is present in a sequence, it
+    means that the sequence is optional and can be skipped.
+
+    Args:
+        tokens: Sequence of tokens to search in.
+        search_patterns: Pattern of categories to match.
+    Returns:
+        Iterator over all matches.
+    """
     for search_start in range(len(tokens)):
         search_index = search_start
 
-        for types in search_pattern:
+        for categories in search_pattern:
             if search_index >= len(tokens):
                 break
 
-            if tokens[search_index].type_ in types:
+            if tokens[search_index].category in categories:
                 search_index += 1
-            elif None in types:
+            elif None in categories:
                 continue
             else:
                 break

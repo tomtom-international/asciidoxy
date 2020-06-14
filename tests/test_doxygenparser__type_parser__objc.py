@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.language_traits import TokenType
+from asciidoxy.doxygenparser.language_traits import TokenCategory
 from asciidoxy.doxygenparser.objc import ObjectiveCTypeParser
 from asciidoxy.doxygenparser.type_parser import Token
 from .shared import assert_equal_or_none_if_empty
@@ -108,7 +108,7 @@ def test_parse_objc_type_with_space(type_with_space):
 
 
 def block(text: str = "^") -> Token:
-    return Token(text, TokenType.BLOCK)
+    return Token(text, TokenCategory.BLOCK)
 
 
 @pytest.mark.parametrize("tokens, expected", [

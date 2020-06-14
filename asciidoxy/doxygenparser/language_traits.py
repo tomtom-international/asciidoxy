@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Base support for parsing documentation for different languages."""
+"""Traits describing how to parse different languages."""
 
 import logging
 
@@ -22,8 +22,8 @@ from typing import Mapping, Optional, Sequence
 logger = logging.getLogger(__name__)
 
 
-class TokenType(Enum):
-    """Types of tokens in a language grammer.
+class TokenCategory(Enum):
+    """Category of tokens in a language grammer.
 
     Attributes:
         UNKNOWN:             Unidentified token.
@@ -72,6 +72,8 @@ class TokenType(Enum):
 class LanguageTraits(ABC):
     """Traits for specific languages needed to parse their Doxyxen XML files.
 
+    Implement this for each language that AsciiDoxy will support.
+
     Attributes:
         TAG:                      Tag for identifying the language.
         TOKENS:                   The allowed tokens for each supported token type.
@@ -84,40 +86,104 @@ class LanguageTraits(ABC):
     """
     TAG: str
 
-    TOKENS: Mapping[TokenType, Sequence[str]]
+    TOKENS: Mapping[TokenCategory, Sequence[str]]
     TOKEN_BOUNDARIES: Sequence[str]
     SEPARATOR_TOKENS_OVERLAP: bool = False
 
-    ALLOWED_PREFIXES: Optional[Sequence[TokenType]]
-    ALLOWED_SUFFIXES: Optional[Sequence[TokenType]]
-    ALLOWED_NAMES: Sequence[TokenType]
+    ALLOWED_PREFIXES: Optional[Sequence[TokenCategory]]
+    ALLOWED_SUFFIXES: Optional[Sequence[TokenCategory]]
+    ALLOWED_NAMES: Sequence[TokenCategory]
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
+        """Is the type a built-in type for the language?
+
+        Built-in types do not need to be resolved to other types from Doxygen.
+
+        Args:
+            type_name: Type name to check.
+        Returns:
+            True if the type is built-in.
+        """
         return False
 
     @classmethod
     def cleanup_name(cls, name: str) -> str:
+        """Clean up the name acoording to language rules.
+
+        Doxygen causes some non C++ names to look like C++.
+
+        Args:
+            name: Name to clean up.
+        Returns:
+            Cleaned up version of the name.
+        """
         return name
 
     @classmethod
     def short_name(cls, name: str) -> str:
+        """Determine the short version of a type name.
+
+        Removes the namespace to leave only the local name of the type.
+
+        Args:
+            name: Long or short version of the name.
+        Returns:
+            The short version of the name.
+        """
         return name
 
     @classmethod
     def full_name(cls, name: str, parent: str = "") -> str:
+        """Determine the long version of a type name.
+
+        The long name should include the namespace. If needed the namespace is deduced from a parent
+        type.
+
+        Args:
+            name: Long or short version of the name.
+            parent: Name of a parent. Used to deduce namespace if needed.
+        Returns:
+            Long version of the name.
+        """
         return name
 
     @classmethod
     def namespace(cls, full_name: str) -> Optional[str]:
+        """Determine the namespace part of a type name.
+
+        Args:
+            full_name: Long version of a type name.
+        Returns:
+            The namespace part of the name, or None if there is no namespace.
+        """
         return None
 
     @classmethod
     def is_member_blacklisted(cls, kind: str, name: str) -> bool:
+        """Is a member black-listed?
+
+        Doxygen sometimes generates invalid members, that should be ignored.
+
+        Args:
+            kind: Kind of member.
+            name: Name of the member.
+        Returns:
+            True if the member is black-listed.
+        """
         return False
 
     @classmethod
     def unique_id(cls, id: Optional[str]) -> Optional[str]:
+        """Generate a unique id that can be used to refer to an element.
+
+        The unique id is also unique over multiple different languages.
+
+        Args:
+            id: Identifier as reported by Doxygen.
+        Returns:
+            Unique identifier.
+        """
         if not id:
             return None
 

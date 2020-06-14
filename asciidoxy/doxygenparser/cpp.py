@@ -17,7 +17,7 @@ import string
 
 from typing import List, Optional
 
-from .language_traits import LanguageTraits, TokenType
+from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser, find_tokens
 
@@ -48,24 +48,24 @@ class CppTraits(LanguageTraits):
                       "char32_t", "char8_t", "float", "double", "long", "short", "int")
 
     TOKENS = {
-        TokenType.NESTED_START: NESTED_STARTS,
-        TokenType.NESTED_END: NESTED_ENDS,
-        TokenType.ARGS_START: ARGS_STARTS,
-        TokenType.ARGS_END: ARGS_ENDS,
-        TokenType.SEPARATOR: SEPARATORS,
-        TokenType.OPERATOR: OPERATORS,
-        TokenType.QUALIFIER: QUALIFIERS,
-        TokenType.BUILT_IN_NAME: BUILT_IN_NAMES,
+        TokenCategory.NESTED_START: NESTED_STARTS,
+        TokenCategory.NESTED_END: NESTED_ENDS,
+        TokenCategory.ARGS_START: ARGS_STARTS,
+        TokenCategory.ARGS_END: ARGS_ENDS,
+        TokenCategory.SEPARATOR: SEPARATORS,
+        TokenCategory.OPERATOR: OPERATORS,
+        TokenCategory.QUALIFIER: QUALIFIERS,
+        TokenCategory.BUILT_IN_NAME: BUILT_IN_NAMES,
     }
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + SEPARATORS +
                         OPERATORS + NAMESPACE_SEPARATORS + tuple(string.whitespace))
     SEPARATOR_TOKENS_OVERLAP = True
 
-    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-    ALLOWED_SUFFIXES = (TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-                        TokenType.NAME, TokenType.NAMESPACE_SEPARATOR)
-    ALLOWED_NAMES = (TokenType.WHITESPACE, TokenType.NAME, TokenType.NAMESPACE_SEPARATOR,
-                     TokenType.BUILT_IN_NAME)
+    ALLOWED_PREFIXES = TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+    ALLOWED_SUFFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+                        TokenCategory.NAME, TokenCategory.NAMESPACE_SEPARATOR)
+    ALLOWED_NAMES = (TokenCategory.WHITESPACE, TokenCategory.NAME,
+                     TokenCategory.NAMESPACE_SEPARATOR, TokenCategory.BUILT_IN_NAME)
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -104,11 +104,11 @@ class CppTypeParser(TypeParser):
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
         tokens = super().adapt_tokens(tokens, array_tokens)
 
-        suffixes_without_name: List[Optional[TokenType]] = list(cls.TRAITS.ALLOWED_SUFFIXES)
-        suffixes_without_name.remove(TokenType.NAME)
-        suffixes_without_name.remove(TokenType.NAMESPACE_SEPARATOR)
+        suffixes_without_name: List[Optional[TokenCategory]] = list(cls.TRAITS.ALLOWED_SUFFIXES)
+        suffixes_without_name.remove(TokenCategory.NAME)
+        suffixes_without_name.remove(TokenCategory.NAMESPACE_SEPARATOR)
         for match in find_tokens(tokens, [
-            (TokenType.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
+            (TokenCategory.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
                 suffixes_without_name,
                 suffixes_without_name + [None],
                 suffixes_without_name + [None],
@@ -116,14 +116,14 @@ class CppTypeParser(TypeParser):
                 suffixes_without_name + [None],
                 suffixes_without_name + [None],
                 suffixes_without_name + [None],
-            [TokenType.NAME],
-            [TokenType.WHITESPACE, None],
-            [TokenType.ARGS_END, TokenType.ARGS_SEPARATOR],
+            [TokenCategory.NAME],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.ARGS_END, TokenCategory.ARGS_SEPARATOR],
         ]):
-            if match[-2].type_ == TokenType.NAME:
-                match[-2].type_ = TokenType.ARG_NAME
-            elif match[-3].type_ == TokenType.NAME:
-                match[-3].type_ = TokenType.ARG_NAME
+            if match[-2].category == TokenCategory.NAME:
+                match[-2].category = TokenCategory.ARG_NAME
+            elif match[-3].category == TokenCategory.NAME:
+                match[-3].category = TokenCategory.ARG_NAME
 
         return tokens
 

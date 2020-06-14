@@ -17,7 +17,7 @@ import string
 
 from typing import List, Optional
 
-from .language_traits import LanguageTraits, TokenType
+from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser
 
@@ -31,16 +31,16 @@ class PythonTraits(LanguageTraits):
     NESTED_SEPARATORS = ",",
 
     TOKENS = {
-        TokenType.NESTED_START: NESTED_STARTS,
-        TokenType.NESTED_END: NESTED_ENDS,
-        TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
+        TokenCategory.NESTED_START: NESTED_STARTS,
+        TokenCategory.NESTED_END: NESTED_ENDS,
+        TokenCategory.NESTED_SEPARATOR: NESTED_SEPARATORS,
     }
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
 
     ALLOWED_PREFIXES = None
     ALLOWED_SUFFIXES = None
-    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
+    ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME,
 
     @classmethod
     def cleanup_name(cls, name: str) -> str:
@@ -80,9 +80,9 @@ class PythonTypeParser(TypeParser):
         if array_tokens:
             # There is a bug where the last closing bracket is stored in the type name. We need to
             # insert the nested types in front of that bracket
-            if tokens[-1].type_ == TokenType.WHITESPACE:
+            if tokens[-1].category == TokenCategory.WHITESPACE:
                 tokens.pop(-1)
-            if tokens[-1].type_ == TokenType.NESTED_END:
+            if tokens[-1].category == TokenCategory.NESTED_END:
                 tokens[-1:-1] = array_tokens
             else:
                 tokens.extend(array_tokens)
