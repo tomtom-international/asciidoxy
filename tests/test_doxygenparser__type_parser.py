@@ -23,7 +23,7 @@ from typing import List, NamedTuple, Optional
 from unittest.mock import MagicMock
 
 from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenType
-from asciidoxy.doxygenparser.type_parser import Token, TypeParser, TypeParseError, find_tokens
+from asciidoxy.doxygenparser.type_parser import Token, TypeParser, find_tokens
 from asciidoxy.model import Compound, Member
 from .shared import assert_equal_or_none_if_empty, sub_element
 
@@ -109,7 +109,7 @@ def nested_sep(text: str = ",") -> Token:
     return Token(text, TokenType.NESTED_SEPARATOR)
 
 
-def ref(text: str, refid: str, kind: Optional[str] = None) -> Token:
+def ref(text: str, refid: Optional[str] = None, kind: Optional[str] = None) -> Token:
     return Token(text, refid=refid, type_=TokenType.NAME, kind=kind)
 
 
@@ -131,6 +131,10 @@ def arg_name(text: str) -> Token:
 
 def sep(text: str = ",") -> Token:
     return Token(text, TokenType.SEPARATOR)
+
+
+def unknown(text: str) -> Token:
+    return Token(text, TokenType.UNKNOWN)
 
 
 @pytest.mark.parametrize("text,tokens", [
@@ -319,6 +323,20 @@ def test_type_parser__tokenize_xml__simple_element__kind_is_optional():
     sub_element(element, "ref", text="MyType", refid="my_type")
     assert TestParser.tokenize_xml(element) == [
         ref("MyType", refid="my_type"),
+    ]
+
+
+def test_type_parser__tokenize_xml__simple_element__name_missing():
+    element = ET.Element("type")
+    sub_element(element, "ref", text="", refid="my_type")
+    assert TestParser.tokenize_xml(element) == []
+
+
+def test_type_parser__tokenize_xml__simple_element__ref_id_missing():
+    element = ET.Element("type")
+    sub_element(element, "ref", text="MyType")
+    assert TestParser.tokenize_xml(element) == [
+        ref("MyType"),
     ]
 
 
@@ -544,9 +562,9 @@ def arg_types(request):
 
 
 def _match_type(actual, expected):
-    assert actual.prefix == expected.prefix
+    assert_equal_or_none_if_empty(actual.prefix, expected.prefix)
     assert actual.name == expected.name
-    assert actual.suffix == expected.suffix
+    assert_equal_or_none_if_empty(actual.suffix, expected.suffix)
     assert actual.kind == expected.kind
     if expected.refid is None:
         assert actual.id is None
@@ -737,23 +755,30 @@ def test_type_parser__type_from_tokens__do_not_register_builtin_types():
                     ]) == sorted(["OtherType", "MyType", "OtherType"]))
 
 
-@pytest.mark.parametrize("tokens", [
-    [nested_start()],
-    [nested_sep()],
-    [nested_end()],
-    [qualifier("const")],
-    [operator("*")],
-    [name("MyType"), nested_start()],
-    [name("MyType"), nested_start(), name("OtherType")],
-    [name("MyType"), nested_start(),
-     name("OtherType"), nested_sep()],
-    [name("MyType"), nested_end()],
-    [name("MyType"), nested_sep(), name("OtherType")],
-],
-                         ids=lambda ps: "".join(p.text for p in ps))
-def test_type_parser__type_from_tokens__invalid_token_sequence(tokens):
-    with pytest.raises(TypeParseError):
-        TestParser.type_from_tokens(tokens)
+@pytest.mark.parametrize("tokens,expected", [
+    ([name("MyType"), nested_end()], ExpectedType("", "MyType", ">")),
+    ([name("MyType"), nested_sep(), name("OtherType")], ExpectedType("", "MyType", ",OtherType")),
+])
+def test_type_parser__type_from_tokens__unexpected_trailing_tokens(tokens, expected):
+    type_ref = TestParser.type_from_tokens(tokens)
+    _match_type(type_ref, expected)
+
+
+@pytest.mark.parametrize("tokens,expected", [
+    ([nested_sep()], ExpectedType(None, ",", None)),
+    ([nested_end()], ExpectedType(None, ">", None)),
+    ([qualifier("const")], ExpectedType(None, "const", None)),
+    ([operator("*")], ExpectedType(None, "*", None)),
+    ([nested_start()], ExpectedType(None, "<", None)),
+    ([name("MyType"), nested_start()], ExpectedType(None, "MyType", "<")),
+    ([name("MyType"), nested_start(), name("OtherType")], ExpectedType(
+        None, "MyType", "<OtherType")),
+    ([name("MyType"), nested_start(),
+      name("OtherType"), nested_sep()], ExpectedType(None, "MyType", "<OtherType,")),
+])
+def test_type_parser__type_from_tokens__invalid_token_sequence(tokens, expected):
+    type_ref = TestParser.type_from_tokens(tokens)
+    _match_type(type_ref, expected)
 
 
 def test_type_parser__type_from_tokens__calls_cleanup_name():
@@ -834,6 +859,65 @@ def test_type_parser__type_from_tokens__calls_cleanup_name():
 ],
                          ids=lambda ps: "".join(p.text for p in ps))
 def test_type_parser__adapt_separators(tokens, expected):
+    assert TestParser.adapt_separators(tokens) == expected
+
+
+@pytest.mark.parametrize("tokens,expected", [
+    ([
+        name("Type"),
+        sep(),
+        name("SecondType"),
+        nested_end(),
+    ], [
+        name("Type"),
+        unknown(","),
+        name("SecondType"),
+        nested_end(),
+    ]),
+    ([
+        name("Type"),
+        sep(),
+        name("SecondType"),
+        args_end(),
+    ], [
+        name("Type"),
+        unknown(","),
+        name("SecondType"),
+        args_end(),
+    ]),
+    ([
+        nested_start(),
+        name("Type"),
+        sep(),
+        name("SecondType"),
+        nested_end(),
+        sep(),
+    ], [
+        nested_start(),
+        name("Type"),
+        nested_sep(","),
+        name("SecondType"),
+        nested_end(),
+        unknown(","),
+    ]),
+    ([
+        args_start(),
+        name("Type"),
+        sep(),
+        name("SecondType"),
+        args_end(),
+        sep(),
+    ], [
+        args_start(),
+        name("Type"),
+        args_sep(","),
+        name("SecondType"),
+        args_end(),
+        unknown(","),
+    ]),
+],
+                         ids=lambda ps: "".join(p.text for p in ps))
+def test_type_parser__adapt_separators__invalid(tokens, expected):
     assert TestParser.adapt_separators(tokens) == expected
 
 

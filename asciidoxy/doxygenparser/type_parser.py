@@ -13,6 +13,8 @@
 # limitations under the License.
 """Parsing of types from strings and XML."""
 
+import logging
+
 import xml.etree.ElementTree as ET
 
 from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union
@@ -20,6 +22,8 @@ from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenType
 from ..model import Compound, Member, Parameter, TypeRef
+
+logger = logging.getLogger(__name__)
 
 
 class Token:
@@ -91,7 +95,12 @@ class TypeParser:
 
             elif token.type_ in (TokenType.SEPARATOR, TokenType.NESTED_SEPARATOR,
                                  TokenType.ARGS_SEPARATOR):
-                token.type_ = cls._determine_separator_type(scope_types)
+                try:
+                    token.type_ = cls._determine_separator_type(scope_types)
+                except TypeParseError:
+                    logger.warning(f"Cannot determine type of separator of token {i} in"
+                                   f"{''.join(t.text for t in tokens)}")
+                    token.type_ = TokenType.UNKNOWN
         return tokens
 
     @staticmethod
@@ -165,9 +174,11 @@ class TypeParser:
             kind = element.get("kindref", None)
 
             if not name or not refid:
-                raise TypeParseError("Encountered reference XML element without name or id.")
+                logger.error(f"Encountered reference XML element without name or id: "
+                             f"{ET.tostring(element, encoding='utf-8')}")
 
-            tokens.append(Token(name, refid=refid, kind=kind, type_=TokenType.NAME))
+            if name:
+                tokens.append(Token(name, refid=refid, kind=kind, type_=TokenType.NAME))
 
         elif element.text:
             tokens.extend(cls.tokenize_text(element.text))
@@ -197,18 +208,25 @@ class TypeParser:
         cls.remove_leading_whitespace(names)
         tokens[:0] = cls.remove_trailing_whitespace(names)
 
-        nested_types, tokens = cls.nested_types(tokens, driver, parent)
-        arg_types, tokens = cls.arg_types(tokens, driver, parent)
+        nested_types: Optional[List[TypeRef]] = []
+        arg_types: Optional[List[Parameter]] = []
+        try:
+            nested_types, tokens = cls.nested_types(tokens, driver, parent)
+            arg_types, tokens = cls.arg_types(tokens, driver, parent)
+        except TypeParseError as e:
+            logger.warning(f"Failed to parse nested types or args: {e}")
 
         suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
         cls.remove_trailing_whitespace(suffixes)
 
         if not names:
-            raise TypeParseError(f"No name found"
-                                 f" in `{'`,`'.join(t.text for t in original_tokens)}`")
+            logger.warning(f"No name found in `{'`,`'.join(t.text for t in original_tokens)}`")
+            return TypeRef(cls.TRAITS.TAG, "".join(t.text for t in original_tokens))
+
         if tokens and any(t.type_ != TokenType.WHITESPACE for t in tokens):
-            raise TypeParseError(f"Unexpected token(s) `{'`,`'.join(t.text for t in tokens)}`"
-                                 f" in `{'`,`'.join(t.text for t in original_tokens)}`")
+            logger.warning(f"Unexpected trailing token(s) `{'`,`'.join(t.text for t in tokens)}`"
+                           f" in `{'`,`'.join(t.text for t in original_tokens)}`")
+            suffixes.extend(tokens)
 
         type_ref = TypeRef(cls.TRAITS.TAG)
         type_ref.name = cls.TRAITS.cleanup_name("".join(n.text for n in names))
