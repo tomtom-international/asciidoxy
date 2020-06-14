@@ -47,6 +47,7 @@ class ObjectiveCTraits(LanguageTraits):
     QUALIFIERS = "nullable", "const", "__weak", "__strong", "__nonnull", "_Nullable", "_Nonnull",
     BUILT_IN_NAMES = ("char", "unsigned", "signed", "int", "short", "long", "float", "double",
                       "void", "bool", "BOOL", "id", "instancetype")
+    BLOCKS = "^",
 
     TOKENS = {
         TokenType.NESTED_START: NESTED_STARTS,
@@ -57,9 +58,10 @@ class ObjectiveCTraits(LanguageTraits):
         TokenType.OPERATOR: OPERATORS,
         TokenType.QUALIFIER: QUALIFIERS,
         TokenType.BUILT_IN_NAME: BUILT_IN_NAMES,
+        TokenType.BLOCK: BLOCKS,
     }
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + SEPARATORS +
-                        OPERATORS + tuple(string.whitespace))
+                        OPERATORS + BLOCKS + tuple(string.whitespace))
     SEPARATOR_TOKENS_OVERLAP = True
 
     ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.QUALIFIER,
@@ -114,6 +116,16 @@ class ObjectiveCTypeParser(TypeParser):
         tokens = super().adapt_tokens(tokens, array_tokens)
 
         for match in find_tokens(tokens, [
+            [TokenType.ARGS_START],
+            [TokenType.WHITESPACE, None],
+            [TokenType.BLOCK],
+            [TokenType.WHITESPACE, None],
+            [TokenType.ARGS_END],
+        ]):
+            for t in match:
+                t.type_ = TokenType.INVALID
+
+        for match in find_tokens(tokens, [
             (TokenType.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
                 cls.TRAITS.ALLOWED_SUFFIXES,
                 cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
@@ -130,6 +142,8 @@ class ObjectiveCTypeParser(TypeParser):
                 match[-2].type_ = TokenType.ARG_NAME
             elif match[-3].type_ == TokenType.NAME:
                 match[-3].type_ = TokenType.ARG_NAME
+
+        tokens = [t for t in tokens if t.type_ != TokenType.INVALID]
 
         return tokens
 
