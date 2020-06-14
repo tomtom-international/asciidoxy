@@ -101,4 +101,4 @@ Severity severity;
 /*!
  Callback for receiving new traffic events.
  */
-typedef void (^OnTrafficEventCallback)(id<ADTrafficEvent>);
+typedef void (^OnTrafficEventCallback)(id<ADTrafficEvent>, NSInteger delay);
