@@ -19,7 +19,9 @@ import xml.etree.ElementTree as ET
 
 from unittest.mock import MagicMock
 
+from asciidoxy.doxygenparser.language_traits import TokenType
 from asciidoxy.doxygenparser.objc import ObjectiveCTypeParser
+from asciidoxy.doxygenparser.type_parser import Token
 from .shared import assert_equal_or_none_if_empty
 from .test_doxygenparser__type_parser import (qualifier, whitespace, name, operator, arg_name,
                                               args_start, args_end, sep, args_sep)
@@ -105,6 +107,10 @@ def test_parse_objc_type_with_space(type_with_space):
     assert not type_ref.suffix
 
 
+def block(text: str = "^") -> Token:
+    return Token(text, TokenType.BLOCK)
+
+
 @pytest.mark.parametrize("tokens, expected", [
     ([], []),
     ([
@@ -188,6 +194,26 @@ def test_parse_objc_type_with_space(type_with_space):
         qualifier("nullable"),
         whitespace(),
         arg_name("null_value"),
+        args_end(),
+    ]),
+    ([
+        name("void"),
+        args_start(),
+        block(),
+        args_end(),
+        args_start(),
+        name("NSString"),
+        whitespace(),
+        operator("*"),
+        name("text"),
+        args_end(),
+    ], [
+        name("void"),
+        args_start(),
+        name("NSString"),
+        whitespace(),
+        operator("*"),
+        arg_name("text"),
         args_end(),
     ]),
 ],
