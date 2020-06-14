@@ -104,14 +104,26 @@ class CppTypeParser(TypeParser):
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
         tokens = super().adapt_tokens(tokens, array_tokens)
 
+        suffixes_without_name: List[Optional[TokenType]] = list(cls.TRAITS.ALLOWED_SUFFIXES)
+        suffixes_without_name.remove(TokenType.NAME)
+        suffixes_without_name.remove(TokenType.NAMESPACE_SEPARATOR)
         for match in find_tokens(tokens, [
-            (TokenType.NESTED_END, TokenType.NESTED_START) + cls.TRAITS.ALLOWED_NAMES,
-            [TokenType.WHITESPACE],
+            (TokenType.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
+                suffixes_without_name,
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
             [TokenType.NAME],
             [TokenType.WHITESPACE, None],
             [TokenType.ARGS_END, TokenType.ARGS_SEPARATOR],
         ]):
-            match[2].type_ = TokenType.ARG_NAME
+            if match[-2].type_ == TokenType.NAME:
+                match[-2].type_ = TokenType.ARG_NAME
+            elif match[-3].type_ == TokenType.NAME:
+                match[-3].type_ = TokenType.ARG_NAME
 
         return tokens
 
