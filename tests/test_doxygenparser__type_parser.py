@@ -22,7 +22,7 @@ import xml.etree.ElementTree as ET
 from typing import List, NamedTuple, Optional
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenType
+from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenCategory
 from asciidoxy.doxygenparser.type_parser import Token, TypeParser, find_tokens
 from asciidoxy.model import Compound, Member
 from .shared import assert_equal_or_none_if_empty, sub_element
@@ -40,21 +40,21 @@ class TestTraits(LanguageTraits):
     SEPARATORS = ",", ";",
 
     TOKENS = {
-        TokenType.NESTED_START: NESTED_STARTS,
-        TokenType.NESTED_END: NESTED_ENDS,
-        TokenType.OPERATOR: OPERATORS,
-        TokenType.QUALIFIER: QUALIFIERS,
-        TokenType.ARGS_START: ARGS_STARTS,
-        TokenType.ARGS_END: ARGS_ENDS,
-        TokenType.SEPARATOR: SEPARATORS,
+        TokenCategory.NESTED_START: NESTED_STARTS,
+        TokenCategory.NESTED_END: NESTED_ENDS,
+        TokenCategory.OPERATOR: OPERATORS,
+        TokenCategory.QUALIFIER: QUALIFIERS,
+        TokenCategory.ARGS_START: ARGS_STARTS,
+        TokenCategory.ARGS_END: ARGS_ENDS,
+        TokenCategory.SEPARATOR: SEPARATORS,
     }
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + OPERATORS + ARGS_STARTS + ARGS_ENDS +
                         SEPARATORS + tuple(string.whitespace))
     SEPARATOR_TOKENS_OVERLAP = True
 
-    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-    ALLOWED_SUFFIXES = TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
+    ALLOWED_PREFIXES = TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+    ALLOWED_SUFFIXES = TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+    ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME,
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -76,65 +76,65 @@ class TestParser(TypeParser):
 
         for token in tokens:
             if token.text.startswith("arg_"):
-                token.type_ = TokenType.ARG_NAME
+                token.category = TokenCategory.ARG_NAME
 
         return tokens
 
 
 def whitespace(text: str = " ") -> Token:
-    return Token(text, TokenType.WHITESPACE)
+    return Token(text, TokenCategory.WHITESPACE)
 
 
 def qualifier(text: str) -> Token:
-    return Token(text, TokenType.QUALIFIER)
+    return Token(text, TokenCategory.QUALIFIER)
 
 
 def operator(text: str) -> Token:
-    return Token(text, TokenType.OPERATOR)
+    return Token(text, TokenCategory.OPERATOR)
 
 
 def name(text: str) -> Token:
-    return Token(text, TokenType.NAME)
+    return Token(text, TokenCategory.NAME)
 
 
 def nested_start(text: str = "<") -> Token:
-    return Token(text, TokenType.NESTED_START)
+    return Token(text, TokenCategory.NESTED_START)
 
 
 def nested_end(text: str = ">") -> Token:
-    return Token(text, TokenType.NESTED_END)
+    return Token(text, TokenCategory.NESTED_END)
 
 
 def nested_sep(text: str = ",") -> Token:
-    return Token(text, TokenType.NESTED_SEPARATOR)
+    return Token(text, TokenCategory.NESTED_SEPARATOR)
 
 
 def ref(text: str, refid: Optional[str] = None, kind: Optional[str] = None) -> Token:
-    return Token(text, refid=refid, type_=TokenType.NAME, kind=kind)
+    return Token(text, refid=refid, category=TokenCategory.NAME, kind=kind)
 
 
 def args_start(text: str = "(") -> Token:
-    return Token(text, TokenType.ARGS_START)
+    return Token(text, TokenCategory.ARGS_START)
 
 
 def args_end(text: str = ")") -> Token:
-    return Token(text, TokenType.ARGS_END)
+    return Token(text, TokenCategory.ARGS_END)
 
 
 def args_sep(text: str = ",") -> Token:
-    return Token(text, TokenType.ARGS_SEPARATOR)
+    return Token(text, TokenCategory.ARGS_SEPARATOR)
 
 
 def arg_name(text: str) -> Token:
-    return Token(text, TokenType.ARG_NAME)
+    return Token(text, TokenCategory.ARG_NAME)
 
 
 def sep(text: str = ",") -> Token:
-    return Token(text, TokenType.SEPARATOR)
+    return Token(text, TokenCategory.SEPARATOR)
 
 
 def unknown(text: str) -> Token:
-    return Token(text, TokenType.UNKNOWN)
+    return Token(text, TokenCategory.UNKNOWN)
 
 
 @pytest.mark.parametrize("text,tokens", [
@@ -1116,16 +1116,16 @@ def test_type_parser__parse_xml__nested_types_and_args():
     ([
         whitespace(),
     ], [
-        [TokenType.WHITESPACE],
-        [TokenType.WHITESPACE],
+        [TokenCategory.WHITESPACE],
+        [TokenCategory.WHITESPACE],
     ], []),
     ([
         name("Type"),
         whitespace(),
         name("Arg"),
     ], [
-        [TokenType.WHITESPACE],
-        [TokenType.NAME],
+        [TokenCategory.WHITESPACE],
+        [TokenCategory.NAME],
     ], [[
         whitespace(),
         name("Arg"),
@@ -1135,16 +1135,16 @@ def test_type_parser__parse_xml__nested_types_and_args():
         whitespace(),
         name("Arg"),
     ], [
-        [TokenType.NAME],
-        [TokenType.NAME],
+        [TokenCategory.NAME],
+        [TokenCategory.NAME],
     ], []),
     ([
         name("Type"),
         whitespace(),
         name("Arg"),
     ], [
-        [TokenType.WHITESPACE, TokenType.NAME],
-        [TokenType.NAME, TokenType.WHITESPACE],
+        [TokenCategory.WHITESPACE, TokenCategory.NAME],
+        [TokenCategory.NAME, TokenCategory.WHITESPACE],
     ], [[
         name("Type"),
         whitespace(),
@@ -1157,9 +1157,9 @@ def test_type_parser__parse_xml__nested_types_and_args():
         whitespace(),
         name("Arg"),
     ], [
-        [TokenType.NAME],
-        [TokenType.WHITESPACE, None],
-        [TokenType.NAME],
+        [TokenCategory.NAME],
+        [TokenCategory.WHITESPACE, None],
+        [TokenCategory.NAME],
     ], [[
         name("Type"),
         whitespace(),
@@ -1169,9 +1169,9 @@ def test_type_parser__parse_xml__nested_types_and_args():
         name("Type"),
         name("Arg"),
     ], [
-        [TokenType.NAME],
-        [TokenType.WHITESPACE, None],
-        [TokenType.NAME],
+        [TokenCategory.NAME],
+        [TokenCategory.WHITESPACE, None],
+        [TokenCategory.NAME],
     ], [[
         name("Type"),
         name("Arg"),

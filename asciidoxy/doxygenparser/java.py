@@ -17,7 +17,7 @@ import string
 
 from typing import List, Optional
 
-from .language_traits import LanguageTraits, TokenType
+from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import TypeParser, Token, find_tokens
 
@@ -38,20 +38,21 @@ class JavaTraits(LanguageTraits):
     INVALID = "private",
 
     TOKENS = {
-        TokenType.NESTED_START: NESTED_STARTS,
-        TokenType.NESTED_END: NESTED_ENDS,
-        TokenType.NESTED_SEPARATOR: NESTED_SEPARATORS,
-        TokenType.QUALIFIER: QUALIFIERS,
-        TokenType.WILDCARD_BOUNDS: WILDCARD_BOUNDS,
-        TokenType.INVALID: INVALID,
+        TokenCategory.NESTED_START: NESTED_STARTS,
+        TokenCategory.NESTED_END: NESTED_ENDS,
+        TokenCategory.NESTED_SEPARATOR: NESTED_SEPARATORS,
+        TokenCategory.QUALIFIER: QUALIFIERS,
+        TokenCategory.WILDCARD_BOUNDS: WILDCARD_BOUNDS,
+        TokenCategory.INVALID: INVALID,
     }
 
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
 
-    ALLOWED_PREFIXES = (TokenType.WHITESPACE, TokenType.OPERATOR, TokenType.QUALIFIER,
-                        TokenType.WILDCARD, TokenType.WILDCARD_BOUNDS, TokenType.UNKNOWN)
-    ALLOWED_SUFFIXES = TokenType.WHITESPACE,
-    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME,
+    ALLOWED_PREFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+                        TokenCategory.WILDCARD, TokenCategory.WILDCARD_BOUNDS,
+                        TokenCategory.UNKNOWN)
+    ALLOWED_SUFFIXES = TokenCategory.WHITESPACE,
+    ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME,
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -90,7 +91,7 @@ class JavaTypeParser(TypeParser):
     def adapt_tokens(cls,
                      tokens: List[Token],
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
-        tokens = [t for t in tokens if t.type_ != TokenType.INVALID]
+        tokens = [t for t in tokens if t.category != TokenCategory.INVALID]
         tokens = cls.mark_separate_wildcard_bounds(tokens)
         tokens = cls.detect_wildcards(tokens)
         return tokens
@@ -101,30 +102,30 @@ class JavaTypeParser(TypeParser):
         # Separate wildcard bounds are not supported yet
         nested = 0
         for token in tokens:
-            if nested == 0 and token.type_ == TokenType.NAME:
+            if nested == 0 and token.category == TokenCategory.NAME:
                 break
 
-            elif token.type_ == TokenType.NESTED_START:
+            elif token.category == TokenCategory.NESTED_START:
                 nested += 1
-                token.type_ = TokenType.UNKNOWN
+                token.category = TokenCategory.UNKNOWN
 
-            elif token.type_ == TokenType.NESTED_END:
+            elif token.category == TokenCategory.NESTED_END:
                 nested -= 1
-                token.type_ = TokenType.UNKNOWN
+                token.category = TokenCategory.UNKNOWN
 
             elif nested > 0:
-                token.type_ = TokenType.UNKNOWN
+                token.category = TokenCategory.UNKNOWN
 
         return tokens
 
     @staticmethod
     def detect_wildcards(tokens: List[Token]) -> List[Token]:
         for match in find_tokens(tokens, [
-            [TokenType.NAME],
-            [TokenType.WHITESPACE],
-            [TokenType.WILDCARD_BOUNDS],
+            [TokenCategory.NAME],
+            [TokenCategory.WHITESPACE],
+            [TokenCategory.WILDCARD_BOUNDS],
         ]):
-            match[0].type_ = TokenType.WILDCARD
+            match[0].category = TokenCategory.WILDCARD
         return tokens
 
 

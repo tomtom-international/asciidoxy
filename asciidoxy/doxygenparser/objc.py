@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ET
 
 from typing import List, Optional
 
-from .language_traits import LanguageTraits, TokenType
+from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import TypeParser, Token, find_tokens
 from ..model import Compound, Member
@@ -50,28 +50,28 @@ class ObjectiveCTraits(LanguageTraits):
     BLOCKS = "^",
 
     TOKENS = {
-        TokenType.NESTED_START: NESTED_STARTS,
-        TokenType.NESTED_END: NESTED_ENDS,
-        TokenType.ARGS_START: ARGS_STARTS,
-        TokenType.ARGS_END: ARGS_ENDS,
-        TokenType.SEPARATOR: SEPARATORS,
-        TokenType.OPERATOR: OPERATORS,
-        TokenType.QUALIFIER: QUALIFIERS,
-        TokenType.BUILT_IN_NAME: BUILT_IN_NAMES,
-        TokenType.BLOCK: BLOCKS,
+        TokenCategory.NESTED_START: NESTED_STARTS,
+        TokenCategory.NESTED_END: NESTED_ENDS,
+        TokenCategory.ARGS_START: ARGS_STARTS,
+        TokenCategory.ARGS_END: ARGS_ENDS,
+        TokenCategory.SEPARATOR: SEPARATORS,
+        TokenCategory.OPERATOR: OPERATORS,
+        TokenCategory.QUALIFIER: QUALIFIERS,
+        TokenCategory.BUILT_IN_NAME: BUILT_IN_NAMES,
+        TokenCategory.BLOCK: BLOCKS,
     }
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + SEPARATORS +
                         OPERATORS + BLOCKS + tuple(string.whitespace))
     SEPARATOR_TOKENS_OVERLAP = True
 
-    ALLOWED_PREFIXES = TokenType.WHITESPACE, TokenType.QUALIFIER,
+    ALLOWED_PREFIXES = TokenCategory.WHITESPACE, TokenCategory.QUALIFIER,
     ALLOWED_SUFFIXES = (
-        TokenType.WHITESPACE,
-        TokenType.OPERATOR,
-        TokenType.QUALIFIER,
-        TokenType.ARG_NAME,
+        TokenCategory.WHITESPACE,
+        TokenCategory.OPERATOR,
+        TokenCategory.QUALIFIER,
+        TokenCategory.ARG_NAME,
     )
-    ALLOWED_NAMES = TokenType.WHITESPACE, TokenType.NAME, TokenType.BUILT_IN_NAME,
+    ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME, TokenCategory.BUILT_IN_NAME,
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -116,17 +116,17 @@ class ObjectiveCTypeParser(TypeParser):
         tokens = super().adapt_tokens(tokens, array_tokens)
 
         for match in find_tokens(tokens, [
-            [TokenType.ARGS_START],
-            [TokenType.WHITESPACE, None],
-            [TokenType.BLOCK],
-            [TokenType.WHITESPACE, None],
-            [TokenType.ARGS_END],
+            [TokenCategory.ARGS_START],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.BLOCK],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.ARGS_END],
         ]):
             for t in match:
-                t.type_ = TokenType.INVALID
+                t.category = TokenCategory.INVALID
 
         for match in find_tokens(tokens, [
-            (TokenType.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
+            (TokenCategory.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
                 cls.TRAITS.ALLOWED_SUFFIXES,
                 cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
                 cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
@@ -134,16 +134,16 @@ class ObjectiveCTypeParser(TypeParser):
                 cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
                 cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
                 cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
-            [TokenType.NAME],
-            [TokenType.WHITESPACE, None],
-            [TokenType.ARGS_END, TokenType.ARGS_SEPARATOR],
+            [TokenCategory.NAME],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.ARGS_END, TokenCategory.ARGS_SEPARATOR],
         ]):
-            if match[-2].type_ == TokenType.NAME:
-                match[-2].type_ = TokenType.ARG_NAME
-            elif match[-3].type_ == TokenType.NAME:
-                match[-3].type_ = TokenType.ARG_NAME
+            if match[-2].category == TokenCategory.NAME:
+                match[-2].category = TokenCategory.ARG_NAME
+            elif match[-3].category == TokenCategory.NAME:
+                match[-3].category = TokenCategory.ARG_NAME
 
-        tokens = [t for t in tokens if t.type_ != TokenType.INVALID]
+        tokens = [t for t in tokens if t.category != TokenCategory.INVALID]
 
         return tokens
 

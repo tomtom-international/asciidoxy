@@ -37,7 +37,14 @@ def _yes_no_to_bool(yes_no: str) -> bool:
 
 
 class ParserBase(ABC):
-    """Base functionality for language parsers."""
+    """Base functionality for language parsers.
+
+    The parser is mostly anemic by design: there is no internal state that changes during parsing.
+
+    Attributes:
+        TRAITS:      Specifics for the language grammar to parse.
+        TYPE_PARSER: Specific type parser for the langugage.
+    """
     TRAITS: Type[LanguageTraits]
     TYPE_PARSER: Type[TypeParser]
 
