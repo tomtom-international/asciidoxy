@@ -163,6 +163,4 @@ class ObjectiveCParser(ParserBase):
         type_element.text = type_text
         memberdef_element.set("kind", "block")
 
-        print(memberdef_element.findtext("name"), type_text)
-
         return memberdef_element
