@@ -99,6 +99,85 @@ def test_link_from_ref__nested_types(context_mock):
          call(ref.id, ref.name)])
 
 
+def test_link_from_ref__empty_nested_types(context_mock):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = []
+
+    assert link_from_ref(ref, context_mock) == "const xref:lang-tomtom_1_MyType[MyType]&lt;&gt; &"
+    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+
+
+def test_link_from_ref__args(context_mock):
+    arg1_type = TypeRef("lang")
+    arg1_type.name = "ArgType1"
+    arg1_type.id = "lang-argtype1"
+
+    arg1 = Parameter()
+    arg1.type = arg1_type
+
+    arg2_type = TypeRef("lang")
+    arg2_type.name = "ArgType2"
+
+    arg2 = Parameter()
+    arg2.name = "value"
+    arg2.type = arg2_type
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = [arg1, arg2]
+
+    assert (link_from_ref(ref, context_mock) ==
+            "xref:lang-tomtom_1_MyType[MyType](xref:lang-argtype1[ArgType1], ArgType2 value)")
+    context_mock.link_to_element.assert_has_calls(
+        [call(arg1_type.id, arg1_type.name),
+         call(ref.id, ref.name)])
+
+
+def test_link_from_ref__empty_args(context_mock):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = []
+
+    assert link_from_ref(ref, context_mock) == "const xref:lang-tomtom_1_MyType[MyType]() &"
+    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+
+
+def test_link_from_ref__nested_and_args_custom_start_and_end(context_mock):
+    nested_type = TypeRef("lang")
+    nested_type.name = "Nested1"
+
+    arg_type = TypeRef("lang")
+    arg_type.name = "ArgType"
+    arg_type.id = "lang-argtype"
+
+    arg = Parameter()
+    arg.type = arg_type
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = [nested_type]
+    ref.args = [arg]
+
+    assert (link_from_ref(ref,
+                          context_mock,
+                          nested_start="{",
+                          nested_end=";",
+                          args_start="@",
+                          args_end="#") ==
+            "const xref:lang-tomtom_1_MyType[MyType]{Nested1;@xref:lang-argtype[ArgType]# &")
+
+
 def test_print_ref__empty():
     ref = TypeRef("lang")
     assert print_ref(ref) == ""
@@ -149,6 +228,74 @@ def test_print_ref__nested_types():
     ref.nested = [nested_type_with_id, nested_type_without_id]
 
     assert print_ref(ref) == "const MyType&lt;Nested1, Nested2&gt; &"
+
+
+def test_print_ref__empty_nested_types():
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = []
+
+    assert print_ref(ref) == "const MyType&lt;&gt; &"
+
+
+def test_print_ref__args():
+    arg1_type = TypeRef("lang")
+    arg1_type.name = "ArgType1"
+    arg1_type.id = "lang-argtype1"
+
+    arg1 = Parameter()
+    arg1.type = arg1_type
+
+    arg2_type = TypeRef("lang")
+    arg2_type.name = "ArgType2"
+
+    arg2 = Parameter()
+    arg2.name = "value"
+    arg2.type = arg2_type
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = [arg1, arg2]
+
+    assert print_ref(ref) == "MyType(ArgType1, ArgType2 value)"
+
+
+def test_print_ref__empty_args():
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = []
+
+    assert print_ref(ref) == "const MyType() &"
+
+
+def test_print_ref__nested_and_args_custom_start_and_end():
+    nested_type = TypeRef("lang")
+    nested_type.name = "Nested1"
+
+    arg_type = TypeRef("lang")
+    arg_type.name = "ArgType"
+    arg_type.id = "lang-argtype"
+
+    arg = Parameter()
+    arg.type = arg_type
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = [nested_type]
+    ref.args = [arg]
+
+    assert (print_ref(ref, nested_start="{", nested_end=";", args_start="@",
+                      args_end="#") == "const MyType{Nested1;@ArgType# &")
 
 
 def test_argument_list__empty(empty_context):

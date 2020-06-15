@@ -48,7 +48,7 @@ def test_type_ref_to_str():
     assert str(type_ref) == "const Type &"
 
     nested_type_1 = TypeRef("cpp", "Nested1")
-    type_ref.nested.append(nested_type_1)
+    type_ref.nested = [nested_type_1]
     assert str(type_ref) == "const Type< Nested1 > &"
 
     nested_type_2 = TypeRef("cpp", "Nested2")
@@ -57,5 +57,5 @@ def test_type_ref_to_str():
     type_ref.nested.append(nested_type_2)
     assert str(type_ref) == "const Type< Nested1, const Nested2* > &"
 
-    nested_type_2.nested.append(nested_type_1)
+    nested_type_2.nested = [nested_type_1]
     assert str(type_ref) == "const Type< Nested1, const Nested2< Nested1 >* > &"

@@ -13,26 +13,20 @@
 # limitations under the License.
 """Support for parsing C++ documentation."""
 
-import re
+import string
 
-from typing import Optional
+from typing import List, Optional
 
-from .language_traits import LanguageTraits
+from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
+from .type_parser import Token, TypeParser, find_tokens
 
 
 class CppTraits(LanguageTraits):
     """Traits for parsing C++ documentation."""
     TAG: str = "cpp"
 
-    TYPE_PREFIXES = re.compile(r"((const|volatile|constexpr|mutable|enum|class)\s*)+\s+")
-    TYPE_SUFFIXES = re.compile(r"(\s*(\*|&|const))+")
-    TYPE_NESTED_START = re.compile(r"\s*<\s*")
-    TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
-    TYPE_NESTED_END = re.compile(r"\s*>")
-    TYPE_NAME = re.compile(r"((unsigned|signed|short|long)\s+)*(?:(?!\bconst)[a-zA-Z0-9_:])+")
-
-    LANGUAGE_BUILD_IN_TYPES = ("void", "bool", "signed char", "unsigned char", "char", "wchar_t",
+    LANGUAGE_BUILT_IN_TYPES = ("void", "bool", "signed char", "unsigned char", "char", "wchar_t",
                                "char16_t", "char32_t", "char8_t", "float", "double", "long double",
                                "short", "short int", "signed short", "signed short int",
                                "unsigned short", "unsigned short int", "int", "signed",
@@ -42,9 +36,40 @@ class CppTraits(LanguageTraits):
                                "signed long long", "signed long long int", "unsigned long long",
                                "unsigned long long int")
 
+    NESTED_STARTS = "<",
+    NESTED_ENDS = ">",
+    ARGS_STARTS = "(",
+    ARGS_ENDS = ")",
+    SEPARATORS = ",",
+    NAMESPACE_SEPARATORS = ":",
+    OPERATORS = "*", "&", "...",
+    QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
+    BUILT_IN_NAMES = ("void", "bool", "signed", "unsigned", "char", "wchar_t", "char16_t",
+                      "char32_t", "char8_t", "float", "double", "long", "short", "int")
+
+    TOKENS = {
+        TokenCategory.NESTED_START: NESTED_STARTS,
+        TokenCategory.NESTED_END: NESTED_ENDS,
+        TokenCategory.ARGS_START: ARGS_STARTS,
+        TokenCategory.ARGS_END: ARGS_ENDS,
+        TokenCategory.SEPARATOR: SEPARATORS,
+        TokenCategory.OPERATOR: OPERATORS,
+        TokenCategory.QUALIFIER: QUALIFIERS,
+        TokenCategory.BUILT_IN_NAME: BUILT_IN_NAMES,
+    }
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + SEPARATORS +
+                        OPERATORS + NAMESPACE_SEPARATORS + tuple(string.whitespace))
+    SEPARATOR_TOKENS_OVERLAP = True
+
+    ALLOWED_PREFIXES = TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+    ALLOWED_SUFFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+                        TokenCategory.NAME, TokenCategory.NAMESPACE_SEPARATOR)
+    ALLOWED_NAMES = (TokenCategory.WHITESPACE, TokenCategory.NAME,
+                     TokenCategory.NAMESPACE_SEPARATOR, TokenCategory.BUILT_IN_NAME)
+
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
-        return type_name in cls.LANGUAGE_BUILD_IN_TYPES or type_name.startswith("std::")
+        return type_name in cls.LANGUAGE_BUILT_IN_TYPES or type_name.startswith("std::")
 
     @classmethod
     def short_name(cls, name: str) -> str:
@@ -69,6 +94,41 @@ class CppTraits(LanguageTraits):
         return kind == "friend"
 
 
+class CppTypeParser(TypeParser):
+    """Parser for C++ types."""
+    TRAITS = CppTraits
+
+    @classmethod
+    def adapt_tokens(cls,
+                     tokens: List[Token],
+                     array_tokens: Optional[List[Token]] = None) -> List[Token]:
+        tokens = super().adapt_tokens(tokens, array_tokens)
+
+        suffixes_without_name: List[Optional[TokenCategory]] = list(cls.TRAITS.ALLOWED_SUFFIXES)
+        suffixes_without_name.remove(TokenCategory.NAME)
+        suffixes_without_name.remove(TokenCategory.NAMESPACE_SEPARATOR)
+        for match in find_tokens(tokens, [
+            (TokenCategory.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
+                suffixes_without_name,
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+                suffixes_without_name + [None],
+            [TokenCategory.NAME],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.ARGS_END, TokenCategory.ARGS_SEPARATOR],
+        ]):
+            if match[-2].category == TokenCategory.NAME:
+                match[-2].category = TokenCategory.ARG_NAME
+            elif match[-3].category == TokenCategory.NAME:
+                match[-3].category = TokenCategory.ARG_NAME
+
+        return tokens
+
+
 class CppParser(ParserBase):
     """Parser for C++ documentation."""
     TRAITS = CppTraits
+    TYPE_PARSER = CppTypeParser

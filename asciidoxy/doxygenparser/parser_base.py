@@ -23,7 +23,7 @@ from typing import List, Optional, Tuple, Type, Union
 from .description_parser import DescriptionParser, select_descriptions
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
-from .type_parser import parse_type
+from .type_parser import TypeParser, TypeParseError
 from ..model import (Compound, EnumValue, Member, Parameter, ReturnValue, ThrowsClause, TypeRef,
                      InnerTypeReference)
 
@@ -37,8 +37,16 @@ def _yes_no_to_bool(yes_no: str) -> bool:
 
 
 class ParserBase(ABC):
-    """Base functionality for language parsers."""
+    """Base functionality for language parsers.
+
+    The parser is mostly anemic by design: there is no internal state that changes during parsing.
+
+    Attributes:
+        TRAITS:      Specifics for the language grammar to parse.
+        TYPE_PARSER: Specific type parser for the langugage.
+    """
     TRAITS: Type[LanguageTraits]
+    TYPE_PARSER: Type[TypeParser]
 
     _driver: DriverBase
 
@@ -67,9 +75,10 @@ class ParserBase(ABC):
         params = []
         for param_element in memberdef_element.iterfind("param"):
             param = Parameter()
-            param.type = self.parse_type(param_element.find("type"), parent)
+            param.type = self.parse_type(param_element.find("type"),
+                                         param_element.find("array"),
+                                         parent=parent)
             param.name = param_element.findtext("declname") or ""
-            self.parse_array(param_element.find("array"), param)
 
             matching_descriptions = [desc for name, desc in descriptions if name == param.name]
             if matching_descriptions:
@@ -80,16 +89,22 @@ class ParserBase(ABC):
             params.append(param)
         return params
 
-    def parse_array(self, array_element: Optional[ET.Element], param: Parameter):
-        pass
-
     def parse_type(self,
                    type_element: Optional[ET.Element],
+                   array_element: Optional[ET.Element] = None,
                    parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
         if type_element is None:
             return None
 
-        type_ref = parse_type(self.TRAITS, self._driver, type_element, parent)
+        try:
+            type_ref = self.TYPE_PARSER.parse_xml(type_element,
+                                                  array_element,
+                                                  driver=self._driver,
+                                                  parent=parent)
+        except TypeParseError:
+            logger.exception(
+                f"Failed to parse type {ET.tostring(type_element, encoding='unicode')}.")
+            return None
 
         if type_ref is not None and type_ref.name:
             return type_ref
@@ -109,7 +124,7 @@ class ParserBase(ABC):
 
     def parse_returns(self, memberdef_element: ET.Element, parent: Member) -> Optional[ReturnValue]:
         returns = ReturnValue()
-        returns.type = self.parse_type(memberdef_element.find("type"), parent)
+        returns.type = self.parse_type(memberdef_element.find("type"), parent=parent)
 
         description = memberdef_element.find("detaileddescription/para/simplesect[@kind='return']")
         if description:

@@ -68,7 +68,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="traffic_event.hpp" line="131" column="20" bodyfile="traffic_event.hpp" bodystart="131" bodyend="-1"/>
+        <location file="traffic_event.hpp" line="138" column="20" bodyfile="traffic_event.hpp" bodystart="138" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
@@ -235,17 +235,46 @@
         </inbodydescription>
         <location file="traffic_event.hpp" line="128" column="8"/>
       </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::traffic::TrafficEvent::RegisterTrafficCallback</definition>
+        <argsstring>(std::function&lt; void(const TrafficEventData &amp;, int delay)&gt; callback)</argsstring>
+        <name>RegisterTrafficCallback</name>
+        <param>
+          <type>std::function&lt; void(const <ref refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref> &amp;, int delay)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Register a callback to receive updates for the traffic event.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>callback</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A function to call on updates. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="traffic_event.hpp" line="135" column="8"/>
+      </memberdef>
       </sectiondef>
     <briefdescription>
     </briefdescription>
     <detaileddescription>
 <para>Information about a traffic event. </para>
     </detaileddescription>
-    <location file="traffic_event.hpp" line="28" column="1" bodyfile="traffic_event.hpp" bodystart="28" bodyend="132"/>
+    <location file="traffic_event.hpp" line="28" column="1" bodyfile="traffic_event.hpp" bodystart="28" bodyend="139"/>
     <listofallmembers>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>CalculateDelay</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>Data</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad" prot="private" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>data_</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>RegisterTrafficCallback</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>Severity</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>SharedData</name></member>
       <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent</scope><name>TrafficEvent</name></member>

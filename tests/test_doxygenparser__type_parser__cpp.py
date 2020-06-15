@@ -19,9 +19,11 @@ import xml.etree.ElementTree as ET
 
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.cpp import CppTraits
-from asciidoxy.doxygenparser.type_parser import parse_type
+from asciidoxy.doxygenparser.cpp import CppTypeParser
+from asciidoxy.doxygenparser.language_traits import TokenCategory
+from asciidoxy.doxygenparser.type_parser import Token
 from tests.shared import assert_equal_or_none_if_empty, sub_element
+from .test_doxygenparser__type_parser import name, args_start, whitespace, args_end, arg_name
 
 
 @pytest.fixture(params=[
@@ -42,7 +44,7 @@ def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
     type_element.text = f"{cpp_type_prefix}double{cpp_type_suffix}"
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
@@ -52,7 +54,7 @@ def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
     assert type_ref.name == "double"
     assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
     assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
-    assert len(type_ref.nested) == 0
+    assert not type_ref.nested
 
 
 def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix, cpp_type_suffix):
@@ -61,7 +63,7 @@ def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix,
                          f">{cpp_type_suffix}")
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
 
     assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
                     ]) == sorted(["Coordinate", "Unit"]))
@@ -96,7 +98,7 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_typ
                 tail=cpp_type_suffix)
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
@@ -106,7 +108,7 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_typ
     assert type_ref.name == "Coordinate"
     assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
     assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
-    assert len(type_ref.nested) == 0
+    assert not type_ref.nested
 
 
 def test_parse_cpp_type_from_ref_with_nested_text_type():
@@ -120,7 +122,7 @@ def test_parse_cpp_type_from_ref_with_nested_text_type():
                 tail="< const Unit > &")
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
     assert (sorted([args[0].name
                     for args, _ in driver_mock.unresolved_ref.call_args_list]) == sorted(["Unit"]))
 
@@ -154,7 +156,7 @@ def test_parse_cpp_type_from_text_with_nested_ref_type():
                 tail=" & > *")
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
@@ -199,7 +201,7 @@ def test_parse_cpp_type_from_multiple_nested_text_and_ref():
                 tail=" < const std::string & > >")
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
 
     assert type_ref is not None
@@ -255,7 +257,7 @@ def test_parse_cpp_type_multiple_prefix_and_suffix():
     type_element.text = "mutable volatile std::string * const *"
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
@@ -267,25 +269,187 @@ def test_parse_cpp_type_multiple_prefix_and_suffix():
     assert type_ref.suffix == " * const *"
 
 
-@pytest.mark.parametrize("type_with_space", [
+@pytest.fixture(params=[
     "short int", "signed short", "signed short int", "unsigned short", "unsigned short int",
     "signed int", "signed", "unsigned", "unsigned int", "long int", "signed long",
     "signed long int", "unsigned long", "unsigned long int", "long long", "long long int",
     "signed long long", "signed long long int", "unsigned long long", "unsigned long long int",
     "signed char", "long double"
 ])
-def test_parse_cpp_type_with_space(cpp_type_prefix, type_with_space, cpp_type_suffix):
+def cpp_type_with_space(request):
+    return request.param
+
+
+def test_parse_cpp_type_with_space(cpp_type_prefix, cpp_type_with_space, cpp_type_suffix):
     type_element = ET.Element("type")
-    type_element.text = f"{cpp_type_prefix}{type_with_space}{cpp_type_suffix}"
+    type_element.text = f"{cpp_type_prefix}{cpp_type_with_space}{cpp_type_suffix}"
 
     driver_mock = MagicMock()
-    type_ref = parse_type(CppTraits, driver_mock, type_element)
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is not None
     assert not type_ref.id
     assert not type_ref.kind
     assert type_ref.language == "cpp"
-    assert type_ref.name == type_with_space
+    assert type_ref.name == cpp_type_with_space
     assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
     assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
+
+
+def test_parse_cpp_type_with_member():
+    type_element = ET.Element("type")
+    type_element.text = "MyType<NestedType>::member"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType", "NestedType"]))
+
+    assert type_ref is not None
+    assert not type_ref.id
+    assert not type_ref.kind
+    assert type_ref.language == "cpp"
+    assert type_ref.name == "MyType"
+    assert not type_ref.prefix
+    assert type_ref.suffix == "::member"
+    assert len(type_ref.nested) == 1
+
+    assert type_ref.nested[0].name == "NestedType"
+    assert not type_ref.nested[0].prefix
+    assert not type_ref.nested[0].suffix
+    assert not type_ref.nested[0].nested
+
+
+def test_parse_cpp_type_with_function_arguments():
+    type_element = ET.Element("type")
+    type_element.text = "MyType(const Message&, ErrorCode code)"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType", "Message", "ErrorCode"]))
+
+    assert type_ref is not None
+    assert not type_ref.id
+    assert not type_ref.kind
+    assert type_ref.language == "cpp"
+    assert type_ref.name == "MyType"
+    assert not type_ref.prefix
+    assert not type_ref.suffix
+    assert not type_ref.nested
+    assert len(type_ref.args) == 2
+
+    assert not type_ref.args[0].name
+    assert type_ref.args[0].type.name == "Message"
+    assert type_ref.args[0].type.prefix == "const "
+    assert type_ref.args[0].type.suffix == "&"
+    assert not type_ref.args[0].type.nested
+
+    assert type_ref.args[1].name == "code"
+    assert type_ref.args[1].type.name == "ErrorCode"
+    assert not type_ref.args[1].type.prefix
+    assert not type_ref.args[1].type.suffix
+    assert not type_ref.args[1].type.nested
+
+
+@pytest.mark.parametrize("arg_name", ["", " value"])
+def test_parse_cpp_type_with_function_arguments_with_space_in_type(cpp_type_with_space, arg_name):
+    type_element = ET.Element("type")
+    type_element.text = f"MyType({cpp_type_with_space}{arg_name})"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+
+    assert type_ref is not None
+    assert not type_ref.id
+    assert not type_ref.kind
+    assert type_ref.language == "cpp"
+    assert type_ref.name == "MyType"
+    assert not type_ref.prefix
+    assert not type_ref.suffix
+    assert not type_ref.nested
+    assert len(type_ref.args) == 1
+
+    assert_equal_or_none_if_empty(type_ref.args[0].name, arg_name.strip())
+    assert type_ref.args[0].type.name == cpp_type_with_space
+    assert not type_ref.args[0].type.prefix
+    assert not type_ref.args[0].type.suffix
+    assert not type_ref.args[0].type.nested
+
+
+def namespace_sep(text: str = ":") -> Token:
+    return Token(text, TokenCategory.NAMESPACE_SEPARATOR)
+
+
+@pytest.mark.parametrize("tokens, expected", [
+    ([], []),
+    ([
+        name("Type"),
+        args_start(),
+        name("ArgType"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("ArgType"),
+        args_end(),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("ArgType"),
+        whitespace(),
+        name("arg"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("ArgType"),
+        whitespace(),
+        arg_name("arg"),
+        args_end(),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("std"),
+        namespace_sep(),
+        namespace_sep(),
+        name("vector"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("std"),
+        namespace_sep(),
+        namespace_sep(),
+        name("vector"),
+        args_end(),
+    ]),
+    ([
+        name("Type"),
+        args_start(),
+        name("std"),
+        namespace_sep(),
+        namespace_sep(),
+        name("vector"),
+        whitespace(),
+        name("list"),
+        args_end(),
+    ], [
+        name("Type"),
+        args_start(),
+        name("std"),
+        namespace_sep(),
+        namespace_sep(),
+        name("vector"),
+        whitespace(),
+        arg_name("list"),
+        args_end(),
+    ]),
+])
+def test_cpp_type_parser__adapt_tokens(tokens, expected):
+    assert CppTypeParser.adapt_tokens(tokens) == expected

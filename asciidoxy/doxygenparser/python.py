@@ -13,27 +13,34 @@
 # limitations under the License.
 """Support for parsing python documentation."""
 
-import re
+import string
 
-import xml.etree.ElementTree as ET
+from typing import List, Optional
 
-from typing import Optional
-
-from ..model import Compound, Member, Parameter
-from .language_traits import LanguageTraits
+from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
+from .type_parser import Token, TypeParser
 
 
 class PythonTraits(LanguageTraits):
     """Traits for parsing python documentation."""
     TAG: str = "python"
 
-    TYPE_PREFIXES = None
-    TYPE_SUFFIXES = None
-    TYPE_NESTED_START = re.compile(r"\s*\[\s*")
-    TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
-    TYPE_NESTED_END = re.compile(r"\s*\]")
-    TYPE_NAME = re.compile(r"\"?[a-zA-Z0-9_.]+\"?")
+    NESTED_STARTS = "[",
+    NESTED_ENDS = "]",
+    NESTED_SEPARATORS = ",",
+
+    TOKENS = {
+        TokenCategory.NESTED_START: NESTED_STARTS,
+        TokenCategory.NESTED_END: NESTED_ENDS,
+        TokenCategory.NESTED_SEPARATOR: NESTED_SEPARATORS,
+    }
+
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
+
+    ALLOWED_PREFIXES = None
+    ALLOWED_SUFFIXES = None
+    ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME,
 
     @classmethod
     def cleanup_name(cls, name: str) -> str:
@@ -58,29 +65,35 @@ class PythonTraits(LanguageTraits):
             return None
 
 
+class PythonTypeParser(TypeParser):
+    """Parser for python types."""
+    TRAITS = PythonTraits
+
+    @classmethod
+    def adapt_tokens(cls,
+                     tokens: List[Token],
+                     array_tokens: Optional[List[Token]] = None) -> List[Token]:
+        if not tokens:
+            return []
+
+        # Nested type hints are stored as arrays in a separate element.
+        if array_tokens:
+            # There is a bug where the last closing bracket is stored in the type name. We need to
+            # insert the nested types in front of that bracket
+            if tokens[-1].category == TokenCategory.WHITESPACE:
+                tokens.pop(-1)
+            if tokens[-1].category == TokenCategory.NESTED_END:
+                tokens[-1:-1] = array_tokens
+            else:
+                tokens.extend(array_tokens)
+
+        # Workaround for Doxygen issue
+        tokens = [t for t in tokens if t.text != "def"]
+
+        return tokens
+
+
 class PythonParser(ParserBase):
     """Parser for python documentation."""
     TRAITS = PythonTraits
-
-    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
-        member = super().parse_member(memberdef_element, parent)
-
-        if member and member.returns and member.returns.type and member.returns.type.name == "def":
-            # Workaround for Doxygen issue
-            member.returns = None
-
-        return member
-
-    def parse_array(self, array_element: Optional[ET.Element], param: Parameter):
-        if array_element is None or param.type is None:
-            return
-        if not array_element.text:
-            return
-
-        # TODO: This is ugly. Type parsing needs refactoring.
-        type_element = ET.Element("type")
-        type_element.text = f"{param.type.name}{array_element.text}"
-        type_ref = self.parse_type(type_element)
-
-        if type_ref is not None and type_ref.nested:
-            param.type.nested = type_ref.nested
+    TYPE_PARSER = PythonTypeParser

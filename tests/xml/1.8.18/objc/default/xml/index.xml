@@ -25,6 +25,6 @@
   </compound>
   <compound refid="_a_d_traffic_event_8h" kind="file"><name>ADTrafficEvent.h</name>
     <member refid="_a_d_traffic_event_8h_1a929385fc78158cf2be0d44416a5df884" kind="typedef"><name>TpegCauseCode</name></member>
-    <member refid="_a_d_traffic_event_8h_1a38c6f0aeef5e08b2f836e0dc35b02a15" kind="typedef"><name>OnTrafficEventCallback</name></member>
+    <member refid="_a_d_traffic_event_8h_1ac1569299203e247cb766d015774a764e" kind="typedef"><name>OnTrafficEventCallback</name></member>
   </compound>
 </doxygenindex>

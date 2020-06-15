@@ -31,10 +31,10 @@
         </inbodydescription>
         <location file="ADTrafficEvent.h" line="22" column="19" bodyfile="ADTrafficEvent.h" bodystart="22" bodyend="-1"/>
       </memberdef>
-      <memberdef kind="typedef" id="_a_d_traffic_event_8h_1a38c6f0aeef5e08b2f836e0dc35b02a15" prot="public" static="no">
+      <memberdef kind="typedef" id="_a_d_traffic_event_8h_1ac1569299203e247cb766d015774a764e" prot="public" static="no">
         <type>void(^</type>
-        <definition>typedef void(^ OnTrafficEventCallback) (id&lt; ADTrafficEvent)</definition>
-        <argsstring>)(id&lt; ADTrafficEvent)</argsstring>
+        <definition>typedef void(^ OnTrafficEventCallback) (id&lt; ADTrafficEvent &gt;, NSInteger delay)</definition>
+        <argsstring>)(id&lt; ADTrafficEvent &gt;, NSInteger delay)</argsstring>
         <name>OnTrafficEventCallback</name>
         <briefdescription>
         </briefdescription>
@@ -100,7 +100,7 @@
 <codeline lineno="98"><highlight class="normal"></highlight></codeline>
 <codeline lineno="99"><highlight class="normal"></highlight><highlight class="keyword">@end</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="100"><highlight class="normal"></highlight></codeline>
-<codeline lineno="104"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>void<sp/>(^OnTrafficEventCallback)(</highlight><highlight class="keywordtype">id</highlight><highlight class="normal">&lt;<ref refid="protocol_a_d_traffic_event-p" kindref="compound">ADTrafficEvent</ref>);</highlight></codeline>
+<codeline lineno="104"><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>void<sp/>(^OnTrafficEventCallback)(id&lt;ADTrafficEvent&gt;,<sp/>NSInteger<sp/>delay);</highlight></codeline>
     </programlisting>
     <location file="ADTrafficEvent.h"/>
   </compounddef>
