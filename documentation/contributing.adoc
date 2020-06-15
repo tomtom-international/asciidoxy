@@ -38,6 +38,33 @@ https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = Contributing
 
+You can contribute to AsciiDoxy by reporting issues, updating the documentation, fixing issues, or
+developing new features.
+
+To report issues, or find issues to fix, go to
+https://github.com/tomtom-international/asciidoxy/issues[the issue tracker on GitHub].
+
+To make changes to the documentation or source code, fork the repository into your own GitHub
+account. Then create a Pull Request (PR) back to the AsciiDoxy main repository to contribute your
+changes.
+
+Before making a PR make sure that:
+
+* New code is covered in unit tests.
+* All tests pass.
+* There are no linter warnings or errors.
+* MyPy analysis is successful.
+
+There are two main branches to target for your PR:
+
+* `master` only for documentation changes that affect the currently released version.
+* `develop` for all other changes.
+
+The `develop` branch is merged periodically to `master` to create a new release. The AsciiDoxy
+website is generated from the `master` branch manually.
+
+== Development environment
+
 AsciiDoxy is developed in python 3.6. For development it is recommended to set up a virtual
 environment with all dependencies. Use the following commands to quickly set up the entire
 environment:
