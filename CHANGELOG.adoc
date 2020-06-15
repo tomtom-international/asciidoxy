@@ -20,6 +20,21 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== Unreleased
+
+=== Changed
+
+  - Complete redesign of the type parser. The type parser is now token based instead of using
+    regular expressions.
+  - The new type parser is more strict and will issue warnings when a type is considered malformed.
+    These warnings will not trigger an error when `--warnings-are-errors` is enabled.
+
+=== Fixed
+
+  - Issue #9 - std::function types with function arguments are now fully parsed.
+  - Many parsing issues for types have been addressed in the new type parser.
+
+
 == 0.5.5 (8 Jun 2020)
 
 === Fixed
