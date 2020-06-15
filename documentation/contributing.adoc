@@ -161,3 +161,18 @@ directory.
 The expectations for the tests in `test_templates.py` can be easily regenerated when templates have
 been changed. Run `pytest --update-expected-results` to overwrite the current expectations with the
 new output. Make sure to check the diff to see if there are no unexpected side effects!
+
+== Releasing a new version
+
+Only AsciiDoxy maintainers can release new versions of AsciiDoxy. To create a new release, follow
+these steps:
+
+* On `develop` update the version number in `asciidoxy/_version.py`.
+* Replace the unreleased heading in `CHANGELOG.adoc` with the new version.
+* Create a PR from `develop` to `master`. Merge it when all checks are passed.
+* On GitHub go to `Releases` and click `Draft a new release`.
+* Set the version tag to the new version number (no prefix or suffix).
+* Set the description to `AsciiDoxy <VERSION>`.
+* Copy the changelog into the description, and change the headers to MarkDown format.
+* Save the release. A GitHub action will be started to publish the release.
+* After the publishing GitHub action has completed, update the website (ask Rob).
