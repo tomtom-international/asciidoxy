@@ -20,8 +20,8 @@ import pytest
 from unittest.mock import call, patch
 
 from asciidoxy.templates.helpers import (link_from_ref, print_ref, argument_list, type_list, has,
-                                         type_and_name, chain)
-from asciidoxy.model import Parameter, TypeRef
+                                         type_and_name, chain, method_signature)
+from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
 
 
 @pytest.fixture
@@ -447,3 +447,140 @@ def test_type_and_name__no_name(empty_context):
     param.name = ""
 
     assert type_and_name(param, empty_context) == "const xref:lang-tomtom_1_MyType[MyType] &"
+
+
+def test_method_signature__no_params(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    assert method_signature(method, empty_context) == "void ShortMethod()"
+
+
+def test_method_signature__single_param(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+
+    assert method_signature(method, empty_context) == "void ShortMethod(int value)"
+
+
+def test_method_signature__single_param__too_wide(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+
+    assert (method_signature(method, empty_context, max_width=20) == """\
+void ShortMethod(
+    int value)""")
+
+
+def test_method_signature__multiple_params(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("lang", "double")
+    method.params[2].name = "text"
+    method.params[2].type = TypeRef("lang", "std::string")
+
+    assert (method_signature(method, empty_context) == """\
+void ShortMethod(int value,
+                 double other_value,
+                 std::string text)""")
+
+
+def test_method_signature__multiple_params__first_param_too_wide(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("lang", "double")
+    method.params[2].name = "text"
+    method.params[2].type = TypeRef("lang", "std::string")
+
+    assert (method_signature(method, empty_context, max_width=20) == """\
+void ShortMethod(
+    int value,
+    double other_value,
+    std::string text)""")
+
+
+def test_method_signature__multiple_params__last_param_too_wide(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("lang", "double")
+    method.params[2].name = "text" * 10
+    method.params[2].type = TypeRef("lang", "std::string")
+
+    assert (method_signature(method, empty_context, max_width=40) == f"""\
+void ShortMethod(
+    int value,
+    double other_value,
+    std::string {"text" * 10})""")
+
+
+def test_method_signature__ignore_return_type_xref_length(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+    method.returns.type.id = "ab" * 80
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+
+    assert (method_signature(method,
+                             empty_context) == f"xref:{'ab' * 80}[void] ShortMethod(int value)")
+
+
+def test_method_signature__ignore_param_type_xref_length(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+    method.params[0].type.id = "ab" * 80
+
+    assert (method_signature(method,
+                             empty_context) == f"void ShortMethod(xref:{'ab' * 80}[int] value)")
