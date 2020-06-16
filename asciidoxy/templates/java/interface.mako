@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, print_ref, argument_list, type_list, has)
+from asciidoxy.templates.helpers import (link_from_ref, print_ref, type_list, has, method_signature)
 from asciidoxy.templates.java.helpers import (public_methods, public_static_methods, public_constants)
 %>
 ######################################################################## Header and introduction ##
@@ -72,7 +72,7 @@ ${method.brief}
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-static ${link_from_ref(method.returns.type, api_context)} ${method.name}${argument_list(method.params, api_context)}
+${method_signature(method, api_context)}
 ----
 
 ${method.brief}
@@ -117,7 +117,7 @@ ${exception.description}
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${link_from_ref(method.returns.type, api_context)} ${method.name}${argument_list(method.params, api_context)}
+${method_signature(method, api_context)}
 ----
 
 ${method.brief}

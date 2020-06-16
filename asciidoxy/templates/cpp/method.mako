@@ -12,16 +12,15 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, type_and_name, argument_list, has)
+from asciidoxy.templates.helpers import (link_from_ref, type_and_name, has, method_signature)
 %>
 
 = [[${element.id},${element.name}]]
 ${api_context.insert(element)}
 
+[%autofit]
 [source,cpp,subs="-specialchars,macros+"]
 ----
-${"static" if element.static else ""} \
-${link_from_ref(element.returns.type, api_context) if element.returns else ""} \
-${element.name}${argument_list(element.params, api_context)}
+${method_signature(element, api_context)}
 ----
 <%include file="/cpp/_function.mako"/>

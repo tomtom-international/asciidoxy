@@ -14,8 +14,8 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, print_ref, argument_list, type_list, has,
-type_and_name, chain)
+from asciidoxy.templates.helpers import (link_from_ref, print_ref, type_list, has, type_and_name,
+chain)
 from asciidoxy.templates.cpp.helpers import (public_static_methods, public_methods,
 public_constructors, public_variables, public_simple_enclosed_types, public_complex_enclosed_types)
 %>

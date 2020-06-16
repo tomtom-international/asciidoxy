@@ -102,3 +102,31 @@ def chain(first_collection, second_collection):
 
 def type_and_name(param, context: Context):
     return f"{link_from_ref(param.type, context)} {param.name}".strip()
+
+
+def method_signature(element, context: Context, max_width: int = 80):
+    static = "static" if element.static else ""
+    return_type = link_from_ref(element.returns.type, context) if element.returns else ""
+    method_name = element.name
+
+    method_without_params = " ".join(part for part in (static, return_type, method_name) if part)
+
+    if not element.params:
+        return (f"{method_without_params}()")
+
+    return_type_no_ref = print_ref(element.returns.type, context) if element.returns else ""
+    method_without_params_length = len(" ".join(part for part in (static, return_type_no_ref,
+                                                                  method_name) if part))
+
+    param_sizes = [len(f"{print_ref(p.type)} {p.name}".strip()) for p in element.params]
+    indent_size = method_without_params_length + 1
+    first_indent = ""
+
+    if any(indent_size + size + 1 > max_width for size in param_sizes):
+        indent_size = 4
+        first_indent = "\n    "
+
+    param_separator = f",\n{' ' * indent_size}"
+    formatted_params = f"{param_separator.join(type_and_name(p, context) for p in element.params)}"
+
+    return (f"{method_without_params}({first_indent}{formatted_params})")
