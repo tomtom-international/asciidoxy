@@ -76,8 +76,17 @@ make install
 
 == Invocation
 
-The minimal invocation takes an input AsciiDoc file and a package specification file. It creates a
-single page HTML document.
+The minimal invocation takes only an input AsciiDoc file. In the AsciiDoc file you can execute any
+python code in Mako format. It creates a single page HTML document.
+
+[source,bash]
+----
+asciidoxy input_file.adoc
+----
+
+AsciiDoxy becomes more powerful if you specify a Package Specification file pointing to external
+resources and API reference documentation. It allows you to generate API reference in AsciiDoc
+files.
 
 [source,bash]
 ----

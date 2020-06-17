@@ -30,6 +30,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     These warnings will not trigger an error when `--warnings-are-errors` is enabled.
   - Improve formatting of method parameters. Each parameter is put on its own line. The first
     parameter is put on a separate line if the definition gets too long.
+  - Loading API reference using a package spec is no longer required. The `--spec-file` option is
+    no longer mandatory. This way you can generate any AsciiDoc file with python code, without
+    generating API reference documentation.
 
 === Fixed
 

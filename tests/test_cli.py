@@ -201,3 +201,15 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
     asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
                                              "html5", [])
     assert processed_file.is_file()
+
+
+def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_data):
+    in_file = adoc_data / "no_api_reference.input.adoc"
+
+    main([str(in_file), "--destination-dir", str(destination_dir), "--build-dir", str(build_dir)])
+
+    output_file = destination_dir / "no_api_reference.input.html"
+    processed_file = build_dir / "intermediate" / ".asciidoxy.no_api_reference.input.adoc"
+    asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
+                                             "html5", [])
+    assert processed_file.is_file()
