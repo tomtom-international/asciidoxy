@@ -28,8 +28,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     regular expressions.
   - The new type parser is more strict and will issue warnings when a type is considered malformed.
     These warnings will not trigger an error when `--warnings-are-errors` is enabled.
-  - C{plus}{plus}, Java: Improve formatting of method parameters. Each parameter is put on its own
-    line. The first parameter is put on a separate line if the definition gets too long.
+  - Improve formatting of method parameters. Each parameter is put on its own line. The first
+    parameter is put on a separate line if the definition gets too long.
 
 === Fixed
 

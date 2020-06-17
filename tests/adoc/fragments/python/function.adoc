@@ -5,7 +5,9 @@
 
 [source,python,subs="-specialchars,macros+"]
 ----
-def update(self, cause: int, delay: int) -> bool
+def update(self,
+           cause: int,
+           delay: int) -> bool
 ----
 
 Update the traffic event data.
