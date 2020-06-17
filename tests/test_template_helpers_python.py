@@ -17,9 +17,9 @@ import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Member, Parameter, ReturnValue, TypeRef, InnerTypeReference
-from asciidoxy.templates.python.helpers import (argument_list, params, public_static_methods,
-                                                public_methods, public_constructors,
-                                                public_enclosed_types, public_variables)
+from asciidoxy.templates.python.helpers import (params, public_static_methods, public_methods,
+                                                public_constructors, public_enclosed_types,
+                                                public_variables, method_signature)
 
 
 @pytest.fixture
@@ -77,101 +77,6 @@ def python_class():
     ]
 
     return compound
-
-
-def test_argument_list__empty(empty_context):
-    assert argument_list([], empty_context) == "()"
-
-
-def test_argument_list__with_types(empty_context):
-    type1 = TypeRef("lang")
-    type1.name = "Type1"
-
-    type2 = TypeRef("lang")
-    type2.name = "Type2"
-    type2.id = "lang-type2"
-
-    type3 = TypeRef("lang")
-    type3.name = "Type3"
-    type3.nested = [type1, type2]
-
-    param1 = Parameter()
-    param1.type = type1
-    param1.name = "arg1"
-
-    param2 = Parameter()
-    param2.type = type2
-    param2.name = "arg2"
-
-    param3 = Parameter()
-    param3.type = type3
-    param3.name = "arg3"
-
-    assert (argument_list([param1, param2, param3],
-                          empty_context) == "(arg1: Type1, arg2: xref:lang-type2[Type2], "
-            "arg3: Type3[Type1, xref:lang-type2[Type2]])")
-
-
-def test_argument_list__self(empty_context):
-    type1 = TypeRef("lang")
-    type1.name = "self"
-
-    type2 = TypeRef("lang")
-    type2.name = "Type2"
-    type2.id = "lang-type2"
-
-    param1 = Parameter()
-    param1.type = type1
-
-    param2 = Parameter()
-    param2.type = type2
-    param2.name = "arg2"
-
-    assert (argument_list([param1, param2],
-                          empty_context) == "(self, arg2: xref:lang-type2[Type2])")
-
-
-def test_argument_list__cls(empty_context):
-    type1 = TypeRef("lang")
-    type1.name = "cls"
-
-    type2 = TypeRef("lang")
-    type2.name = "Type2"
-    type2.id = "lang-type2"
-
-    param1 = Parameter()
-    param1.type = type1
-
-    param2 = Parameter()
-    param2.type = type2
-    param2.name = "arg2"
-
-    assert (argument_list([param1, param2], empty_context) == "(cls, arg2: xref:lang-type2[Type2])")
-
-
-def test_argument_list__no_type(empty_context):
-    param1 = Parameter()
-    param1.name = "arg1"
-
-    param2 = Parameter()
-    param2.name = "arg2"
-
-    assert (argument_list([param1, param2], empty_context) == "(arg1, arg2)")
-
-
-def test_argument_list__empty_type(empty_context):
-    type1 = TypeRef("lang")
-    type2 = TypeRef("lang")
-
-    param1 = Parameter()
-    param1.type = type1
-    param1.name = "arg1"
-
-    param2 = Parameter()
-    param2.type = type2
-    param2.name = "arg2"
-
-    assert (argument_list([param1, param2], empty_context) == "(arg1, arg2)")
 
 
 def test_params__empty():
@@ -333,3 +238,140 @@ def test_public_variables__filter_match(python_class):
 def test_public_variables__filter_no_match(python_class):
     result = list(m.name for m in public_variables(python_class, InsertionFilter(members="NONE")))
     assert not result
+
+
+def test_method_signature__no_params(empty_context):
+    method = Member("python")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("python", "None")
+
+    assert method_signature(method, empty_context) == "def ShortMethod() -> None"
+
+
+def test_method_signature__single_param(empty_context):
+    method = Member("python")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("python", "int")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("python", "int")
+
+    assert method_signature(method, empty_context) == "def ShortMethod(value: int) -> int"
+
+
+def test_method_signature__single_param__too_wide(empty_context):
+    method = Member("python")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("python", "str")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("python", "int")
+
+    assert (method_signature(method, empty_context, max_width=20) == """\
+def ShortMethod(
+    value: int) -> str""")
+
+
+def test_method_signature__multiple_params(empty_context):
+    method = Member("python")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("python", "None")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("python", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("python", "float")
+    method.params[2].name = "text"
+    method.params[2].type = TypeRef("python", "str")
+
+    assert (method_signature(method, empty_context) == """\
+def ShortMethod(value: int,
+                other_value: float,
+                text: str) -> None""")
+
+
+def test_method_signature__multiple_params__first_param_too_wide(empty_context):
+    method = Member("python")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("python", "None")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("python", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("python", "float")
+    method.params[2].name = "text"
+    method.params[2].type = TypeRef("python", "str")
+
+    assert (method_signature(method, empty_context, max_width=20) == """\
+def ShortMethod(
+    value: int,
+    other_value: float,
+    text: str) -> None""")
+
+
+def test_method_signature__multiple_params__last_param_too_wide(empty_context):
+    method = Member("python")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("python", "Type")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("python", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("python", "float")
+    method.params[2].name = "text" * 10
+    method.params[2].type = TypeRef("python", "str")
+
+    assert (method_signature(method, empty_context, max_width=40) == f"""\
+def ShortMethod(
+    value: int,
+    other_value: float,
+    {"text" * 10}: str) -> Type""")
+
+
+def test_method_signature__ignore_return_type_xref_length(empty_context):
+    method = Member("python")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("python", "Type")
+    method.returns.type.id = "ab" * 80
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("python", "int")
+
+    assert (method_signature(
+        method, empty_context) == f"def ShortMethod(value: int) -> xref:{'ab' * 80}[Type]")
+
+
+def test_method_signature__ignore_param_type_xref_length(empty_context):
+    method = Member("python")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("python", "None")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("python", "int")
+    method.params[0].type.id = "ab" * 80
+
+    assert (method_signature(
+        method, empty_context) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")

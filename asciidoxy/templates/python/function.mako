@@ -13,7 +13,7 @@
 ## limitations under the License.
 <%!
 from asciidoxy.templates.helpers import (link_from_ref, has)
-from asciidoxy.templates.python.helpers import (type_and_name, argument_list, params)
+from asciidoxy.templates.python.helpers import (type_and_name, method_signature, params)
 %>
 
 = [[${element.id},${element.name}]]
@@ -21,9 +21,7 @@ ${api_context.insert(element)}
 
 [source,python,subs="-specialchars,macros+"]
 ----
-${"@staticmethod\n" if element.static else ""}\
-def ${element.name}${argument_list(element.params, api_context)} \
--> ${link_from_ref(element.returns.type, api_context, '[', ']') if element.returns else "None"}
+${method_signature(element, api_context)}
 ----
 
 ${element.brief}

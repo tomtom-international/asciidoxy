@@ -15,11 +15,7 @@
 
 from asciidoxy.generator import Context
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.templates.helpers import link_from_ref
-
-
-def argument_list(params, context: Context):
-    return f"({', '.join(type_and_name(p, context) for p in params)})"
+from asciidoxy.templates.helpers import link_from_ref, print_ref
 
 
 def type_and_name(param, context: Context):
@@ -58,3 +54,28 @@ def public_enclosed_types(element, insert_filter: InsertionFilter):
 def public_variables(element, insert_filter: InsertionFilter):
     return (m for m in insert_filter.members(element)
             if m.kind == "variable" and not m.name.startswith("_"))
+
+
+def method_signature(element, context: Context, max_width: int = 80):
+    method_without_params = f"def {element.name}"
+    return_suffix = f" -> {link_from_ref(element.returns.type, context)}" if element.returns else ""
+
+    if not element.params:
+        return (f"{method_without_params}(){return_suffix}")
+
+    method_without_params_length = len(method_without_params)
+    return_type_no_ref = (f" -> {print_ref(element.returns.type)}" if element.returns else "")
+    suffix_length = len(return_type_no_ref)
+
+    param_sizes = [len(f"{p.name}: {print_ref(p.type)}".strip()) for p in element.params]
+    indent_size = method_without_params_length + 1
+    first_indent = ""
+
+    if any(indent_size + size + 1 + suffix_length > max_width for size in param_sizes):
+        indent_size = 4
+        first_indent = "\n    "
+
+    param_separator = f",\n{' ' * indent_size}"
+    formatted_params = f"{param_separator.join(type_and_name(p, context) for p in element.params)}"
+
+    return (f"{method_without_params}({first_indent}{formatted_params}){return_suffix}")
