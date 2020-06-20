@@ -11,13 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= AsciiDoxy
+= Usage
 :notitle:
-:toc: left
-:toc-title: AsciiDoxy
 :icons: font
 :doctype: book
 :source-highlighter: highlightjs
+:toc: right
+:toc-title: On this page
+${api.multipage_toc()}
 
 ----
     ___              _ _ ____
@@ -36,7 +37,7 @@ ${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
 ${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
-= Usage
+= {doctitle}
 
 Instructions for how to install and use AsciiDoxy to create your own AsciiDoc API reference
 documentation.

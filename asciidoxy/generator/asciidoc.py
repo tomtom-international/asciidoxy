@@ -37,7 +37,7 @@ from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFo
                      IncompatibleVersionError, ReferenceNotFoundError, TemplateMissingError,
                      UnlinkableError)
 from .filters import FilterSpec, InsertionFilter
-from .navigation import DocumentTreeNode, navigation_bar, relative_path
+from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipage_toc
 
 logger = logging.getLogger(__name__)
 
@@ -464,6 +464,25 @@ class Api(object):
         # Prevent output of None
         return ""
 
+    def multipage_toc(self, side: str = "left") -> str:
+        """Insert a table of contents for multipage documents.
+
+        Only supported for the HTML backend and when multipage mode is on.
+
+        This command needs to be included in the document headers to work. To not break headers
+        when multipage mode is off, it is recommended to add it to the end of the headers.
+
+        Args:
+            side: Show the multipage TOC at the `left` or `right` side.
+        """
+        if not self._context.multi_page:
+            return ""
+
+        toc_content = multipage_toc(self._context.current_document, side)
+        with _docinfo_footer_file_name(self._current_file).open(mode="w", encoding="utf-8") as f:
+            f.write(toc_content)
+        return ":docinfo: private"
+
     def _template(self, lang: str, kind: str) -> Template:
         key = Api.TemplateKey(lang, kind)
         template = self._template_cache.get(key, None)
@@ -564,3 +583,7 @@ def _check_links(context: Context):
 
 def _out_file_name(in_file: Path) -> Path:
     return in_file.parent / f".asciidoxy.{in_file.name}"
+
+
+def _docinfo_footer_file_name(in_file: Path) -> Path:
+    return in_file.parent / f".asciidoxy.{in_file.stem}-docinfo-footer.html"
