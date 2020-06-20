@@ -475,7 +475,7 @@ class Api(object):
         Args:
             side: Show the multipage TOC at the `left` or `right` side.
         """
-        if not self._context.multi_page:
+        if not self._context.multi_page or self._context.preprocessing_run:
             return ""
 
         toc_content = multipage_toc(self._context.current_document, side)

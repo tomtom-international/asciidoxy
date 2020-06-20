@@ -165,6 +165,38 @@ def test_document_tree_node_all_documents_from_leaf_node(document_tree_two_level
              })
 
 
+def test_document_tree_node__title(tmp_path):
+    adoc_file = tmp_path / "file.adoc"
+    adoc_file.write_text("= My title\n\nOther text.")
+
+    doc = DocumentTreeNode(adoc_file)
+    assert doc.title == "My title"
+
+
+def test_document_tree_node__title__only_first_title(tmp_path):
+    adoc_file = tmp_path / "file.adoc"
+    adoc_file.write_text("= My title\n\nOther text.\n\n= Other title\n\nMore text.")
+
+    doc = DocumentTreeNode(adoc_file)
+    assert doc.title == "My title"
+
+
+def test_document_tree_node__title__no_title(tmp_path):
+    adoc_file = tmp_path / "file.adoc"
+    adoc_file.write_text("My title\n\nOther text.\n\n== Other title\n\nMore text.")
+
+    doc = DocumentTreeNode(adoc_file)
+    assert doc.title == "file"
+
+
+def test_document_tree_node__title__no_file(tmp_path):
+    adoc_file = tmp_path / "file.adoc"
+    assert not adoc_file.exists()
+
+    doc = DocumentTreeNode(adoc_file)
+    assert doc.title == "file"
+
+
 def test_navigation_bar_first_document(document_tree_two_subpages):
     next_doc = document_tree_two_subpages.children[0]
     assert navigation_bar(document_tree_two_subpages) == (
@@ -401,7 +433,8 @@ def test_multipage_toc__level2__child1(document_tree_three_levels_deep):
 
 
 def test_multipage_toc__level3(document_tree_three_levels_deep):
-    assert multipage_toc(document_tree_three_levels_deep.children[0].children[1].children[0]) == """\
+    assert multipage_toc(
+        document_tree_three_levels_deep.children[0].children[1].children[0]) == """\
 <div class="toc2" id="toc" style="left: 0; right: unset; border-right-width: 1px; border-left-width: 0px">
   <div id="toctitle">
     <a href="../../index.html">index</a>

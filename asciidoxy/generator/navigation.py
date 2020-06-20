@@ -14,12 +14,15 @@
 """Support for navigating multi page output."""
 
 import os
+import logging
 import xml.dom.minidom
 
 import xml.etree.ElementTree as ET
 
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Set, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentTreeNode(object):
@@ -36,11 +39,18 @@ class DocumentTreeNode(object):
     in_file: Path
     parent: Optional["DocumentTreeNode"]
     children: List["DocumentTreeNode"]
+    _title: Optional[str] = None
 
     def __init__(self, in_file: Path, parent: "DocumentTreeNode" = None):
         self.in_file = Path(in_file)
         self.parent = parent
         self.children = []
+
+    @property
+    def title(self) -> str:
+        if self._title is None:
+            self._title = self._read_title()
+        return self._title
 
     def preorder_traversal_next(self):
         if len(self.children) > 0:
@@ -89,6 +99,17 @@ class DocumentTreeNode(object):
         for child in self.children:
             for d in child._all_documents_in_subtree():
                 yield d
+
+    def _read_title(self) -> str:
+        try:
+            with self.in_file.open(mode="r", encoding="utf-8") as f:
+                for line in f:
+                    if line.startswith("= "):
+                        return line[2:].strip()
+        except OSError:
+            logger.exception(f"Failed to read title from AsciiDoc file {self.in_file}.")
+        logger.exception(f"Did not find title in AsciiDoc file {self.in_file}.")
+        return self.in_file.stem
 
 
 def relative_path(from_file: Path, to_file: Path):
@@ -179,7 +200,7 @@ def multipage_toc(doc: DocumentTreeNode, side: str = "left") -> str:
         breadcrumbs.add(doc)
 
     toc = _toc_div(side)
-    _toc_title(toc, link=_relative_html_link(current_doc, doc), text=doc.in_file.stem)
+    _toc_title(toc, link=_relative_html_link(current_doc, doc), text=doc.title)
 
     if doc is not None:
         _toc(parent=toc, doc=doc, current_doc=current_doc, level=1, breadcrumbs=breadcrumbs)
@@ -189,13 +210,17 @@ def multipage_toc(doc: DocumentTreeNode, side: str = "left") -> str:
     return _pretty_html(toc) + _pretty_html(script)
 
 
-def _toc(parent: ET.Element, doc: DocumentTreeNode, current_doc:DocumentTreeNode,
-         level: int, breadcrumbs: Sequence[DocumentTreeNode]) -> None:
+def _toc(parent: ET.Element, doc: DocumentTreeNode, current_doc: DocumentTreeNode, level: int,
+         breadcrumbs: Set[DocumentTreeNode]) -> None:
     ul = _toc_ul(parent, level)
     for child in doc.children:
-        li = _toc_li(ul, link=_relative_html_link(current_doc, child), text=child.in_file.stem)
+        li = _toc_li(ul, link=_relative_html_link(current_doc, child), text=child.title)
         if len(child.children) > 0 and child in breadcrumbs:
-            _toc(parent=li, doc=child, current_doc=current_doc, level=level + 1, breadcrumbs=breadcrumbs)
+            _toc(parent=li,
+                 doc=child,
+                 current_doc=current_doc,
+                 level=level + 1,
+                 breadcrumbs=breadcrumbs)
 
 
 def _toc_script(side: str = "left") -> ET.Element:
