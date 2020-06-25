@@ -13,8 +13,9 @@
 # limitations under the License.
 """Support for navigating multi page output."""
 
-import os
 import logging
+import os
+import re
 import xml.dom.minidom
 
 import xml.etree.ElementTree as ET
@@ -105,11 +106,20 @@ class DocumentTreeNode(object):
             with self.in_file.open(mode="r", encoding="utf-8") as f:
                 for line in f:
                     if line.startswith("= "):
-                        return line[2:].strip()
+                        return self._clean_title(line)
         except OSError:
             logger.exception(f"Failed to read title from AsciiDoc file {self.in_file}.")
         logger.exception(f"Did not find title in AsciiDoc file {self.in_file}.")
         return self.in_file.stem
+
+    @staticmethod
+    def _clean_title(title: str) -> str:
+        title = title[2:]
+        title = re.sub(r"\[.*\]", "", title)
+        title = re.sub(r"\{.*\}", "", title)
+        title = re.sub(r"[*_`^~#]", "", title)
+        title = title.strip()
+        return title
 
 
 def relative_path(from_file: Path, to_file: Path):

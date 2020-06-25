@@ -197,6 +197,27 @@ def test_document_tree_node__title__no_file(tmp_path):
     assert doc.title == "file"
 
 
+@pytest.mark.parametrize("content,title", [
+    ("= *My title*", "My title"),
+    ("= **My title**", "My title"),
+    ("= _My_ title", "My title"),
+    ("= __My__ title", "My title"),
+    ("= `*__My__ title*`", "My title"),
+    ("= My title[[anchor,anchor]]", "My title"),
+    ("= My title [[anchor,anchor]]", "My title"),
+    ("= My ^title^", "My title"),
+    ("= My ~title~", "My title"),
+    ("= [.big]#My# title", "My title"),
+    ("= [.big]##My## title", "My title"),
+])
+def test_document_tree_node__title__remove_formatting(tmp_path, content, title):
+    adoc_file = tmp_path / "file.adoc"
+    adoc_file.write_text(content)
+
+    doc = DocumentTreeNode(adoc_file)
+    assert doc.title == title
+
+
 def test_navigation_bar_first_document(document_tree_two_subpages):
     next_doc = document_tree_two_subpages.children[0]
     assert navigation_bar(document_tree_two_subpages) == (
