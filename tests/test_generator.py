@@ -474,6 +474,30 @@ def test_include_error_file_not_found(api, input_file):
         api.include("non_existing_file.adoc")
 
 
+def test_multipage_toc__default(api, input_file, multi_page):
+    result = api.multipage_toc()
+    assert result == ":docinfo: private"
+
+    toc_file = input_file.parent / f".asciidoxy.{input_file.stem}-docinfo-footer.html"
+    assert toc_file.is_file()
+
+
+def test_multipage_toc__multipage_off(api, input_file):
+    result = api.multipage_toc()
+    assert not result
+
+    toc_file = input_file.parent / f".asciidoxy.{input_file.stem}-docinfo-footer.html"
+    assert not toc_file.exists()
+
+
+def test_multipage_toc__preprocessing_run(preprocessing_api, input_file, multi_page):
+    result = preprocessing_api.multipage_toc()
+    assert not result
+
+    toc_file = input_file.parent / f".asciidoxy.{input_file.stem}-docinfo-footer.html"
+    assert not toc_file.exists()
+
+
 @pytest.mark.parametrize("warnings_are_errors", [True, False],
                          ids=["warnings-are-errors", "warnings-are-not-errors"])
 @pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
