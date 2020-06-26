@@ -306,7 +306,7 @@ class Api(object):
                 else:
                     logger.warning(msg)
 
-        if not self._context.multi_page:
+        if not self._context.multipage:
             file_path = Path(file_name)
             if not file_path.is_absolute():
                 file_path = (self._current_file.parent / file_path).resolve().relative_to(
@@ -363,7 +363,7 @@ class Api(object):
                 leveloffset: str = "+1",
                 link_text: str = "",
                 link_prefix: str = "",
-                multi_page_link: bool = True,
+                multipage_link: bool = True,
                 **asciidoc_options) -> str:
         """Include another AsciiDoc file, and process it to insert API references.
 
@@ -381,7 +381,7 @@ class Api(object):
             link_prefix:       Optional text which will be inserted before the link when the output
                                    format is multi-paged. It can be used for example to compose a
                                    list of linked subdocuments by setting it to ". ".
-            multi_page_link:   True to include a link in a multi-page document (default). Otherwise
+            multipage_link:    True to include a link in a multi-page document (default). Otherwise
                                    the separate document is generated but not linked from here.
             asciidoc_options:  Any additional option is added as an attribute to the include
                                    directive in single page mode.
@@ -407,8 +407,8 @@ class Api(object):
             assert sub_context.current_document is not None
 
         out_file = _process_adoc(file_path, sub_context)
-        if self._context.multi_page:
-            if multi_page_link:
+        if self._context.multipage:
+            if multipage_link:
                 referenced_file = relative_path(self._current_file, file_path)
                 return (f"{link_prefix}"
                         f"<<{referenced_file}#,{link_text if link_text else referenced_file}>>")
@@ -481,7 +481,7 @@ class Api(object):
         Args:
             side: Show the multipage TOC at the `left` or `right` side.
         """
-        if not self._context.multi_page or self._context.preprocessing_run:
+        if not self._context.multipage or self._context.preprocessing_run:
             return ""
 
         toc_content = multipage_toc(self._context.current_document, side)
@@ -508,7 +508,7 @@ def process_adoc(in_file: Path,
                  build_dir: Path,
                  api_reference: ApiReference,
                  warnings_are_errors: bool = False,
-                 multi_page: bool = False,
+                 multipage: bool = False,
                  progress: Optional[tqdm] = None):
     """Process an AsciiDoc file and insert API reference.
 
@@ -517,7 +517,7 @@ def process_adoc(in_file: Path,
         build_dir:           Directory to store build artifacts in.
         api_reference:       API reference to insert in the documents.
         warnings_are_errors: True to treat every warning as an error.
-        multi_page:          True to enable multi page output.
+        multipage:          True to enable multi page output.
 
     Returns:
         Dictionary that maps input AsciiDoc files to output AsciiDoc files with inserted API
@@ -534,7 +534,7 @@ def process_adoc(in_file: Path,
     context.fragment_dir.mkdir(parents=True, exist_ok=True)
 
     context.warnings_are_errors = warnings_are_errors
-    context.multi_page = multi_page
+    context.multipage = multipage
     context.progress = progress
 
     _process_adoc(in_file, context)
@@ -563,7 +563,7 @@ def _process_adoc(in_file: Path, context: Context):
     if not context.preprocessing_run:
         with out_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
-            if context.multi_page:
+            if context.multipage:
                 nav_bar = navigation_bar(context.current_document)
                 if nav_bar:
                     print(nav_bar, file=f)

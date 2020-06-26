@@ -40,11 +40,11 @@ def error(*args, **kwargs) -> None:
     print(*args, **kwargs)
 
 
-def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, multi_page: bool,
+def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, multipage: bool,
                 backend: str, extra_args: Sequence[str]) -> None:
     subprocess.run([
         f"asciidoctor -D {destination_dir} -o {out_file} -b {backend} "
-        f"{'-a multipage ' if multi_page else ''}"
+        f"{'-a multipage ' if multipage else ''}"
         f"{processed_file} {' '.join(extra_args)}"
     ],
                    shell=True,
@@ -129,7 +129,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                         metavar="LANGUAGE",
                         help="Force language used when parsing doxygen XML files. Ignores the"
                         " language specified in the XML files.")
-    parser.add_argument("--multi-page", action="store_true", help="Generate multi-page document.")
+    parser.add_argument("--multipage", action="store_true", help="Generate multi-page document.")
     if argv is None:
         argv = sys.argv[1:]
     args, extra_args = parser.parse_known_args(argv)
@@ -205,7 +205,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                                               build_dir,
                                               api_reference,
                                               warnings_are_errors=args.warnings_are_errors,
-                                              multi_page=args.multi_page,
+                                              multipage=args.multipage,
                                               progress=progress)
 
     except AsciiDocError as e:
@@ -220,11 +220,11 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     logger.info("Running asciidoctor")
     in_dir = in_file.parent
     for (in_adoc_file, out_adoc_file) in tqdm(
-        [(k, v) for (k, v) in in_to_out_file_map.items() if args.multi_page or k == in_file],
+        [(k, v) for (k, v) in in_to_out_file_map.items() if args.multipage or k == in_file],
             desc="Running asciidoctor  ",
             unit="file"):
         out_file = destination_dir / in_adoc_file.relative_to(in_dir).with_suffix(extension)
-        asciidoctor(destination_dir, out_file, out_adoc_file, args.multi_page, args.backend,
+        asciidoctor(destination_dir, out_file, out_adoc_file, args.multipage, args.backend,
                     extra_args)
         logger.info(f"Generated: {out_file}")
 

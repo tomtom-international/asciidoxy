@@ -603,7 +603,7 @@ ${api.include(<file_name>,
               [leveloffset=<offset>,]
               [link_text=<text>,]
               [link_prefix=<prefix>,]
-              [multi_page_link=<bool>],
+              [multipage_link=<bool>],
               [...])}
 """}
 ----
@@ -623,7 +623,7 @@ arguments:
 `link_text`:: Text for the link to insert in multi-page mode.
 `link_prefix`:: Text to insert before the link in multi-page mode. Use this to create for example a
 numbered list of links.
-`multi_page_link`:: By default a link is inserted in multi-page mode. Set this to False to omit
+`multipage_link`:: By default a link is inserted in multi-page mode. Set this to False to omit
 inserting the link. The included file is still processed. Use <<cross_referencing>> to insert a
 link elsewhere in the document.
 
@@ -639,7 +639,7 @@ ${"""
 ${api.include("component/reference.adoc")}                                           # <1>
 ${api.include("/mount/data/reference.adoc", leveloffset="+3")}                       # <2>
 ${api.include("component/reference.adoc", link_text="Reference", link_prefix=". ")}  # <3>
-${api.include("/component/reference.adoc", multi_page_link=False)}                   # <4>
+${api.include("/component/reference.adoc", multipage_link=False)}                   # <4>
 """}
 ----
 <1> Include and process `component/reference.adoc` relative to this file.

@@ -77,8 +77,8 @@ the internal version of AsciiDoxy. Many thanks to:
 The python package was created with https://github.com/audreyr/cookiecutter[Cookiecutter] and the
 https://github.com/audreyr/cookiecutter-pypackage[audreyr/cookiecutter-pypackage] project template.
 
-${api.include("about.adoc", multi_page_link=False)}
-${api.include("usage.adoc", multi_page_link=False)}
-${api.include("examples.adoc", multi_page_link=False)}
-${api.include("contributing.adoc", multi_page_link=False)}
-${api.include("changelog.adoc", multi_page_link=False)}
+${api.include("about.adoc", multipage_link=False)}
+${api.include("usage.adoc", multipage_link=False)}
+${api.include("examples.adoc", multipage_link=False)}
+${api.include("contributing.adoc", multipage_link=False)}
+${api.include("changelog.adoc", multipage_link=False)}

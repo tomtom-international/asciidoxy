@@ -28,4 +28,4 @@ Reference in a table to a sub-document:
 |---
 
 Hidden link in multi-page, embedded in single-page:
-${api.include("sub_directory/multifile_subdoc_in_table_test.input.adoc", multi_page_link=False)}
+${api.include("sub_directory/multifile_subdoc_in_table_test.input.adoc", multipage_link=False)}

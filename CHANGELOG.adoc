@@ -40,6 +40,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - [AD-5] When using `api.link` the first match from an overload set is returned, instead of
     throwing an error. This can be disabled by using `allow_overloads=False`. `api.insert` still
     requires a perfect match.
+  - [AD-29] Rename `multi_page` and `multi-page` to `multipage`. This is a breaking change for the
+    command-line options and `api.include`.
 
 === Fixed
 

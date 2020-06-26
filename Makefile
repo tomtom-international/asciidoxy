@@ -123,5 +123,5 @@ docs: ## generate documentation
 		--build-dir ../build/doc/asciidoxy \
 		--destination-dir ../build/doc/output \
 		--spec-file asciidoxy.toml \
-		--debug --multi-page \
+		--debug --multipage \
 		-a linkcss

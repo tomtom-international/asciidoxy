@@ -45,7 +45,7 @@ class Context(object):
         insert_filter:      Filter used to select members of elements to insert.
         preprocessing_run:  True when preprocessing. During preprocessing no files are generated.
         warnings_are_errors:True to treat every warning as an error.
-        multi_page:         True when multi page output is enabled.
+        multipage:          True when multi page output is enabled.
         reference:          API reference information.
         linked:             All elements to which links are inserted in the documentation.
         inserted:           All elements that have been inserted in the documentation.
@@ -62,7 +62,7 @@ class Context(object):
 
     preprocessing_run: bool = True
     warnings_are_errors: bool = False
-    multi_page: bool = False
+    multipage: bool = False
 
     reference: ApiReference
     progress: Optional[tqdm] = None
@@ -111,7 +111,7 @@ class Context(object):
         sub.language = self.language
         sub.preprocessing_run = self.preprocessing_run
         sub.warnings_are_errors = self.warnings_are_errors
-        sub.multi_page = self.multi_page
+        sub.multipage = self.multipage
 
         # References
         sub.linked = self.linked
@@ -127,7 +127,7 @@ class Context(object):
                         link_text: str,
                         element: Optional[ReferableElement] = None) -> str:
         def file_part():
-            if not self.multi_page or element_id not in self.inserted:
+            if not self.multipage or element_id not in self.inserted:
                 return ""
             containing_file = self.inserted[element_id]
             assert containing_file is not None
