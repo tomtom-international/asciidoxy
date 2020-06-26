@@ -112,5 +112,5 @@ def test_parse_java_method(api_reference):
     assert member.returns.type.namespace == "com.asciidoxy.traffic.TrafficEvent"
     assert not member.returns.type.prefix
     assert not member.returns.type.suffix
-    assert len(member.returns.type.nested) == 0
+    assert not member.returns.type.nested
     assert member.returns.description == "True if the update is valid."

@@ -80,7 +80,8 @@ Traffic event details.
 
 [source,java,subs="-specialchars,macros+"]
 ----
-boolean Update(int cause, int delay)
+boolean Update(int cause,
+               int delay)
 ----
 
 Update the traffic event data.

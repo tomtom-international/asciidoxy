@@ -309,7 +309,7 @@ def test_cross_document_ref_with_relative_path(sub_document_api, sub_document_fi
 
 
 def test_cross_document_ref_with_relative_path_multipage(sub_document_api, sub_document_file,
-                                                         multi_page):
+                                                         multipage):
     anchor = "anchor"
     target_file_rel = Path("includes") / "other_file.adoc"
 
@@ -327,7 +327,7 @@ def test_cross_document_ref_with_absolute_path(sub_document_api, sub_document_fi
 
 
 def test_cross_document_ref_with_absolute_path_multipage(sub_document_api, sub_document_file,
-                                                         multi_page):
+                                                         multipage):
     anchor = "anchor"
     target_file_rel = Path("includes") / "other_file.adoc"
     target_file = sub_document_file.parent / target_file_rel
@@ -364,7 +364,7 @@ def test_include_relative_path(api, context, input_file):
     assert file_name.name == ".asciidoxy.another_file.adoc"
 
 
-def test_include_relative_path_multipage(api, context, input_file, multi_page):
+def test_include_relative_path_multipage(api, context, input_file, multipage):
     include_file_rel = Path("includes") / "another_file.adoc"
     include_file = input_file.parent / include_file_rel
     include_file.parent.mkdir(parents=True)
@@ -393,7 +393,7 @@ def test_include_absolute_path(api, context, input_file):
     assert file_name.name == ".asciidoxy.another_file.adoc"
 
 
-def test_include_absolute_path_multipage(api, context, input_file, multi_page):
+def test_include_absolute_path_multipage(api, context, input_file, multipage):
     include_file_rel = Path("includes") / "another_file.adoc"
     include_file = input_file.parent / include_file_rel
     include_file.parent.mkdir(parents=True)
@@ -418,7 +418,7 @@ def test_include_with_leveloffset(api, context, input_file):
     assert result.endswith("[leveloffset=-1]")
 
 
-def test_include_multipage_with_link_text(api, context, input_file, multi_page):
+def test_include_multipage_with_link_text(api, context, input_file, multipage):
     link_text = "Link"
     include_file_rel = Path("includes") / "another_file.adoc"
     include_file = input_file.parent / include_file_rel
@@ -431,7 +431,7 @@ def test_include_multipage_with_link_text(api, context, input_file, multi_page):
     assert result == f"<<{include_file_rel}#,{link_text}>>"
 
 
-def test_include_multipage_with_prefix_text(api, context, input_file, multi_page):
+def test_include_multipage_with_prefix_text(api, context, input_file, multipage):
     prefix = ". "
     include_file_rel = Path("includes") / "another_file.adoc"
     include_file = input_file.parent / include_file_rel
@@ -444,7 +444,7 @@ def test_include_multipage_with_prefix_text(api, context, input_file, multi_page
     assert result == f"{prefix}<<{include_file_rel}#,{include_file_rel}>>"
 
 
-def test_include_multipage_without_link(api, context, input_file, multi_page):
+def test_include_multipage_without_link(api, context, input_file, multipage):
     prefix = ". "
     include_file_rel = Path("includes") / "another_file.adoc"
     include_file = input_file.parent / include_file_rel
@@ -453,7 +453,7 @@ def test_include_multipage_without_link(api, context, input_file, multi_page):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include(include_file_rel, link_prefix=prefix, multi_page_link=False)
+    result = api.include(include_file_rel, link_prefix=prefix, multipage_link=False)
     assert result == ""
 
 
@@ -474,11 +474,35 @@ def test_include_error_file_not_found(api, input_file):
         api.include("non_existing_file.adoc")
 
 
+def test_multipage_toc__default(api, input_file, multipage):
+    result = api.multipage_toc()
+    assert result == ":docinfo: private"
+
+    toc_file = input_file.parent / f".asciidoxy.{input_file.stem}-docinfo-footer.html"
+    assert toc_file.is_file()
+
+
+def test_multipage_toc__multipage_off(api, input_file):
+    result = api.multipage_toc()
+    assert not result
+
+    toc_file = input_file.parent / f".asciidoxy.{input_file.stem}-docinfo-footer.html"
+    assert not toc_file.exists()
+
+
+def test_multipage_toc__preprocessing_run(preprocessing_api, input_file, multipage):
+    result = preprocessing_api.multipage_toc()
+    assert not result
+
+    toc_file = input_file.parent / f".asciidoxy.{input_file.stem}-docinfo-footer.html"
+    assert not toc_file.exists()
+
+
 @pytest.mark.parametrize("warnings_are_errors", [True, False],
                          ids=["warnings-are-errors", "warnings-are-not-errors"])
 @pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
 def test_process_adoc_single_file(warnings_are_errors, build_dir, test_file_name,
-                                  single_and_multi_page, adoc_data, api_reference):
+                                  single_and_multipage, adoc_data, api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
 
@@ -498,7 +522,7 @@ def test_process_adoc_single_file(warnings_are_errors, build_dir, test_file_name
     assert progress_mock.total == 2
 
 
-def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, api_reference):
+def test_process_adoc_multi_file(build_dir, single_and_multipage, adoc_data, api_reference):
     main_doc_file = adoc_data / "multifile_test.input.adoc"
     sub_doc_file = main_doc_file.parent / "sub_directory" / "multifile_subdoc_test.input.adoc"
     sub_doc_in_table_file = main_doc_file.parent / "sub_directory" \
@@ -509,7 +533,7 @@ def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, ap
                                 build_dir,
                                 api_reference,
                                 warnings_are_errors=True,
-                                multi_page=single_and_multi_page,
+                                multipage=single_and_multipage,
                                 progress=progress_mock)
     assert len(output_files) == 3
     assert (
@@ -520,7 +544,7 @@ def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, ap
     for input_file, output_file in output_files.items():
         assert output_file.is_file()
         expected_output_file = input_file.with_suffix(
-            ".expected.multipage.adoc" if single_and_multi_page else ".expected.singlepage.adoc")
+            ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
         content = output_file.read_text()
         content = content.replace(os.fspath(build_dir), "BUILD_DIR")
         assert content == expected_output_file.read_text()
@@ -533,20 +557,18 @@ def test_process_adoc_multi_file(build_dir, single_and_multi_page, adoc_data, ap
 @pytest.mark.parametrize(
     "test_file_name",
     ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
-def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_page, adoc_data,
+def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multipage, adoc_data,
                                    api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
-    if single_and_multi_page:
+    if single_and_multipage:
         expected_output_file_multipage = expected_output_file.with_suffix('.multipage.adoc')
         if expected_output_file_multipage.is_file():
             expected_output_file = expected_output_file_multipage
 
-    output_file = process_adoc(input_file,
-                               build_dir,
-                               api_reference,
-                               multi_page=single_and_multi_page)[input_file]
+    output_file = process_adoc(input_file, build_dir, api_reference,
+                               multipage=single_and_multipage)[input_file]
     assert output_file.is_file()
 
     content = output_file.read_text()
@@ -559,7 +581,7 @@ def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multi_p
                                                    ("dangling_cross_doc_ref", ConsistencyError),
                                                    ("double_insert", ConsistencyError),
                                                    ("dangling_link_in_insert", ConsistencyError)])
-def test_process_adoc_file_warning_as_error(build_dir, test_file_name, error, single_and_multi_page,
+def test_process_adoc_file_warning_as_error(build_dir, test_file_name, error, single_and_multipage,
                                             adoc_data, api_reference):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 

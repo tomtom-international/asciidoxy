@@ -48,6 +48,7 @@
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b" kind="function"><name>Update</name></member>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf" kind="function"><name>SharedData</name></member>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17" kind="function"><name>CalculateDelay</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0" kind="function"><name>RegisterTrafficCallback</name></member>
   </compound>
   <compound refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kind="struct"><name>asciidoxy::traffic::TrafficEvent::TrafficEventData</name>
     <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675" kind="variable"><name>cause</name></member>
@@ -55,6 +56,8 @@
     <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68" kind="variable"><name>severity</name></member>
   </compound>
   <compound refid="namespaceasciidoxy" kind="namespace"><name>asciidoxy</name>
+    <member refid="overloads_8hpp_1afbbb1c0274b5a0d90b2d1d39f1269027" kind="function"><name>to_string</name></member>
+    <member refid="overloads_8hpp_1a8eebbc44a7bed882754da89a49139680" kind="function"><name>to_string</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
   </compound>
@@ -64,10 +67,13 @@
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
     <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>
     <member refid="traffic__event_8hpp_1adb4a21783ecb2c7bf30726a36c61a502" kind="typedef"><name>Delay</name></member>
+    <member refid="overloads_8hpp_1aebc2b625b914c709f972b5b8eca35d39" kind="function"><name>to_string</name></member>
   </compound>
   <compound refid="coordinate_8hpp" kind="file"><name>coordinate.hpp</name>
   </compound>
   <compound refid="logger_8hpp" kind="file"><name>logger.hpp</name>
+  </compound>
+  <compound refid="overloads_8hpp" kind="file"><name>overloads.hpp</name>
   </compound>
   <compound refid="same__in__multiple__namespaces_8hpp" kind="file"><name>same_in_multiple_namespaces.hpp</name>
   </compound>

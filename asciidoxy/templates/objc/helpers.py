@@ -14,7 +14,7 @@
 """Helper functions for Objective C templates."""
 
 from asciidoxy.generator import Context, InsertionFilter
-from asciidoxy.templates.helpers import link_from_ref, print_ref
+from asciidoxy.templates.helpers import argument_list, link_from_ref, print_ref
 
 
 def objc_method_signature(method, context: Context):
@@ -48,6 +48,16 @@ def objc_method_signature(method, context: Context):
         return "\n".join(method_parts)
     else:
         return f"{prefix}{method_parts[0]}"
+
+
+def objc_block_definition(block, context: Context):
+    if block.name:
+        block_name = f" {block.name}"
+    else:
+        block_name = ""
+
+    return (f"typedef {link_from_ref(block.returns.type, context, skip_args=True)}(^{block_name})"
+            f" {argument_list(block.returns.type.args, context)}")
 
 
 def public_methods(element, insert_filter: InsertionFilter):

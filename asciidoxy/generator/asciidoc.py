@@ -37,7 +37,7 @@ from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFo
                      IncompatibleVersionError, ReferenceNotFoundError, TemplateMissingError,
                      UnlinkableError)
 from .filters import FilterSpec, InsertionFilter
-from .navigation import DocumentTreeNode, navigation_bar, relative_path
+from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipage_toc
 
 logger = logging.getLogger(__name__)
 
@@ -76,16 +76,18 @@ class Api(object):
                      name: str,
                      *,
                      kind: Optional[str] = None,
-                     lang: Optional[str] = None) -> ReferableElement:
+                     lang: Optional[str] = None,
+                     allow_overloads: bool = False) -> ReferableElement:
         """Find a reference to API documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
         disambiguate.
 
         Args:
-            name: Name of the object to insert.
-            kind: Kind of object to generate reference documentation for.
-            lang: Programming language of the object.
+            name:            Name of the object to insert.
+            kind:            Kind of object to generate reference documentation for.
+            lang:            Programming language of the object.
+            allow_overloads: True to return the first match of an overload set.
 
         Returns:
             An API documentation reference.
@@ -103,7 +105,8 @@ class Api(object):
             element = self._context.reference.find(name=name,
                                                    namespace=self._context.namespace,
                                                    kind=kind,
-                                                   lang=lang)
+                                                   lang=lang,
+                                                   allow_overloads=allow_overloads)
         except AmbiguousLookupError as ex:
             raise AmbiguousReferenceError(name, ex.candidates)
 
@@ -213,8 +216,9 @@ class Api(object):
         else:
             insert_filter = self._context.insert_filter
 
-        return self.insert_fragment(self.find_element(name, kind=kind, lang=lang), insert_filter,
-                                    leveloffset, **asciidoc_options)
+        return self.insert_fragment(
+            self.find_element(name, kind=kind, lang=lang, allow_overloads=False), insert_filter,
+            leveloffset, **asciidoc_options)
 
     def link(self,
              name: str,
@@ -222,19 +226,21 @@ class Api(object):
              kind: Optional[str] = None,
              lang: Optional[str] = None,
              text: Optional[str] = None,
-             full_name: bool = False) -> str:
+             full_name: bool = False,
+             allow_overloads: bool = True) -> str:
         """Insert a link to API reference documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
         disambiguate.
 
         Args:
-            name:      Fully qualified name of the object to link to.
-            kind:      Kind of object to link to.
-            lang:      Programming language of the object.
-            text:      Alternative text to use for the link. If not supplied, the object name is
-                           used.
-            full_name: Use the fully qualified name of the object for the link text.
+            name:            Fully qualified name of the object to link to.
+            kind:            Kind of object to link to.
+            lang:            Programming language of the object.
+            text:            Alternative text to use for the link. If not supplied, the object name
+                                 is used.
+            full_name:       Use the fully qualified name of the object for the link text.
+            allow_overloads: Link to the first match in an overload set. Enabled by default.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -243,7 +249,7 @@ class Api(object):
             raise ValueError("`text` and `full_name` cannot be used together.")
 
         try:
-            element = self.find_element(name, kind=kind, lang=lang)
+            element = self.find_element(name, kind=kind, lang=lang, allow_overloads=allow_overloads)
         except ReferenceNotFoundError as ref_not_found:
             if self._context.warnings_are_errors:
                 raise
@@ -300,7 +306,7 @@ class Api(object):
                 else:
                     logger.warning(msg)
 
-        if not self._context.multi_page:
+        if not self._context.multipage:
             file_path = Path(file_name)
             if not file_path.is_absolute():
                 file_path = (self._current_file.parent / file_path).resolve().relative_to(
@@ -357,7 +363,7 @@ class Api(object):
                 leveloffset: str = "+1",
                 link_text: str = "",
                 link_prefix: str = "",
-                multi_page_link: bool = True,
+                multipage_link: bool = True,
                 **asciidoc_options) -> str:
         """Include another AsciiDoc file, and process it to insert API references.
 
@@ -375,7 +381,7 @@ class Api(object):
             link_prefix:       Optional text which will be inserted before the link when the output
                                    format is multi-paged. It can be used for example to compose a
                                    list of linked subdocuments by setting it to ". ".
-            multi_page_link:   True to include a link in a multi-page document (default). Otherwise
+            multipage_link:    True to include a link in a multi-page document (default). Otherwise
                                    the separate document is generated but not linked from here.
             asciidoc_options:  Any additional option is added as an attribute to the include
                                    directive in single page mode.
@@ -401,8 +407,8 @@ class Api(object):
             assert sub_context.current_document is not None
 
         out_file = _process_adoc(file_path, sub_context)
-        if self._context.multi_page:
-            if multi_page_link:
+        if self._context.multipage:
+            if multipage_link:
                 referenced_file = relative_path(self._current_file, file_path)
                 return (f"{link_prefix}"
                         f"<<{referenced_file}#,{link_text if link_text else referenced_file}>>")
@@ -464,6 +470,25 @@ class Api(object):
         # Prevent output of None
         return ""
 
+    def multipage_toc(self, side: str = "left") -> str:
+        """Insert a table of contents for multipage documents.
+
+        Only supported for the HTML backend and when multipage mode is on.
+
+        This command needs to be included in the document headers to work. To not break headers
+        when multipage mode is off, it is recommended to add it to the end of the headers.
+
+        Args:
+            side: Show the multipage TOC at the `left` or `right` side.
+        """
+        if not self._context.multipage or self._context.preprocessing_run:
+            return ""
+
+        toc_content = multipage_toc(self._context.current_document, side)
+        with _docinfo_footer_file_name(self._current_file).open(mode="w", encoding="utf-8") as f:
+            f.write(toc_content)
+        return ":docinfo: private"
+
     def _template(self, lang: str, kind: str) -> Template:
         key = Api.TemplateKey(lang, kind)
         template = self._template_cache.get(key, None)
@@ -483,7 +508,7 @@ def process_adoc(in_file: Path,
                  build_dir: Path,
                  api_reference: ApiReference,
                  warnings_are_errors: bool = False,
-                 multi_page: bool = False,
+                 multipage: bool = False,
                  progress: Optional[tqdm] = None):
     """Process an AsciiDoc file and insert API reference.
 
@@ -492,7 +517,7 @@ def process_adoc(in_file: Path,
         build_dir:           Directory to store build artifacts in.
         api_reference:       API reference to insert in the documents.
         warnings_are_errors: True to treat every warning as an error.
-        multi_page:          True to enable multi page output.
+        multipage:          True to enable multi page output.
 
     Returns:
         Dictionary that maps input AsciiDoc files to output AsciiDoc files with inserted API
@@ -509,7 +534,7 @@ def process_adoc(in_file: Path,
     context.fragment_dir.mkdir(parents=True, exist_ok=True)
 
     context.warnings_are_errors = warnings_are_errors
-    context.multi_page = multi_page
+    context.multipage = multipage
     context.progress = progress
 
     _process_adoc(in_file, context)
@@ -538,7 +563,7 @@ def _process_adoc(in_file: Path, context: Context):
     if not context.preprocessing_run:
         with out_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
-            if context.multi_page:
+            if context.multipage:
                 nav_bar = navigation_bar(context.current_document)
                 if nav_bar:
                     print(nav_bar, file=f)
@@ -564,3 +589,7 @@ def _check_links(context: Context):
 
 def _out_file_name(in_file: Path) -> Path:
     return in_file.parent / f".asciidoxy.{in_file.name}"
+
+
+def _docinfo_footer_file_name(in_file: Path) -> Path:
+    return in_file.parent / f".asciidoxy.{in_file.stem}-docinfo-footer.html"

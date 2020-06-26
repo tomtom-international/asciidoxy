@@ -37,7 +37,7 @@ def test_context_create_sub_context(context):
 
     assert sub.preprocessing_run == context.preprocessing_run
     assert sub.warnings_are_errors == context.warnings_are_errors
-    assert sub.multi_page == context.multi_page
+    assert sub.multipage == context.multipage
 
     assert sub.reference is context.reference
     assert sub.linked is context.linked
@@ -64,7 +64,7 @@ def test_context_link_to_element_singlepage(context):
     assert context.link_to_element(element_id, link_text) == f"xref:{element_id}[{link_text}]"
 
 
-def test_context_link_to_element_multipage(context, multi_page):
+def test_context_link_to_element_multipage(context, multipage):
     element_id = "element"
     file_containing_element = "other_file.adoc"
     link_text = "Link"
@@ -73,14 +73,14 @@ def test_context_link_to_element_multipage(context, multi_page):
         element_id, link_text) == f"xref:{file_containing_element}#{element_id}[{link_text}]")
 
 
-def test_context_link_to_element_multipage_element_in_the_same_document(context, multi_page):
+def test_context_link_to_element_multipage_element_in_the_same_document(context, multipage):
     element_id = "element"
     link_text = "Link"
     context.inserted[element_id] = context.current_document.in_file
     assert (context.link_to_element(element_id, link_text) == f"xref:{element_id}[{link_text}]")
 
 
-def test_context_link_to_element_element_not_inserted(context, single_and_multi_page):
+def test_context_link_to_element_element_not_inserted(context, single_and_multipage):
     element_id = "element"
     link_text = "Link"
     assert element_id not in context.inserted

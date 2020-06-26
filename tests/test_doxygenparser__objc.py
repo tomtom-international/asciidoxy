@@ -100,7 +100,7 @@ def test_parse_objc_member_function(api_reference):
     assert param.type.namespace == "ADTrafficEvent"
     assert not param.type.prefix
     assert not param.type.suffix
-    assert len(param.type.nested) == 0
+    assert not param.type.nested
     assert param.name == "cause"
     assert param.description == "New TPEG cause code."
 
@@ -113,7 +113,7 @@ def test_parse_objc_member_function(api_reference):
     assert param.type.namespace == "ADTrafficEvent"
     assert not param.type.prefix
     assert not param.type.suffix
-    assert len(param.type.nested) == 0
+    assert not param.type.nested
     assert param.name == "delay"
     assert param.description == "New delay in seconds."
 
@@ -130,18 +130,28 @@ def test_parse_objc_block(api_reference):
 
     assert element.returns is not None
     assert element.returns.type is not None
-    assert element.returns.type.name == "void"
-    assert element.returns.type.language == "objc"
-    assert element.returns.type.namespace is None
 
-    assert len(element.params) == 1
+    block_type = element.returns.type
+    assert block_type.name == "void"
+    assert block_type.language == "objc"
+    assert block_type.namespace is None
+    assert len(block_type.args) == 2
 
-    param = element.params[0]
-    assert param.type is not None
-    assert param.type.name == "id"
-    assert not param.type.prefix
-    assert not param.type.suffix
-    assert len(param.type.nested) == 1
+    arg = block_type.args[0]
+    assert not arg.name
+    assert arg.type is not None
+    assert arg.type.name == "id"
+    assert not arg.type.prefix
+    assert not arg.type.suffix
+    assert len(arg.type.nested) == 1
 
-    nested = param.type.nested[0]
+    nested = arg.type.nested[0]
     assert nested.name == "ADTrafficEvent"
+
+    arg = block_type.args[1]
+    assert arg.name == "delay"
+    assert arg.type is not None
+    assert arg.type.name == "NSInteger"
+    assert not arg.type.prefix
+    assert not arg.type.suffix
+    assert not arg.type.nested

@@ -27,6 +27,7 @@ from typing import Optional, Sequence, List
 from mako.exceptions import RichTraceback
 from tqdm import tqdm
 
+from .api_reference import ApiReference
 from .collect import collect, specs_from_file, CollectError, SpecificationError
 from .doxygenparser import Driver as ParserDriver
 from .generator import process_adoc, AsciiDocError
@@ -39,11 +40,11 @@ def error(*args, **kwargs) -> None:
     print(*args, **kwargs)
 
 
-def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, multi_page: bool,
+def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, multipage: bool,
                 backend: str, extra_args: Sequence[str]) -> None:
     subprocess.run([
         f"asciidoctor -D {destination_dir} -o {out_file} -b {backend} "
-        f"{'-a multipage ' if multi_page else ''}"
+        f"{'-a multipage ' if multipage else ''}"
         f"{processed_file} {' '.join(extra_args)}"
     ],
                    shell=True,
@@ -107,7 +108,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     parser.add_argument("-s",
                         "--spec-file",
                         metavar="SPEC_FILE",
-                        required=True,
+                        default=None,
                         help="Package specification file.")
     parser.add_argument("-v",
                         "--version-file",
@@ -128,7 +129,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                         metavar="LANGUAGE",
                         help="Force language used when parsing doxygen XML files. Ignores the"
                         " language specified in the XML files.")
-    parser.add_argument("--multi-page", action="store_true", help="Generate multi-page document.")
+    parser.add_argument("--multipage", action="store_true", help="Generate multi-page document.")
     if argv is None:
         argv = sys.argv[1:]
     args, extra_args = parser.parse_known_args(argv)
@@ -143,59 +144,68 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         destination_dir = Path(args.destination_dir).resolve()
     else:
         destination_dir = build_dir / "output"
-    spec_file = Path(args.spec_file).resolve()
-    if args.version_file:
-        version_file: Optional[Path] = Path(args.version_file).resolve()
-    else:
-        version_file = None
-
     extension = output_extension(args.backend)
     if extension is None:
         logger.error(f"Backend {args.backend} is not supported.")
         sys.exit(1)
 
-    logger.info("Collecting packages  ")
-    try:
-        package_specs = specs_from_file(spec_file, version_file)
-    except SpecificationError:
-        logger.exception("Failed to load package specifications.")
-        sys.exit(1)
+    if args.spec_file is not None:
+        spec_file = Path(args.spec_file).resolve()
+        if args.version_file:
+            version_file: Optional[Path] = Path(args.version_file).resolve()
+        else:
+            version_file = None
 
-    download_dir = build_dir / "download"
-    try:
-        with tqdm(desc="Collecting packages  ", total=len(package_specs), unit="pkg") as progress:
-            packages = asyncio.get_event_loop().run_until_complete(
-                collect(package_specs, download_dir, progress))
-    except CollectError:
-        logger.exception("Failed to collect packages.")
-        sys.exit(1)
+        logger.info("Collecting packages  ")
+        try:
+            package_specs = specs_from_file(spec_file, version_file)
+        except SpecificationError:
+            logger.exception("Failed to load package specifications.")
+            sys.exit(1)
 
-    logger.info("Loading packages")
-    include_dirs: List[Path] = []
-    xml_parser = ParserDriver(force_language=args.force_language)
-    for pkg in tqdm(packages, desc="Loading API reference", unit="pkg"):
-        include_dirs.extend(pkg.include_dirs)
-        for xml_dir in pkg.xml_dirs:
-            for xml_file in xml_dir.glob("**/*.xml"):
-                xml_parser.parse(xml_file)
+        download_dir = build_dir / "download"
+        try:
+            with tqdm(desc="Collecting packages  ", total=len(package_specs),
+                      unit="pkg") as progress:
+                packages = asyncio.get_event_loop().run_until_complete(
+                    collect(package_specs, download_dir, progress))
+        except CollectError:
+            logger.exception("Failed to collect packages.")
+            sys.exit(1)
 
-    with tqdm(desc="Resolving references ", unit="ref") as progress:
-        xml_parser.resolve_references(progress)
+        logger.info("Loading packages")
+        include_dirs: List[Path] = []
+        xml_parser = ParserDriver(force_language=args.force_language)
+        for pkg in tqdm(packages, desc="Loading API reference", unit="pkg"):
+            include_dirs.extend(pkg.include_dirs)
+            for xml_dir in pkg.xml_dirs:
+                for xml_file in xml_dir.glob("**/*.xml"):
+                    xml_parser.parse(xml_file)
 
-    if args.debug:
-        logger.info("Writing debug data, sorry for the delay!")
-        with (build_dir / "debug.json").open("w", encoding="utf-8") as f:
-            json.dump(xml_parser.api_reference.elements, f, default=json_repr, indent=2)
+        with tqdm(desc="Resolving references ", unit="ref") as progress:
+            xml_parser.resolve_references(progress)
+
+        if args.debug:
+            logger.info("Writing debug data, sorry for the delay!")
+            with (build_dir / "debug.json").open("w", encoding="utf-8") as f:
+                json.dump(xml_parser.api_reference.elements, f, default=json_repr, indent=2)
+
+        api_reference = xml_parser.api_reference
+
+    else:
+        api_reference = ApiReference()
+        include_dirs = []
 
     in_file = copy_and_switch_to_intermediate_dir(
         Path(args.input_file).resolve(), include_dirs, build_dir)
+
     try:
         with tqdm(desc="Processing asciidoc  ", total=1, unit="file") as progress:
             in_to_out_file_map = process_adoc(in_file,
                                               build_dir,
-                                              xml_parser.api_reference,
+                                              api_reference,
                                               warnings_are_errors=args.warnings_are_errors,
-                                              multi_page=args.multi_page,
+                                              multipage=args.multipage,
                                               progress=progress)
 
     except AsciiDocError as e:
@@ -210,11 +220,11 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     logger.info("Running asciidoctor")
     in_dir = in_file.parent
     for (in_adoc_file, out_adoc_file) in tqdm(
-        [(k, v) for (k, v) in in_to_out_file_map.items() if args.multi_page or k == in_file],
+        [(k, v) for (k, v) in in_to_out_file_map.items() if args.multipage or k == in_file],
             desc="Running asciidoctor  ",
             unit="file"):
         out_file = destination_dir / in_adoc_file.relative_to(in_dir).with_suffix(extension)
-        asciidoctor(destination_dir, out_file, out_adoc_file, args.multi_page, args.backend,
+        asciidoctor(destination_dir, out_file, out_adoc_file, args.multipage, args.backend,
                     extra_args)
         logger.info(f"Generated: {out_file}")
 

@@ -302,7 +302,7 @@ def test_table_with_nested_itemizedlist():
     itemized_list = sub_element(para, "itemizedlist")
 
     list_item_1 = sub_element(itemized_list, "listitem")
-    para_1 = sub_element(list_item_1, "para", text="List item 1")
+    sub_element(list_item_1, "para", text="List item 1")
 
     list_item_2 = sub_element(itemized_list, "listitem")
     sub_element(list_item_2, "para", text="List item 2")
@@ -346,7 +346,7 @@ def test_table_with_caption():
     description = ET.Element("description")
     para = sub_element(description, "para")
     table = sub_element(para, "table", rows="1", cols="1")
-    caption = sub_element(table, "caption", text="Caption")
+    sub_element(table, "caption", text="Caption")
     row = sub_element(table, "row")
     entry = sub_element(row, "entry")
     sub_element(entry, "para", text="text")

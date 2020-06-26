@@ -13,29 +13,23 @@
 # limitations under the License.
 """Support for Objective-C documentation."""
 
-import re
+import string
 
 import xml.etree.ElementTree as ET
 
-from typing import Optional
+from typing import List, Optional
 
-from .language_traits import LanguageTraits
+from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
-from ..model import Compound, Member, Parameter, ReturnValue
+from .type_parser import TypeParser, Token, find_tokens
+from ..model import Compound, Member
 
 
 class ObjectiveCTraits(LanguageTraits):
     """Traits for parsing Objective C documentation."""
     TAG: str = "objc"
 
-    TYPE_PREFIXES = re.compile(r"((nullable|const|__weak|__strong)\s*)+\s+")
-    TYPE_SUFFIXES = re.compile(r"(\s*\*\s*?)+")
-    TYPE_NESTED_START = re.compile(r"\s*<\s*")
-    TYPE_NESTED_SEPARATOR = re.compile(r"\s*,\s*")
-    TYPE_NESTED_END = re.compile(r"\s*>")
-    TYPE_NAME = re.compile(r"((unsigned|signed|short|long)\s+)*[a-zA-Z0-9_:]+")
-
-    LANGUAGE_BUILD_IN_TYPES = ("char", "unsigned char", "signed char", "int", "short", "long",
+    LANGUAGE_BUILT_IN_TYPES = ("char", "unsigned char", "signed char", "int", "short", "long",
                                "float", "double", "void", "bool", "BOOL", "id", "instancetype",
                                "short int", "signed short", "signed short int", "unsigned short",
                                "unsigned short int", "signed int", "unsigned int", "long int",
@@ -44,11 +38,44 @@ class ObjectiveCTraits(LanguageTraits):
                                "signed long long", "signed long long int", "unsigned long long",
                                "unsigned long long int", "signed char", "long double")
 
-    BLOCK = re.compile(r"typedef (.+)\(\^(.+)\)\s*\((.*)\)")
+    NESTED_STARTS = "<",
+    NESTED_ENDS = ">",
+    ARGS_STARTS = "(",
+    ARGS_ENDS = ")",
+    SEPARATORS = ",",
+    OPERATORS = "*",
+    QUALIFIERS = "nullable", "const", "__weak", "__strong", "__nonnull", "_Nullable", "_Nonnull",
+    BUILT_IN_NAMES = ("char", "unsigned", "signed", "int", "short", "long", "float", "double",
+                      "void", "bool", "BOOL", "id", "instancetype")
+    BLOCKS = "^",
+
+    TOKENS = {
+        TokenCategory.NESTED_START: NESTED_STARTS,
+        TokenCategory.NESTED_END: NESTED_ENDS,
+        TokenCategory.ARGS_START: ARGS_STARTS,
+        TokenCategory.ARGS_END: ARGS_ENDS,
+        TokenCategory.SEPARATOR: SEPARATORS,
+        TokenCategory.OPERATOR: OPERATORS,
+        TokenCategory.QUALIFIER: QUALIFIERS,
+        TokenCategory.BUILT_IN_NAME: BUILT_IN_NAMES,
+        TokenCategory.BLOCK: BLOCKS,
+    }
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + SEPARATORS +
+                        OPERATORS + BLOCKS + tuple(string.whitespace))
+    SEPARATOR_TOKENS_OVERLAP = True
+
+    ALLOWED_PREFIXES = TokenCategory.WHITESPACE, TokenCategory.QUALIFIER,
+    ALLOWED_SUFFIXES = (
+        TokenCategory.WHITESPACE,
+        TokenCategory.OPERATOR,
+        TokenCategory.QUALIFIER,
+        TokenCategory.ARG_NAME,
+    )
+    ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME, TokenCategory.BUILT_IN_NAME,
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
-        return type_name in cls.LANGUAGE_BUILD_IN_TYPES or type_name.startswith("NS")
+        return type_name in cls.LANGUAGE_BUILT_IN_TYPES or type_name.startswith("NS")
 
     @classmethod
     def cleanup_name(cls, name: str) -> str:
@@ -78,42 +105,76 @@ class ObjectiveCTraits(LanguageTraits):
         return kind == "function" and name == "NS_ENUM"
 
 
+class ObjectiveCTypeParser(TypeParser):
+    "Parser for Objective C types." ""
+    TRAITS = ObjectiveCTraits
+
+    @classmethod
+    def adapt_tokens(cls,
+                     tokens: List[Token],
+                     array_tokens: Optional[List[Token]] = None) -> List[Token]:
+        tokens = super().adapt_tokens(tokens, array_tokens)
+
+        for match in find_tokens(tokens, [
+            [TokenCategory.ARGS_START],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.BLOCK],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.ARGS_END],
+        ]):
+            for t in match:
+                t.category = TokenCategory.INVALID
+
+        for match in find_tokens(tokens, [
+            (TokenCategory.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
+                cls.TRAITS.ALLOWED_SUFFIXES,
+                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
+                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
+                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
+                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
+                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
+                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
+            [TokenCategory.NAME],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.ARGS_END, TokenCategory.ARGS_SEPARATOR],
+        ]):
+            if match[-2].category == TokenCategory.NAME:
+                match[-2].category = TokenCategory.ARG_NAME
+            elif match[-3].category == TokenCategory.NAME:
+                match[-3].category = TokenCategory.ARG_NAME
+
+        tokens = [t for t in tokens if t.category != TokenCategory.INVALID]
+
+        return tokens
+
+
 class ObjectiveCParser(ParserBase):
     """Parser for Objective C documentation."""
     TRAITS = ObjectiveCTraits
+    TYPE_PARSER = ObjectiveCTypeParser
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
+        memberdef_element = self._fix_block_element(memberdef_element)
         member = super().parse_member(memberdef_element, parent)
-        if member is None:
-            return None
-
-        if member.kind in ("variable", "typedef") and "^" in member.definition:
-            self._redefine_as_block(member, parent)
-
         return member
 
-    def _redefine_as_block(self, member: Member, parent: Compound) -> None:
-        block_match = self.TRAITS.BLOCK.search(member.definition)
-        if not block_match:
-            return
+    def _fix_block_element(self, memberdef_element: ET.Element) -> ET.Element:
+        if memberdef_element.get("kind", "") not in ("variable", "typedef"):
+            return memberdef_element
 
-        return_type = block_match.group(1)
-        name = block_match.group(2).strip()
-        args = block_match.group(3).strip()
+        type_element = memberdef_element.find("type")
+        if type_element is None:
+            return memberdef_element
 
-        member.kind = "block"
-        member.name = name
+        type_text = type_element.text
+        args_string = memberdef_element.findtext("argsstring", "")
+        if not type_text or "(^" not in type_text or ")(" not in args_string:
+            return memberdef_element
 
-        def type_from_text(text):
-            type_element = ET.Element("type")
-            type_element.text = text
-            return self.parse_type(type_element, member)
+        type_text = type_text[:type_text.find("(^")]
+        type_text += args_string[args_string.find(")(") + 1:]
 
-        member.returns = ReturnValue()
-        member.returns.type = type_from_text(return_type)
+        type_element.text = type_text
+        memberdef_element.set("kind", "block")
 
-        if args:
-            for arg in args.split(","):
-                param = Parameter()
-                param.type = type_from_text(arg.strip())
-                member.params.append(param)
+        return memberdef_element

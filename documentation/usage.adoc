@@ -11,13 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= AsciiDoxy
+= Usage
 :notitle:
-:toc: left
-:toc-title: AsciiDoxy
 :icons: font
 :doctype: book
 :source-highlighter: highlightjs
+:toc: right
+:toc-title: On this page
+${api.multipage_toc()}
 
 ----
     ___              _ _ ____
@@ -36,7 +37,7 @@ ${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
 ${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
-= Usage
+= {doctitle}
 
 Instructions for how to install and use AsciiDoxy to create your own AsciiDoc API reference
 documentation.
@@ -76,8 +77,17 @@ make install
 
 == Invocation
 
-The minimal invocation takes an input AsciiDoc file and a package specification file. It creates a
-single page HTML document.
+The minimal invocation takes only an input AsciiDoc file. In the AsciiDoc file you can execute any
+python code in Mako format. It creates a single page HTML document.
+
+[source,bash]
+----
+asciidoxy input_file.adoc
+----
+
+AsciiDoxy becomes more powerful if you specify a Package Specification file pointing to external
+resources and API reference documentation. It allows you to generate API reference in AsciiDoc
+files.
 
 [source,bash]
 ----
@@ -495,11 +505,13 @@ ${api.link(<name>,
            [kind=<kind>,]
            [lang=<language>,]
            [text=<alt_text>,]
-           [full_name=<True/False>])}
+           [full_name=<True/False>,]
+           [allow_overloads=<True/False>])}
 ${api.link_<kind>(<name>,                     # <1>
                   [lang=<language>,]
                   [text=<alt_text>,]
-                  [full_name=<True/False>])}
+                  [full_name=<True/False>,]
+                  [allow_overloads=<True/False>])}
 """}
 ----
 <1> Alternative way to specify the `kind` of element to link to.
@@ -511,6 +523,7 @@ By default the short name of the element is used as the text of the link.
 `kind`:: Kind of element to insert.
 `text`:: Alternative text to use for the link.
 `full_name`:: Use the fully qualified name of the referenced element.
+`allow_overloads`:: True to link to the first match in an overload set.
 
 A warning is shown if the element is unknown, or is not inserted in the same document using the
 `insert` method. There is a command-line option to throw an error instead.
@@ -521,8 +534,9 @@ deduce the kind and language. If there are multiple matching elements, an error 
 ==== Function or method overloads
 
 In languages that support overloading functions, methods or other callables, the name alone is not
-sufficient to select the correct element to link to or to insert. In this case the exact list of
-types of the parameters can be provided to select the right element.
+sufficient to select the correct element to link to or to insert. By default AsciiDoxy will create
+a link to the first member of the overload. In case you need to link to a specific overload the
+exact list of types of the parameters can be provided to select the right element.
 
 The list of parameter types should be specified in parentheses after the function name:
 
@@ -589,7 +603,7 @@ ${api.include(<file_name>,
               [leveloffset=<offset>,]
               [link_text=<text>,]
               [link_prefix=<prefix>,]
-              [multi_page_link=<bool>],
+              [multipage_link=<bool>],
               [...])}
 """}
 ----
@@ -609,7 +623,7 @@ arguments:
 `link_text`:: Text for the link to insert in multi-page mode.
 `link_prefix`:: Text to insert before the link in multi-page mode. Use this to create for example a
 numbered list of links.
-`multi_page_link`:: By default a link is inserted in multi-page mode. Set this to False to omit
+`multipage_link`:: By default a link is inserted in multi-page mode. Set this to False to omit
 inserting the link. The included file is still processed. Use <<cross_referencing>> to insert a
 link elsewhere in the document.
 
@@ -625,7 +639,7 @@ ${"""
 ${api.include("component/reference.adoc")}                                           # <1>
 ${api.include("/mount/data/reference.adoc", leveloffset="+3")}                       # <2>
 ${api.include("component/reference.adoc", link_text="Reference", link_prefix=". ")}  # <3>
-${api.include("/component/reference.adoc", multi_page_link=False)}                   # <4>
+${api.include("/component/reference.adoc", multipage_link=False)}                   # <4>
 """}
 ----
 <1> Include and process `component/reference.adoc` relative to this file.
@@ -768,6 +782,50 @@ ${api.require_version(">=0.5.3,<0.7")}  # <4>
 are allowed, but minor and major increments are not.
 <3> Require version 0.5.3 and any newer version, including versions with breaking changes.
 <4> Require version 0.5.3 and above, but below version 0.7.
+
+=== Multi-page table of contents
+
+In multi-page mode the table of contents generated by AsciiDoctor only contains the sections for
+each specific page. The contents of other pages in the tree are not visible. You can add an extra
+table of contents listing each separate page.
+
+[source,python]
+----
+${"""
+${api.multipage_toc([side=<left/right>])}
+"""}
+----
+
+`side`:: Side of the page to put the table of contents, similar to the AsciiDoc option. Defaults to
+the left side.
+
+In the table of contents, only the first document title encountered in each AsciiDoc file is used.
+For documents having multiple titles, like the book type, the other titles are ignored.
+
+It can be combined with the normal AsciiDoctor table of contents. If both tables are configured to
+appear on the same side, they will hide eachother, so make sure you choose different sides.
+
+The command should be included in the document header. If that is not possible, make sure the
+document header contains at least:
+
+[source]
+----
+:docinfo: private
+----
+
+==== Examples
+
+[source,python]
+----
+${"""
+${api.multipage_toc()}              # <1>
+${api.multipage_toc(side="left")}   # <2>
+${api.multipage_toc(side="right")}  # <3>
+"""}
+----
+<1> Insert a multi-page ToC on the left side of the document (default).
+<2> Same as above, but with explicit side.
+<3> Insert a multi-page ToC on the right side of the document.
 
 === Reference
 

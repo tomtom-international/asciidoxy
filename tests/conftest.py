@@ -207,14 +207,14 @@ def warnings_are_and_are_not_errors(request, context):
 
 
 @pytest.fixture
-def multi_page(context):
-    context.multi_page = True
+def multipage(context):
+    context.multipage = True
     return True
 
 
 @pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
-def single_and_multi_page(request, context):
-    context.multi_page = request.param
+def single_and_multipage(request, context):
+    context.multipage = request.param
     return request.param
 
 

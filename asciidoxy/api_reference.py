@@ -378,7 +378,8 @@ class ApiReference:
              namespace: Optional[str] = None,
              kind: Optional[str] = None,
              lang: Optional[str] = None,
-             target_id: Optional[str] = None) -> Optional[ReferableElement]:
+             target_id: Optional[str] = None,
+             allow_overloads: bool = False) -> Optional[ReferableElement]:
         """Find information about an API element.
 
         The minimum search uses either `name` or `target_id`. If `target_id` is not None, all other
@@ -390,11 +391,12 @@ class ApiReference:
         multiple types are separated by a comma.
 
         Args:
-            name:      Name of the object.
-            namespace: [Optional] Namespace to start searching in.
-            kind:      [Optional] Kind of object.
-            lang:      [Optional] Programming language.
-            target_id: [Optional] Id of referred object
+            name:            Name of the object.
+            namespace:       [Optional] Namespace to start searching in.
+            kind:            [Optional] Kind of object.
+            lang:            [Optional] Programming language.
+            target_id:       [Optional] Id of referred object
+            allow_overloads: [Optional] Set to True to return the first match of an overload set.
 
         Returns:
             Information about the API element, or None if not found.
@@ -442,5 +444,9 @@ class ApiReference:
             matches_without_namespace = [e for e in matches if NameFilter(name)(e)]
             if len(matches_without_namespace) == 1:
                 return matches_without_namespace[0]
+
+        if allow_overloads and all(e.full_name == matches[0].full_name and e.kind == matches[0].kind
+                                   and e.language == matches[0].language for e in matches):
+            return matches[0]
 
         raise AmbiguousLookupError(matches)

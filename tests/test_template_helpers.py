@@ -20,8 +20,8 @@ import pytest
 from unittest.mock import call, patch
 
 from asciidoxy.templates.helpers import (link_from_ref, print_ref, argument_list, type_list, has,
-                                         type_and_name, chain)
-from asciidoxy.model import Parameter, TypeRef
+                                         type_and_name, chain, method_signature)
+from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
 
 
 @pytest.fixture
@@ -99,6 +99,85 @@ def test_link_from_ref__nested_types(context_mock):
          call(ref.id, ref.name)])
 
 
+def test_link_from_ref__empty_nested_types(context_mock):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = []
+
+    assert link_from_ref(ref, context_mock) == "const xref:lang-tomtom_1_MyType[MyType]&lt;&gt; &"
+    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+
+
+def test_link_from_ref__args(context_mock):
+    arg1_type = TypeRef("lang")
+    arg1_type.name = "ArgType1"
+    arg1_type.id = "lang-argtype1"
+
+    arg1 = Parameter()
+    arg1.type = arg1_type
+
+    arg2_type = TypeRef("lang")
+    arg2_type.name = "ArgType2"
+
+    arg2 = Parameter()
+    arg2.name = "value"
+    arg2.type = arg2_type
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = [arg1, arg2]
+
+    assert (link_from_ref(ref, context_mock) ==
+            "xref:lang-tomtom_1_MyType[MyType](xref:lang-argtype1[ArgType1], ArgType2 value)")
+    context_mock.link_to_element.assert_has_calls(
+        [call(arg1_type.id, arg1_type.name),
+         call(ref.id, ref.name)])
+
+
+def test_link_from_ref__empty_args(context_mock):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = []
+
+    assert link_from_ref(ref, context_mock) == "const xref:lang-tomtom_1_MyType[MyType]() &"
+    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+
+
+def test_link_from_ref__nested_and_args_custom_start_and_end(context_mock):
+    nested_type = TypeRef("lang")
+    nested_type.name = "Nested1"
+
+    arg_type = TypeRef("lang")
+    arg_type.name = "ArgType"
+    arg_type.id = "lang-argtype"
+
+    arg = Parameter()
+    arg.type = arg_type
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = [nested_type]
+    ref.args = [arg]
+
+    assert (link_from_ref(ref,
+                          context_mock,
+                          nested_start="{",
+                          nested_end=";",
+                          args_start="@",
+                          args_end="#") ==
+            "const xref:lang-tomtom_1_MyType[MyType]{Nested1;@xref:lang-argtype[ArgType]# &")
+
+
 def test_print_ref__empty():
     ref = TypeRef("lang")
     assert print_ref(ref) == ""
@@ -149,6 +228,74 @@ def test_print_ref__nested_types():
     ref.nested = [nested_type_with_id, nested_type_without_id]
 
     assert print_ref(ref) == "const MyType&lt;Nested1, Nested2&gt; &"
+
+
+def test_print_ref__empty_nested_types():
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = []
+
+    assert print_ref(ref) == "const MyType&lt;&gt; &"
+
+
+def test_print_ref__args():
+    arg1_type = TypeRef("lang")
+    arg1_type.name = "ArgType1"
+    arg1_type.id = "lang-argtype1"
+
+    arg1 = Parameter()
+    arg1.type = arg1_type
+
+    arg2_type = TypeRef("lang")
+    arg2_type.name = "ArgType2"
+
+    arg2 = Parameter()
+    arg2.name = "value"
+    arg2.type = arg2_type
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = [arg1, arg2]
+
+    assert print_ref(ref) == "MyType(ArgType1, ArgType2 value)"
+
+
+def test_print_ref__empty_args():
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.args = []
+
+    assert print_ref(ref) == "const MyType() &"
+
+
+def test_print_ref__nested_and_args_custom_start_and_end():
+    nested_type = TypeRef("lang")
+    nested_type.name = "Nested1"
+
+    arg_type = TypeRef("lang")
+    arg_type.name = "ArgType"
+    arg_type.id = "lang-argtype"
+
+    arg = Parameter()
+    arg.type = arg_type
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+    ref.nested = [nested_type]
+    ref.args = [arg]
+
+    assert (print_ref(ref, nested_start="{", nested_end=";", args_start="@",
+                      args_end="#") == "const MyType{Nested1;@ArgType# &")
 
 
 def test_argument_list__empty(empty_context):
@@ -300,3 +447,140 @@ def test_type_and_name__no_name(empty_context):
     param.name = ""
 
     assert type_and_name(param, empty_context) == "const xref:lang-tomtom_1_MyType[MyType] &"
+
+
+def test_method_signature__no_params(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    assert method_signature(method, empty_context) == "void ShortMethod()"
+
+
+def test_method_signature__single_param(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+
+    assert method_signature(method, empty_context) == "void ShortMethod(int value)"
+
+
+def test_method_signature__single_param__too_wide(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+
+    assert (method_signature(method, empty_context, max_width=20) == """\
+void ShortMethod(
+    int value)""")
+
+
+def test_method_signature__multiple_params(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("lang", "double")
+    method.params[2].name = "text"
+    method.params[2].type = TypeRef("lang", "std::string")
+
+    assert (method_signature(method, empty_context) == """\
+void ShortMethod(int value,
+                 double other_value,
+                 std::string text)""")
+
+
+def test_method_signature__multiple_params__first_param_too_wide(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("lang", "double")
+    method.params[2].name = "text"
+    method.params[2].type = TypeRef("lang", "std::string")
+
+    assert (method_signature(method, empty_context, max_width=20) == """\
+void ShortMethod(
+    int value,
+    double other_value,
+    std::string text)""")
+
+
+def test_method_signature__multiple_params__last_param_too_wide(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter(), Parameter(), Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+    method.params[1].name = "other_value"
+    method.params[1].type = TypeRef("lang", "double")
+    method.params[2].name = "text" * 10
+    method.params[2].type = TypeRef("lang", "std::string")
+
+    assert (method_signature(method, empty_context, max_width=40) == f"""\
+void ShortMethod(
+    int value,
+    double other_value,
+    std::string {"text" * 10})""")
+
+
+def test_method_signature__ignore_return_type_xref_length(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+    method.returns.type.id = "ab" * 80
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+
+    assert (method_signature(method,
+                             empty_context) == f"xref:{'ab' * 80}[void] ShortMethod(int value)")
+
+
+def test_method_signature__ignore_param_type_xref_length(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    method.params = [Parameter()]
+    method.params[0].name = "value"
+    method.params[0].type = TypeRef("lang", "int")
+    method.params[0].type.id = "ab" * 80
+
+    assert (method_signature(method,
+                             empty_context) == f"void ShortMethod(xref:{'ab' * 80}[int] value)")

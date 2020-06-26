@@ -11,13 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= AsciiDoxy
+= Contributing
 :notitle:
-:toc: left
-:toc-title: AsciiDoxy
 :icons: font
 :doctype: book
 :source-highlighter: highlightjs
+:toc: right
+:toc-title: On this page
+${api.multipage_toc()}
 
 ----
     ___              _ _ ____
@@ -36,7 +37,7 @@ ${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
 ${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
-= Contributing
+= {doctitle}
 
 You can contribute to AsciiDoxy by reporting issues, updating the documentation, fixing issues, or
 developing new features.
@@ -108,13 +109,17 @@ converted to AsciiDoc.
 
 == Adding programming language support
 
-`DoxygenXmlParser` (in `doxygenparser.parser`) is the main entry point for loading the API
-reference from Doxygen XML files. It uses an instance of `Language` to parse XML files with
-language specific transformations. Too add support for an extra language:
+`Driver` (in `doxygenparser.driver`) is the main entry point for loading the API reference from
+Doxygen XML files. It uses an instance of `ParserBase` to parse XML files with language specific
+transformations. Too add support for an extra language:
 
-- Add a subclass of `Language`.
-- Register it in the constructor of `DoxygenXmlParser`.
+- Add a new module for the language in subpackage `doxygenparser`.
+- Define a subclass of `LanguageTraits` containing details on how to parse types for the language.
+- Add a subclass of `TypeParser` using the language traits implementation.
+- Add a subclass of `ParserBase` using the type parser and language traits.
+- Register the parser in the constructor of `Driver`.
 - If needed, add aliases in `safe_language_tag`.
+- Add unit tests!
 
 == Adding methods for use in AsciiDoc files
 
