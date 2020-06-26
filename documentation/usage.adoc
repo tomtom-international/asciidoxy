@@ -505,11 +505,13 @@ ${api.link(<name>,
            [kind=<kind>,]
            [lang=<language>,]
            [text=<alt_text>,]
-           [full_name=<True/False>])}
+           [full_name=<True/False>,]
+           [allow_overloads=<True/False>])}
 ${api.link_<kind>(<name>,                     # <1>
                   [lang=<language>,]
                   [text=<alt_text>,]
-                  [full_name=<True/False>])}
+                  [full_name=<True/False>,]
+                  [allow_overloads=<True/False>])}
 """}
 ----
 <1> Alternative way to specify the `kind` of element to link to.
@@ -521,6 +523,7 @@ By default the short name of the element is used as the text of the link.
 `kind`:: Kind of element to insert.
 `text`:: Alternative text to use for the link.
 `full_name`:: Use the fully qualified name of the referenced element.
+`allow_overloads`:: True to link to the first match in an overload set.
 
 A warning is shown if the element is unknown, or is not inserted in the same document using the
 `insert` method. There is a command-line option to throw an error instead.
@@ -531,8 +534,9 @@ deduce the kind and language. If there are multiple matching elements, an error 
 ==== Function or method overloads
 
 In languages that support overloading functions, methods or other callables, the name alone is not
-sufficient to select the correct element to link to or to insert. In this case the exact list of
-types of the parameters can be provided to select the right element.
+sufficient to select the correct element to link to or to insert. By default AsciiDoxy will create
+a link to the first member of the overload. In case you need to link to a specific overload the
+exact list of types of the parameters can be provided to select the right element.
 
 The list of parameter types should be specified in parentheses after the function name:
 

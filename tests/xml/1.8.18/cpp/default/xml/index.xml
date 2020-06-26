@@ -56,6 +56,8 @@
     <member refid="structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68" kind="variable"><name>severity</name></member>
   </compound>
   <compound refid="namespaceasciidoxy" kind="namespace"><name>asciidoxy</name>
+    <member refid="overloads_8hpp_1afbbb1c0274b5a0d90b2d1d39f1269027" kind="function"><name>to_string</name></member>
+    <member refid="overloads_8hpp_1a8eebbc44a7bed882754da89a49139680" kind="function"><name>to_string</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
   </compound>
@@ -65,10 +67,13 @@
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
     <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>
     <member refid="traffic__event_8hpp_1adb4a21783ecb2c7bf30726a36c61a502" kind="typedef"><name>Delay</name></member>
+    <member refid="overloads_8hpp_1aebc2b625b914c709f972b5b8eca35d39" kind="function"><name>to_string</name></member>
   </compound>
   <compound refid="coordinate_8hpp" kind="file"><name>coordinate.hpp</name>
   </compound>
   <compound refid="logger_8hpp" kind="file"><name>logger.hpp</name>
+  </compound>
+  <compound refid="overloads_8hpp" kind="file"><name>overloads.hpp</name>
   </compound>
   <compound refid="same__in__multiple__namespaces_8hpp" kind="file"><name>same_in_multiple_namespaces.hpp</name>
   </compound>

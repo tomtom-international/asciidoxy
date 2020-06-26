@@ -299,6 +299,81 @@ def test_find_by_name_ambiguous(test_data):
 
 
 @pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_by_name__overload_set(api_reference):
+    element = api_reference.find("asciidoxy::to_string", allow_overloads=True)
+    assert element is not None
+    assert element.kind == "function"
+    assert element.namespace == "asciidoxy"
+
+    element = api_reference.find("asciidoxy::traffic::to_string", allow_overloads=True)
+    assert element is not None
+    assert element.kind == "function"
+    assert element.namespace == "asciidoxy::traffic"
+
+    element = api_reference.find("to_string", namespace="asciidoxy", allow_overloads=True)
+    assert element is not None
+    assert element.kind == "function"
+    assert element.namespace == "asciidoxy"
+
+    element = api_reference.find("to_string", namespace="asciidoxy::traffic", allow_overloads=True)
+    assert element is not None
+    assert element.kind == "function"
+    assert element.namespace == "asciidoxy::traffic"
+
+    element = api_reference.find("to_string", namespace="asciidoxy::geometry", allow_overloads=True)
+    assert element is not None
+    assert element.kind == "function"
+    assert element.namespace == "asciidoxy"
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_by_name__overload_set__multiple_namespaces_are_ambiguous(api_reference):
+    with pytest.raises(AmbiguousLookupError) as exception:
+        api_reference.find("to_string",
+                           namespace="asciidoxy::traffic::geometry",
+                           allow_overloads=True)
+    assert len(exception.value.candidates) == 3
+
+
+def test_find_by_name__overload_set__multiple_kinds_are_ambiguous(test_data):
+    parser = ParserDriver()
+    parser.parse(test_data / "ambiguous_names.xml")
+
+    with pytest.raises(AmbiguousLookupError) as exception:
+        parser.api_reference.find("StringType", allow_overloads=True)
+    assert len(exception.value.candidates) == 3
+
+    element = parser.api_reference.find("StringType", allow_overloads=True, kind="class")
+    assert element is not None
+    assert element.kind == "class"
+
+    element = parser.api_reference.find("StringType", allow_overloads=True, kind="enum")
+    assert element is not None
+    assert element.kind == "enum"
+
+    element = parser.api_reference.find("StringType", allow_overloads=True, kind="interface")
+    assert element is not None
+    assert element.kind == "interface"
+
+
+def test_find_by_name__overload_set__multiple_languages_are_ambiguous(test_data):
+    parser = ParserDriver()
+    parser.parse(test_data / "ambiguous_names.xml")
+
+    with pytest.raises(AmbiguousLookupError) as exception:
+        parser.api_reference.find("BoundingBox", allow_overloads=True)
+    assert len(exception.value.candidates) == 2
+
+    element = parser.api_reference.find("BoundingBox", allow_overloads=True, lang="java")
+    assert element is not None
+    assert element.language == "java"
+
+    element = parser.api_reference.find("BoundingBox", allow_overloads=True, lang="objc")
+    assert element is not None
+    assert element.language == "objc"
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_method__explicit_no_arguments(api_reference):
     element = api_reference.find("asciidoxy::geometry::Coordinate::Coordinate()")
     assert element is not None

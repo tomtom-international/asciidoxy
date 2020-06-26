@@ -32,4 +32,28 @@
     </detaileddescription>
     <location file="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" line="26" column="1" bodyfile="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" bodystart="26" bodyend="133"/>
   </compounddef>
+  <compounddef id="classstringtype" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>StringType</compoundname>
+    <briefdescription>
+<para>Type of a string.</para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" line="26" column="1" bodyfile="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" bodystart="26" bodyend="133"/>
+  </compounddef>
+  <compounddef id="enumstringtype" kind="enum" language="C++" prot="public" final="yes">
+    <compoundname>StringType</compoundname>
+    <briefdescription>
+<para>Type of a string.</para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" line="26" column="1" bodyfile="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" bodystart="26" bodyend="133"/>
+  </compounddef>
+  <compounddef id="interfacestringtype" kind="interface" language="C++" prot="public" final="yes">
+    <compoundname>StringType</compoundname>
+    <briefdescription>
+<para>Type of a string.</para>    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" line="26" column="1" bodyfile="/jenkins/workspace/ramework-clientlib-common_master/include/tomtom/navkit2/place/coordinate.hpp" bodystart="26" bodyend="133"/>
+  </compounddef>
 </doxygen>

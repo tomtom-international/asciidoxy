@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1traffic_1_1_string_type" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::traffic::StringType</compoundname>
+    <includes refid="overloads_8hpp" local="no">overloads.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Type of string. </para>
+    </detaileddescription>
+    <location file="overloads.hpp" line="41" column="1" bodyfile="overloads.hpp" bodystart="41" bodyend="42"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

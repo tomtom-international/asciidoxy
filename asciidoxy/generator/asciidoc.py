@@ -76,16 +76,18 @@ class Api(object):
                      name: str,
                      *,
                      kind: Optional[str] = None,
-                     lang: Optional[str] = None) -> ReferableElement:
+                     lang: Optional[str] = None,
+                     allow_overloads: bool = False) -> ReferableElement:
         """Find a reference to API documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
         disambiguate.
 
         Args:
-            name: Name of the object to insert.
-            kind: Kind of object to generate reference documentation for.
-            lang: Programming language of the object.
+            name:            Name of the object to insert.
+            kind:            Kind of object to generate reference documentation for.
+            lang:            Programming language of the object.
+            allow_overloads: True to return the first match of an overload set.
 
         Returns:
             An API documentation reference.
@@ -103,7 +105,8 @@ class Api(object):
             element = self._context.reference.find(name=name,
                                                    namespace=self._context.namespace,
                                                    kind=kind,
-                                                   lang=lang)
+                                                   lang=lang,
+                                                   allow_overloads=allow_overloads)
         except AmbiguousLookupError as ex:
             raise AmbiguousReferenceError(name, ex.candidates)
 
@@ -213,8 +216,9 @@ class Api(object):
         else:
             insert_filter = self._context.insert_filter
 
-        return self.insert_fragment(self.find_element(name, kind=kind, lang=lang), insert_filter,
-                                    leveloffset, **asciidoc_options)
+        return self.insert_fragment(
+            self.find_element(name, kind=kind, lang=lang, allow_overloads=False), insert_filter,
+            leveloffset, **asciidoc_options)
 
     def link(self,
              name: str,
@@ -222,19 +226,21 @@ class Api(object):
              kind: Optional[str] = None,
              lang: Optional[str] = None,
              text: Optional[str] = None,
-             full_name: bool = False) -> str:
+             full_name: bool = False,
+             allow_overloads: bool = True) -> str:
         """Insert a link to API reference documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
         disambiguate.
 
         Args:
-            name:      Fully qualified name of the object to link to.
-            kind:      Kind of object to link to.
-            lang:      Programming language of the object.
-            text:      Alternative text to use for the link. If not supplied, the object name is
-                           used.
-            full_name: Use the fully qualified name of the object for the link text.
+            name:            Fully qualified name of the object to link to.
+            kind:            Kind of object to link to.
+            lang:            Programming language of the object.
+            text:            Alternative text to use for the link. If not supplied, the object name
+                                 is used.
+            full_name:       Use the fully qualified name of the object for the link text.
+            allow_overloads: Link to the first match in an overload set. Enabled by default.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -243,7 +249,7 @@ class Api(object):
             raise ValueError("`text` and `full_name` cannot be used together.")
 
         try:
-            element = self.find_element(name, kind=kind, lang=lang)
+            element = self.find_element(name, kind=kind, lang=lang, allow_overloads=allow_overloads)
         except ReferenceNotFoundError as ref_not_found:
             if self._context.warnings_are_errors:
                 raise

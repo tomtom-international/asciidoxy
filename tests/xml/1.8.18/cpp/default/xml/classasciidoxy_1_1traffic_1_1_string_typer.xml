@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1traffic_1_1_string_typer" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::traffic::StringTyper</compoundname>
+    <includes refid="overloads_8hpp" local="no">overloads.hpp</includes>
+      <sectiondef kind="private-type">
+      <memberdef kind="enum" id="classasciidoxy_1_1traffic_1_1_string_typer_1a804eb0635001959da535978701ad1c7f" prot="private" static="no" strong="yes">
+        <type></type>
+        <name>StringType</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Type of string. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="overloads.hpp" line="45" column="3" bodyfile="overloads.hpp" bodystart="45" bodyend="46"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="classasciidoxy_1_1traffic_1_1_string_typer_1a347425ddd6487659aa56bd2836175bf3" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>enum StringType</type>
+        <definition>enum StringType asciidoxy::traffic::StringTyper::StringType</definition>
+        <argsstring>()</argsstring>
+        <name>StringType</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Type of string. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="overloads.hpp" line="36" column="13"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Type of string. </para>
+    </detaileddescription>
+    <location file="overloads.hpp" line="41" column="1" bodyfile="overloads.hpp" bodystart="41" bodyend="52"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1traffic_1_1_string_typer_1a804eb0635001959da535978701ad1c7f" prot="private" virt="non-virtual"><scope>asciidoxy::traffic::StringTyper</scope><name>StringType</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_string_typer_1a347425ddd6487659aa56bd2836175bf3" prot="private" virt="non-virtual"><scope>asciidoxy::traffic::StringTyper</scope><name>StringType</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
