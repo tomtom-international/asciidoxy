@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, method_signature)
+from asciidoxy.templates.helpers import method_signature
 %>
 
 = [[${element.id},${element.full_name}]]${element.name}

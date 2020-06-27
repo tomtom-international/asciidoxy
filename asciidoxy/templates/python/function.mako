@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, has)
+from asciidoxy.templates.helpers import (print_ref, has)
 from asciidoxy.templates.python.helpers import (type_and_name, method_signature, params)
 %>
 
@@ -43,7 +43,7 @@ ${param.description}
 % if element.returns and element.returns.type.name != "None":
 | Returns
 |
-`${link_from_ref(element.returns.type, api_context, '[', ']')}`::
+`${print_ref(element.returns.type, api_context, nested_start='[', nested_end=']')}`::
 ${element.returns.description}
 
 % endif

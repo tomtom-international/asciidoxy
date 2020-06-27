@@ -13,7 +13,6 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import link_from_ref
 from asciidoxy.templates.objc.helpers import objc_block_definition
 %>
 = [[${element.id},${element.full_name}]]${element.name}

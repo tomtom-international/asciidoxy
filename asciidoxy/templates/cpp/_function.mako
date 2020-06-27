@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, type_and_name, has)
+from asciidoxy.templates.helpers import print_ref, type_and_name, has
 %>
 ${element.brief}
 
@@ -33,7 +33,7 @@ ${param.description}
 % if element.returns and element.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(element.returns.type, api_context)}`::
+`${print_ref(element.returns.type, api_context)}`::
 ${element.returns.description}
 
 % endif

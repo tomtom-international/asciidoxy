@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, print_ref, type_list, has, method_signature)
+from asciidoxy.templates.helpers import (print_ref, type_list, has, method_signature)
 from asciidoxy.templates.java.helpers import (public_methods, public_static_methods, public_constants)
 %>
 ######################################################################## Header and introduction ##
@@ -48,7 +48,7 @@ ${constant.description}
 |*Static methods*
 |
 % for method in public_static_methods(element, insert_filter):
-`xref:${method.id}[static ${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
+`xref:${method.id}[static ${print_ref(method.returns.type, link=False)} ${method.name}${type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -58,7 +58,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in public_methods(element, insert_filter):
-`xref:${method.id}[${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
+`xref:${method.id}[${print_ref(method.returns.type, link=False)} ${method.name}${type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -86,7 +86,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${link_from_ref(param.type, api_context)} ${param.name}`::
+`${print_ref(param.type, api_context)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -94,7 +94,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(method.returns.type, api_context)}`::
+`${print_ref(method.returns.type, api_context)}`::
 ${method.returns.description}
 
 % endif
@@ -131,7 +131,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${link_from_ref(param.type, api_context)} ${param.name}`::
+`${print_ref(param.type, api_context)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -139,7 +139,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(method.returns.type, api_context)}`::
+`${print_ref(method.returns.type, api_context)}`::
 ${method.returns.description}
 
 % endif

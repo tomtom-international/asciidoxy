@@ -15,7 +15,7 @@
 
 from asciidoxy.generator import Context
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.templates.helpers import link_from_ref, print_ref
+from asciidoxy.templates.helpers import print_ref
 
 
 def type_and_name(param, context: Context):
@@ -23,7 +23,7 @@ def type_and_name(param, context: Context):
         return param.name
     if param.type.name in ("self", "cls"):
         return param.type.name
-    return f"{param.name}: {link_from_ref(param.type, context, '[', ']')}".strip()
+    return f"{param.name}: {print_ref(param.type, context, nested_start='[', nested_end=']')}".strip()
 
 
 def params(element):
@@ -58,16 +58,16 @@ def public_variables(element, insert_filter: InsertionFilter):
 
 def method_signature(element, context: Context, max_width: int = 80):
     method_without_params = f"def {element.name}"
-    return_suffix = f" -> {link_from_ref(element.returns.type, context)}" if element.returns else ""
+    return_suffix = f" -> {print_ref(element.returns.type, context)}" if element.returns else ""
 
     if not element.params:
         return (f"{method_without_params}(){return_suffix}")
 
     method_without_params_length = len(method_without_params)
-    return_type_no_ref = (f" -> {print_ref(element.returns.type)}" if element.returns else "")
+    return_type_no_ref = (f" -> {print_ref(element.returns.type, link=False)}" if element.returns else "")
     suffix_length = len(return_type_no_ref)
 
-    param_sizes = [len(f"{p.name}: {print_ref(p.type)}".strip()) for p in element.params]
+    param_sizes = [len(f"{p.name}: {print_ref(p.type, link=False)}".strip()) for p in element.params]
     indent_size = method_without_params_length + 1
     first_indent = ""
 

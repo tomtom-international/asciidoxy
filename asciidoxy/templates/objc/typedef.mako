@@ -13,7 +13,7 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import link_from_ref
+from asciidoxy.templates.helpers import print_ref
 %>
 = [[${element.id},${element.full_name}]]${element.name}
 ${api_context.insert(element)}
@@ -21,7 +21,7 @@ ${api_context.insert(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-typedef ${link_from_ref(element.returns.type, api_context)} ${element.name}
+typedef ${print_ref(element.returns.type, api_context)} ${element.name}
 ----
 ${element.brief}
 

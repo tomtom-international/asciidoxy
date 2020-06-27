@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, has)
+from asciidoxy.templates.helpers import print_ref, has
 from asciidoxy.templates.objc.helpers import (objc_method_signature, public_methods,
 public_class_methods, public_properties, public_simple_enclosed_types)
 %>
@@ -93,7 +93,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ${api_context.insert(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-@property() ${link_from_ref(prop.returns.type, api_context)} ${prop.name}
+@property() ${print_ref(prop.returns.type, api_context)} ${prop.name}
 ----
 
 ${prop.brief}
@@ -122,7 +122,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`(${link_from_ref(param.type, api_context)})${param.name}`::
+`(${print_ref(param.type, api_context)})${param.name}`::
 ${param.description}
 
 % endfor
@@ -130,7 +130,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(method.returns.type, api_context)}`::
+`${print_ref(method.returns.type, api_context)}`::
 ${method.returns.description}
 
 % endif
@@ -168,7 +168,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`(${link_from_ref(param.type, api_context)})${param.name}`::
+`(${print_ref(param.type, api_context)})${param.name}`::
 ${param.description}
 
 % endfor
@@ -176,7 +176,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(method.returns.type, api_context)}`::
+`${print_ref(method.returns.type, api_context)}`::
 ${method.returns.description}
 
 % endif

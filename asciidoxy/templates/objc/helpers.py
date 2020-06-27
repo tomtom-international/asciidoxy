@@ -14,7 +14,7 @@
 """Helper functions for Objective C templates."""
 
 from asciidoxy.generator import Context, InsertionFilter
-from asciidoxy.templates.helpers import argument_list, link_from_ref, print_ref
+from asciidoxy.templates.helpers import argument_list, print_ref
 
 
 def objc_method_signature(method, context: Context):
@@ -23,17 +23,17 @@ def objc_method_signature(method, context: Context):
     static = "+" if method.static else "-"
 
     if len(method_name_parts) == 1:
-        return f"{static} ({link_from_ref(method.returns.type, context)}){method.name}"
+        return f"{static} ({print_ref(method.returns.type, context)}){method.name}"
 
     method_parts = []
     for method_name_part, param in zip(method_name_parts, method.params):
         method_parts.append(
-            f"{method_name_part}:({link_from_ref(param.type, context)}){param.name}")
+            f"{method_name_part}:({print_ref(param.type, context)}){param.name}")
 
-    prefix = f"{static} ({link_from_ref(method.returns.type, context)})"
+    prefix = f"{static} ({print_ref(method.returns.type, context)})"
 
     if len(method_parts) > 1:
-        first_line_text = f"- ({print_ref(method.returns.type)}){method_parts[0]}"
+        first_line_text = f"- ({print_ref(method.returns.type, link=False)}){method_parts[0]}"
         first_line_colon_position = first_line_text.find(":")
         assert first_line_colon_position > 0
 
@@ -56,7 +56,7 @@ def objc_block_definition(block, context: Context):
     else:
         block_name = ""
 
-    return (f"typedef {link_from_ref(block.returns.type, context, skip_args=True)}(^{block_name})"
+    return (f"typedef {print_ref(block.returns.type, context, skip_args=True)}(^{block_name})"
             f" {argument_list(block.returns.type.args, context)}")
 
 
