@@ -21,39 +21,18 @@ class PythonTemplateHelper(TemplateHelper):
     NESTED_START: str = "["
     NESTED_END: str = "]"
 
-    def type_and_name(self, param):
+    def type_and_name(self, param, *, link: bool = True):
         if param.type is None or not param.type.name:
             return param.name
         if param.type.name in ("self", "cls"):
             return param.type.name
-        return (f"{param.name}: {self.print_ref(param.type)}".strip())
+        return (f"{param.name}: {self.print_ref(param.type, link=link)}".strip())
 
-    def method_signature(self, element, max_width: int = 80):
-        method_without_params = f"def {element.name}"
-        return_suffix = f" -> {self.print_ref(element.returns.type)}" if element.returns else ""
+    def _method_prefix(self, method, *, link: bool = True) -> str:
+        return "def"
 
-        if not element.params:
-            return (f"{method_without_params}(){return_suffix}")
-
-        method_without_params_length = len(method_without_params)
-        return_type_no_ref = (f" -> {self.print_ref(element.returns.type, link=False)}"
-                              if element.returns else "")
-        suffix_length = len(return_type_no_ref)
-
-        param_sizes = [
-            len(f"{p.name}: {self.print_ref(p.type, link=False)}".strip()) for p in element.params
-        ]
-        indent_size = method_without_params_length + 1
-        first_indent = ""
-
-        if any(indent_size + size + 1 + suffix_length > max_width for size in param_sizes):
-            indent_size = 4
-            first_indent = "\n    "
-
-        param_separator = f",\n{' ' * indent_size}"
-        formatted_params = f"{param_separator.join(self.type_and_name(p) for p in element.params)}"
-
-        return (f"{method_without_params}({first_indent}{formatted_params}){return_suffix}")
+    def _method_suffix(self, method, *, link: bool = True) -> str:
+        return f" -> {self.print_ref(method.returns.type, link=link)}" if method.returns else ""
 
 
 def params(element):

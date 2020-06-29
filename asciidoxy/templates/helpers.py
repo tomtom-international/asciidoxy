@@ -67,35 +67,42 @@ class TemplateHelper:
         return f"({', '.join(self.print_ref(p.type, link=link) for p in params)})"
 
     def method_signature(self, method, max_width: int = 80):
-        static = "static" if method.static else ""
-        return_type = self.print_ref(method.returns.type) if method.returns else ""
-        method_name = method.name
-
-        method_without_params = " ".join(part for part in (static, return_type, method_name)
-                                         if part)
+        method_without_params = self._method_join(self._method_prefix(method), method.name)
+        suffix = self._method_suffix(method)
 
         if not method.params:
-            return (f"{method_without_params}()")
+            return (f"{method_without_params}(){suffix}")
 
-        return_type_no_ref = self.print_ref(method.returns.type,
-                                            link=False) if method.returns else ""
-        method_without_params_length = len(" ".join(part for part in (static, return_type_no_ref,
-                                                                      method_name) if part))
+        method_without_params_length = len(self._method_join(self._method_prefix(method, link=False),
+                                                             method.name))
+        suffix_length = len(self._method_suffix(method, link=False))
 
-        param_sizes = [
-            len(f"{self.print_ref(p.type, link=False)} {p.name}".strip()) for p in method.params
-        ]
+        param_sizes = [len(self.type_and_name(p, link=False)) for p in method.params]
         indent_size = method_without_params_length + 1
         first_indent = ""
 
-        if any(indent_size + size + 1 > max_width for size in param_sizes):
+        if any(indent_size + size + 1 + suffix_length > max_width for size in param_sizes):
             indent_size = 4
             first_indent = "\n    "
 
         param_separator = f",\n{' ' * indent_size}"
         formatted_params = f"{param_separator.join(self.type_and_name(p) for p in method.params)}"
 
-        return (f"{method_without_params}({first_indent}{formatted_params})")
+        return (f"{method_without_params}({first_indent}{formatted_params}){suffix}")
+
+    def _method_prefix(self, method, *, link: bool = True) -> str:
+        static = "static" if method.static else ""
+        return_type = self.print_ref(method.returns.type, link=link) if method.returns else ""
+
+        return self._method_join(static, return_type)
+
+    def _method_suffix(self, method, *, link: bool = True) -> str:
+        return ""
+
+    @staticmethod
+    def _method_join(*parts: str) -> str:
+        return " ".join(part for part in parts if part)
+
 
 
 def has(elements):
