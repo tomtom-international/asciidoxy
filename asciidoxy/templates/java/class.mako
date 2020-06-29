@@ -14,12 +14,11 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, TemplateHelper
-from asciidoxy.templates.java.helpers import (public_methods, public_static_methods,
-public_constructors, public_constants, public_complex_enclosed_types)
+from asciidoxy.templates.helpers import has
+from asciidoxy.templates.java.helpers import JavaTemplateHelper
 %>
 <%
-helper = TemplateHelper(api_context)
+helper = JavaTemplateHelper(api_context, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
@@ -38,50 +37,50 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(public_complex_enclosed_types(element, insert_filter)):
+% if has(helper.public_complex_enclosed_types()):
 |*Enclosed types*
 |
-% for enclosed in public_complex_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_complex_enclosed_types():
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constructors(element, insert_filter)):
+% if has(helper.public_constructors()):
 |*Constructors*
 |
-% for constructor in public_constructors(element, insert_filter):
+% for constructor in helper.public_constructors():
 `xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constants(element, insert_filter)):
+% if has(helper.public_constants()):
 |*Constants*
 |
-% for constant in public_constants(element, insert_filter):
+% for constant in helper.public_constants():
 `${constant.name}`::
 ${constant.description}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_static_methods(element, insert_filter)):
+% if has(helper.public_static_methods()):
 |*Static methods*
 |
-% for method in public_static_methods(element, insert_filter):
+% for method in helper.public_static_methods():
 `xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_methods(element, insert_filter)):
+% if has(helper.public_methods()):
 |*Methods*
 |
-% for method in public_methods(element, insert_filter):
+% for method in helper.public_methods():
 `xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
@@ -91,7 +90,7 @@ ${method.brief}
 
 == Members
 ################################################################################### Constructors ##
-% for constructor in public_constructors(element, insert_filter):
+% for constructor in helper.public_constructors():
 [[${constructor.id},${constructor.name}]]
 ${api_context.insert(constructor)}
 [source,java,subs="-specialchars,macros+"]
@@ -129,7 +128,7 @@ ${exception.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in public_static_methods(element, insert_filter):
+% for method in helper.public_static_methods():
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
@@ -174,7 +173,7 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in public_methods(element, insert_filter):
+% for method in helper.public_methods():
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
@@ -221,6 +220,6 @@ ${exception.description}
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in public_complex_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_complex_enclosed_types():
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor

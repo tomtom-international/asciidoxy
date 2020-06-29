@@ -13,7 +13,6 @@
 # limitations under the License.
 """Helper functions for python reference templates."""
 
-from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Member, Parameter
 from asciidoxy.templates.helpers import TemplateHelper
 
@@ -35,32 +34,26 @@ class PythonTemplateHelper(TemplateHelper):
     def _method_suffix(self, method: Member, *, link: bool = True) -> str:
         return f" -> {self.print_ref(method.returns.type, link=link)}" if method.returns else ""
 
+    def public_static_methods(self):
+        return (m for m in super().public_static_methods() if not m.name.startswith("_"))
+
+    def public_methods(self):
+        return (m for m in super().public_methods() if not m.name.startswith("_"))
+
+    def public_constructors(self):
+        assert self.element is not None
+        assert self.insert_filter is not None
+
+        return (m for m in self.insert_filter.members(self.element)
+                if m.kind == "function" and m.name == "__init__")
+
+    def public_complex_enclosed_types(self):
+        return (m for m in super().public_complex_enclosed_types() if not m.name.startswith("_"))
+
+    def public_variables(self):
+        return (m for m in super().public_variables() if not m.name.startswith("_"))
+
 
 def params(element):
     return (param for param in element.params
             if (not param.type or param.type.name not in ("self", "cls")))
-
-
-def public_static_methods(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if (m.kind == "function" and m.returns and not m.name.startswith("_") and m.static))
-
-
-def public_methods(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if (m.kind == "function" and m.returns and not m.name.startswith("_") and not m.static))
-
-
-def public_constructors(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if m.kind == "function" and m.name == "__init__")
-
-
-def public_enclosed_types(element, insert_filter: InsertionFilter):
-    return (m.referred_object for m in insert_filter.inner_classes(element)
-            if m.referred_object is not None and not m.name.startswith("_"))
-
-
-def public_variables(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if m.kind == "variable" and not m.name.startswith("_"))

@@ -13,7 +13,6 @@
 # limitations under the License.
 """Helper functions for Objective C templates."""
 
-from asciidoxy.generator import InsertionFilter
 from asciidoxy.model import Member
 from asciidoxy.templates.helpers import TemplateHelper
 
@@ -65,22 +64,13 @@ class ObjcTemplateHelper(TemplateHelper):
         return (f"typedef {self.print_ref(block.returns.type, skip_args=True)}(^{block_name})"
                 f" {self.argument_list(block.returns.type.args)}")
 
+    def public_simple_enclosed_types(self):
+        assert self.element is not None
+        assert self.insert_filter is not None
 
-def public_methods(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if (m.kind == "function" and m.prot == "public" and not m.static))
+        # For some reason enclosed types are always set to private, so ignore visibility
+        return (m for m in self.insert_filter.members(self.element)
+                if m.kind in ["enum", "class", "protocol"])
 
-
-def public_class_methods(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if (m.kind == "function" and m.prot == "public" and m.static))
-
-
-def public_properties(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if m.kind == "property" and m.prot == "public")
-
-
-def public_simple_enclosed_types(element, insert_filter: InsertionFilter):
-    # For some reason enclosed types are always set to private, so ignore visibility
-    return (m for m in insert_filter.members(element) if m.kind in ["enum", "class", "protocol"])
+    def public_class_methods(self):
+        return self.public_static_methods()

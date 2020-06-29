@@ -16,9 +16,7 @@
 import pytest
 
 from asciidoxy.model import Compound, Member, ReturnValue, TypeRef, InnerTypeReference
-from asciidoxy.templates.java.helpers import (public_methods, public_static_methods,
-                                              public_constructors, public_constants,
-                                              public_complex_enclosed_types)
+from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.generator.filters import InsertionFilter
 
 
@@ -90,86 +88,95 @@ def java_class():
     return compound
 
 
-def test_public_constructors__no_filter(java_class):
-    result = list(public_constructors(java_class, InsertionFilter()))
+@pytest.fixture
+def helper(java_class, empty_context):
+    return JavaTemplateHelper(empty_context, java_class, InsertionFilter())
+
+
+def test_public_constructors__no_filter(helper):
+    result = list(helper.public_constructors())
     assert len(result) == 1
     assert result[0].name == "MyClass"
     assert result[0].prot == "public"
 
 
-def test_public_constructors__filter_match(java_class):
-    result = list(public_constructors(java_class, InsertionFilter(members="MyClass")))
+def test_public_constructors__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="MyClass")
+    result = list(helper.public_constructors())
     assert len(result) == 1
     assert result[0].name == "MyClass"
     assert result[0].prot == "public"
 
 
-def test_public_constructors__filter_no_match(java_class):
-    result = list(public_constructors(java_class, InsertionFilter(members="NONE")))
+def test_public_constructors__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = list(helper.public_constructors())
     assert len(result) == 0
 
 
-def test_public_methods__no_filter(java_class):
-    result = [m.name for m in public_methods(java_class, InsertionFilter())]
+def test_public_methods__no_filter(helper):
+    result = [m.name for m in helper.public_methods()]
     assert sorted(result) == sorted(["PublicMethod"])
 
 
-def test_public_methods__filter_match(java_class):
-    result = [m.name for m in public_methods(java_class, InsertionFilter(members="PublicMethod"))]
+def test_public_methods__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="PublicMethod")
+    result = [m.name for m in helper.public_methods()]
     assert sorted(result) == sorted(["PublicMethod"])
 
 
-def test_public_methods__filter_no_match(java_class):
-    result = [m.name for m in public_methods(java_class, InsertionFilter(members="NONE"))]
+def test_public_methods__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.public_methods()]
     assert len(result) == 0
 
 
-def test_public_static_methods__no_filter(java_class):
-    result = [m.name for m in public_static_methods(java_class, InsertionFilter())]
+def test_public_static_methods__no_filter(helper):
+    result = [m.name for m in helper.public_static_methods()]
     assert sorted(result) == sorted(["PublicStaticMethod"])
 
 
-def test_public_static_methods__filter_match(java_class):
-    result = [m.name for m in public_static_methods(java_class, InsertionFilter(members="Public"))]
+def test_public_static_methods__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="Public")
+    result = [m.name for m in helper.public_static_methods()]
     assert sorted(result) == sorted(["PublicStaticMethod"])
 
 
-def test_public_static_methods__filter_no_match(java_class):
-    result = [m.name for m in public_static_methods(java_class, InsertionFilter(members="NONE"))]
+def test_public_static_methods__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.public_static_methods()]
     assert len(result) == 0
 
 
-def test_public_constants__no_filter(java_class):
-    result = [m.name for m in public_constants(java_class, InsertionFilter())]
+def test_public_constants__no_filter(helper):
+    result = [m.name for m in helper.public_constants()]
     assert result == ["PublicConstant"]
 
 
-def test_public_constants__filter_match(java_class):
-    result = [m.name for m in public_constants(java_class, InsertionFilter(members="Public"))]
+def test_public_constants__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="Public")
+    result = [m.name for m in helper.public_constants()]
     assert result == ["PublicConstant"]
 
 
-def test_public_constants__filter_no_match(java_class):
-    result = [m.name for m in public_constants(java_class, InsertionFilter(members="NONE"))]
+def test_public_constants__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.public_constants()]
     assert len(result) == 0
 
 
-def test_public_complex_enclosed_types__no_filter(java_class):
-    result = [m.name for m in public_complex_enclosed_types(java_class, InsertionFilter())]
+def test_public_complex_enclosed_types__no_filter(helper):
+    result = [m.name for m in helper.public_complex_enclosed_types()]
     assert result == ["NestedClass"]
 
 
-def test_public_complex_enclosed_types__filter_match(java_class):
-    result = [
-        m.name
-        for m in public_complex_enclosed_types(java_class, InsertionFilter(inner_classes="Nested"))
-    ]
+def test_public_complex_enclosed_types__filter_match(helper):
+    helper.insert_filter = InsertionFilter(inner_classes="Nested")
+    result = [m.name for m in helper.public_complex_enclosed_types()]
     assert result == ["NestedClass"]
 
 
-def test_public_complex_enclosed_types__filter_no_match(java_class):
-    result = [
-        m.name
-        for m in public_complex_enclosed_types(java_class, InsertionFilter(inner_classes="NONE"))
-    ]
+def test_public_complex_enclosed_types__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(inner_classes="NONE")
+    result = [m.name for m in helper.public_complex_enclosed_types()]
     assert len(result) == 0

@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import TemplateHelper
+from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 %>
 
 = [[${element.id},${element.name}]]
@@ -21,6 +21,6 @@ ${api_context.insert(element)}
 [%autofit]
 [source,cpp,subs="-specialchars,macros+"]
 ----
-${TemplateHelper(api_context).method_signature(element)}
+${CppTemplateHelper(api_context).method_signature(element)}
 ----
 <%include file="/cpp/_function.mako"/>

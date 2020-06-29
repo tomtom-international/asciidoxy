@@ -12,10 +12,11 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import has, TemplateHelper
+from asciidoxy.templates.helpers import has
+from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 %>
 <%
-helper = TemplateHelper(api_context)
+helper = CppTemplateHelper(api_context)
 %>
 ${element.brief}
 

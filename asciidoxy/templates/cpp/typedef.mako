@@ -13,14 +13,14 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import TemplateHelper
+from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 %>
 = [[${element.id},${element.full_name}]]${element.name}
 ${api_context.insert(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-using ${element.name} = ${TemplateHelper(api_context).print_ref(element.returns.type)}
+using ${element.name} = ${CppTemplateHelper(api_context).print_ref(element.returns.type)}
 ----
 ${element.brief}
 
