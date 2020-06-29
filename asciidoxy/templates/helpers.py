@@ -13,7 +13,10 @@
 # limitations under the License.
 """Helper functions for API reference templates."""
 
+from typing import Optional, Sequence
+
 from asciidoxy.generator import Context
+from asciidoxy.model import Member, Parameter, TypeRef
 
 
 class TemplateHelper:
@@ -27,7 +30,11 @@ class TemplateHelper:
     def __init__(self, context: Context):
         self.context = context
 
-    def print_ref(self, ref, *, link: bool = True, skip_args: bool = False):
+    def print_ref(self,
+                  ref: Optional[TypeRef],
+                  *,
+                  link: bool = True,
+                  skip_args: bool = False) -> str:
         if ref is None:
             return ""
 
@@ -57,24 +64,24 @@ class TemplateHelper:
         else:
             return f"{ref.prefix or ''}{ref.name}{nested}{args}{ref.suffix or ''}".strip()
 
-    def type_and_name(self, param, *, link: bool = True):
+    def type_and_name(self, param: Parameter, *, link: bool = True) -> str:
         return f"{self.print_ref(param.type, link=link)} {param.name}".strip()
 
-    def argument_list(self, params, *, link: bool = True):
+    def argument_list(self, params: Sequence[Parameter], *, link: bool = True) -> str:
         return f"({', '.join(self.type_and_name(p, link=link) for p in params)})"
 
-    def type_list(self, params, *, link: bool = False):
+    def type_list(self, params: Sequence[Parameter], *, link: bool = False) -> str:
         return f"({', '.join(self.print_ref(p.type, link=link) for p in params)})"
 
-    def method_signature(self, method, max_width: int = 80):
+    def method_signature(self, method: Member, max_width: int = 80) -> str:
         method_without_params = self._method_join(self._method_prefix(method), method.name)
         suffix = self._method_suffix(method)
 
         if not method.params:
             return (f"{method_without_params}(){suffix}")
 
-        method_without_params_length = len(self._method_join(self._method_prefix(method, link=False),
-                                                             method.name))
+        method_without_params_length = len(
+            self._method_join(self._method_prefix(method, link=False), method.name))
         suffix_length = len(self._method_suffix(method, link=False))
 
         param_sizes = [len(self.type_and_name(p, link=False)) for p in method.params]
@@ -90,19 +97,18 @@ class TemplateHelper:
 
         return (f"{method_without_params}({first_indent}{formatted_params}){suffix}")
 
-    def _method_prefix(self, method, *, link: bool = True) -> str:
+    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
         static = "static" if method.static else ""
         return_type = self.print_ref(method.returns.type, link=link) if method.returns else ""
 
         return self._method_join(static, return_type)
 
-    def _method_suffix(self, method, *, link: bool = True) -> str:
+    def _method_suffix(self, method: Member, *, link: bool = True) -> str:
         return ""
 
     @staticmethod
     def _method_join(*parts: str) -> str:
         return " ".join(part for part in parts if part)
-
 
 
 def has(elements):

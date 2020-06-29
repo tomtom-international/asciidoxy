@@ -14,13 +14,15 @@
 """Helper functions for Objective C templates."""
 
 from asciidoxy.generator import InsertionFilter
+from asciidoxy.model import Member
 from asciidoxy.templates.helpers import TemplateHelper
 
 
 class ObjcTemplateHelper(TemplateHelper):
-    def method_signature(self, method, max_width: int = 80):
-        method_name_parts = method.name.split(":")
+    def method_signature(self, method: Member, max_width: int = 80) -> str:
+        assert method.returns is not None
 
+        method_name_parts = method.name.split(":")
         static = "+" if method.static else "-"
 
         if len(method_name_parts) == 1:
@@ -50,7 +52,11 @@ class ObjcTemplateHelper(TemplateHelper):
         else:
             return f"{prefix}{method_parts[0]}"
 
-    def block_definition(self, block):
+    def block_definition(self, block: Member) -> str:
+        assert block.returns is not None
+        assert block.returns.type is not None
+        assert block.returns.type.args is not None
+
         if block.name:
             block_name = f" {block.name}"
         else:

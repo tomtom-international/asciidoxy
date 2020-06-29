@@ -14,6 +14,7 @@
 """Helper functions for python reference templates."""
 
 from asciidoxy.generator.filters import InsertionFilter
+from asciidoxy.model import Member, Parameter
 from asciidoxy.templates.helpers import TemplateHelper
 
 
@@ -21,17 +22,17 @@ class PythonTemplateHelper(TemplateHelper):
     NESTED_START: str = "["
     NESTED_END: str = "]"
 
-    def type_and_name(self, param, *, link: bool = True):
+    def type_and_name(self, param: Parameter, *, link: bool = True) -> str:
         if param.type is None or not param.type.name:
             return param.name
         if param.type.name in ("self", "cls"):
             return param.type.name
         return (f"{param.name}: {self.print_ref(param.type, link=link)}".strip())
 
-    def _method_prefix(self, method, *, link: bool = True) -> str:
+    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
         return "def"
 
-    def _method_suffix(self, method, *, link: bool = True) -> str:
+    def _method_suffix(self, method: Member, *, link: bool = True) -> str:
         return f" -> {self.print_ref(method.returns.type, link=link)}" if method.returns else ""
 
 
