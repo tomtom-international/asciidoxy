@@ -14,9 +14,12 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import print_ref, type_list, has, type_and_name, chain
+from asciidoxy.templates.helpers import has, chain, TemplateHelper
 from asciidoxy.templates.cpp.helpers import (public_static_methods, public_methods,
 public_constructors, public_variables, public_simple_enclosed_types, public_complex_enclosed_types)
+%>
+<%
+helper = TemplateHelper(api_context)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
@@ -53,7 +56,7 @@ ${enclosed.brief}
 |*Constructors*
 |
 % for constructor in public_constructors(element, insert_filter):
-`xref:${constructor.id}[${constructor.name}${type_list(constructor.params)}]`::
+`xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
@@ -72,7 +75,7 @@ ${variable.brief}
 |*Static methods*
 |
 % for method in public_static_methods(element, insert_filter):
-`xref:${method.id}[static ${print_ref(method.returns.type, link=False)} ${method.name}${type_list(method.params)}]`::
+`xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -82,7 +85,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in public_methods(element, insert_filter):
-`xref:${method.id}[${print_ref(method.returns.type, link=False)} ${method.name}${type_list(method.params)}]`::
+`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -108,7 +111,7 @@ ${api_context.insert(variable)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-${print_ref(variable.returns.type, api_context)} ${variable.name}
+${helper.print_ref(variable.returns.type)} ${variable.name}
 ----
 
 ${variable.brief}

@@ -14,9 +14,12 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (print_ref, has, type_and_name, chain)
+from asciidoxy.templates.helpers import has, chain
 from asciidoxy.templates.python.helpers import (public_static_methods, public_methods,
-public_constructors, public_variables, public_enclosed_types)
+public_constructors, public_variables, public_enclosed_types, PythonTemplateHelper)
+%>
+<%
+helper = PythonTemplateHelper(api_context)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
@@ -100,7 +103,7 @@ ${api_context.insert(variable)}
 [source,python,subs="-specialchars,macros+"]
 ----
 % if variable.returns is not None:
-${variable.name}: ${print_ref(variable.returns.type, api_context, nested_start='[', nested_end=']')}
+${variable.name}: ${helper.print_ref(variable.returns.type)}
 % else:
 ${variable.name}
 % endif

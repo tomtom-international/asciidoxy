@@ -19,7 +19,7 @@ from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Member, Parameter, ReturnValue, TypeRef, InnerTypeReference
 from asciidoxy.templates.python.helpers import (params, public_static_methods, public_methods,
                                                 public_constructors, public_enclosed_types,
-                                                public_variables, method_signature)
+                                                public_variables, PythonTemplateHelper)
 
 
 @pytest.fixture
@@ -247,7 +247,8 @@ def test_method_signature__no_params(empty_context):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("python", "None")
 
-    assert method_signature(method, empty_context) == "def ShortMethod() -> None"
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.method_signature(method) == "def ShortMethod() -> None"
 
 
 def test_method_signature__single_param(empty_context):
@@ -261,7 +262,8 @@ def test_method_signature__single_param(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    assert method_signature(method, empty_context) == "def ShortMethod(value: int) -> int"
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.method_signature(method) == "def ShortMethod(value: int) -> int"
 
 
 def test_method_signature__single_param__too_wide(empty_context):
@@ -275,7 +277,8 @@ def test_method_signature__single_param__too_wide(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    assert (method_signature(method, empty_context, max_width=20) == """\
+    helper = PythonTemplateHelper(empty_context)
+    assert (helper.method_signature(method, max_width=20) == """\
 def ShortMethod(
     value: int) -> str""")
 
@@ -295,7 +298,8 @@ def test_method_signature__multiple_params(empty_context):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("python", "str")
 
-    assert (method_signature(method, empty_context) == """\
+    helper = PythonTemplateHelper(empty_context)
+    assert (helper.method_signature(method) == """\
 def ShortMethod(value: int,
                 other_value: float,
                 text: str) -> None""")
@@ -316,7 +320,8 @@ def test_method_signature__multiple_params__first_param_too_wide(empty_context):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("python", "str")
 
-    assert (method_signature(method, empty_context, max_width=20) == """\
+    helper = PythonTemplateHelper(empty_context)
+    assert (helper.method_signature(method, max_width=20) == """\
 def ShortMethod(
     value: int,
     other_value: float,
@@ -338,7 +343,8 @@ def test_method_signature__multiple_params__last_param_too_wide(empty_context):
     method.params[2].name = "text" * 10
     method.params[2].type = TypeRef("python", "str")
 
-    assert (method_signature(method, empty_context, max_width=40) == f"""\
+    helper = PythonTemplateHelper(empty_context)
+    assert (helper.method_signature(method, max_width=40) == f"""\
 def ShortMethod(
     value: int,
     other_value: float,
@@ -357,8 +363,9 @@ def test_method_signature__ignore_return_type_xref_length(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    assert (method_signature(
-        method, empty_context) == f"def ShortMethod(value: int) -> xref:{'ab' * 80}[Type]")
+    helper = PythonTemplateHelper(empty_context)
+    assert (
+        helper.method_signature(method) == f"def ShortMethod(value: int) -> xref:{'ab' * 80}[Type]")
 
 
 def test_method_signature__ignore_param_type_xref_length(empty_context):
@@ -373,5 +380,6 @@ def test_method_signature__ignore_param_type_xref_length(empty_context):
     method.params[0].type = TypeRef("python", "int")
     method.params[0].type.id = "ab" * 80
 
-    assert (method_signature(
-        method, empty_context) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")
+    helper = PythonTemplateHelper(empty_context)
+    assert (
+        helper.method_signature(method) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")

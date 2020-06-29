@@ -23,7 +23,7 @@ from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Member, ReturnValue, Parameter, TypeRef
 from asciidoxy.templates.objc.helpers import (public_methods, public_class_methods,
                                               public_properties, public_simple_enclosed_types,
-                                              objc_method_signature)
+                                              ObjcTemplateHelper)
 
 
 @pytest.fixture
@@ -169,7 +169,8 @@ def test_objc_method_signature__no_params_simple_return(context):
     method.name = "start"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="void")
-    assert objc_method_signature(method, context) == "- (void)start"
+    helper = ObjcTemplateHelper(context)
+    assert helper.method_signature(method) == "- (void)start"
 
 
 def test_objc_method_signature__no_params_link_return(context):
@@ -178,7 +179,8 @@ def test_objc_method_signature__no_params_link_return(context):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="Value")
     method.returns.type.id = "objc-value"
-    assert objc_method_signature(method, context) == "- (xref:objc-value[Value])retrieveValue"
+    helper = ObjcTemplateHelper(context)
+    assert helper.method_signature(method) == "- (xref:objc-value[Value])retrieveValue"
 
 
 def test_objc_method_signature__one_param(context):
@@ -193,8 +195,8 @@ def test_objc_method_signature__one_param(context):
     param1.type = TypeRef("objc", "Type1")
     method.params = [param1]
 
-    assert objc_method_signature(method,
-                                 context) == "- (xref:objc-value[Value])setValue:(Type1)arg1"
+    helper = ObjcTemplateHelper(context)
+    assert helper.method_signature(method) == "- (xref:objc-value[Value])setValue:(Type1)arg1"
 
 
 def test_objc_method_signature__multiple_params_simple_return(context):
@@ -218,9 +220,11 @@ def test_objc_method_signature__multiple_params_simple_return(context):
 
     method.params = [param1, param2, param3]
 
-    assert (objc_method_signature(method, context) == "- (Value)setValue:(Type1)arg1\n"
-            "         withUnit:(xref:objc-type2[Type2])arg2\n"
-            "  andALongerParam:(Type3)arg3")
+    helper = ObjcTemplateHelper(context)
+    assert (helper.method_signature(method) == """\
+- (Value)setValue:(Type1)arg1
+         withUnit:(xref:objc-type2[Type2])arg2
+  andALongerParam:(Type3)arg3""")
 
 
 def test_objc_method_signature__multiple_params_linked_return(context):
@@ -245,10 +249,11 @@ def test_objc_method_signature__multiple_params_linked_return(context):
 
     method.params = [param1, param2, param3]
 
-    assert (objc_method_signature(method,
-                                  context) == "- (xref:objc-value[Value])setValue:(Type1)arg1\n"
-            "         withUnit:(xref:objc-type2[Type2])arg2\n"
-            "  andALongerParam:(Type3)arg3")
+    helper = ObjcTemplateHelper(context)
+    assert (helper.method_signature(method) == """\
+- (xref:objc-value[Value])setValue:(Type1)arg1
+         withUnit:(xref:objc-type2[Type2])arg2
+  andALongerParam:(Type3)arg3""")
 
 
 def test_objc_method_signature__class_method(context):
@@ -257,4 +262,5 @@ def test_objc_method_signature__class_method(context):
     method.static = True
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="void")
-    assert objc_method_signature(method, context) == "+ (void)start"
+    helper = ObjcTemplateHelper(context)
+    assert helper.method_signature(method) == "+ (void)start"

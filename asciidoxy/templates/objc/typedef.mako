@@ -13,7 +13,7 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import print_ref
+from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 %>
 = [[${element.id},${element.full_name}]]${element.name}
 ${api_context.insert(element)}
@@ -21,7 +21,7 @@ ${api_context.insert(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-typedef ${print_ref(element.returns.type, api_context)} ${element.name}
+typedef ${ObjcTemplateHelper(api_context).print_ref(element.returns.type)} ${element.name}
 ----
 ${element.brief}
 

@@ -13,17 +13,47 @@
 # limitations under the License.
 """Helper functions for python reference templates."""
 
-from asciidoxy.generator import Context
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.templates.helpers import print_ref
+from asciidoxy.templates.helpers import TemplateHelper
 
 
-def type_and_name(param, context: Context):
-    if param.type is None or not param.type.name:
-        return param.name
-    if param.type.name in ("self", "cls"):
-        return param.type.name
-    return f"{param.name}: {print_ref(param.type, context, nested_start='[', nested_end=']')}".strip()
+class PythonTemplateHelper(TemplateHelper):
+    NESTED_START: str = "["
+    NESTED_END: str = "]"
+
+    def type_and_name(self, param):
+        if param.type is None or not param.type.name:
+            return param.name
+        if param.type.name in ("self", "cls"):
+            return param.type.name
+        return (f"{param.name}: {self.print_ref(param.type)}".strip())
+
+    def method_signature(self, element, max_width: int = 80):
+        method_without_params = f"def {element.name}"
+        return_suffix = f" -> {self.print_ref(element.returns.type)}" if element.returns else ""
+
+        if not element.params:
+            return (f"{method_without_params}(){return_suffix}")
+
+        method_without_params_length = len(method_without_params)
+        return_type_no_ref = (f" -> {self.print_ref(element.returns.type, link=False)}"
+                              if element.returns else "")
+        suffix_length = len(return_type_no_ref)
+
+        param_sizes = [
+            len(f"{p.name}: {self.print_ref(p.type, link=False)}".strip()) for p in element.params
+        ]
+        indent_size = method_without_params_length + 1
+        first_indent = ""
+
+        if any(indent_size + size + 1 + suffix_length > max_width for size in param_sizes):
+            indent_size = 4
+            first_indent = "\n    "
+
+        param_separator = f",\n{' ' * indent_size}"
+        formatted_params = f"{param_separator.join(self.type_and_name(p) for p in element.params)}"
+
+        return (f"{method_without_params}({first_indent}{formatted_params}){return_suffix}")
 
 
 def params(element):
@@ -54,28 +84,3 @@ def public_enclosed_types(element, insert_filter: InsertionFilter):
 def public_variables(element, insert_filter: InsertionFilter):
     return (m for m in insert_filter.members(element)
             if m.kind == "variable" and not m.name.startswith("_"))
-
-
-def method_signature(element, context: Context, max_width: int = 80):
-    method_without_params = f"def {element.name}"
-    return_suffix = f" -> {print_ref(element.returns.type, context)}" if element.returns else ""
-
-    if not element.params:
-        return (f"{method_without_params}(){return_suffix}")
-
-    method_without_params_length = len(method_without_params)
-    return_type_no_ref = (f" -> {print_ref(element.returns.type, link=False)}" if element.returns else "")
-    suffix_length = len(return_type_no_ref)
-
-    param_sizes = [len(f"{p.name}: {print_ref(p.type, link=False)}".strip()) for p in element.params]
-    indent_size = method_without_params_length + 1
-    first_indent = ""
-
-    if any(indent_size + size + 1 + suffix_length > max_width for size in param_sizes):
-        indent_size = 4
-        first_indent = "\n    "
-
-    param_separator = f",\n{' ' * indent_size}"
-    formatted_params = f"{param_separator.join(type_and_name(p, context) for p in element.params)}"
-
-    return (f"{method_without_params}({first_indent}{formatted_params}){return_suffix}")

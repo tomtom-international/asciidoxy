@@ -13,15 +13,14 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import print_ref
+from asciidoxy.templates.helpers import TemplateHelper
 %>
 = [[${element.id},${element.full_name}]]${element.name}
 ${api_context.insert(element)}
 
-
 [source,cpp,subs="-specialchars,macros+"]
 ----
-using ${element.name} = ${print_ref(element.returns.type, api_context)}
+using ${element.name} = ${TemplateHelper(api_context).print_ref(element.returns.type)}
 ----
 ${element.brief}
 

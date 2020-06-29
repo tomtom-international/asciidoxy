@@ -14,9 +14,12 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (print_ref, type_list, has, method_signature)
+from asciidoxy.templates.helpers import has, TemplateHelper
 from asciidoxy.templates.java.helpers import (public_methods, public_static_methods,
 public_constructors, public_constants, public_complex_enclosed_types)
+%>
+<%
+helper = TemplateHelper(api_context)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
@@ -49,7 +52,7 @@ ${enclosed.brief}
 |*Constructors*
 |
 % for constructor in public_constructors(element, insert_filter):
-`xref:${constructor.id}[${constructor.name}${type_list(constructor.params)}]`::
+`xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
@@ -69,7 +72,7 @@ ${constant.description}
 |*Static methods*
 |
 % for method in public_static_methods(element, insert_filter):
-`xref:${method.id}[static ${print_ref(method.returns.type, link=False)} ${method.name}${type_list(method.params)}]`::
+`xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -79,7 +82,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in public_methods(element, insert_filter):
-`xref:${method.id}[${print_ref(method.returns.type, link=False)} ${method.name}${type_list(method.params)}]`::
+`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -93,7 +96,7 @@ ${method.brief}
 ${api_context.insert(constructor)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${method_signature(constructor, api_context)}
+${helper.method_signature(constructor)}
 ----
 
 ${constructor.brief}
@@ -107,7 +110,7 @@ ${constructor.description}
 | Parameters
 |
 % for param in constructor.params:
-`${print_ref(param.type, api_context)} ${param.name}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -116,7 +119,7 @@ ${param.description}
 | Throws
 |
 % for exception in constructor.exceptions:
-`${print_ref(exception.type, api_context)}`::
+`${helper.print_ref(exception.type)}`::
 ${exception.description}
 
 % endfor
@@ -131,7 +134,7 @@ ${exception.description}
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${method_signature(method, api_context)}
+${helper.method_signature(method)}
 ----
 
 ${method.brief}
@@ -145,7 +148,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${print_ref(param.type, api_context)} ${param.name}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -153,7 +156,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${print_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif
@@ -176,7 +179,7 @@ ${exception.description}
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${method_signature(method, api_context)}
+${helper.method_signature(method)}
 ----
 
 ${method.brief}
@@ -190,7 +193,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${print_ref(param.type, api_context)} ${param.name}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -198,7 +201,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${print_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif

@@ -13,7 +13,7 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.objc.helpers import objc_block_definition
+from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 %>
 = [[${element.id},${element.full_name}]]${element.name}
 ${api_context.insert(element)}
@@ -21,7 +21,7 @@ ${api_context.insert(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${objc_block_definition(element, api_context)}
+${ObjcTemplateHelper(api_context).block_definition(element)}
 ----
 ${element.brief}
 

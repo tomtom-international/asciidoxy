@@ -14,9 +14,12 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import print_ref, has
-from asciidoxy.templates.objc.helpers import (objc_method_signature, public_methods,
-public_class_methods, public_properties, public_simple_enclosed_types)
+from asciidoxy.templates.helpers import has
+from asciidoxy.templates.objc.helpers import (public_methods, public_class_methods,
+public_properties, public_simple_enclosed_types, ObjcTemplateHelper)
+%>
+<%
+helper = ObjcTemplateHelper(api_context)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
@@ -93,7 +96,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ${api_context.insert(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-@property() ${print_ref(prop.returns.type, api_context)} ${prop.name}
+@property() ${helper.print_ref(prop.returns.type)} ${prop.name}
 ----
 
 ${prop.brief}
@@ -108,7 +111,7 @@ ${prop.description}
 ${api_context.insert(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${objc_method_signature(method, api_context)};
+${helper.method_signature(method)};
 ----
 
 ${method.brief}
@@ -122,7 +125,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`(${print_ref(param.type, api_context)})${param.name}`::
+`(${helper.print_ref(param.type)})${param.name}`::
 ${param.description}
 
 % endfor
@@ -130,7 +133,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${print_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif
@@ -154,7 +157,7 @@ ${exception.description}
 ${api_context.insert(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${objc_method_signature(method, api_context)};
+${helper.method_signature(method)};
 ----
 
 ${method.brief}
@@ -168,7 +171,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`(${print_ref(param.type, api_context)})${param.name}`::
+`(${helper.print_ref(param.type)})${param.name}`::
 ${param.description}
 
 % endfor
@@ -176,7 +179,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${print_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif

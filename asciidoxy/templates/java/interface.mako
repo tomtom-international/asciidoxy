@@ -14,8 +14,11 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (print_ref, type_list, has, method_signature)
+from asciidoxy.templates.helpers import has, TemplateHelper
 from asciidoxy.templates.java.helpers import (public_methods, public_static_methods, public_constants)
+%>
+<%
+helper = TemplateHelper(api_context)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
@@ -48,7 +51,7 @@ ${constant.description}
 |*Static methods*
 |
 % for method in public_static_methods(element, insert_filter):
-`xref:${method.id}[static ${print_ref(method.returns.type, link=False)} ${method.name}${type_list(method.params)}]`::
+`xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -58,7 +61,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in public_methods(element, insert_filter):
-`xref:${method.id}[${print_ref(method.returns.type, link=False)} ${method.name}${type_list(method.params)}]`::
+`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -72,7 +75,7 @@ ${method.brief}
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${method_signature(method, api_context)}
+${helper.method_signature(method)}
 ----
 
 ${method.brief}
@@ -86,7 +89,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${print_ref(param.type, api_context)} ${param.name}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -94,7 +97,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${print_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif
@@ -117,7 +120,7 @@ ${exception.description}
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${method_signature(method, api_context)}
+${helper.method_signature(method)}
 ----
 
 ${method.brief}
@@ -131,7 +134,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${print_ref(param.type, api_context)} ${param.name}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -139,7 +142,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${print_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif

@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.java.helpers import (enums)
+from asciidoxy.templates.java.helpers import enums
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}

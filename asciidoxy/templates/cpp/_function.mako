@@ -12,7 +12,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import print_ref, type_and_name, has
+from asciidoxy.templates.helpers import has, TemplateHelper
+%>
+<%
+helper = TemplateHelper(api_context)
 %>
 ${element.brief}
 
@@ -25,7 +28,7 @@ ${element.description}
 | Parameters
 |
 % for param in element.params:
-`${type_and_name(param, api_context)}`::
+`${helper.type_and_name(param)}`::
 ${param.description}
 
 % endfor
@@ -33,7 +36,7 @@ ${param.description}
 % if element.returns and element.returns.type.name != "void":
 | Returns
 |
-`${print_ref(element.returns.type, api_context)}`::
+`${helper.print_ref(element.returns.type)}`::
 ${element.returns.description}
 
 % endif

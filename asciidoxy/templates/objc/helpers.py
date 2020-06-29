@@ -13,51 +13,51 @@
 # limitations under the License.
 """Helper functions for Objective C templates."""
 
-from asciidoxy.generator import Context, InsertionFilter
-from asciidoxy.templates.helpers import argument_list, print_ref
+from asciidoxy.generator import InsertionFilter
+from asciidoxy.templates.helpers import TemplateHelper
 
 
-def objc_method_signature(method, context: Context):
-    method_name_parts = method.name.split(":")
+class ObjcTemplateHelper(TemplateHelper):
+    def method_signature(self, method, max_width: int = 80):
+        method_name_parts = method.name.split(":")
 
-    static = "+" if method.static else "-"
+        static = "+" if method.static else "-"
 
-    if len(method_name_parts) == 1:
-        return f"{static} ({print_ref(method.returns.type, context)}){method.name}"
+        if len(method_name_parts) == 1:
+            return f"{static} ({self.print_ref(method.returns.type)}){method.name}"
 
-    method_parts = []
-    for method_name_part, param in zip(method_name_parts, method.params):
-        method_parts.append(
-            f"{method_name_part}:({print_ref(param.type, context)}){param.name}")
+        method_parts = []
+        for method_name_part, param in zip(method_name_parts, method.params):
+            method_parts.append(f"{method_name_part}:({self.print_ref(param.type)}){param.name}")
 
-    prefix = f"{static} ({print_ref(method.returns.type, context)})"
+        prefix = f"{static} ({self.print_ref(method.returns.type)})"
 
-    if len(method_parts) > 1:
-        first_line_text = f"- ({print_ref(method.returns.type, link=False)}){method_parts[0]}"
-        first_line_colon_position = first_line_text.find(":")
-        assert first_line_colon_position > 0
+        if len(method_parts) > 1:
+            first_line_text = (f"- ({self.print_ref(method.returns.type, link=False)})"
+                               f"{method_parts[0]}")
+            first_line_colon_position = first_line_text.find(":")
+            assert first_line_colon_position > 0
 
-        formatted = [f"{prefix}{method_parts[0]}"]
-        for line in method_parts[1:]:
-            colon_position = line.find(":")
-            if colon_position < first_line_colon_position:
-                line = " " * (first_line_colon_position - colon_position) + line
-            formatted.append(line)
-        method_parts = formatted
+            formatted = [f"{prefix}{method_parts[0]}"]
+            for line in method_parts[1:]:
+                colon_position = line.find(":")
+                if colon_position < first_line_colon_position:
+                    line = " " * (first_line_colon_position - colon_position) + line
+                formatted.append(line)
+            method_parts = formatted
 
-        return "\n".join(method_parts)
-    else:
-        return f"{prefix}{method_parts[0]}"
+            return "\n".join(method_parts)
+        else:
+            return f"{prefix}{method_parts[0]}"
 
+    def block_definition(self, block):
+        if block.name:
+            block_name = f" {block.name}"
+        else:
+            block_name = ""
 
-def objc_block_definition(block, context: Context):
-    if block.name:
-        block_name = f" {block.name}"
-    else:
-        block_name = ""
-
-    return (f"typedef {print_ref(block.returns.type, context, skip_args=True)}(^{block_name})"
-            f" {argument_list(block.returns.type.args, context)}")
+        return (f"typedef {self.print_ref(block.returns.type, skip_args=True)}(^{block_name})"
+                f" {self.argument_list(block.returns.type.args)}")
 
 
 def public_methods(element, insert_filter: InsertionFilter):

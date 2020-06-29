@@ -1,5 +1,6 @@
 
 
+
 = [[objc-interface_a_d_coordinate,ADCoordinate]]ADCoordinate
 
 
