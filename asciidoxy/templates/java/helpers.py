@@ -13,11 +13,17 @@
 # limitations under the License.
 """Helper functions for Java templates."""
 
+from typing import Iterator
+
+from asciidoxy.model import Member
 from asciidoxy.templates.helpers import TemplateHelper
 
 
 class JavaTemplateHelper(TemplateHelper):
-    def public_constants(self):
+    def public_constants(self) -> Iterator[Member]:
+        assert self.element is not None
+        assert self.insert_filter is not None
+
         return (m for m in self.insert_filter.members(self.element)
                 if (m.kind == "variable" and m.prot == "public" and m.returns and m.returns.type
                     and m.returns.type.prefix and "final" in m.returns.type.prefix))

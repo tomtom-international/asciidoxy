@@ -13,7 +13,7 @@
 # limitations under the License.
 """Helper functions for API reference templates."""
 
-from typing import Optional, Sequence, Union
+from typing import Iterator, Optional, Sequence
 
 from asciidoxy.generator import Context
 from asciidoxy.generator.filters import InsertionFilter
@@ -22,7 +22,7 @@ from asciidoxy.model import Compound, Member, Parameter, TypeRef
 
 class TemplateHelper:
     context: Context
-    element: Optional[Union[Compound, Member]]
+    element: Optional[Compound]
     insert_filter: Optional[InsertionFilter]
 
     NESTED_START: str = "&lt;"
@@ -32,7 +32,7 @@ class TemplateHelper:
 
     def __init__(self,
                  context: Context,
-                 element: Optional[Union[Compound, Member]] = None,
+                 element: Optional[Compound] = None,
                  insert_filter: Optional[InsertionFilter] = None):
         self.context = context
         self.element = element
@@ -118,21 +118,21 @@ class TemplateHelper:
     def _method_join(*parts: str) -> str:
         return " ".join(part for part in parts if part)
 
-    def public_static_methods(self):
+    def public_static_methods(self) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if (m.kind == "function" and m.returns and m.prot == "public" and m.static))
 
-    def public_methods(self):
+    def public_methods(self) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if (m.kind == "function" and m.returns and m.prot == "public" and not m.static))
 
-    def public_constructors(self):
+    def public_constructors(self) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
@@ -140,28 +140,28 @@ class TemplateHelper:
         return (m for m in self.insert_filter.members(self.element)
                 if m.kind == "function" and m.name == constructor_name and m.prot == "public")
 
-    def public_simple_enclosed_types(self):
+    def public_simple_enclosed_types(self) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if m.prot in ("public", "protected", None) and m.kind in ["enum", "typedef"])
 
-    def public_complex_enclosed_types(self):
+    def public_complex_enclosed_types(self) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m.referred_object for m in self.insert_filter.inner_classes(self.element)
                 if m.referred_object is not None)
 
-    def public_variables(self):
+    def public_variables(self) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if m.kind == "variable" and m.prot == "public")
 
-    def public_properties(self):
+    def public_properties(self) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
