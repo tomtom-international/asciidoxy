@@ -24,7 +24,8 @@ from asciidoxy.generator.asciidoc import Api, process_adoc
 from asciidoxy.generator.navigation import DocumentTreeNode
 from asciidoxy.generator.errors import (AmbiguousReferenceError, ConsistencyError,
                                         IncludeFileNotFoundError, IncompatibleVersionError,
-                                        ReferenceNotFoundError, TemplateMissingError)
+                                        InvalidApiCallError, ReferenceNotFoundError,
+                                        TemplateMissingError)
 from asciidoxy import __version__
 from .shared import ProgressMock
 
@@ -165,6 +166,53 @@ def test_insert_with_default_language_can_be_overridden(api):
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+
+
+def test_insert__transcode__explicit(api):
+    # TODO: Use language that supports transcoding
+    api.language("java", source="cpp")
+    result = api.insert_class("asciidoxy::geometry::Coordinate", lang="java")
+    assert result.startswith("include::")
+    assert result.endswith("[leveloffset=+1]")
+    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    _check_inserted_file_contains(result, "java")
+
+
+def test_insert__transcode__implicit(api):
+    # TODO: Use language that supports transcoding
+    api.language("java", source="cpp")
+    result = api.insert_class("asciidoxy::geometry::Coordinate")
+    assert result.startswith("include::")
+    assert result.endswith("[leveloffset=+1]")
+    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    _check_inserted_file_contains(result, "java")
+
+
+def test_insert__transcode__reset(api):
+    # TODO: Use language that supports transcoding
+    api.language("java", source="cpp")
+    api.language(None)
+    result = api.insert_class("asciidoxy::geometry::Coordinate")
+    assert result.startswith("include::")
+    assert result.endswith("[leveloffset=+1]")
+    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    _check_inserted_file_does_not_contain(result, "java")
+
+
+def test_language__source_requires_lang(api):
+    with pytest.raises(InvalidApiCallError):
+        api.language("", source="java")
+
+    with pytest.raises(InvalidApiCallError):
+        api.language(None, source="java")
+
+
+def test_language__source_cannot_be_the_same_as_lang(api):
+    with pytest.raises(InvalidApiCallError):
+        api.language("java", source="java")
+
+    with pytest.raises(InvalidApiCallError):
+        api.language("c++", source="cpp")
 
 
 def test_insert_relative_name_with_namespace(api):

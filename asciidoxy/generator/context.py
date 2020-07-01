@@ -58,6 +58,7 @@ class Context(object):
 
     namespace: Optional[str] = None
     language: Optional[str] = None
+    source_language: Optional[str] = None
     insert_filter: InsertionFilter
 
     preprocessing_run: bool = True
@@ -109,6 +110,7 @@ class Context(object):
         # Copies
         sub.namespace = self.namespace
         sub.language = self.language
+        sub.source_language = self.source_language
         sub.preprocessing_run = self.preprocessing_run
         sub.warnings_are_errors = self.warnings_are_errors
         sub.multipage = self.multipage

@@ -34,8 +34,8 @@ from ..model import ReferableElement
 from .._version import __version__
 from .context import Context
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
-                     IncompatibleVersionError, ReferenceNotFoundError, TemplateMissingError,
-                     UnlinkableError)
+                     IncompatibleVersionError, InvalidApiCallError, ReferenceNotFoundError,
+                     TemplateMissingError, UnlinkableError)
 from .filters import FilterSpec, InsertionFilter
 from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipage_toc
 
@@ -111,6 +111,13 @@ class Api(object):
             raise AmbiguousReferenceError(name, ex.candidates)
 
         if element is None:
+            # TODO: Translate object
+            if (lang and lang == self._context.language and self._context.source_language):
+                return self.find_element(name,
+                                         kind=kind,
+                                         lang=self._context.source_language,
+                                         allow_overloads=allow_overloads)
+
             raise ReferenceNotFoundError(name, lang=lang, kind=kind)
         return element
 
@@ -338,6 +345,7 @@ class Api(object):
         """
 
         assert element.id
+        assert element.language
         fragment_file = self._context.fragment_dir / f"{element.id}.adoc"
 
         if kind_override is None:
@@ -345,10 +353,17 @@ class Api(object):
         else:
             kind = kind_override
 
-        rendered_doc = self._template(element.language, kind).render(element=element,
-                                                                     insert_filter=insert_filter,
-                                                                     api_context=self._context,
-                                                                     api=self)
+        # TODO: Use translated elements
+        if element.language == self._context.source_language:
+            assert self._context.language
+            language = self._context.language
+        else:
+            language = element.language
+
+        rendered_doc = self._template(language, kind).render(element=element,
+                                                             insert_filter=insert_filter,
+                                                             api_context=self._context,
+                                                             api=self)
 
         if not self._context.preprocessing_run:
             with fragment_file.open("w", encoding="utf-8") as f:
@@ -421,17 +436,37 @@ class Api(object):
         rel_path = out_file.relative_to(self._current_file.parent)
         return f"include::{rel_path}[{attributes}]"
 
-    def language(self, lang: Optional[str]) -> str:
+    def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
 
         Elements will then only be inserted for that language, and other languages are ignored. The
         language can still be overridden with the `lang` keyword. Files included after this command
         will also be affected.
 
+        Optionally, a different language can be used as the `source` of the API reference. If an
+        element is inserted that does not exist in the target `lang`, it is automatically
+        transcoded from the `source` language. This feature is only available for a limited set of
+        languages.
+
         Params:
-            lang The new default language, or None to reset.
+            lang:   The new default language, or None to reset.
+            source: Language to transcode from if an element is not available in the
+                        selected language. Only available for limited combinations.
+
+        Raises:
+            InvalidApiCallError: The `source` language needs to be different from `lang`, and `lang`
+                                     is required when `source` is specified.
         """
-        self._context.language = safe_language_tag(lang)
+        lang = safe_language_tag(lang)
+        source = safe_language_tag(source)
+
+        if source and not lang:
+            raise InvalidApiCallError("When specifying `source`, `lang` cannot be empty.")
+        if source and source == lang:
+            raise InvalidApiCallError("`source` and `lang` cannot be the same.")
+
+        self._context.language = lang if lang else None
+        self._context.source_language = source if source else None
 
         # Prevent output of None
         return ""

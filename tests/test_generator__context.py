@@ -21,9 +21,10 @@ from asciidoxy.model import ReferableElement
 def test_context_create_sub_context(context):
     context.namespace = "ns"
     context.language = "lang"
+    context.source_language = "java"
     context.preprocessing_run = False
     context.warnings_are_errors = True
-    context.mult_page = True
+    context.multipage = True
 
     sub = context.sub_context()
     assert sub is not context
@@ -32,12 +33,13 @@ def test_context_create_sub_context(context):
     assert sub.build_dir == context.build_dir
     assert sub.fragment_dir == context.fragment_dir
 
-    assert sub.namespace == context.namespace
-    assert sub.language == context.language
+    assert sub.namespace == "ns"
+    assert sub.language == "lang"
+    assert sub.source_language == "java"
 
-    assert sub.preprocessing_run == context.preprocessing_run
-    assert sub.warnings_are_errors == context.warnings_are_errors
-    assert sub.multipage == context.multipage
+    assert sub.preprocessing_run is False
+    assert sub.warnings_are_errors is True
+    assert sub.multipage is True
 
     assert sub.reference is context.reference
     assert sub.linked is context.linked
@@ -45,8 +47,10 @@ def test_context_create_sub_context(context):
 
     sub.namespace = "other"
     sub.language = "objc"
-    assert sub.namespace != context.namespace
-    assert sub.language != context.language
+    sub.source_language = "python"
+    assert context.namespace == "ns"
+    assert context.language == "lang"
+    assert context.source_language == "java"
 
     assert len(context.linked) == 0
     assert "element" not in context.inserted

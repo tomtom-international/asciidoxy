@@ -156,3 +156,18 @@ class IncompatibleVersionError(AsciiDocError):
     def __str__(self) -> str:
         return (f"Input file requires version {self.required_version} of AsciiDoxy. "
                 f"Current version {__version__} is not compatible.")
+
+
+class InvalidApiCallError(AsciiDocError):
+    """The API call is invalid in the current context, or the arguments given are invalid.
+
+    Args:
+        msg: Message explaining what is wrong with the call.
+    """
+    msg: str
+
+    def __init__(self, msg: str):
+        self.msg = msg
+
+    def __str__(self) -> str:
+        return f"Invalid API call: {self.msg}"
