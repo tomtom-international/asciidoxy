@@ -47,22 +47,22 @@ ${enclosed.brief}
 
 % endif
 ###################################################################################################
+% if has(helper.public_constants()):
+|*Constants*
+|
+% for constant in helper.public_constants():
+`xref:${constant.id}[${constant.returns.type.name} ${constant.name}]`::
+${constant.brief}
+% endfor
+
+% endif
+###################################################################################################
 % if has(helper.public_constructors()):
 |*Constructors*
 |
 % for constructor in helper.public_constructors():
 `xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
-% endfor
-
-% endif
-###################################################################################################
-% if has(helper.public_constants()):
-|*Constants*
-|
-% for constant in helper.public_constants():
-`${constant.name}`::
-${constant.description}
 % endfor
 
 % endif
@@ -89,6 +89,21 @@ ${method.brief}
 |===
 
 == Members
+###################################################################################### Constants ##
+% for constant in helper.public_constants():
+[[${constant.id},${constant.name}]]
+${api_context.insert(constant)}
+[source,java,subs="-specialchars,macros+"]
+----
+${constant.returns.type.name} ${constant.name}
+----
+
+${constant.brief}
+
+${constant.description}
+
+'''
+% endfor
 ################################################################################### Constructors ##
 % for constructor in helper.public_constructors():
 [[${constructor.id},${constructor.name}]]
