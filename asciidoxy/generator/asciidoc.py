@@ -31,6 +31,7 @@ from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..doxygenparser import safe_language_tag
 from ..model import ReferableElement
+from ..transcoder import transcode
 from .._version import __version__
 from .context import Context
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
@@ -111,12 +112,13 @@ class Api(object):
             raise AmbiguousReferenceError(name, ex.candidates)
 
         if element is None:
-            # TODO: Translate object
             if (lang and lang == self._context.language and self._context.source_language):
-                return self.find_element(name,
-                                         kind=kind,
-                                         lang=self._context.source_language,
-                                         allow_overloads=allow_overloads)
+                source_element = self.find_element(name,
+                                                   kind=kind,
+                                                   lang=self._context.source_language,
+                                                   allow_overloads=allow_overloads)
+                if source_element is not None:
+                    return transcode(source_element, lang)
 
             raise ReferenceNotFoundError(name, lang=lang, kind=kind)
         return element
@@ -353,17 +355,10 @@ class Api(object):
         else:
             kind = kind_override
 
-        # TODO: Use translated elements
-        if element.language == self._context.source_language:
-            assert self._context.language
-            language = self._context.language
-        else:
-            language = element.language
-
-        rendered_doc = self._template(language, kind).render(element=element,
-                                                             insert_filter=insert_filter,
-                                                             api_context=self._context,
-                                                             api=self)
+        rendered_doc = self._template(element.language, kind).render(element=element,
+                                                                     insert_filter=insert_filter,
+                                                                     api_context=self._context,
+                                                                     api=self)
 
         if not self._context.preprocessing_run:
             with fragment_file.open("w", encoding="utf-8") as f:

@@ -169,34 +169,31 @@ def test_insert_with_default_language_can_be_overridden(api):
 
 
 def test_insert__transcode__explicit(api):
-    # TODO: Use language that supports transcoding
-    api.language("java", source="cpp")
-    result = api.insert_class("asciidoxy::geometry::Coordinate", lang="java")
+    api.language("kotlin", source="java")
+    result = api.insert_class("com.asciidoxy.geometry.Coordinate", lang="kotlin")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
-    _check_inserted_file_contains(result, "java")
+    _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
+    _check_inserted_file_contains(result, "kotlin")
 
 
 def test_insert__transcode__implicit(api):
-    # TODO: Use language that supports transcoding
-    api.language("java", source="cpp")
-    result = api.insert_class("asciidoxy::geometry::Coordinate")
+    api.language("kotlin", source="java")
+    result = api.insert_class("com.asciidoxy.geometry.Coordinate")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
-    _check_inserted_file_contains(result, "java")
+    _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
+    _check_inserted_file_contains(result, "kotlin")
 
 
 def test_insert__transcode__reset(api):
-    # TODO: Use language that supports transcoding
-    api.language("java", source="cpp")
+    api.language("kotlin", source="java")
     api.language(None)
-    result = api.insert_class("asciidoxy::geometry::Coordinate")
+    result = api.insert_class("com.asciidoxy.geometry.Coordinate")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
-    _check_inserted_file_does_not_contain(result, "java")
+    _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
+    _check_inserted_file_does_not_contain(result, "kotlin")
 
 
 def test_language__source_requires_lang(api):
