@@ -41,8 +41,8 @@ ${element.description}
 |*Constants*
 |
 % for constant in helper.public_constants():
-`${constant.name}`::
-${constant.description}
+`xref:${constant.id}[${constant.returns.type.name} ${constant.name}]`::
+${constant.brief}
 % endfor
 
 % endif
@@ -69,6 +69,21 @@ ${method.brief}
 |===
 
 == Members
+###################################################################################### Constants ##
+% for constant in helper.public_constants():
+[[${constant.id},${constant.name}]]
+${api_context.insert(constant)}
+[source,java,subs="-specialchars,macros+"]
+----
+${constant.returns.type.name} ${constant.name}
+----
+
+${constant.brief}
+
+${constant.description}
+
+'''
+% endfor
 ################################################################################# Static methods ##
 % for method in helper.public_static_methods():
 [[${method.id},${method.name}]]
