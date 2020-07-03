@@ -327,6 +327,24 @@ def test_link_class_with_alternative_language_tag(api):
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
 
 
+def test_link_class_with_transcoding(api):
+    api.language("kotlin", source="java")
+    result = api.link("com.asciidoxy.geometry.Coordinate")
+    assert result == "xref:kotlin-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate[Coordinate]"
+
+
+def test_link_class_with_transcoding__not_found_warning(api):
+    api.language("kotlin", source="java")
+    result = api.link("com.asciidoxy.world.Coordinate")
+    assert result == "com.asciidoxy.world.Coordinate"
+
+
+def test_link_class_with_transcoding__not_found_error(warnings_are_errors, api):
+    api.language("kotlin", source="java")
+    with pytest.raises(ReferenceNotFoundError):
+        api.link("com.asciidoxy.world.Coordinate")
+
+
 def test_link_class_not_found_warning(api):
     result = api.link("std::vector")
     assert result == "std::vector"
