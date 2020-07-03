@@ -13,23 +13,25 @@
 # limitations under the License.
 """Transcoding of API reference information from one language to another."""
 
-from typing import Mapping, Tuple
+from typing import Mapping, Tuple, Type
 
+from ..api_reference import ApiReference
 from ..model import Compound, Member, ReferableElement
 from .base import TranscoderBase, TranscoderError
 from .kotlin import KotlinTranscoder
 
-_transcoders: Mapping[Tuple[str, str], TranscoderBase] = {
-    (KotlinTranscoder.SOURCE, KotlinTranscoder.TARGET): KotlinTranscoder(),
+_transcoders: Mapping[Tuple[str, str], Type[TranscoderBase]] = {
+    (KotlinTranscoder.SOURCE, KotlinTranscoder.TARGET): KotlinTranscoder,
 }
 
 
-def transcode(element: ReferableElement, target: str) -> ReferableElement:
+def transcode(element: ReferableElement, target: str, reference: ApiReference) -> ReferableElement:
     """Transcode an element from its source language to another language.
 
     Args:
         element: Element to transcode.
         target:  Target language to transcode to.
+        reference: API reference to read and write transcoded elements from.
 
     Returns:
         Version of `element` for language `target`.
@@ -42,9 +44,9 @@ def transcode(element: ReferableElement, target: str) -> ReferableElement:
         raise TranscoderError(f"Transcoding from {element.language} to {target} is not supported.")
 
     if isinstance(element, Compound):
-        return transcoder.compound(element)
+        return transcoder(reference).compound(element)
     elif isinstance(element, Member):
-        return transcoder.member(element)
+        return transcoder(reference).member(element)
     else:
         assert False, "Invalid element to transcode."
         return element

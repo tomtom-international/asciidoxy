@@ -14,8 +14,9 @@
 """Base classes and functionality for transcoding."""
 
 from abc import ABC
-from typing import Optional, TypeVar
+from typing import Callable, Optional, TypeVar
 
+from ..api_reference import ApiReference
 from ..generator.errors import AsciiDocError
 from ..model import (Compound, EnumValue, InnerTypeReference, Member, Parameter, ReferableElement,
                      ReturnValue, ThrowsClause, TypeRef, TypeRefBase)
@@ -40,9 +41,15 @@ class TranscoderBase(ABC):
     SOURCE: str
     TARGET: str
 
-    def compound(self, compound: Compound) -> Compound:
-        # TODO update ApiReference
+    reference: ApiReference
 
+    def __init__(self, reference: ApiReference):
+        self.reference = reference
+
+    def compound(self, compound: Compound) -> Compound:
+        return self.find_or_transcode(compound, self._compound)
+
+    def _compound(self, compound: Compound) -> Compound:
         transcoded = self.referable_element(compound)
 
         transcoded.members = [self.member(m) for m in compound.members]
@@ -58,8 +65,9 @@ class TranscoderBase(ABC):
         return transcoded
 
     def member(self, member: Member) -> Member:
-        # TODO update ApiReference
+        return self.find_or_transcode(member, self._member)
 
+    def _member(self, member: Member) -> Member:
         transcoded = self.referable_element(member)
 
         transcoded.definition = member.definition
@@ -115,8 +123,9 @@ class TranscoderBase(ABC):
         return transcoded
 
     def enum_value(self, enum_value: EnumValue) -> EnumValue:
-        # TODO update ApiReference
+        return self.find_or_transcode(enum_value, self._enum_value)
 
+    def _enum_value(self, enum_value: EnumValue) -> EnumValue:
         transcoded = self.referable_element(enum_value)
 
         transcoded.initializer = enum_value.initializer
@@ -143,6 +152,21 @@ class TranscoderBase(ABC):
         return f"{self.TARGET}-{old_id}"
 
     ElementType = TypeVar("ElementType", bound=ReferableElement)
+
+    def find_or_transcode(self, element: ElementType,
+                          transcode_func: Callable[[ElementType], ElementType]) -> ElementType:
+        transcoded = self.reference.find(name=element.full_name,
+                                         kind=element.kind,
+                                         lang=self.TARGET,
+                                         target_id=self.convert_id(element.id))
+
+        if transcoded is None:
+            transcoded = transcode_func(element)
+            self.reference.append(transcoded)
+        else:
+            assert isinstance(transcoded, element.__class__)
+
+        return transcoded
 
     def referable_element(self, element: ElementType) -> ElementType:
         transcoded = element.__class__(self.TARGET)

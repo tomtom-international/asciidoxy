@@ -13,16 +13,24 @@
 # limitations under the License.
 """Test base functionality for transcoding."""
 
+import pytest
+
 from typing import List, Optional, Type
 
+from asciidoxy.api_reference import ApiReference
 from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Member, Parameter,
                              ReferableElement, ReturnValue, ThrowsClause, TypeRef, TypeRefBase)
 from asciidoxy.transcoder.base import TranscoderBase
 
 
-class TestTranscoder(TranscoderBase):
+class _TestTranscoder(TranscoderBase):
     SOURCE = "java"
     TARGET = "kotlin"
+
+
+@pytest.fixture
+def transcoder():
+    return _TestTranscoder(ApiReference())
 
 
 def make_referable(cls: Type[ReferableElement], lang: str, name: str) -> ReferableElement:
@@ -135,10 +143,10 @@ def make_return_value(type_ref: Optional[TypeRef] = None) -> ReturnValue:
     return value
 
 
-def test_transcode_compound__no_nested_elements():
+def test_transcode_compound__no_nested_elements(transcoder):
     compound = make_compound("java", "Coordinate")
 
-    transcoded = TestTranscoder().compound(compound)
+    transcoded = transcoder.compound(compound)
 
     assert transcoded.id == "kotlin-coordinate"
     assert transcoded.name == "Coordinate"
@@ -157,10 +165,10 @@ def test_transcode_compound__no_nested_elements():
     assert compound.language == "java"
 
 
-def test_transcode_compound__members():
+def test_transcode_compound__members(transcoder):
     compound = make_compound("java", "Coordinate", members=[make_member("java", "getLatitude")])
 
-    transcoded = TestTranscoder().compound(compound)
+    transcoded = transcoder.compound(compound)
 
     assert len(transcoded.members) == 1
     assert transcoded.members[0]
@@ -171,13 +179,13 @@ def test_transcode_compound__members():
     assert compound.members[0].language == "java"
 
 
-def test_transcode_compound__inner_classes():
+def test_transcode_compound__inner_classes(transcoder):
     compound = make_compound(
         "java",
         "Coordinate",
         inner_classes=[make_inner_type_ref("java", "Point", make_compound("java", "Point"))])
 
-    transcoded = TestTranscoder().compound(compound)
+    transcoded = transcoder.compound(compound)
 
     assert len(transcoded.inner_classes) == 1
     assert transcoded.inner_classes[0]
@@ -193,10 +201,10 @@ def test_transcode_compound__inner_classes():
     assert compound.inner_classes[0].referred_object.language == "java"
 
 
-def test_transcode_compound__enumvalues():
+def test_transcode_compound__enumvalues(transcoder):
     compound = make_compound("java", "Coordinate", enumvalues=[make_enum_value("java", "WGS84")])
 
-    transcoded = TestTranscoder().compound(compound)
+    transcoded = transcoder.compound(compound)
 
     assert len(transcoded.enumvalues) == 1
     assert transcoded.enumvalues[0]
@@ -207,10 +215,34 @@ def test_transcode_compound__enumvalues():
     assert compound.enumvalues[0].language == "java"
 
 
-def test_transcode_member__no_nested_elements():
+def test_transcode_compound__store_in_api_reference(transcoder):
+    compound = make_compound("java", "Coordinate")
+    transcoded = transcoder.compound(compound)
+    assert transcoder.reference.find(target_id=transcoded.id) is transcoded
+
+
+def test_transcode_compound__transcode_only_once(transcoder):
+    compound = make_compound("java", "Coordinate")
+    transcoded = transcoder.compound(compound)
+    transcoded2 = transcoder.compound(compound)
+    assert transcoded is transcoded2
+
+
+def test_transcode_compound__transcode_inner_class_only_once(transcoder):
+    inner_class = make_compound("java", "Point")
+    compound = make_compound("java",
+                             "Coordinate",
+                             inner_classes=[make_inner_type_ref("java", "Point", inner_class)])
+
+    transcoded_inner = transcoder.compound(inner_class)
+    transcoded = transcoder.compound(compound)
+    assert transcoded.inner_classes[0].referred_object is transcoded_inner
+
+
+def test_transcode_member__no_nested_elements(transcoder):
     member = make_member("java", "getLatitude")
 
-    transcoded = TestTranscoder().member(member)
+    transcoded = transcoder.member(member)
 
     assert transcoded.id == "kotlin-getlatitude"
     assert transcoded.name == "getLatitude"
@@ -235,14 +267,14 @@ def test_transcode_member__no_nested_elements():
     assert member.language == "java"
 
 
-def test_transcode_member__with_params():
+def test_transcode_member__with_params(transcoder):
     member = make_member(
         "java",
         "getLatitude",
         params=[make_parameter("arg1"),
                 make_parameter("arg2", make_type_ref("java", "double"))])
 
-    transcoded = TestTranscoder().member(member)
+    transcoded = transcoder.member(member)
 
     assert len(transcoded.params) == 2
     assert not transcoded.params[0].type
@@ -258,13 +290,13 @@ def test_transcode_member__with_params():
     assert member.params[1].type.language == "java"
 
 
-def test_transcode_member__with_exceptions():
+def test_transcode_member__with_exceptions(transcoder):
     member = make_member(
         "java",
         "getLatitude",
         exceptions=[make_throws_clause("java", make_type_ref("java", "RuntimeException"))])
 
-    transcoded = TestTranscoder().member(member)
+    transcoded = transcoder.member(member)
 
     assert len(transcoded.exceptions) == 1
     assert transcoded.exceptions[0].type
@@ -276,12 +308,12 @@ def test_transcode_member__with_exceptions():
     assert member.exceptions[0].type.language == "java"
 
 
-def test_transcode_member__with_return_value():
+def test_transcode_member__with_return_value(transcoder):
     member = make_member("java",
                          "getLatitude",
                          returns=make_return_value(make_type_ref("java", "boolean")))
 
-    transcoded = TestTranscoder().member(member)
+    transcoded = transcoder.member(member)
 
     assert transcoded.returns
     assert transcoded.returns.type
@@ -293,14 +325,14 @@ def test_transcode_member__with_return_value():
     assert member.returns.type.language == "java"
 
 
-def test_transcode_member__with_enum_values():
+def test_transcode_member__with_enum_values(transcoder):
     member = make_member(
         "java",
         "CoordinateType",
         enumvalues=[make_enum_value("java", "TypeA"),
                     make_enum_value("java", "TypeB")])
 
-    transcoded = TestTranscoder().member(member)
+    transcoded = transcoder.member(member)
 
     assert len(transcoded.enumvalues) == 2
     assert transcoded.enumvalues[0].id == "kotlin-typea"
@@ -314,10 +346,23 @@ def test_transcode_member__with_enum_values():
     assert member.enumvalues[1].language == "java"
 
 
-def test_transcode_type_ref__no_nested_elements():
+def test_transcode_member__store_in_api_reference(transcoder):
+    member = make_member("java", "getLatitude")
+    transcoded = transcoder.member(member)
+    assert transcoder.reference.find(target_id=transcoded.id) is transcoded
+
+
+def test_transcode_member__transcode_only_once(transcoder):
+    member = make_member("java", "getLatitude")
+    transcoded = transcoder.member(member)
+    transcoded2 = transcoder.member(member)
+    assert transcoded is transcoded2
+
+
+def test_transcode_type_ref__no_nested_elements(transcoder):
     type_ref = make_type_ref("java", "Coordinate")
 
-    transcoded = TestTranscoder().type_ref(type_ref)
+    transcoded = transcoder.type_ref(type_ref)
 
     assert transcoded is not type_ref
 
@@ -340,11 +385,11 @@ def test_transcode_type_ref__no_nested_elements():
     assert type_ref.suffix == " *"
 
 
-def test_transcode_type_ref__nested_types():
+def test_transcode_type_ref__nested_types(transcoder):
     type_ref = make_type_ref("java", "Coordinate")
     type_ref.nested = [make_type_ref("java", "Point"), make_type_ref("java", "System")]
 
-    transcoded = TestTranscoder().type_ref(type_ref)
+    transcoded = transcoder.type_ref(type_ref)
 
     assert transcoded is not type_ref
 
@@ -374,14 +419,14 @@ def test_transcode_type_ref__nested_types():
     assert type_ref.suffix == " *"
 
 
-def test_transcode_type_ref__args():
+def test_transcode_type_ref__args(transcoder):
     type_ref = make_type_ref("java", "Coordinate")
     type_ref.args = [
         make_parameter("arg1"),
         make_parameter("arg2", make_type_ref("java", "MyType")),
     ]
 
-    transcoded = TestTranscoder().type_ref(type_ref)
+    transcoded = transcoder.type_ref(type_ref)
 
     assert transcoded is not type_ref
 
@@ -404,20 +449,20 @@ def test_transcode_type_ref__args():
     assert type_ref.args[1].type.language == "java"
 
 
-def test_transcode_parameter__no_type():
+def test_transcode_parameter__no_type(transcoder):
     param = make_parameter("argument")
 
-    transcoded = TestTranscoder().parameter(param)
+    transcoded = transcoder.parameter(param)
 
     assert not transcoded.type
     assert transcoded.name == "argument"
     assert transcoded.description == "Description"
 
 
-def test_transcode_parameter__with_type():
+def test_transcode_parameter__with_type(transcoder):
     param = make_parameter("argument", make_type_ref("java", "MyType"))
 
-    transcoded = TestTranscoder().parameter(param)
+    transcoded = transcoder.parameter(param)
 
     assert transcoded.type
     assert transcoded.type.language == "kotlin"
@@ -428,22 +473,22 @@ def test_transcode_parameter__with_type():
     assert param.type.language == "java"
 
 
-def test_transcode_return_value__no_type():
+def test_transcode_return_value__no_type(transcoder):
     ret_val = ReturnValue()
     ret_val.description = "Description"
 
-    transcoded = TestTranscoder().return_value(ret_val)
+    transcoded = transcoder.return_value(ret_val)
 
     assert transcoded.type is None
     assert transcoded.description == "Description"
 
 
-def test_transcode_return_value__with_type():
+def test_transcode_return_value__with_type(transcoder):
     ret_val = ReturnValue()
     ret_val.description = "Description"
     ret_val.type = make_type_ref("java", "MyType")
 
-    transcoded = TestTranscoder().return_value(ret_val)
+    transcoded = transcoder.return_value(ret_val)
 
     assert transcoded.type
     assert transcoded.type.language == "kotlin"
@@ -453,12 +498,12 @@ def test_transcode_return_value__with_type():
     assert ret_val.type.language == "java"
 
 
-def test_transcode_throws_clause():
+def test_transcode_throws_clause(transcoder):
     ret_val = ThrowsClause("java")
     ret_val.description = "Description"
     ret_val.type = make_type_ref("java", "MyType")
 
-    transcoded = TestTranscoder().throws_clause(ret_val)
+    transcoded = transcoder.throws_clause(ret_val)
 
     assert transcoded.type
     assert transcoded.type.language == "kotlin"
@@ -468,10 +513,10 @@ def test_transcode_throws_clause():
     assert ret_val.type.language == "java"
 
 
-def test_transcode_enum_value():
+def test_transcode_enum_value(transcoder):
     enum_value = make_enum_value("java", "SomeValue")
 
-    transcoded = TestTranscoder().enum_value(enum_value)
+    transcoded = transcoder.enum_value(enum_value)
 
     assert transcoded.id == "kotlin-somevalue"
     assert transcoded.name == "SomeValue"
@@ -486,10 +531,23 @@ def test_transcode_enum_value():
     assert enum_value.language == "java"
 
 
-def test_transcode_inner_type_reference__empty():
+def test_transcode_enum_value__store_in_api_reference(transcoder):
+    enum_value = make_enum_value("java", "SomeValue")
+    transcoded = transcoder.enum_value(enum_value)
+    assert transcoder.reference.find(target_id=transcoded.id) is transcoded
+
+
+def test_transcode_enum_value__transcode_only_once(transcoder):
+    enum_value = make_enum_value("java", "SomeValue")
+    transcoded = transcoder.enum_value(enum_value)
+    transcoded2 = transcoder.enum_value(enum_value)
+    assert transcoded is transcoded2
+
+
+def test_transcode_inner_type_reference__empty(transcoder):
     ref = make_inner_type_ref("java", "Coordinate")
 
-    transcoded = TestTranscoder().inner_type_reference(ref)
+    transcoded = transcoder.inner_type_reference(ref)
     assert transcoded.language == "kotlin"
     assert transcoded.id == "kotlin-coordinate"
     assert transcoded.name == "Coordinate"
@@ -502,10 +560,10 @@ def test_transcode_inner_type_reference__empty():
     assert ref.namespace == "com.asciidoxy.geometry"
 
 
-def test_transcode_inner_type_reference__referred_object():
+def test_transcode_inner_type_reference__referred_object(transcoder):
     ref = make_inner_type_ref("java", "Coordinate", make_compound("java", "Coordinate"))
 
-    transcoded = TestTranscoder().inner_type_reference(ref)
+    transcoded = transcoder.inner_type_reference(ref)
 
     assert transcoded.referred_object
     assert transcoded.referred_object.id == "kotlin-coordinate"

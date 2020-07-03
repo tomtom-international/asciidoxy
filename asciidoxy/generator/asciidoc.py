@@ -118,7 +118,7 @@ class Api(object):
                                                    lang=self._context.source_language,
                                                    allow_overloads=allow_overloads)
                 if source_element is not None:
-                    return transcode(source_element, lang)
+                    return transcode(source_element, lang, self._context.reference)
 
             raise ReferenceNotFoundError(name, lang=lang, kind=kind)
         return element
