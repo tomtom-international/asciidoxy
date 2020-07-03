@@ -113,7 +113,8 @@ include::./source_code/objc/default/ADCoordinate.h[]
 
 === Output
 
-${api.insert("ADCoordinate", leveloffset="+3")}
+${api.insert("ADCoordinate", leveloffset="+3", lang="objc")}
+${api.insert("ADTrafficEvent", leveloffset="+3", lang="objc")}
 
 == Python class
 
@@ -138,3 +139,30 @@ include::./source_code/python/default/asciidoxy/geometry.py[]
 === Output
 
 ${api.insert("asciidoxy.geometry.Coordinate", leveloffset="+3")}
+
+== Swift transcoding from Objective C
+
+Insert a basic Objective C interface transcoded to Swift:
+
+[source,python]
+----
+${"""
+${language("swift", source="objc")}
+${api.insert("ADCoordinate", leveloffset="+3")}
+"""}
+----
+
+.Source code
+[%collapsible]
+====
+[source,objectivec]
+----
+include::./source_code/objc/default/ADCoordinate.h[]
+----
+====
+
+=== Output
+
+${api.language("swift", source="objc")}
+${api.insert("ADCoordinate", leveloffset="+3")}
+${api.insert("ADTrafficEvent", leveloffset="+3")}
