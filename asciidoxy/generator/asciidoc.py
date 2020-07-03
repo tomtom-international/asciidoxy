@@ -31,7 +31,7 @@ from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..doxygenparser import safe_language_tag
 from ..model import ReferableElement
-from ..transcoder import transcode
+from ..transcoder import TranscoderBase
 from .._version import __version__
 from .context import Context
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
@@ -118,7 +118,7 @@ class Api(object):
                                                    lang=self._context.source_language,
                                                    allow_overloads=allow_overloads)
                 if source_element is not None:
-                    return transcode(source_element, lang, self._context.reference)
+                    return TranscoderBase.transcode(source_element, lang, self._context.reference)
 
             raise ReferenceNotFoundError(name, lang=lang, kind=kind)
         return element

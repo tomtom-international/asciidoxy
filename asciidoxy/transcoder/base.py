@@ -13,8 +13,12 @@
 # limitations under the License.
 """Base classes and functionality for transcoding."""
 
+import importlib
+import os
+import pkgutil
+
 from abc import ABC
-from typing import Callable, Optional, TypeVar
+from typing import Callable, Mapping, Optional, Tuple, Type, TypeVar
 
 from ..api_reference import ApiReference
 from ..generator.errors import AsciiDocError
@@ -42,6 +46,62 @@ class TranscoderBase(ABC):
     TARGET: str
 
     reference: ApiReference
+
+    __transcoders: Optional[Mapping[Tuple[str, str], Type["TranscoderBase"]]] = None
+
+    @staticmethod
+    def instance(source: str, target: str, reference: ApiReference) -> "TranscoderBase":
+        """Create an instance of a transcoder to transcode from `source` to `target`.
+
+
+        Args:
+            source:    Language to transcode from.
+            target:    Language to transcode to.
+            reference: API reference to read and write transcoded elements from.
+
+        Returns:
+            An instance of the required transcoder.
+
+        Raises:
+            TranscoderError: Transcoding from `source` to `target` is not supported.
+        """
+        if TranscoderBase.__transcoders is None:
+            for _, name, _ in pkgutil.iter_modules([os.path.dirname(__file__)]):
+                importlib.import_module(f".{name}", __package__)
+
+            TranscoderBase.__transcoders = {(t.SOURCE, t.TARGET): t
+                                            for t in TranscoderBase.__subclasses__()}
+
+        transcoder = TranscoderBase.__transcoders.get((source, target), None)
+        if transcoder is None:
+            raise TranscoderError(f"Transcoding from {source} to {target} is not supported.")
+        return transcoder(reference)
+
+    @staticmethod
+    def transcode(element: ReferableElement, target: str,
+                  reference: ApiReference) -> ReferableElement:
+        """Transcode an element from its source language to another language.
+
+        Args:
+            element: Element to transcode.
+            target:  Target language to transcode to.
+            reference: API reference to read and write transcoded elements from.
+
+        Returns:
+            Version of `element` for language `target`.
+
+        Raises:
+            TranscoderError: Transcoding failed or is not supported.
+        """
+        transcoder = TranscoderBase.instance(element.language, target, reference)
+
+        if isinstance(element, Compound):
+            return transcoder.compound(element)
+        elif isinstance(element, Member):
+            return transcoder.member(element)
+        else:
+            assert False, "Invalid element to transcode."
+            return element
 
     def __init__(self, reference: ApiReference):
         self.reference = reference
