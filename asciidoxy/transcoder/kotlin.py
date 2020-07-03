@@ -14,8 +14,53 @@
 """Transcoding Java reference into Kotlin."""
 
 from .base import TranscoderBase
+from ..model import Member, Parameter
 
+_JAVA_TO_KOTLIN_TYPE_MAPPING = {
+    # Integral
+    "byte" : "Byte",
+    "Byte" : "Byte",
+    "short" : "Short",
+    "Short" : "Short",
+    "int" : "Int",
+    "Integer" : "Int",
+    "long" : "Long",
+    "Long" : "Long",
+    # Floating-point
+    "float" : "Float",
+    "Float" : "Float",    
+    "double" : "Double",
+    "Double" : "Double",
+    # Other
+    "boolean" : "Boolean",
+    "Boolean" : "Boolean",
+    "char" : "Char",
+    "Character" : "Char",
+}
+
+def _to_kotlin_type(typename: str):
+    if (typename in _JAVA_TO_KOTLIN_TYPE_MAPPING):
+        return _JAVA_TO_KOTLIN_TYPE_MAPPING[typename]
+    else:
+        return typename
 
 class KotlinTranscoder(TranscoderBase):
     SOURCE = "java"
     TARGET = "kotlin"
+
+    def parameter(self, parameter: Parameter) -> Parameter:
+        transcoded = super().parameter(parameter)
+
+        transcoded.type.name = _to_kotlin_type(parameter.type.name)
+        
+        return transcoded
+
+    def _member(self, member: Member) -> Member:
+        transcoded = super()._member(member)
+
+        if (transcoded.returns != None):
+            transcoded.returns.type.name = _to_kotlin_type(transcoded.returns.type.name)
+
+        return transcoded
+
+    

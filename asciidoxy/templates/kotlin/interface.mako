@@ -16,19 +16,17 @@
 <%!
 from asciidoxy.templates.helpers import has
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
-from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
 %>
 <%
-helper = KotlinTemplateHelper(api_context, element, insert_filter)
-java_helper = JavaTemplateHelper(api_context, element, insert_filter)
+helper = JavaTemplateHelper(api_context, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
 ${api_context.insert(element)}
 
-[source,kotlin,subs="-specialchars,macros+"]
+[source,java,subs="-specialchars,macros+"]
 ----
-class ${element.full_name}
+interface ${element.full_name}
 ----
 ${element.brief}
 
@@ -39,41 +37,21 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(helper.public_complex_enclosed_types()):
-|*Enclosed types*
-|
-% for enclosed in helper.public_complex_enclosed_types():
-`xref:${enclosed.id}[${enclosed.name}]`::
-${enclosed.brief}
-% endfor
-
-% endif
-###################################################################################################
 % if has(helper.public_constants()):
 |*Constants*
 |
 % for constant in helper.public_constants():
-`const val xref:${constant.id}[${constant.name}: ${constant.returns.type.name}]`::
+`xref:${constant.id}[${constant.returns.type.name} ${constant.name}]`::
 ${constant.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_constructors()):
-|*Constructors*
+% if has(helper.public_static_methods()):
+|*Static methods*
 |
-% for constructor in helper.public_constructors():
-`xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
-${constructor.brief}
-% endfor
-
-% endif
-###################################################################################################
-% if has(java_helper.public_static_methods()):
-|*Static Java methods*
-|
-% for method in java_helper.public_static_methods():
-`xref:${method.id}[static ${java_helper.print_ref(method.returns.type, link=False)} ${method.name}${java_helper.type_list(method.params)}]`::
+% for method in helper.public_static_methods():
+`xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -83,11 +61,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in helper.public_methods():
-% if method.returns and method.returns.type.name != 'void':
-`xref:${method.id}[${method.name}${helper.type_list(method.params)}: ${helper.print_ref(method.returns.type, link=False)}]`::
-% else:
-`xref:${method.id}[${method.name}${helper.type_list(method.params)}]`::
-% endif
+`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -99,9 +73,9 @@ ${method.brief}
 % for constant in helper.public_constants():
 [[${constant.id},${constant.name}]]
 ${api_context.insert(constant)}
-[source,kotlin,subs="-specialchars,macros+"]
+[source,java,subs="-specialchars,macros+"]
 ----
-const val ${constant.name}: ${constant.returns.type.name} 
+${constant.returns.type.name} ${constant.name}
 ----
 
 ${constant.brief}
@@ -110,94 +84,11 @@ ${constant.description}
 
 '''
 % endfor
-################################################################################### Constructors ##
-% for constructor in helper.public_constructors():
-[[${constructor.id},${constructor.name}]]
-${api_context.insert(constructor)}
-[source,kotlin,subs="-specialchars,macros+"]
-----
-${helper.method_signature(constructor)}
-----
-
-${constructor.brief}
-
-${constructor.description}
-
-% if constructor.params or constructor.exceptions:
-[cols='h,5a']
-|===
-% if constructor.params:
-| Parameters
-|
-% for param in constructor.params:
-`${helper.print_ref(param.type)} ${param.name}`::
-${param.description}
-
-% endfor
-% endif
-% if constructor.exceptions:
-| Throws
-|
-% for exception in constructor.exceptions:
-`${helper.print_ref(exception.type)}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
-'''
-% endfor
 ################################################################################# Static methods ##
-% for method in java_helper.public_static_methods():
+% for method in helper.public_static_methods():
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
-----
-${java_helper.method_signature(method)}
-----
-
-${method.brief}
-
-${method.description}
-
-% if method.params or method.exceptions or method.returns:
-[cols='h,5a']
-|===
-% if method.params:
-| Parameters
-|
-% for param in method.params:
-`${java_helper.print_ref(param.type)} ${param.name}`::
-${param.description}
-
-% endfor
-% endif
-% if method.returns and method.returns.type.name != "void":
-| Returns
-|
-`${java_helper.print_ref(method.returns.type)}`::
-${method.returns.description}
-
-% endif
-% if method.exceptions:
-| Throws
-|
-% for exception in method.exceptions:
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
-'''
-% endfor
-######################################################################################## Methods ##
-% for method in helper.public_methods():
-[[${method.id},${method.name}]]
-${api_context.insert(method)}
-[source,kotlin,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)}
 ----
@@ -213,7 +104,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${param.name}: ${helper.print_ref(param.type)}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -238,9 +129,48 @@ ${exception.description}
 % endif
 '''
 % endfor
+######################################################################################## Methods ##
+% for method in helper.public_methods():
+[[${method.id},${method.name}]]
+${api_context.insert(method)}
+[source,java,subs="-specialchars,macros+"]
+----
+${helper.method_signature(method)}
+----
 
-############################################################################# Inner/Nested types ##
+${method.brief}
 
-% for enclosed in helper.public_complex_enclosed_types():
-${api.insert_fragment(enclosed, insert_filter)}
+${method.description}
+
+% if method.params or method.exceptions or method.returns:
+[cols='h,5a']
+|===
+% if method.params:
+| Parameters
+|
+% for param in method.params:
+`${helper.print_ref(param.type)} ${param.name}`::
+${param.description}
+
+% endfor
+% endif
+% if method.returns and method.returns.type.name != "void":
+| Returns
+|
+`${helper.print_ref(method.returns.type)}`::
+${method.returns.description}
+
+% endif
+% if method.exceptions:
+| Throws
+|
+% for exception in method.exceptions:
+`${exception.type.name}`::
+${exception.description}
+
+% endfor
+%endif
+|===
+% endif
+'''
 % endfor
