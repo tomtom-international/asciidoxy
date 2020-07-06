@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= Examples
+= Objective C
 :notitle:
 :icons: font
 :doctype: book
@@ -39,13 +39,28 @@ https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = {doctitle}
 
-These are some examples of AsciiDoxy in action. They demonstrate documentation for source code used
-to test AsciiDoxy. The first example is the website you are looking at. It is completely generated
-using AsciiDoxy.
+This example shows documentation for an Objective C project. The documentation is generated using
+the following AsciiDoxy directives:
 
-${api.include("example-cpp.adoc", link_text="C{plus}{plus}", link_prefix=". ")}
-${api.include("example-java.adoc", link_text="Java", link_prefix=". ")}
-${api.include("example-objc.adoc", link_text="Objective C", link_prefix=". ")}
-${api.include("example-python.adoc", link_text="Python", link_prefix=". ")}
-${api.include("example-swift-transcoded.adoc", link_text="Swift transcoded from Objective C", link_prefix=". ")}
+[source,python]
+----
+${"""
+${api.language("objc")}
+${api.insert("ADCoordinate")}
+${api.insert("ADTrafficEvent")}
+"""}
+----
+
+.Source code for which the documentation is generated
+[%collapsible]
+====
+[source,objectivec]
+----
+include::./source_code/objc/default/ADCoordinate.h[]
+----
+====
+
+${api.language("objc")}
+${api.insert("ADCoordinate")}
+${api.insert("ADTrafficEvent")}
 
