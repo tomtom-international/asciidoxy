@@ -125,7 +125,7 @@ Doxygen on your source code, and then provide the path to the generated XML file
 is recommended to set at least the following non-default settings in your Doxyfile when generating
 the XML.
 
-==== C++
+==== {cpp}
 
 ----
 GENERATE_XML           = YES
@@ -137,6 +137,15 @@ GENERATE_XML           = YES
 GENERATE_XML           = YES
 JAVADOC_AUTOBRIEF      = YES
 OPTIMIZE_OUTPUT_JAVA   = YES
+----
+
+Doxygen removes all annotations. To trick Doxygen into passing annotations to AsciiDoxy, you need
+to transform them into a name that does not contain `@`. AsciiDoxy supports changing type prefixes
+like `+++__AT__Annotation__+++` back into `@Annotation`. For example to pass through all annotations with
+information about nullability, add the following to the Doxygen file:
+
+----
+FILTER_PATTERNS        = *.java="sed -E 's/@(Nullable|NonNull|CheckForNull|PossiblyNull)([[:space:]]+[[:alnum:]_])/__AT__\1__\2/g'"
 ----
 
 ==== Objective C
@@ -394,10 +403,10 @@ ${api.insert_function("MyNamespace::FreeFunction", lang="c++")}          # <6>
     for the headers in the API reference.
 <3> Insert API reference for the class named `com.tomtom.Class`. Elements of other types are
     ignored.
-<4> Insert API reference for the C++ element named `MyNamespace::FreeFunction`. Other languages are
+<4> Insert API reference for the {cpp} element named `MyNamespace::FreeFunction`. Other languages are
     ignored.
 <5> Insert API reference for the class named `MyNamespace::MyClass`. Alternative syntax.
-<6> Insert API reference for the C++ function named `MyNamespace::FreeFunction`. Alternative syntax.
+<6> Insert API reference for the {cpp} function named `MyNamespace::FreeFunction`. Alternative syntax.
 
 === Filtering what is inserted
 
@@ -580,11 +589,11 @@ ${api.link_class("MyNamespace::MyClass", lang="c++")}          # <6>
 """}
 ----
 <1> Link to any element called `MyNamespace::MyClass`.
-<2> Link to any C++ element called `MyNamespace::MyClass`. Other languages are ignored.
+<2> Link to any {cpp} element called `MyNamespace::MyClass`. Other languages are ignored.
 <3> Link to `com.tomtom.Class.Method` and use the fully qualified name for the link text.
 <4> Link to `MyNamespace::FreeFunction` and use "FreeFunction" for the link text.
 <5> Link to class `MyNamespace::MyClass`. Ignore other kinds of elements.
-<6> Link to C++ class `MyNamespace::MyClass`. Ignore other kinds of elements and languages.
+<6> Link to {cpp} class `MyNamespace::MyClass`. Ignore other kinds of elements and languages.
 
 === Including other AsciiDoc files
 
@@ -710,8 +719,8 @@ ${api.language("java")} # <3>
 ${api.language(None)}   # <4>
 """}
 ----
-<1> Set the default language to C{plus}{plus}.
-<2> Set the default language to C{plus}{plus}. Alternative language name.
+<1> Set the default language to {cpp}.
+<2> Set the default language to {cpp}. Alternative language name.
 <3> Set the default language to Java.
 <4> Remove the default language.
 
@@ -745,7 +754,7 @@ ${api.namespace(None)}                    # <3>
 """}
 ----
 <1> Search in the Java package `org.asciidoxy.parser`.
-<2> Search in the C++ namespace `asciidoxy::exmaple`.
+<2> Search in the {cpp} namespace `asciidoxy::exmaple`.
 <3> Only allow fully qualified names from now on.
 
 === Required version

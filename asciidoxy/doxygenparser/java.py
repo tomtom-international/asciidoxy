@@ -50,7 +50,7 @@ class JavaTraits(LanguageTraits):
 
     ALLOWED_PREFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
                         TokenCategory.WILDCARD, TokenCategory.WILDCARD_BOUNDS,
-                        TokenCategory.UNKNOWN)
+                        TokenCategory.UNKNOWN, TokenCategory.ANNOTATION)
     ALLOWED_SUFFIXES = TokenCategory.WHITESPACE,
     ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME,
 
@@ -94,6 +94,7 @@ class JavaTypeParser(TypeParser):
         tokens = [t for t in tokens if t.category != TokenCategory.INVALID]
         tokens = cls.mark_separate_wildcard_bounds(tokens)
         tokens = cls.detect_wildcards(tokens)
+        tokens = cls.detect_annotations(tokens)
         return tokens
 
     @staticmethod
@@ -126,6 +127,16 @@ class JavaTypeParser(TypeParser):
             [TokenCategory.WILDCARD_BOUNDS],
         ]):
             match[0].category = TokenCategory.WILDCARD
+        return tokens
+
+    @staticmethod
+    def detect_annotations(tokens: List[Token]) -> List[Token]:
+        for token in tokens:
+            if (token.category == TokenCategory.NAME and token.text
+                    and token.text.startswith("__AT__") and token.text.endswith("__")):
+                token.category = TokenCategory.ANNOTATION
+                token.text = f"@{token.text[6:-2]}"
+
         return tokens
 
 

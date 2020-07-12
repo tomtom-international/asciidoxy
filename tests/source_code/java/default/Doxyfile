@@ -38,3 +38,15 @@ JAVADOC_AUTOBRIEF      = YES
 
 OPTIMIZE_OUTPUT_JAVA   = YES
 
+# The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
+# basis. Doxygen will compare the file name with each pattern and apply the
+# filter if there is a match. The filters are a list of the form: pattern=filter
+# (like *.cpp=my_cpp_filter). See INPUT_FILTER for further information on how
+# filters are used. If the FILTER_PATTERNS tag is empty or if none of the
+# patterns match the file name, INPUT_FILTER is applied.
+#
+# Note that for custom extensions or not directly supported extensions you also
+# need to set EXTENSION_MAPPING for the extension otherwise the files are not
+# properly processed by doxygen.
+
+FILTER_PATTERNS        = *.java="sed -E 's/@(Nullable|NonNull|CheckForNull|PossiblyNull)([[:space:]]+[[:alnum:]_])/__AT__\1__\2/g'"

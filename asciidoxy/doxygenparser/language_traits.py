@@ -47,6 +47,7 @@ class TokenCategory(Enum):
                                  kind.
         BUILT_IN_NAME:       Type name that is built-in in the language.
         BLOCK:               Token indicating a block definition.
+        ANNOTATION:          Token indicating an annotation.
     """
     UNKNOWN = auto()
     WHITESPACE = auto()
@@ -67,6 +68,7 @@ class TokenCategory(Enum):
     SEPARATOR = auto()
     BUILT_IN_NAME = auto()
     BLOCK = auto()
+    ANNOTATION = auto()
 
 
 class LanguageTraits(ABC):

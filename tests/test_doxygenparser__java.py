@@ -114,3 +114,29 @@ def test_parse_java_method(api_reference):
     assert not member.returns.type.suffix
     assert not member.returns.type.nested
     assert member.returns.description == "True if the update is valid."
+
+
+@pytest.mark.parametrize("api_reference_set", [["java/default"]])
+def test_parse_java_method__with_return_type_annotation(api_reference):
+    member = api_reference.find("com.asciidoxy.Nullability.getData",
+                                kind="function",
+                                lang="java")
+
+    assert member is not None
+    assert member.returns
+    assert member.returns.type
+    assert member.returns.type.prefix == "@Nullable "
+    assert member.returns.type.name == "DataClass"
+
+
+@pytest.mark.parametrize("api_reference_set", [["java/default"]])
+def test_parse_java_method__with_parameter_type_annotation(api_reference):
+    member = api_reference.find("com.asciidoxy.Nullability.setData",
+                                kind="function",
+                                lang="java")
+
+    assert member is not None
+    assert len(member.params) == 1
+    assert member.params[0].type
+    assert member.params[0].type.prefix == "@Nullable "
+    assert member.params[0].type.name == "DataClass"

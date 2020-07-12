@@ -20,6 +20,13 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== Unreleased
+
+=== Added
+
+  - [AD-18] Basic support for Java type annotations.
+
+
 == 0.6.0 (26 Jun 2020)
 
 === Added
