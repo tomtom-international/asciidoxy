@@ -145,3 +145,23 @@ def test_local_filter(api, adoc_data, fragment_dir, element_name, language, filt
         (adoc_data / expected_result).write_text(content, encoding="UTF-8")
 
     assert content == (adoc_data / expected_result).read_text(encoding="UTF-8")
+
+
+@pytest.mark.parametrize("element_name,source,target,expected_result", [
+    ("ADTrafficEvent", "objc", "swift", "fragments/swift/transcoded_protocol.adoc"),
+    ("TrafficEventData.ADSeverity", "objc", "swift", "fragments/swift/transcoded_enum.adoc"),
+    ("ADCoordinate", "objc", "swift", "fragments/swift/transcoded_interface.adoc"),
+    ("OnTrafficEventCallback", "objc", "swift", "fragments/swift/transcoded_block.adoc"),
+    ("TpegCauseCode", "objc", "swift", "fragments/swift/transcoded_typedef.adoc"),
+])
+def test_transcoded_fragment(api, adoc_data, fragment_dir, element_name, source, target,
+                             expected_result, update_expected_results):
+    api.language(target, source=source)
+    result = api.insert(element_name)
+    content = _read_fragment(result)
+    content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
+
+    if update_expected_results:
+        (adoc_data / expected_result).write_text(content, encoding="UTF-8")
+
+    assert content == (adoc_data / expected_result).read_text(encoding="UTF-8")

@@ -1,0 +1,75 @@
+
+
+
+= [[swift-protocol_a_d_traffic_event-p,ADTrafficEvent]]ADTrafficEvent
+
+
+[source,swift,subs="-specialchars,macros+"]
+----
+protocol ADTrafficEvent
+----
+Information about a traffic event.
+
+
+
+[cols='h,5a']
+|===
+
+|*Properties*
+|
+`xref:swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b[data]`::
+Traffic event details.
+
+|*Methods*
+|
+`xref:swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262[updateWithCause]`::
+Update the traffic event data.
+
+|===
+
+
+== Members
+
+[[swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,data]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+var data: xref:swift-interface_traffic_event_data[TrafficEventData]
+----
+
+Traffic event details.
+
+
+
+'''
+[[swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,updateWithCause]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+func updateWithCause(cause: NSInteger,
+                     delay: NSInteger) -> id
+----
+
+Update the traffic event data.
+
+Verifies the new information before updating.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`cause: NSInteger`::
+New TPEG cause code.
+
+`delay: NSInteger`::
+New delay in seconds.
+
+| Returns
+|
+`id`::
+True if the update is valid.
+
+|===
+
+'''
+
