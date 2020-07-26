@@ -212,18 +212,6 @@ async def test_http_package_version_and_name_interpolation_in_file_names(aiohttp
 
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
-async def test_http_package_name_interpolation(aiohttp_server, tmp_path):
-    server = await start_server(aiohttp_server, web.get("/test/1.0.0/test", xml_file_response))
-
-    spec = HttpPackageSpec("test", "1.0.0",
-                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
-    spec.file_names = ["{name}"]
-
-    packages = await collect([spec], tmp_path)
-
-    assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
 async def test_local_package_xml_and_include(tmp_path):
     output_dir = tmp_path / "output"
@@ -325,6 +313,7 @@ async def test_progress_report(tmp_path):
     packages = await collect([spec, spec, spec], output_dir, progress=progress_mock)
     assert len(packages) == 3
     assert progress_mock.ready == 3
+
 
 def test_versions_from_file(tmp_path):
     version_file = tmp_path / "versions.csv"
