@@ -26,6 +26,7 @@ from asciidoxy.collect import (DownloadError, InvalidPackageError, HttpPackageSp
 
 from .shared import ProgressMock
 
+
 async def start_server(aiohttp_server, *routes):
     app = web.Application()
     app.add_routes(routes)
