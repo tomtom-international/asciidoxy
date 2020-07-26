@@ -26,7 +26,6 @@ from asciidoxy.collect import (DownloadError, InvalidPackageError, HttpPackageSp
 
 from .shared import ProgressMock
 
-
 async def start_server(aiohttp_server, *routes):
     app = web.Application()
     app.add_routes(routes)
@@ -174,6 +173,57 @@ async def test_http_package_not_a_tarfile(aiohttp_server, tmp_path):
     with pytest.raises(DownloadError):
         await collect([spec], tmp_path)
 
+async def test_http_package_name_interpolation_in_file_names(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/test", xml_file_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.xml_subdir = "xml"
+    spec.include_subdir = "adoc"
+    spec.file_names = ["{name}"]
+
+    packages = await collect([spec], tmp_path)
+
+    assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
+
+async def test_http_package_version_interpolation_in_file_names(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/documentation-1.0.0", xml_file_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.xml_subdir = "xml"
+    spec.include_subdir = "adoc"
+    spec.file_names = ["documentation-{version}"]
+
+    packages = await collect([spec], tmp_path)
+
+    assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
+
+async def test_http_package_version_and_name_interpolation_in_file_names(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/test-1.0.0", xml_file_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.xml_subdir = "xml"
+    spec.include_subdir = "adoc"
+    spec.file_names = ["{name}-{version}"]
+
+    packages = await collect([spec], tmp_path)
+
+    assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
+
+async def test_http_package_name_interpolation(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/test", xml_file_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.xml_subdir = "xml"
+    spec.include_subdir = "adoc"
+    spec.file_names = ["{name}"]
+
+    packages = await collect([spec], tmp_path)
+
+    assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
 async def test_local_package_xml_and_include(tmp_path):
     output_dir = tmp_path / "output"
@@ -275,7 +325,6 @@ async def test_progress_report(tmp_path):
     packages = await collect([spec, spec, spec], output_dir, progress=progress_mock)
     assert len(packages) == 3
     assert progress_mock.ready == 3
-
 
 def test_versions_from_file(tmp_path):
     version_file = tmp_path / "versions.csv"
@@ -682,3 +731,37 @@ version = "1.0.0"
 
     with pytest.raises(SpecificationError):
         specs_from_file(spec_file)
+
+def test_specs_from_file__name_and_version_interpolation(tmp_path):
+    spec_file = tmp_path / "spec.toml"
+    spec_file.write_text("""
+[sources]
+
+[sources.http]
+type = "http"
+xml_subdir = "xml"
+include_subdir = "include"
+url_template = "https://example.com/{version}"
+file_names = [ "{name}-{version}.tar.gz" ]
+
+
+[packages]
+
+[packages.test]
+source = "http"
+xml_subdir = "xml"
+include_subdir = "adoc"
+version = "1.0.0"
+""")
+
+    specs = specs_from_file(spec_file)
+    assert len(specs) == 1
+
+    spec = specs[0]
+    assert spec.name == "test"
+    assert isinstance(spec, HttpPackageSpec)
+    assert spec.xml_subdir == "xml"
+    assert spec.include_subdir == "adoc"
+    assert spec.url_template == "https://example.com/{version}"
+    assert spec.file_names == ["{name}-{version}.tar.gz"]
+    assert spec.version == "1.0.0"
