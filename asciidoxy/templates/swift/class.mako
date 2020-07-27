@@ -37,10 +37,10 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(helper.public_simple_enclosed_types()):
+% if has(helper.public_simple_enclosed_types()) or has(helper.public_complex_enclosed_types()):
 |*Enclosed types*
 |
-% for enclosed in helper.public_simple_enclosed_types():
+% for enclosed in chain(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types()):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
@@ -67,10 +67,10 @@ ${prop.brief}
 
 % endif
 ###################################################################################################
-% if has(helper.public_class_methods()):
-|*Class methods*
+% if has(helper.public_type_methods()):
+|*Type methods*
 |
-% for method in helper.public_class_methods():
+% for method in helper.public_type_methods():
 `xref:${method.id}[${method.name}]`::
 ${method.brief}
 % endfor
@@ -149,8 +149,8 @@ ${prop.description}
 
 '''
 % endfor
-################################################################################## Class methods ##
-% for method in helper.public_class_methods():
+################################################################################### Type methods ##
+% for method in helper.public_type_methods():
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,swift,subs="-specialchars,macros+"]
@@ -240,4 +240,10 @@ ${exception.description}
 % endif
 
 '''
+% endfor
+
+############################################################################# Inner/Nested types ##
+
+% for enclosed in helper.public_complex_enclosed_types():
+${api.insert_fragment(enclosed, insert_filter)}
 % endfor

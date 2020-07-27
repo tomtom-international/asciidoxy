@@ -23,8 +23,6 @@ class SwiftTemplateHelper(TemplateHelper):
     def type_and_name(self, param: Parameter, *, link: bool = True) -> str:
         if param.type is None or not param.type.name:
             return param.name
-        if param.type.name in ("self", "cls"):
-            return param.type.name
         return (f"{param.name}: {self.print_ref(param.type, link=link)}".strip())
 
     def _method_prefix(self, method: Member, *, link: bool = True) -> str:
@@ -46,15 +44,7 @@ class SwiftTemplateHelper(TemplateHelper):
         return (f"typedef {self.print_ref(block.returns.type, skip_args=True)}(^{block_name})"
                 f" {self.argument_list(block.returns.type.args)}")
 
-    def public_simple_enclosed_types(self) -> Iterator[Member]:
-        assert self.element is not None
-        assert self.insert_filter is not None
-
-        # For some reason enclosed types are always set to private, so ignore visibility
-        return (m for m in self.insert_filter.members(self.element)
-                if m.kind in ["enum", "class", "protocol"])
-
-    def public_class_methods(self) -> Iterator[Member]:
+    def public_type_methods(self) -> Iterator[Member]:
         return self.public_static_methods()
 
     def public_constructors(self) -> Iterator[Member]:
