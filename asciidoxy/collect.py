@@ -247,11 +247,10 @@ class HttpPackageSpec(PackageSpec):
         for file_name in self.file_names:
             if "{version}" in file_name and "{name}" in file_name:
                 file_name = file_name.format(name=self.name, version=self.version)
-            else:
-                if "{version}" in file_name:
-                    file_name = file_name.format(version=self.version)
-                if "{name}" in file_name:
-                    file_name = file_name.format(name=self.name)
+            elif "{version}" in file_name:
+                file_name = file_name.format(version=self.version)
+            elif "{name}" in file_name:
+                file_name = file_name.format(name=self.name)
             url = self.url_template.format(name=self.name,
                                            version=self.version,
                                            file_name=file_name)
