@@ -11,6 +11,7 @@
 std::shared_ptr&lt;xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]&gt; SharedData()
 ----
 
+
 Get a shared pointer to a copy of the data.
 
 Not sure why you want this.

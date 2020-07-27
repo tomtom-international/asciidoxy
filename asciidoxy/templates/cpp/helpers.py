@@ -13,37 +13,15 @@
 # limitations under the License.
 """Helper functions for C++ templates."""
 
-from asciidoxy.generator.filters import InsertionFilter
+from typing import Iterator
+
+from asciidoxy.model import Member
+from asciidoxy.templates.helpers import TemplateHelper
 
 
-def public_static_methods(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if (m.kind == "function" and m.returns and not m.name.startswith("operator")
-                and m.prot == "public" and m.static))
+class CppTemplateHelper(TemplateHelper):
+    def public_static_methods(self) -> Iterator[Member]:
+        return (m for m in super().public_static_methods() if not m.name.startswith("operator"))
 
-
-def public_methods(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if (m.kind == "function" and m.returns and not m.name.startswith("operator")
-                and m.prot == "public" and not m.static))
-
-
-def public_constructors(element, insert_filter: InsertionFilter):
-    constructor_name = element.name
-    return (m for m in insert_filter.members(element)
-            if m.kind == "function" and m.name == constructor_name and m.prot == "public")
-
-
-def public_simple_enclosed_types(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if m.prot in ("public", "protected", None) and m.kind in ["enum", "typedef"])
-
-
-def public_complex_enclosed_types(element, insert_filter: InsertionFilter):
-    return (m.referred_object for m in insert_filter.inner_classes(element)
-            if m.referred_object is not None)
-
-
-def public_variables(element, insert_filter: InsertionFilter):
-    return (m for m in insert_filter.members(element)
-            if m.kind == "variable" and m.prot == "public")
+    def public_methods(self) -> Iterator[Member]:
+        return (m for m in super().public_methods() if not m.name.startswith("operator"))

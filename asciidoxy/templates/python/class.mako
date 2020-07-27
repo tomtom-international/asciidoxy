@@ -14,9 +14,11 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, print_ref, has, type_and_name, chain)
-from asciidoxy.templates.python.helpers import (public_static_methods, public_methods,
-public_constructors, public_variables, public_enclosed_types)
+from asciidoxy.templates.helpers import has, chain
+from asciidoxy.templates.python.helpers import PythonTemplateHelper
+%>
+<%
+helper = PythonTemplateHelper(api_context, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
@@ -35,49 +37,49 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(public_enclosed_types(element, insert_filter)):
+% if has(helper.public_complex_enclosed_types()):
 |*Enclosed types*
 |
-% for enclosed in public_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_complex_enclosed_types():
 `xref:${enclosed.id}[+++${enclosed.name}+++]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constructors(element, insert_filter)):
+% if has(helper.public_constructors()):
 |*Constructors*
 |
-% for constructor in public_constructors(element, insert_filter):
+% for constructor in helper.public_constructors():
 `xref:${constructor.id}[+++${constructor.name}+++]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_variables(element, insert_filter)):
+% if has(helper.public_variables()):
 |*Variables*
 |
-% for variable in public_variables(element, insert_filter):
+% for variable in helper.public_variables():
 `xref:${variable.id}[+++${variable.name}+++]`::
 ${variable.brief}
 % endfor
 % endif
 ###################################################################################################
-% if has(public_static_methods(element, insert_filter)):
+% if has(helper.public_static_methods()):
 |*Static methods*
 |
-% for method in public_static_methods(element, insert_filter):
+% for method in helper.public_static_methods():
 `xref:${method.id}[+++${method.name}+++]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_methods(element, insert_filter)):
+% if has(helper.public_methods()):
 |*Methods*
 |
-% for method in public_methods(element, insert_filter):
+% for method in helper.public_methods():
 `xref:${method.id}[+++${method.name}+++]`::
 ${method.brief}
 % endfor
@@ -88,19 +90,19 @@ ${method.brief}
 == Members
 
 ################################################################################### Constructors ##
-% for constructor in public_constructors(element, insert_filter):
+% for constructor in helper.public_constructors():
 ${api.insert_fragment(constructor, insert_filter)}
 '''
 % endfor
 ###################################################################################### Variables ##
-% for variable in public_variables(element, insert_filter):
+% for variable in helper.public_variables():
 [[${variable.id},${variable.name}]]
 ${api_context.insert(variable)}
 
 [source,python,subs="-specialchars,macros+"]
 ----
 % if variable.returns is not None:
-${variable.name}: ${link_from_ref(variable.returns.type, api_context, '[', ']')}
+${variable.name}: ${helper.print_ref(variable.returns.type)}
 % else:
 ${variable.name}
 % endif
@@ -113,19 +115,19 @@ ${variable.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in public_static_methods(element, insert_filter):
+% for method in helper.public_static_methods():
 ${api.insert_fragment(method, insert_filter)}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in public_methods(element, insert_filter):
+% for method in helper.public_methods():
 ${api.insert_fragment(method, insert_filter)}
 '''
 % endfor
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in public_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_complex_enclosed_types():
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 

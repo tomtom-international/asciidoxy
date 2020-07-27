@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, method_signature)
+from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 %>
 
 = [[${element.id},${element.full_name}]]${element.name}
@@ -25,6 +25,6 @@ ${api_context.insert(element)}
 #include &lt;${element.include}&gt;
 
 % endif
-${method_signature(element, api_context)}
+${CppTemplateHelper(api_context).method_signature(element)}
 ----
 <%include file="/cpp/_function.mako"/>

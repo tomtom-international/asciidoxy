@@ -12,16 +12,18 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, has)
-from asciidoxy.templates.python.helpers import (type_and_name, method_signature, params)
+from asciidoxy.templates.helpers import has
+from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
 %>
-
+<%
+helper = PythonTemplateHelper(api_context)
+%>
 = [[${element.id},${element.name}]]
 ${api_context.insert(element)}
 
 [source,python,subs="-specialchars,macros+"]
 ----
-${method_signature(element, api_context)}
+${helper.method_signature(element)}
 ----
 
 ${element.brief}
@@ -35,7 +37,7 @@ ${element.description}
 | Parameters
 |
 % for param in params(element):
-`${type_and_name(param, api_context)}`::
+`${helper.type_and_name(param)}`::
 ${param.description}
 
 % endfor
@@ -43,7 +45,7 @@ ${param.description}
 % if element.returns and element.returns.type.name != "None":
 | Returns
 |
-`${link_from_ref(element.returns.type, api_context, '[', ']')}`::
+`${helper.print_ref(element.returns.type)}`::
 ${element.returns.description}
 
 % endif

@@ -10,8 +10,16 @@
     <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a7da297a2e2933bb44990d2e61a22f4cd" kind="function"><name>Altitude</name></member>
     <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1aa2c0aedf89e6586b74745b58e166eba7" kind="function"><name>IsValid</name></member>
   </compound>
+  <compound refid="classcom_1_1asciidoxy_1_1_nullability_1_1_data_class" kind="class"><name>com::asciidoxy::Nullability::DataClass</name>
+  </compound>
   <compound refid="class_logger" kind="class"><name>Logger</name>
     <member refid="class_logger_1ab09f580b42942fa55f3e50997bd98047" kind="function"><name>Log</name></member>
+  </compound>
+  <compound refid="classcom_1_1asciidoxy_1_1_nullability" kind="class"><name>com::asciidoxy::Nullability</name>
+    <member refid="classcom_1_1asciidoxy_1_1_nullability_1a0a549d793bf1081019cd4e6327850683" kind="function"><name>getData</name></member>
+    <member refid="classcom_1_1asciidoxy_1_1_nullability_1aa427cd90202fad337f52469a8e1de05b" kind="function"><name>getDataNonNull</name></member>
+    <member refid="classcom_1_1asciidoxy_1_1_nullability_1a59b5e671b4bae939d78a6d4b7e5ac702" kind="function"><name>setData</name></member>
+    <member refid="classcom_1_1asciidoxy_1_1_nullability_1aa730df21d38a8fd682de682c5a14ad0a" kind="function"><name>setDataNonNull</name></member>
   </compound>
   <compound refid="interfacecom_1_1asciidoxy_1_1system_1_1_service" kind="interface"><name>com::asciidoxy::system::Service</name>
     <member refid="interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c" kind="function"><name>Start</name></member>
@@ -47,6 +55,8 @@
   <compound refid="_coordinate_8java" kind="file"><name>Coordinate.java</name>
   </compound>
   <compound refid="_logger_8java" kind="file"><name>Logger.java</name>
+  </compound>
+  <compound refid="_nullability_8java" kind="file"><name>Nullability.java</name>
   </compound>
   <compound refid="_service_8java" kind="file"><name>Service.java</name>
   </compound>

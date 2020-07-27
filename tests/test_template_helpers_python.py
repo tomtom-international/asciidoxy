@@ -17,9 +17,7 @@ import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Member, Parameter, ReturnValue, TypeRef, InnerTypeReference
-from asciidoxy.templates.python.helpers import (params, public_static_methods, public_methods,
-                                                public_constructors, public_enclosed_types,
-                                                public_variables, method_signature)
+from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
 
 
 @pytest.fixture
@@ -44,6 +42,7 @@ def python_class():
         member_variable = Member("python")
         member_variable.kind = "variable"
         member_variable.name = name
+        member_variable.prot = "public"
         member_variable.returns = ReturnValue()
         member_variable.returns.type = TypeRef("python")
         return member_variable
@@ -160,83 +159,93 @@ def test_params__no_type():
     assert list(params(member)) == [param1, param2]
 
 
-def test_public_static_methods__no_filter(python_class):
-    result = list(m.name for m in public_static_methods(python_class, InsertionFilter()))
+@pytest.fixture
+def helper(empty_context, python_class):
+    return PythonTemplateHelper(empty_context, python_class, InsertionFilter())
+
+
+def test_public_static_methods__no_filter(helper):
+    result = list(m.name for m in helper.public_static_methods())
     assert sorted(result) == sorted(["public_static_method"])
 
 
-def test_public_static_methods__filter_match(python_class):
-    result = list(m.name
-                  for m in public_static_methods(python_class, InsertionFilter(members="ALL")))
+def test_public_static_methods__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="ALL")
+    result = list(m.name for m in helper.public_static_methods())
     assert sorted(result) == sorted(["public_static_method"])
 
 
-def test_public_static_methods__filter_no_match(python_class):
-    result = list(m.name
-                  for m in public_static_methods(python_class, InsertionFilter(members="NONE")))
+def test_public_static_methods__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = list(m.name for m in helper.public_static_methods())
     assert not result
 
 
-def test_public_methods__no_filter(python_class):
-    result = list(m.name for m in public_methods(python_class, InsertionFilter()))
+def test_public_methods__no_filter(helper):
+    result = list(m.name for m in helper.public_methods())
     assert sorted(result) == sorted(["public_method"])
 
 
-def test_public_methods__filter_match(python_class):
-    result = list(m.name for m in public_methods(python_class, InsertionFilter(members="ALL")))
+def test_public_methods__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="ALL")
+    result = list(m.name for m in helper.public_methods())
     assert sorted(result) == sorted(["public_method"])
 
 
-def test_public_methods__filter_no_match(python_class):
-    result = list(m.name for m in public_methods(python_class, InsertionFilter(members="NONE")))
+def test_public_methods__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = list(m.name for m in helper.public_methods())
     assert not result
 
 
-def test_public_constructors__no_filter(python_class):
-    result = list(m.name for m in public_constructors(python_class, InsertionFilter()))
+def test_public_constructors__no_filter(helper):
+    result = list(m.name for m in helper.public_constructors())
     assert sorted(result) == sorted(["__init__"])
 
 
-def test_public_constructors__filter_match(python_class):
-    result = list(m.name for m in public_constructors(python_class, InsertionFilter(members="ALL")))
+def test_public_constructors__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="ALL")
+    result = list(m.name for m in helper.public_constructors())
     assert sorted(result) == sorted(["__init__"])
 
 
-def test_public_constructors__filter_no_match(python_class):
-    result = list(m.name
-                  for m in public_constructors(python_class, InsertionFilter(members="NONE")))
+def test_public_constructors__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = list(m.name for m in helper.public_constructors())
     assert not result
 
 
-def test_public_enclosed_types__no_filter(python_class):
-    result = list(m.name for m in public_enclosed_types(python_class, InsertionFilter()))
+def test_public_enclosed_types__no_filter(helper):
+    result = list(m.name for m in helper.public_complex_enclosed_types())
     assert sorted(result) == sorted(["NestedClass"])
 
 
-def test_public_enclosed_types__filter_match(python_class):
-    result = list(
-        m.name for m in public_enclosed_types(python_class, InsertionFilter(inner_classes="ALL")))
+def test_public_enclosed_types__filter_match(helper):
+    helper.insert_filter = InsertionFilter(inner_classes="ALL")
+    result = list(m.name for m in helper.public_complex_enclosed_types())
     assert sorted(result) == sorted(["NestedClass"])
 
 
-def test_public_enclosed_types__filter_no_match(python_class):
-    result = list(
-        m.name for m in public_enclosed_types(python_class, InsertionFilter(inner_classes="NONE")))
+def test_public_enclosed_types__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(inner_classes="NONE")
+    result = list(m.name for m in helper.public_complex_enclosed_types())
     assert not result
 
 
-def test_public_variables__no_filter(python_class):
-    result = list(m.name for m in public_variables(python_class, InsertionFilter()))
+def test_public_variables__no_filter(helper):
+    result = list(m.name for m in helper.public_variables())
     assert sorted(result) == sorted(["public_variable"])
 
 
-def test_public_variables__filter_match(python_class):
-    result = list(m.name for m in public_variables(python_class, InsertionFilter(members="ALL")))
+def test_public_variables__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="ALL")
+    result = list(m.name for m in helper.public_variables())
     assert sorted(result) == sorted(["public_variable"])
 
 
-def test_public_variables__filter_no_match(python_class):
-    result = list(m.name for m in public_variables(python_class, InsertionFilter(members="NONE")))
+def test_public_variables__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = list(m.name for m in helper.public_variables())
     assert not result
 
 
@@ -247,7 +256,8 @@ def test_method_signature__no_params(empty_context):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("python", "None")
 
-    assert method_signature(method, empty_context) == "def ShortMethod() -> None"
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.method_signature(method) == "def ShortMethod() -> None"
 
 
 def test_method_signature__single_param(empty_context):
@@ -261,7 +271,8 @@ def test_method_signature__single_param(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    assert method_signature(method, empty_context) == "def ShortMethod(value: int) -> int"
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.method_signature(method) == "def ShortMethod(value: int) -> int"
 
 
 def test_method_signature__single_param__too_wide(empty_context):
@@ -275,7 +286,8 @@ def test_method_signature__single_param__too_wide(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    assert (method_signature(method, empty_context, max_width=20) == """\
+    helper = PythonTemplateHelper(empty_context)
+    assert (helper.method_signature(method, max_width=20) == """\
 def ShortMethod(
     value: int) -> str""")
 
@@ -295,7 +307,8 @@ def test_method_signature__multiple_params(empty_context):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("python", "str")
 
-    assert (method_signature(method, empty_context) == """\
+    helper = PythonTemplateHelper(empty_context)
+    assert (helper.method_signature(method) == """\
 def ShortMethod(value: int,
                 other_value: float,
                 text: str) -> None""")
@@ -316,7 +329,8 @@ def test_method_signature__multiple_params__first_param_too_wide(empty_context):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("python", "str")
 
-    assert (method_signature(method, empty_context, max_width=20) == """\
+    helper = PythonTemplateHelper(empty_context)
+    assert (helper.method_signature(method, max_width=20) == """\
 def ShortMethod(
     value: int,
     other_value: float,
@@ -338,7 +352,8 @@ def test_method_signature__multiple_params__last_param_too_wide(empty_context):
     method.params[2].name = "text" * 10
     method.params[2].type = TypeRef("python", "str")
 
-    assert (method_signature(method, empty_context, max_width=40) == f"""\
+    helper = PythonTemplateHelper(empty_context)
+    assert (helper.method_signature(method, max_width=40) == f"""\
 def ShortMethod(
     value: int,
     other_value: float,
@@ -357,8 +372,9 @@ def test_method_signature__ignore_return_type_xref_length(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    assert (method_signature(
-        method, empty_context) == f"def ShortMethod(value: int) -> xref:{'ab' * 80}[Type]")
+    helper = PythonTemplateHelper(empty_context)
+    assert (
+        helper.method_signature(method) == f"def ShortMethod(value: int) -> xref:{'ab' * 80}[Type]")
 
 
 def test_method_signature__ignore_param_type_xref_length(empty_context):
@@ -373,5 +389,6 @@ def test_method_signature__ignore_param_type_xref_length(empty_context):
     method.params[0].type = TypeRef("python", "int")
     method.params[0].type.id = "ab" * 80
 
-    assert (method_signature(
-        method, empty_context) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")
+    helper = PythonTemplateHelper(empty_context)
+    assert (
+        helper.method_signature(method) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")

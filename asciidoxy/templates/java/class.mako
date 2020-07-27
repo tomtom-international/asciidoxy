@@ -14,9 +14,11 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, print_ref, type_list, has, method_signature)
-from asciidoxy.templates.java.helpers import (public_methods, public_static_methods,
-public_constructors, public_constants, public_complex_enclosed_types)
+from asciidoxy.templates.helpers import has
+from asciidoxy.templates.java.helpers import JavaTemplateHelper
+%>
+<%
+helper = JavaTemplateHelper(api_context, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
@@ -35,51 +37,51 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(public_complex_enclosed_types(element, insert_filter)):
+% if has(helper.public_complex_enclosed_types()):
 |*Enclosed types*
 |
-% for enclosed in public_complex_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_complex_enclosed_types():
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constructors(element, insert_filter)):
+% if has(helper.public_constants()):
+|*Constants*
+|
+% for constant in helper.public_constants():
+`xref:${constant.id}[${constant.returns.type.name} ${constant.name}]`::
+${constant.brief}
+% endfor
+
+% endif
+###################################################################################################
+% if has(helper.public_constructors()):
 |*Constructors*
 |
-% for constructor in public_constructors(element, insert_filter):
-`xref:${constructor.id}[${constructor.name}${type_list(constructor.params)}]`::
+% for constructor in helper.public_constructors():
+`xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constants(element, insert_filter)):
-|*Constants*
-|
-% for constant in public_constants(element, insert_filter):
-`${constant.name}`::
-${constant.description}
-% endfor
-
-% endif
-###################################################################################################
-% if has(public_static_methods(element, insert_filter)):
+% if has(helper.public_static_methods()):
 |*Static methods*
 |
-% for method in public_static_methods(element, insert_filter):
-`xref:${method.id}[static ${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
+% for method in helper.public_static_methods():
+`xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_methods(element, insert_filter)):
+% if has(helper.public_methods()):
 |*Methods*
 |
-% for method in public_methods(element, insert_filter):
-`xref:${method.id}[${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
+% for method in helper.public_methods():
+`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -87,13 +89,28 @@ ${method.brief}
 |===
 
 == Members
+###################################################################################### Constants ##
+% for constant in helper.public_constants():
+[[${constant.id},${constant.name}]]
+${api_context.insert(constant)}
+[source,java,subs="-specialchars,macros+"]
+----
+${constant.returns.type.name} ${constant.name}
+----
+
+${constant.brief}
+
+${constant.description}
+
+'''
+% endfor
 ################################################################################### Constructors ##
-% for constructor in public_constructors(element, insert_filter):
+% for constructor in helper.public_constructors():
 [[${constructor.id},${constructor.name}]]
 ${api_context.insert(constructor)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${method_signature(constructor, api_context)}
+${helper.method_signature(constructor)}
 ----
 
 ${constructor.brief}
@@ -107,7 +124,7 @@ ${constructor.description}
 | Parameters
 |
 % for param in constructor.params:
-`${link_from_ref(param.type, api_context)} ${param.name}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -116,7 +133,7 @@ ${param.description}
 | Throws
 |
 % for exception in constructor.exceptions:
-`${link_from_ref(exception.type, api_context)}`::
+`${helper.print_ref(exception.type)}`::
 ${exception.description}
 
 % endfor
@@ -126,12 +143,12 @@ ${exception.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in public_static_methods(element, insert_filter):
+% for method in helper.public_static_methods():
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${method_signature(method, api_context)}
+${helper.method_signature(method)}
 ----
 
 ${method.brief}
@@ -145,7 +162,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${link_from_ref(param.type, api_context)} ${param.name}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -153,7 +170,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif
@@ -171,12 +188,12 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in public_methods(element, insert_filter):
+% for method in helper.public_methods():
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${method_signature(method, api_context)}
+${helper.method_signature(method)}
 ----
 
 ${method.brief}
@@ -190,7 +207,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${link_from_ref(param.type, api_context)} ${param.name}`::
+`${helper.print_ref(param.type)} ${param.name}`::
 ${param.description}
 
 % endfor
@@ -198,7 +215,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif
@@ -218,6 +235,6 @@ ${exception.description}
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in public_complex_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_complex_enclosed_types():
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor

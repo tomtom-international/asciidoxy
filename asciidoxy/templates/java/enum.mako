@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.java.helpers import (enums)
+from asciidoxy.templates.java.helpers import JavaTemplateHelper
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
@@ -37,7 +37,7 @@ ${element.description}
 [cols='h,5a']
 |===
 
-% for enum in enums(element, insert_filter):
+% for enum in JavaTemplateHelper(api_context, element, insert_filter).public_variables():
 ${api_context.insert(enum)}
 |
 [[${enum.id},${enum.name}]]${enum.name}

@@ -2,9 +2,6 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
   <compounddef id="traffic_8py" kind="file" language="Python">
     <compoundname>traffic.py</compoundname>
-    <innerclass refid="classasciidoxy_1_1traffic_1_1_traffic_event" prot="public">asciidoxy::traffic::TrafficEvent</innerclass>
-    <innerclass refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" prot="public">asciidoxy::traffic::TrafficEvent::Severity</innerclass>
-    <innerclass refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" prot="public">asciidoxy::traffic::TrafficEvent::TrafficEventData</innerclass>
     <innernamespace refid="namespaceasciidoxy_1_1traffic">asciidoxy::traffic</innernamespace>
     <briefdescription>
     </briefdescription>
@@ -29,14 +26,14 @@
 <codeline lineno="16"><highlight class="normal"></highlight></codeline>
 <codeline lineno="17"><highlight class="normal"></highlight></codeline>
 <codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">TrafficEvent:</highlight></codeline>
-<codeline lineno="19" refid="classasciidoxy_1_1traffic_1_1_traffic_event" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Information<sp/>about<sp/>a<sp/>traffic<sp/>event.&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Information<sp/>about<sp/>a<sp/>traffic<sp/>event.&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/>_data:<sp/></highlight><highlight class="stringliteral">&quot;TrafficEvent.TrafficEventData&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="21"><highlight class="normal"></highlight></codeline>
-<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kindref="compound">Severity</ref>(Enum):</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Severity(Enum):</highlight></codeline>
 <codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Severity<sp/>scale<sp/>for<sp/>traffic<sp/>events.</highlight></codeline>
 <codeline lineno="24"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="25"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>The<sp/>more<sp/>severe<sp/>the<sp/>traffic<sp/>event,<sp/>the<sp/>more<sp/>likely<sp/>it<sp/>is<sp/>to<sp/>have<sp/>a<sp/>large<sp/>delay.</highlight></codeline>
-<codeline lineno="26" refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" refkind="compound"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Low<sp/>=<sp/>1</highlight></codeline>
 <codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Low<sp/>severity.&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Medium<sp/>=<sp/>2</highlight></codeline>
@@ -49,13 +46,13 @@
 <codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Unknown<sp/>=<sp/>4</highlight></codeline>
 <codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Severity<sp/>unknown.&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="38"><highlight class="normal"></highlight></codeline>
-<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref>:</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">TrafficEventData:</highlight></codeline>
 <codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Details<sp/>about<sp/>a<sp/>traffic<sp/>event.</highlight></codeline>
 <codeline lineno="41"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="42"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Use<sp/>the<sp/>cause<sp/>and<sp/>delay<sp/>to<sp/>properly<sp/>inform<sp/>you<sp/>users.</highlight></codeline>
 <codeline lineno="43"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="44"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Attributes:</highlight></codeline>
-<codeline lineno="45" refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" refkind="compound"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cause:<sp/><sp/><sp/><sp/>TPEG<sp/>cause<sp/>code.</highlight></codeline>
+<codeline lineno="45"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>cause:<sp/><sp/><sp/><sp/>TPEG<sp/>cause<sp/>code.</highlight></codeline>
 <codeline lineno="46"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>delay:<sp/><sp/><sp/><sp/>Delay<sp/>caused<sp/>by<sp/>the<sp/>traffic<sp/>event<sp/>in<sp/>seconds.</highlight></codeline>
 <codeline lineno="47"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>severity:<sp/>Severity<sp/>of<sp/>the<sp/>event.</highlight></codeline>
 <codeline lineno="48"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
@@ -64,14 +61,14 @@
 <codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>severity:<sp/></highlight><highlight class="stringliteral">&quot;TrafficEvent.Severity&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="52"><highlight class="normal"></highlight></codeline>
 <codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal">__init__(self):</highlight></codeline>
-<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>self.<ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a7a93792cb0d89c430b35d085f36e804e" kindref="member">cause</ref><sp/>=<sp/>0</highlight></codeline>
-<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>self.<ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1ad2dcca5c153fdd8bd97d8424bb13c003" kindref="member">delay</ref><sp/>=<sp/>0</highlight></codeline>
-<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>self.<ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a9601be1f4871fbf57154f5a061e0f784" kindref="member">severity</ref><sp/>=<sp/>self.Severity.Unknown</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>self.cause<sp/>=<sp/>0</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>self.delay<sp/>=<sp/>0</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>self.severity<sp/>=<sp/>self.Severity.Unknown</highlight></codeline>
 <codeline lineno="57"><highlight class="normal"></highlight></codeline>
 <codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal">__init__(self,<sp/>data:<sp/></highlight><highlight class="stringliteral">&quot;TrafficEvent.TrafficEventData&quot;</highlight><highlight class="normal">):</highlight></codeline>
 <codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>self._data<sp/>=<sp/>data</highlight></codeline>
 <codeline lineno="60"><highlight class="normal"></highlight></codeline>
-<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e" kindref="member">update</ref>(self,<sp/>cause:<sp/>int,<sp/>delay:<sp/>int)<sp/>-&gt;<sp/>bool:</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal">update(self,<sp/>cause:<sp/>int,<sp/>delay:<sp/>int)<sp/>-&gt;<sp/>bool:</highlight></codeline>
 <codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Update<sp/>the<sp/>traffic<sp/>event<sp/>data.</highlight></codeline>
 <codeline lineno="63"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="64"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Verifies<sp/>the<sp/>new<sp/>information<sp/>before<sp/>updating.</highlight></codeline>
@@ -85,7 +82,7 @@
 <codeline lineno="72"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>...</highlight></codeline>
 <codeline lineno="74"><highlight class="normal"></highlight></codeline>
-<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2a565164d3af2f5655c7ef819ff4545" kindref="member">calculate_delay</ref>(self)<sp/>-&gt;<sp/>int:</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal">calculate_delay(self)<sp/>-&gt;<sp/>int:</highlight></codeline>
 <codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Calculate<sp/>the<sp/>current<sp/>delay.</highlight></codeline>
 <codeline lineno="77"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="78"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Returns:</highlight></codeline>
@@ -96,7 +93,7 @@
 <codeline lineno="83"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>...</highlight></codeline>
 <codeline lineno="85"><highlight class="normal"></highlight></codeline>
-<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3" kindref="member">refresh_data</ref>(self)<sp/>-&gt;<sp/>None:</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal">refresh_data(self)<sp/>-&gt;<sp/>None:</highlight></codeline>
 <codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Refresh<sp/>the<sp/>traffic<sp/>event<sp/>data.</highlight></codeline>
 <codeline lineno="88"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="89"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Raises:</highlight></codeline>

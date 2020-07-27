@@ -1,5 +1,6 @@
 
 
+
 = [[python-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy.geometry.Coordinate]]Coordinate
 
 

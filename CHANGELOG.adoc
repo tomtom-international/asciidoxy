@@ -20,6 +20,18 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.6.1 (27 Jul 2020)
+
+=== Added
+
+  - [AD-18] Basic support for Java type annotations.
+  - Extend 'file_names' option for .toml files to support 'version' and 'name' interpolation.
+
+=== Fixed
+
+  - Java constants are now described correctly.
+
+
 == 0.6.0 (26 Jun 2020)
 
 === Added
@@ -312,4 +324,3 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 == 0.1.0 (22 Oct 2019)
 
 * First internal release.
-

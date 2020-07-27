@@ -14,9 +14,11 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, has)
-from asciidoxy.templates.objc.helpers import (objc_method_signature, public_methods,
-public_class_methods, public_properties, public_simple_enclosed_types)
+from asciidoxy.templates.helpers import has
+from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
+%>
+<%
+helper = ObjcTemplateHelper(api_context, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
@@ -39,40 +41,40 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(public_simple_enclosed_types(element, insert_filter)):
+% if has(helper.public_simple_enclosed_types()):
 |*Enclosed types*
 |
-% for enclosed in public_simple_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_simple_enclosed_types():
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_properties(element, insert_filter)):
+% if has(helper.public_properties()):
 |*Properties*
 |
-% for prop in public_properties(element, insert_filter):
+% for prop in helper.public_properties():
 `xref:${prop.id}[${prop.name}]`::
 ${prop.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_class_methods(element, insert_filter)):
+% if has(helper.public_class_methods()):
 |*Class methods*
 |
-% for method in public_class_methods(element, insert_filter):
+% for method in helper.public_class_methods():
 `xref:${method.id}[+ ${method.name}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_methods(element, insert_filter)):
+% if has(helper.public_methods()):
 |*Methods*
 |
-% for method in public_methods(element, insert_filter):
+% for method in helper.public_methods():
 `xref:${method.id}[- ${method.name}]`::
 ${method.brief}
 % endfor
@@ -81,19 +83,19 @@ ${method.brief}
 |===
 
 ############################################################################ Simple inner types ##
-% for enclosed in public_simple_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_simple_enclosed_types():
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 
 == Members
 
 ##################################################################################### Properties ##
-% for prop in public_properties(element, insert_filter):
+% for prop in helper.public_properties():
 [[${prop.id},${prop.name}]]
 ${api_context.insert(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-@property() ${link_from_ref(prop.returns.type, api_context)} ${prop.name}
+@property() ${helper.print_ref(prop.returns.type)} ${prop.name}
 ----
 
 ${prop.brief}
@@ -103,12 +105,12 @@ ${prop.description}
 '''
 % endfor
 ################################################################################## Class methods ##
-% for method in public_class_methods(element, insert_filter):
+% for method in helper.public_class_methods():
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${objc_method_signature(method, api_context)};
+${helper.method_signature(method)};
 ----
 
 ${method.brief}
@@ -122,7 +124,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`(${link_from_ref(param.type, api_context)})${param.name}`::
+`(${helper.print_ref(param.type)})${param.name}`::
 ${param.description}
 
 % endfor
@@ -130,7 +132,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif
@@ -149,12 +151,12 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in public_methods(element, insert_filter):
+% for method in helper.public_methods():
 [[${method.id},${method.name}]]
 ${api_context.insert(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${objc_method_signature(method, api_context)};
+${helper.method_signature(method)};
 ----
 
 ${method.brief}
@@ -168,7 +170,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`(${link_from_ref(param.type, api_context)})${param.name}`::
+`(${helper.print_ref(param.type)})${param.name}`::
 ${param.description}
 
 % endfor
@@ -176,7 +178,7 @@ ${param.description}
 % if method.returns and method.returns.type.name != "void":
 | Returns
 |
-`${link_from_ref(method.returns.type, api_context)}`::
+`${helper.print_ref(method.returns.type)}`::
 ${method.returns.description}
 
 % endif

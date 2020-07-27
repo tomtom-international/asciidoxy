@@ -15,119 +15,119 @@
 Tests for C++ template helpers.
 """
 
-from asciidoxy.templates.cpp.helpers import (public_static_methods, public_methods,
-                                             public_constructors, public_simple_enclosed_types,
-                                             public_complex_enclosed_types, public_variables)
+import pytest
+
 from asciidoxy.generator.filters import InsertionFilter
+from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 
 
-def test_public_constructors__no_filter(cpp_class):
-    result = list(public_constructors(cpp_class, InsertionFilter()))
+@pytest.fixture
+def helper(empty_context, cpp_class):
+    return CppTemplateHelper(empty_context, cpp_class, InsertionFilter())
+
+
+def test_public_constructors__no_filter(helper):
+    result = list(helper.public_constructors())
     assert len(result) == 1
     assert result[0].name == "MyClass"
     assert result[0].prot == "public"
 
 
-def test_public_constructors__filter_match(cpp_class):
-    result = list(public_constructors(cpp_class, InsertionFilter(members="MyClass")))
+def test_public_constructors__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="MyClass")
+    result = list(helper.public_constructors())
     assert len(result) == 1
     assert result[0].name == "MyClass"
     assert result[0].prot == "public"
 
 
-def test_public_constructors__filter_no_match(cpp_class):
-    result = list(public_constructors(cpp_class, InsertionFilter(members="OtherClass")))
+def test_public_constructors__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="OtherClass")
+    result = list(helper.public_constructors())
     assert len(result) == 0
 
 
-def test_public_methods__no_filter(cpp_class):
-    result = [m.name for m in public_methods(cpp_class, InsertionFilter())]
+def test_public_methods__no_filter(helper):
+    result = [m.name for m in helper.public_methods()]
     assert result == ["PublicMethod"]
 
 
-def test_public_methods__filter_match(cpp_class):
-    result = [m.name for m in public_methods(cpp_class, InsertionFilter(members="Public.*"))]
+def test_public_methods__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="Public.*")
+    result = [m.name for m in helper.public_methods()]
     assert result == ["PublicMethod"]
 
 
-def test_public_methods__filter_no_match(cpp_class):
-    result = [m.name for m in public_methods(cpp_class, InsertionFilter(members="PublicThing"))]
+def test_public_methods__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="PublicThing")
+    result = [m.name for m in helper.public_methods()]
     assert len(result) == 0
 
 
-def test_public_static_methods__no_filter(cpp_class):
-    result = [m.name for m in public_static_methods(cpp_class, InsertionFilter())]
+def test_public_static_methods__no_filter(helper):
+    result = [m.name for m in helper.public_static_methods()]
     assert result == ["PublicStaticMethod"]
 
 
-def test_public_static_methods__filter_match(cpp_class):
-    result = [
-        m.name for m in public_static_methods(cpp_class, InsertionFilter(members=".*Static.*"))
-    ]
+def test_public_static_methods__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members=".*Static.*")
+    result = [m.name for m in helper.public_static_methods()]
     assert result == ["PublicStaticMethod"]
 
 
-def test_public_static_methods__filter_no_match(cpp_class):
-    result = [
-        m.name for m in public_static_methods(cpp_class, InsertionFilter(members="Something"))
-    ]
+def test_public_static_methods__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="Something")
+    result = [m.name for m in helper.public_static_methods()]
     assert len(result) == 0
 
 
-def test_public_variables__no_filter(cpp_class):
-    result = [m.name for m in public_variables(cpp_class, InsertionFilter())]
+def test_public_variables__no_filter(helper):
+    result = [m.name for m in helper.public_variables()]
     assert result == ["PublicVariable"]
 
 
-def test_public_variables__filter_match(cpp_class):
-    result = [m.name for m in public_variables(cpp_class, InsertionFilter(members=".*Var.*"))]
+def test_public_variables__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members=".*Var.*")
+    result = [m.name for m in helper.public_variables()]
     assert result == ["PublicVariable"]
 
 
-def test_public_variables__filter_no_match(cpp_class):
-    result = [m.name for m in public_variables(cpp_class, InsertionFilter(members="NONE"))]
+def test_public_variables__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.public_variables()]
     assert len(result) == 0
 
 
-def test_public_simple_enclosed_types__no_filter(cpp_class):
-    simple_enclosed_types = [
-        m.name for m in public_simple_enclosed_types(cpp_class, InsertionFilter())
-    ]
+def test_public_simple_enclosed_types__no_filter(helper):
+    simple_enclosed_types = [m.name for m in helper.public_simple_enclosed_types()]
     assert sorted(simple_enclosed_types) == sorted(
         ["PublicEnum", "PublicTypedef", "ProtectedEnum", "ProtectedTypedef"])
 
 
-def test_public_simple_enclosed_types__filter_match(cpp_class):
-    simple_enclosed_types = [
-        m.name
-        for m in public_simple_enclosed_types(cpp_class, InsertionFilter(members=".*Typedef"))
-    ]
+def test_public_simple_enclosed_types__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members=".*Typedef")
+    simple_enclosed_types = [m.name for m in helper.public_simple_enclosed_types()]
     assert sorted(simple_enclosed_types) == sorted(["PublicTypedef", "ProtectedTypedef"])
 
 
-def test_public_simple_enclosed_types__filter_no_match(cpp_class):
-    simple_enclosed_types = [
-        m.name for m in public_simple_enclosed_types(cpp_class, InsertionFilter(members="other"))
-    ]
+def test_public_simple_enclosed_types__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="other")
+    simple_enclosed_types = [m.name for m in helper.public_simple_enclosed_types()]
     assert len(simple_enclosed_types) == 0
 
 
-def test_public_complex_enclosed_types__no_filter(cpp_class):
-    result = [m.name for m in public_complex_enclosed_types(cpp_class, InsertionFilter())]
+def test_public_complex_enclosed_types__no_filter(helper):
+    result = [m.name for m in helper.public_complex_enclosed_types()]
     assert result == ["NestedClass"]
 
 
-def test_public_complex_enclosed_types__filter_match(cpp_class):
-    result = [
-        m.name
-        for m in public_complex_enclosed_types(cpp_class, InsertionFilter(inner_classes="Nested"))
-    ]
+def test_public_complex_enclosed_types__filter_match(helper):
+    helper.insert_filter = InsertionFilter(inner_classes="Nested")
+    result = [m.name for m in helper.public_complex_enclosed_types()]
     assert result == ["NestedClass"]
 
 
-def test_public_complex_enclosed_types__filter_no_match(cpp_class):
-    result = [
-        m.name
-        for m in public_complex_enclosed_types(cpp_class, InsertionFilter(inner_classes="NONE"))
-    ]
+def test_public_complex_enclosed_types__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(inner_classes="NONE")
+    result = [m.name for m in helper.public_complex_enclosed_types()]
     assert len(result) == 0

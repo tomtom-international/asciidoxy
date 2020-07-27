@@ -8,9 +8,9 @@
 ----
 #include &lt;service.hpp&gt;
 
-std::unique_ptr&lt;xref:cpp-classasciidoxy_1_1system_1_1_service[Service]&gt; CreateService(
-    std::string name)
+std::unique_ptr&lt;xref:cpp-classasciidoxy_1_1system_1_1_service[Service]&gt; CreateService(std::string name)
 ----
+
 
 Create a new service.
 

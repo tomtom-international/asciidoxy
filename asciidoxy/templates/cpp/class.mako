@@ -14,10 +14,11 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import (link_from_ref, print_ref, type_list, has, type_and_name,
-chain)
-from asciidoxy.templates.cpp.helpers import (public_static_methods, public_methods,
-public_constructors, public_variables, public_simple_enclosed_types, public_complex_enclosed_types)
+from asciidoxy.templates.helpers import has, chain
+from asciidoxy.templates.cpp.helpers import CppTemplateHelper
+%>
+<%
+helper = CppTemplateHelper(api_context, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
@@ -40,50 +41,50 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if (has(public_simple_enclosed_types(element, insert_filter)) or has(public_complex_enclosed_types(element, insert_filter))):
+% if (has(helper.public_simple_enclosed_types()) or has(helper.public_complex_enclosed_types())):
 |*Enclosed types*
 |
-% for enclosed in chain(public_simple_enclosed_types(element, insert_filter), public_complex_enclosed_types(element, insert_filter)):
+% for enclosed in chain(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types()):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_constructors(element, insert_filter)):
+% if has(helper.public_constructors()):
 |*Constructors*
 |
-% for constructor in public_constructors(element, insert_filter):
-`xref:${constructor.id}[${constructor.name}${type_list(constructor.params)}]`::
+% for constructor in helper.public_constructors():
+`xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_variables(element, insert_filter)):
+% if has(helper.public_variables()):
 |*Variables*
 |
-% for variable in public_variables(element, insert_filter):
+% for variable in helper.public_variables():
 `xref:${variable.id}[${variable.name}]`::
 ${variable.brief}
 % endfor
 % endif
 ###################################################################################################
-% if has(public_static_methods(element, insert_filter)):
+% if has(helper.public_static_methods()):
 |*Static methods*
 |
-% for method in public_static_methods(element, insert_filter):
-`xref:${method.id}[static ${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
+% for method in helper.public_static_methods():
+`xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(public_methods(element, insert_filter)):
+% if has(helper.public_methods()):
 |*Methods*
 |
-% for method in public_methods(element, insert_filter):
-`xref:${method.id}[${print_ref(method.returns.type)} ${method.name}${type_list(method.params)}]`::
+% for method in helper.public_methods():
+`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -91,25 +92,25 @@ ${method.brief}
 |===
 
 ##################################################################### Enclosed enums and typedefs ##
-% for enclosed in public_simple_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_simple_enclosed_types():
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 
 == Members
 
 ################################################################################### Constructors ##
-% for constructor in public_constructors(element, insert_filter):
+% for constructor in helper.public_constructors():
 ${api.insert_fragment(constructor, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Variables ##
-% for variable in public_variables(element, insert_filter):
+% for variable in helper.public_variables():
 [[${variable.id},${variable.name}]]
 ${api_context.insert(variable)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-${link_from_ref(variable.returns.type, api_context)} ${variable.name}
+${helper.print_ref(variable.returns.type)} ${variable.name}
 ----
 
 ${variable.brief}
@@ -119,18 +120,18 @@ ${variable.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in public_static_methods(element, insert_filter):
+% for method in helper.public_static_methods():
 ${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in public_methods(element, insert_filter):
+% for method in helper.public_methods():
 ${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in public_complex_enclosed_types(element, insert_filter):
+% for enclosed in helper.public_complex_enclosed_types():
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
