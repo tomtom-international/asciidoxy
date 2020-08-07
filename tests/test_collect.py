@@ -183,7 +183,7 @@ async def test_http_package_name_interpolation_in_file_names(aiohttp_server, tmp
     spec.include_subdir = "adoc"
     spec.file_names = ["{name}"]
 
-    packages = await collect([spec], tmp_path)
+    await collect([spec], tmp_path)
 
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
@@ -196,7 +196,7 @@ async def test_http_package_version_interpolation_in_file_names(aiohttp_server, 
     spec.include_subdir = "adoc"
     spec.file_names = ["documentation-{version}"]
 
-    packages = await collect([spec], tmp_path)
+    await collect([spec], tmp_path)
 
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
@@ -209,7 +209,7 @@ async def test_http_package_version_and_name_interpolation_in_file_names(aiohttp
     spec.include_subdir = "adoc"
     spec.file_names = ["{name}-{version}"]
 
-    packages = await collect([spec], tmp_path)
+    await collect([spec], tmp_path)
 
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
