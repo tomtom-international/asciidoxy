@@ -13,7 +13,9 @@
 # limitations under the License.
 """Transcoding Java reference into Kotlin."""
 
-from ..model import Member
+from typing import Union
+
+from ..model import ReferableElement, TypeRef
 from .base import TranscoderBase
 
 
@@ -21,11 +23,22 @@ class SwiftTranscoder(TranscoderBase):
     SOURCE = "objc"
     TARGET = "swift"
 
-    def _member(self, member: Member) -> Member:
-        transcoded = super()._member(member)
+    def convert_name(self, source_element: Union[ReferableElement, TypeRef]) -> str:
+        name = source_element.name
+        if ":" in name:
+            name = name.split(":", maxsplit=1)[0]
+        if name.startswith("initWith"):
+            name = "init"
+        return name
 
-        if ":" in transcoded.name:
-            transcoded.name, _ = transcoded.name.split(":", maxsplit=1)
-            transcoded.full_name, _ = transcoded.full_name.split(":", maxsplit=1)
-
-        return transcoded
+    def convert_full_name(self, source_element: ReferableElement) -> str:
+        full_name = source_element.full_name
+        if ":" in full_name:
+            full_name = full_name.split(":", maxsplit=1)[0]
+        if source_element.name.startswith("initWith"):
+            if "." in full_name:
+                prefix, _ = full_name.rsplit(".", maxsplit=1)
+                full_name = f"{prefix}.init"
+            else:
+                full_name = "init"
+        return full_name

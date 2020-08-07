@@ -109,10 +109,12 @@ def test_public_simple_enclosed_types(helper):
 
 
 def test_public_complex_enclosed_types(helper):
-     result = [m.name for m in helper.public_complex_enclosed_types()]
-     assert sorted(result) == sorted([
-         "NestedClass", "NestedProtocol", "NestedStruct",
-     ])
+    result = [m.name for m in helper.public_complex_enclosed_types()]
+    assert sorted(result) == sorted([
+        "NestedClass",
+        "NestedProtocol",
+        "NestedStruct",
+    ])
 
 
 def test_method_signature__no_params_no_return(helper):

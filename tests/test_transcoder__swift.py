@@ -58,3 +58,33 @@ def test_transcode_member__multiple_arguments(transcoder):
     assert transcoded.name == "updateWithName"
     assert transcoded.full_name == "com.asciidoxy.geometry.updateWithName"
     assert len(transcoded.params) == 3
+
+
+def test_transcode_member__init(transcoder):
+    member = make_member("objc", name="init")
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.full_name == "com.asciidoxy.geometry.init"
+    assert not transcoded.params
+
+
+def test_transcode_member__init__single_argument(transcoder):
+    member = make_member("objc", name="initWithName:", params=[make_parameter("name")])
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.full_name == "com.asciidoxy.geometry.init"
+    assert len(transcoded.params) == 1
+
+
+def test_transcode_member__init__multiple_arguments(transcoder):
+    member = make_member("objc",
+                         name="initWithName:andAge",
+                         params=[make_parameter("name"),
+                                 make_parameter("age")])
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.full_name == "com.asciidoxy.geometry.init"
+    assert len(transcoded.params) == 2

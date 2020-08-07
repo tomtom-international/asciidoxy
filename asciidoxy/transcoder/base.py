@@ -18,7 +18,7 @@ import os
 import pkgutil
 
 from abc import ABC
-from typing import Callable, Mapping, Optional, Tuple, Type, TypeVar
+from typing import Callable, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from ..api_reference import ApiReference
 from ..generator.errors import AsciiDocError
@@ -148,7 +148,7 @@ class TranscoderBase(ABC):
     def type_ref(self, type_ref: TypeRef) -> TypeRef:
         transcoded = self.type_ref_base(type_ref)
 
-        transcoded.kind = type_ref.kind
+        transcoded.kind = self.convert_kind(type_ref)
         transcoded.prefix = type_ref.prefix
         transcoded.suffix = type_ref.suffix
         transcoded.nested = [self.type_ref(tr)
@@ -211,12 +211,21 @@ class TranscoderBase(ABC):
 
         return f"{self.TARGET}-{old_id}"
 
+    def convert_kind(self, source_element: Union[ReferableElement, TypeRef]) -> Optional[str]:
+        return source_element.kind
+
+    def convert_name(self, source_element: Union[ReferableElement, TypeRef]) -> str:
+        return source_element.name
+
+    def convert_full_name(self, source_element: ReferableElement) -> str:
+        return source_element.full_name
+
     ElementType = TypeVar("ElementType", bound=ReferableElement)
 
     def find_or_transcode(self, element: ElementType,
                           transcode_func: Callable[[ElementType], ElementType]) -> ElementType:
-        transcoded = self.reference.find(name=element.full_name,
-                                         kind=element.kind,
+        transcoded = self.reference.find(name=self.convert_full_name(element),
+                                         kind=self.convert_kind(element),
                                          lang=self.TARGET,
                                          target_id=self.convert_id(element.id))
 
@@ -232,9 +241,9 @@ class TranscoderBase(ABC):
         transcoded = element.__class__(self.TARGET)
 
         transcoded.id = self.convert_id(element.id)
-        transcoded.name = element.name
-        transcoded.full_name = element.full_name
-        transcoded.kind = element.kind
+        transcoded.name = self.convert_name(element)
+        transcoded.full_name = self.convert_full_name(element)
+        transcoded.kind = self.convert_kind(element) or ""
 
         return transcoded
 
