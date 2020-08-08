@@ -64,12 +64,13 @@ def make_compound(lang: str,
 
 def make_member(lang: str,
                 name: str,
+                kind: str = "function",
                 params: Optional[List[Parameter]] = None,
                 exceptions: Optional[List[Exception]] = None,
                 returns: Optional[ReturnValue] = None,
                 enumvalues: Optional[List[EnumValue]] = None) -> Member:
     member = make_referable(Member, lang, name)
-    member.kind = "function"
+    member.kind = kind
     member.definition = "definition"
     member.args = "args"
     if params is not None:

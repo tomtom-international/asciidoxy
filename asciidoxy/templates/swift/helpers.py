@@ -23,6 +23,8 @@ class SwiftTemplateHelper(TemplateHelper):
     def type_and_name(self, param: Parameter, *, link: bool = True) -> str:
         if param.type is None or not param.type.name:
             return param.name
+        if not param.name:
+            return self.print_ref(param.type, link=link)
         return (f"{param.name}: {self.print_ref(param.type, link=link)}".strip())
 
     def _method_prefix(self, method: Member, *, link: bool = True) -> str:
@@ -31,18 +33,13 @@ class SwiftTemplateHelper(TemplateHelper):
     def _method_suffix(self, method: Member, *, link: bool = True) -> str:
         return f" -> {self.print_ref(method.returns.type, link=link)}" if method.returns else ""
 
-    def block_definition(self, block: Member) -> str:
-        assert block.returns is not None
-        assert block.returns.type is not None
-        assert block.returns.type.args is not None
+    def closure_definition(self, closure: Member) -> str:
+        assert closure.returns is not None
+        assert closure.returns.type is not None
+        assert closure.returns.type.args is not None
 
-        if block.name:
-            block_name = f" {block.name}"
-        else:
-            block_name = ""
-
-        return (f"typedef {self.print_ref(block.returns.type, skip_args=True)}(^{block_name})"
-                f" {self.argument_list(block.returns.type.args)}")
+        return (f"typealias {closure.name} = {self.argument_list(closure.returns.type.args)}"
+                f" -> {self.print_ref(closure.returns.type, skip_args=True)}")
 
     def public_type_methods(self) -> Iterator[Member]:
         return self.public_static_methods()

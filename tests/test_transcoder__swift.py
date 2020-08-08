@@ -18,7 +18,7 @@ import pytest
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.swift import SwiftTranscoder
 
-from .test_transcoder__base import make_member, make_parameter
+from .test_transcoder__base import make_member, make_parameter, make_return_value, make_type_ref
 
 
 @pytest.fixture
@@ -88,3 +88,19 @@ def test_transcode_member__init__multiple_arguments(transcoder):
     assert transcoded.language == "swift"
     assert transcoded.full_name == "com.asciidoxy.geometry.init"
     assert len(transcoded.params) == 2
+
+
+def test_transcode_member__block(transcoder):
+    closure = make_member("objc",
+                          name="SuccessBlock",
+                          kind="block",
+                          params=[
+                              make_parameter("number", type_=make_type_ref("objc", "NSInteger")),
+                              make_parameter("data", type_=make_type_ref("objc", "data"))
+                          ],
+                          returns=make_return_value(make_type_ref("objc", name="BOOL")))
+    transcoded = transcoder.member(closure)
+
+    assert transcoded.language == "swift"
+    assert transcoded.full_name == "com.asciidoxy.geometry.SuccessBlock"
+    assert transcoded.kind == "closure"

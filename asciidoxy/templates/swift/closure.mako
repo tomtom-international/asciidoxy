@@ -21,7 +21,7 @@ ${api_context.insert(element)}
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-${SwiftTemplateHelper(api_context).block_definition(element)}
+${SwiftTemplateHelper(api_context).closure_definition(element)}
 ----
 ${element.brief}
 

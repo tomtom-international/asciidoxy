@@ -152,3 +152,55 @@ def test_method_signature__one_param(helper):
     method.params = [param1]
 
     assert helper.method_signature(method) == "func setValue(arg1: Type1) -> Value"
+
+
+def test_closure_definition__no_params__void_return(helper):
+    closure = Member("swift")
+    closure.name = "SuccessClosure"
+    closure.returns = ReturnValue()
+    closure.returns.type = TypeRef("swift", name="Void")
+    closure.returns.type.args = []
+
+    assert helper.closure_definition(closure) == "typealias SuccessClosure = () -> Void"
+
+
+def test_closure_definition__multiple_params_type_only__void_return(helper):
+    closure = Member("swift")
+    closure.name = "SuccessClosure"
+    closure.returns = ReturnValue()
+    closure.returns.type = TypeRef("swift", name="Void")
+    closure.returns.type.args = [Parameter(), Parameter()]
+    closure.returns.type.args[0].type = TypeRef("swift", "int")
+    closure.returns.type.args[1].type = TypeRef("swift", "Data")
+    closure.returns.type.args[1].type.id = "swift-data"
+
+    assert (helper.closure_definition(closure) ==
+            "typealias SuccessClosure = (int, xref:swift-data[Data]) -> Void")
+
+
+def test_closure_definition__multiple_params_type_and_name__void_return(helper):
+    closure = Member("swift")
+    closure.name = "SuccessClosure"
+    closure.returns = ReturnValue()
+    closure.returns.type = TypeRef("swift", name="Void")
+    closure.returns.type.args = [Parameter(), Parameter()]
+    closure.returns.type.args[0].type = TypeRef("swift", "int")
+    closure.returns.type.args[0].name = "number"
+    closure.returns.type.args[1].type = TypeRef("swift", "Data")
+    closure.returns.type.args[1].type.id = "swift-data"
+    closure.returns.type.args[1].name = "theData"
+
+    assert (helper.closure_definition(closure) ==
+            "typealias SuccessClosure = (number: int, theData: xref:swift-data[Data]) -> Void")
+
+
+def test_closure_definition__no_params__return_type(helper):
+    closure = Member("swift")
+    closure.name = "SuccessClosure"
+    closure.returns = ReturnValue()
+    closure.returns.type = TypeRef("swift", name="Data")
+    closure.returns.type.id = "swift-data"
+    closure.returns.type.args = []
+
+    assert (helper.closure_definition(closure) ==
+            "typealias SuccessClosure = () -> xref:swift-data[Data]")

@@ -13,7 +13,7 @@
 # limitations under the License.
 """Transcoding Java reference into Kotlin."""
 
-from typing import Union
+from typing import Optional, Union
 
 from ..model import ReferableElement, TypeRef
 from .base import TranscoderBase
@@ -22,6 +22,11 @@ from .base import TranscoderBase
 class SwiftTranscoder(TranscoderBase):
     SOURCE = "objc"
     TARGET = "swift"
+
+    def convert_kind(self, source_element: Union[ReferableElement, TypeRef]) -> Optional[str]:
+        if source_element.kind is None:
+            return None
+        return {"block": "closure"}.get(source_element.kind, source_element.kind)
 
     def convert_name(self, source_element: Union[ReferableElement, TypeRef]) -> str:
         name = source_element.name
