@@ -40,10 +40,13 @@ export PRINT_HELP_PYSCRIPT
 
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
+export ROOT_DIR = $(CURDIR)
+export BUILD_DIR = $(CURDIR)/build
+
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test clean-docker ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
 	rm -rf build/
@@ -66,11 +69,6 @@ clean-test: ## remove test and coverage artifacts
 	rm -rf test_results
 	rm -rf .mypy_cache
 	find . -name '.asciidoxy.*' -exec rm -rf {} +
-
-clean-docker: ## remove docker build artifacts
-	rm -rf docker/.gradle
-	rm -rf docker/build
-	rm -rf docker/src/main/docker/dist
 
 lint: ## check style with flake8
 	flake8 asciidoxy tests
@@ -117,15 +115,4 @@ format: ## format the code
 	yapf -r -i -p setup.py asciidoxy tests
 
 docs: ## generate documentation
-	cp -r tests/source_code documentation/source_code
-	mkdir -p documentation/copy
-	cp CHANGELOG.adoc documentation/copy/
-	mkdir -p build/doc/doxygen
-	mkdir -p build/doc/asciidoxy
-	cd documentation && doxygen
-	cd documentation && asciidoxy index.adoc \
-		--build-dir ../build/doc/asciidoxy \
-		--destination-dir ../build/doc/output \
-		--spec-file asciidoxy.toml \
-		--debug --multipage \
-		-a linkcss
+	cd documentation && $(MAKE)
