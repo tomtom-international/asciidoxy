@@ -1,2 +1,2 @@
 #!/bin/bash
-doxypypy -a -c $1 | sed 's/#        /# /'
+python doxypypy.py -a -c $1 | sed 's/#        /# /'
