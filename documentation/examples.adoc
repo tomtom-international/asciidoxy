@@ -43,9 +43,9 @@ These are some examples of AsciiDoxy in action. They demonstrate documentation f
 to test AsciiDoxy. The first example is the website you are looking at. It is completely generated
 using AsciiDoxy.
 
-${api.include("example-cpp.adoc", link_text="C{plus}{plus}", link_prefix=". ")}
-${api.include("example-java.adoc", link_text="Java", link_prefix=". ")}
-${api.include("example-objc.adoc", link_text="Objective C", link_prefix=". ")}
-${api.include("example-python.adoc", link_text="Python", link_prefix=". ")}
-${api.include("example-swift-transcoded.adoc", link_text="Swift transcoded from Objective C", link_prefix=". ")}
+${api.include("examples/cpp/example-cpp.adoc", link_text="{Cpp}", link_prefix=". ")}
+${api.include("examples/java/example-java.adoc", link_text="Java", link_prefix=". ")}
+${api.include("examples/objc/example-objc.adoc", link_text="Objective C", link_prefix=". ")}
+${api.include("examples/objc/example-swift-transcoded.adoc", link_text="Swift transcoded from Objective C", link_prefix=". ")}
+${api.include("examples/python/example-python.adoc", link_text="Python", link_prefix=". ")}
 

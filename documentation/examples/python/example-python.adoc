@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= Objective C
+= Python
 :notitle:
 :icons: font
 :doctype: book
@@ -29,38 +29,31 @@ ${api.multipage_toc()}
                                       /____/
 ----
 
-[ ${api.cross_document_ref("index.adoc", "", "Home")} |
-${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", "", "Usage")} |
-${api.cross_document_ref("examples.adoc", "", "Examples")} |
-${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
-${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
+[ ${api.cross_document_ref("../../index.adoc", "", "Home")} |
+${api.cross_document_ref("../../about.adoc", "", "What is AsciiDoxy?")} |
+${api.cross_document_ref("../../usage.adoc", "", "Usage")} |
+${api.cross_document_ref("../../examples.adoc", "", "Examples")} |
+${api.cross_document_ref("../../contributing.adoc", "", "Contributing")} |
+${api.cross_document_ref("../../changelog.adoc", "", "Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = {doctitle}
 
-This example shows documentation for an Objective C project. The documentation is generated using
-the following AsciiDoxy directives:
+This example shows documentation for a python project.
 
+.Doxygen configuration
+[source]
+----
+include::Doxyfile[]
+----
+
+.AsciiDoxy directives
 [source,python]
 ----
 ${"""
-${api.language("objc")}
-${api.insert("ADCoordinate")}
-${api.insert("ADTrafficEvent")}
+${api.insert("geometry.Coordinate")}
 """}
 ----
 
-.Source code for which the documentation is generated
-[%collapsible]
-====
-[source,objectivec]
-----
-include::./source_code/objc/default/ADCoordinate.h[]
-----
-====
-
-${api.language("objc")}
-${api.insert("ADCoordinate")}
-${api.insert("ADTrafficEvent")}
+${api.insert("geometry.Coordinate")}
 

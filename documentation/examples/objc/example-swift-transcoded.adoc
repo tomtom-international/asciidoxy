@@ -29,37 +29,43 @@ ${api.multipage_toc()}
                                       /____/
 ----
 
-[ ${api.cross_document_ref("index.adoc", "", "Home")} |
-${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", "", "Usage")} |
-${api.cross_document_ref("examples.adoc", "", "Examples")} |
-${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
-${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
+[ ${api.cross_document_ref("../../index.adoc", "", "Home")} |
+${api.cross_document_ref("../../about.adoc", "", "What is AsciiDoxy?")} |
+${api.cross_document_ref("../../usage.adoc", "", "Usage")} |
+${api.cross_document_ref("../../examples.adoc", "", "Examples")} |
+${api.cross_document_ref("../../contributing.adoc", "", "Contributing")} |
+${api.cross_document_ref("../../changelog.adoc", "", "Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = {doctitle}
 
-This example shows how documentation for Swift can be generated for a Swift library. The
-documentation is generated using the following AsciiDoxy directives:
+This is an example demonstrating documentation for an Objective C project transcoded to Swift. The
+used source code files come from the https://github.com/AFNetworking/AFNetworking[AFNetworking]
+project.
 
+NOTE: This is not meant to be complete documentation. Some links in the documentation may not work
+due to missing documentation.
+
+.Doxygen configuration
+[source]
+----
+include::Doxyfile[]
+----
+
+.AsciiDoxy directives
 [source,python]
 ----
 ${"""
 ${api.language("swift", source="objc")}
-${api.insert("ADCoordinate")}
-${api.insert("ADTrafficEvent")}
+${api.insert("AFHTTPSessionManager")}
+${api.insert("AFHTTPRequestSerializer")}
+${api.insert("AFURLRequestSerialization")}
+${api.insert("AFMultipartFormData")}
 """}
 ----
 
-.Source code
-[%collapsible]
-====
-[source,objectivec]
-----
-include::./source_code/objc/default/ADCoordinate.h[]
-----
-====
-
 ${api.language("swift", source="objc")}
-${api.insert("ADCoordinate")}
-${api.insert("ADTrafficEvent")}
+${api.insert("AFHTTPSessionManager")}
+${api.insert("AFHTTPRequestSerializer")}
+${api.insert("AFURLRequestSerialization")}
+${api.insert("AFMultipartFormData")}

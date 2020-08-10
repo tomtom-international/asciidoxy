@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= Java
+= C++
 :notitle:
 :icons: font
 :doctype: book
@@ -29,34 +29,38 @@ ${api.multipage_toc()}
                                       /____/
 ----
 
-[ ${api.cross_document_ref("index.adoc", "", "Home")} |
-${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", "", "Usage")} |
-${api.cross_document_ref("examples.adoc", "", "Examples")} |
-${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
-${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
+[ ${api.cross_document_ref("../../index.adoc", "", "Home")} |
+${api.cross_document_ref("../../about.adoc", "", "What is AsciiDoxy?")} |
+${api.cross_document_ref("../../usage.adoc", "", "Usage")} |
+${api.cross_document_ref("../../examples.adoc", "", "Examples")} |
+${api.cross_document_ref("../../contributing.adoc", "", "Contributing")} |
+${api.cross_document_ref("../../changelog.adoc", "", "Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = {doctitle}
 
-This example shows documentation for a Java project. The documentation is generated using the
-following AsciiDoxy directives:
+This is an example demonstrating documentation for a {Cpp} project. The used source code files come
+from the https://github.com/SFML/SFML[SFML] project.
 
+NOTE: This is not meant to be complete documentation. Some links in the documentation may not work
+due to missing documentation.
+
+.Doxygen configuration
+[source]
+----
+include::Doxyfile[]
+----
+
+.AsciiDoxy directives
 [source,python]
 ----
 ${"""
-${api.insert("com.asciidoxy.geometry.Coordinate")}
+${api.insert("sf::UdpSocket")}
+${api.insert("sf::Packet")}
+${api.insert("sf::IpAddress")}
 """}
 ----
 
-.Source code for which the documentation is generated
-[%collapsible]
-====
-[source,java]
-----
-include::./source_code/java/default/Coordinate.java[]
-----
-====
-
-${api.insert("com.asciidoxy.geometry.Coordinate")}
-
+${api.insert("sf::UdpSocket")}
+${api.insert("sf::Packet")}
+${api.insert("sf::IpAddress")}

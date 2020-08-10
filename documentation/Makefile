@@ -12,39 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export DOC_BUILD_DIR = $(BUILD_DIR)/doc
+.PHONY: docs
+.SUFFIXES:
+
+export DOC_BUILD_DIR := $(BUILD_DIR)/doc
+export DOXYGEN_BUILD_DIR := $(DOC_BUILD_DIR)/doxygen
 
 docs: $(DOC_BUILD_DIR)/output/index.html
 
 $(DOC_BUILD_DIR):
 	mkdir -p $(DOC_BUILD_DIR)
 
-$(DOC_BUILD_DIR)/doxygen: $(DOC_BUILD_DIR)
-	mkdir -p $(DOC_BUILD_DIR)/doxygen
+$(DOXYGEN_BUILD_DIR): $(DOC_BUILD_DIR)
+	mkdir -p $(DOXYGEN_BUILD_DIR)
 
 $(DOC_BUILD_DIR)/asciidoxy: $(DOC_BUILD_DIR)
 	mkdir -p $(DOC_BUILD_DIR)/asciidoxy
 
-$(DOC_BUILD_DIR)/doxygen/xml: $(DOC_BUILD_DIR)/doxygen
+$(DOXYGEN_BUILD_DIR)/asciidoxy: $(DOXYGEN_BUILD_DIR)
+	mkdir -p $(DOXYGEN_BUILD_DIR)/asciidoxy
+
+$(DOXYGEN_BUILD_DIR)/asciidoxy/xml: $(DOXYGEN_BUILD_DIR)/asciidoxy
 	doxygen
 
 $(CURDIR)/copy: $(ROOT_DIR)/CHANGELOG.adoc
 	mkdir -p copy
 	cp $(ROOT_DIR)/CHANGELOG.adoc copy/
 
-$(CURDIR)/source_code:
-	cp -r $(ROOT_DIR)/tests/source_code source_code
+EXAMPLE_DIRS := $(dir $(wildcard examples/**/Doxyfile))
+EXAMPLE_OUTPUTS := $(addprefix $(DOXYGEN_BUILD_DIR)/,$(addsuffix xml,$(EXAMPLE_DIRS)))
 
-ADOC_IN_FILES := $(wildcard *.adoc)
+define EXAMPLE_template
+$(DOXYGEN_BUILD_DIR)/$(1): $(DOXYGEN_BUILD_DIR)
+	mkdir -p $(DOXYGEN_BUILD_DIR)/$(1)
+
+$(DOXYGEN_BUILD_DIR)/$(1)xml: $(DOXYGEN_BUILD_DIR)/$(1) $(filter-out %.adoc,$(wildcard $(1)/*))
+	cd $(1) && OUTPUT_DIR=$(DOXYGEN_BUILD_DIR)/$(1) doxygen
+endef
+
+$(foreach example_dir,$(EXAMPLE_DIRS),$(eval $(call EXAMPLE_template,$(example_dir))))
+
+ADOC_IN_FILES := $(wildcard *.adoc) $(wildcard examples/**/*.adoc)
 ADOC_OUT_FILES := $(patsubst %.adoc,%.html,$(addprefix $(DOC_BUILD_DIR)/output/, $(ADOC_IN_FILES)))
 
-$(ADOC_OUT_FILES): $(ADOC_IN_FILES) $(DOC_BUILD_DIR)/asciidoxy $(CURDIR)/asciidoxy.toml $(CURDIR)/copy $(CURDIR)/source_code $(DOC_BUILD_DIR)/doxygen/xml
+$(ADOC_OUT_FILES): $(ADOC_IN_FILES) $(DOC_BUILD_DIR)/asciidoxy $(CURDIR)/asciidoxy.toml $(CURDIR)/copy $(DOXYGEN_BUILD_DIR)/asciidoxy/xml $(EXAMPLE_OUTPUTS)
 	asciidoxy index.adoc \
 		--build-dir $(DOC_BUILD_DIR)/asciidoxy \
 		--destination-dir $(DOC_BUILD_DIR)/output \
 		--spec-file asciidoxy.toml \
 		--debug --multipage \
 		-a linkcss
-
-#examples/cpp:
-#	cd examples/cpp && $(MAKE)
