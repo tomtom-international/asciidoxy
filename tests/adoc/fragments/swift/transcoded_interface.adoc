@@ -95,7 +95,7 @@ The altitude in meters.
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-func isValid() -> id
+func isValid() -> Any
 ----
 
 Check if the coordinate is valid.
@@ -106,7 +106,7 @@ A coordinate is valid if its values are within WGS84 bounds.
 |===
 | Returns
 |
-`id`::
+`Any`::
 True if valid, false if not.
 
 |===

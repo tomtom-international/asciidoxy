@@ -6,7 +6,7 @@
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-typedef NSInteger TpegCauseCode
+typedef Integer TpegCauseCode
 ----
 Type for TPEG cause codes.
 

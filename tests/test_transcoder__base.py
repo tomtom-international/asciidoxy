@@ -97,11 +97,11 @@ def make_type_ref_base(cls: Type[TypeRefBase], lang: str, name: str) -> TypeRefB
     return type_ref
 
 
-def make_type_ref(lang: str, name: str) -> TypeRef:
+def make_type_ref(lang: str, name: str, prefix: str = "final ", suffix: str = " *") -> TypeRef:
     type_ref = make_type_ref_base(TypeRef, lang, name)
     type_ref.kind = "class"
-    type_ref.prefix = "final "
-    type_ref.suffix = " *"
+    type_ref.prefix = prefix
+    type_ref.suffix = suffix
     return type_ref
 
 

@@ -214,7 +214,7 @@ class TranscoderBase(ABC):
     def convert_kind(self, source_element: Union[ReferableElement, TypeRef]) -> Optional[str]:
         return source_element.kind
 
-    def convert_name(self, source_element: Union[ReferableElement, TypeRef]) -> str:
+    def convert_name(self, source_element: Union[ReferableElement, TypeRefBase]) -> str:
         return source_element.name
 
     def convert_full_name(self, source_element: ReferableElement) -> str:
@@ -253,7 +253,7 @@ class TranscoderBase(ABC):
         transcoded = type_ref.__class__(self.TARGET)
 
         transcoded.id = self.convert_id(type_ref.id)
-        transcoded.name = type_ref.name
+        transcoded.name = self.convert_name(type_ref)
         transcoded.namespace = type_ref.namespace
 
         return transcoded

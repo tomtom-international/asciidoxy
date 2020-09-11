@@ -16,9 +16,11 @@
 import pytest
 
 from asciidoxy.api_reference import ApiReference
+from asciidoxy.model import ReferableElement
 from asciidoxy.transcoder.swift import SwiftTranscoder
 
-from .test_transcoder__base import make_member, make_parameter, make_return_value, make_type_ref
+from .test_transcoder__base import (make_member, make_parameter, make_referable, make_return_value,
+                                    make_type_ref)
 
 
 @pytest.fixture
@@ -104,3 +106,84 @@ def test_transcode_member__block(transcoder):
     assert transcoded.language == "swift"
     assert transcoded.full_name == "com.asciidoxy.geometry.SuccessBlock"
     assert transcoded.kind == "closure"
+
+
+@pytest.mark.parametrize("objc_name, swift_name", [
+    ("NSObject", "NSObject"),
+    ("NSAutoReleasePool", "NSAutoReleasePool"),
+    ("NSException", "NSException"),
+    ("NSProxy", "NSProxy"),
+    ("NSBackgroundActivity", "NSBackgroundActivity"),
+    ("NSUserNotification", "NSUserNotification"),
+    ("NSXPCConnection", "NSXPCConnection"),
+    ("NSNumber", "NSNumber"),
+    ("NSDecimalNumber", "Decimal"),
+    ("NSArray", "Array"),
+    ("NSDate", "Date"),
+    ("NSURL", "URL"),
+    ("NSURLRequest", "URLRequest"),
+    ("NSUUID", "UUID"),
+    ("init:", "init"),
+    ("initWithName:", "init"),
+    ("initWithName:andAge:", "init"),
+    ("BOOL", "Bool"),
+])
+def test_convert_name(transcoder, objc_name, swift_name):
+    element = make_referable(ReferableElement, lang="objc", name=objc_name)
+    assert transcoder.convert_name(element) == swift_name
+
+
+@pytest.mark.parametrize("objc_name, objc_full_name, swift_full_name", [
+    ("NSObject", "NSObject", "NSObject"),
+    ("NSURL", "URL", "URL"),
+    ("NSUUID", "UUID", "UUID"),
+    ("init:", "MyClass.init:", "MyClass.init"),
+    ("initWithName:", "MyClass.initWithName:", "MyClass.init"),
+    ("initWithName:andAge:", "MyClass.initWithName:andAge:", "MyClass.init"),
+])
+def test_convert_full_name(transcoder, objc_name, objc_full_name, swift_full_name):
+    element = make_referable(ReferableElement, lang="objc", name=objc_name)
+    element.full_name = objc_full_name
+    assert transcoder.convert_full_name(element) == swift_full_name
+
+
+def test_transcode_type_ref__nullable_prefix(transcoder):
+    type_ref = make_type_ref(lang="objc", name="MyClass", prefix="nullable ", suffix="")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert transcoded.suffix == "?"
+
+
+def test_transcode_type_ref__nullable_suffix(transcoder):
+    type_ref = make_type_ref(lang="objc", name="MyClass", prefix="", suffix=" _Nullable")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert transcoded.suffix == "?"
+
+
+def test_transcode_type_ref__pointer(transcoder):
+    type_ref = make_type_ref(lang="objc", name="MyClass", prefix="", suffix=" *")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert not transcoded.suffix
+
+
+def test_transcode_type_ref__bare_id(transcoder):
+    type_ref = make_type_ref(lang="objc", name="id", prefix="", suffix="")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == "Any"
+    assert not transcoded.prefix
+    assert not transcoded.suffix
+
+
+def test_transcode_type_ref__id_type(transcoder):
+    type_ref = make_type_ref(lang="objc", name="id", prefix="", suffix="")
+    type_ref.nested = [make_type_ref(lang="objc", name="MyClass", prefix="", suffix="")]
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert not transcoded.suffix
+    assert not transcoded.nested

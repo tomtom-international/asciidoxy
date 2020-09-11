@@ -46,8 +46,8 @@ Traffic event details.
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-func updateWithCause(cause: NSInteger,
-                     delay: NSInteger) -> id
+func updateWithCause(cause: Integer,
+                     delay: Integer) -> Any
 ----
 
 Update the traffic event data.
@@ -58,15 +58,15 @@ Verifies the new information before updating.
 |===
 | Parameters
 |
-`cause: NSInteger`::
+`cause: Integer`::
 New TPEG cause code.
 
-`delay: NSInteger`::
+`delay: Integer`::
 New delay in seconds.
 
 | Returns
 |
-`id`::
+`Any`::
 True if the update is valid.
 
 |===
