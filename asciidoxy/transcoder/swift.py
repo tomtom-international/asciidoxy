@@ -87,6 +87,9 @@ class SwiftTranscoder(TranscoderBase):
             suffix = transcoded.suffix.replace(" _Nullable", "")
             transcoded.suffix = f"?{suffix}"
 
+        if transcoded.suffix and "__autoreleasing" in transcoded.suffix:
+            transcoded.suffix = transcoded.suffix.replace("__autoreleasing", "").rstrip()
+
         if transcoded.name == "id":
             if not transcoded.nested:
                 transcoded.name = "Any"

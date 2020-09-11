@@ -171,6 +171,14 @@ def test_transcode_type_ref__pointer(transcoder):
     assert not transcoded.suffix
 
 
+def test_transcode_type_ref__autoreleasing(transcoder):
+    type_ref = make_type_ref(lang="objc", name="MyClass", prefix="", suffix="*__autoreleasing")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert not transcoded.suffix
+
+
 def test_transcode_type_ref__bare_id(transcoder):
     type_ref = make_type_ref(lang="objc", name="id", prefix="", suffix="")
     transcoded = transcoder.type_ref(type_ref)
