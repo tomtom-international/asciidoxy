@@ -154,6 +154,23 @@ def test_method_signature__one_param(helper):
     assert helper.method_signature(method) == "func setValue(arg1: Type1) -> Value"
 
 
+def test_method_signature__closure_param(helper):
+    method = Member("swift")
+    method.name = "setValue"
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("swift", name="Value")
+
+    param1 = Parameter()
+    param1.name = "arg1"
+    param1.type = TypeRef("objc", "Type1")
+    param1.type.args = [Parameter()]
+    param1.type.args[0].type = TypeRef("objc", "Type2")
+    param1.type.args[0].name = "arg2"
+    method.params = [param1]
+
+    assert helper.method_signature(method) == "func setValue(arg1: (arg2: Type2) -> Type1) -> Value"
+
+
 def test_closure_definition__no_params__void_return(helper):
     closure = Member("swift")
     closure.name = "SuccessClosure"

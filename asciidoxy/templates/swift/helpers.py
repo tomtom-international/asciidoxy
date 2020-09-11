@@ -20,6 +20,9 @@ from asciidoxy.templates.helpers import TemplateHelper
 
 
 class SwiftTemplateHelper(TemplateHelper):
+    ARGS_BEFORE_TYPE = True
+    ARGS_TO_TYPE = " -> "
+
     def type_and_name(self, param: Parameter, *, link: bool = True) -> str:
         if param.type is None or not param.type.name:
             return param.name

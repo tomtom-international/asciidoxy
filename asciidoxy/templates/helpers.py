@@ -29,6 +29,8 @@ class TemplateHelper:
     NESTED_END: str = "&gt;"
     ARGS_START: str = "("
     ARGS_END: str = ")"
+    ARGS_BEFORE_TYPE = False
+    ARGS_TO_TYPE = ""
 
     def __init__(self,
                  context: Context,
@@ -62,15 +64,23 @@ class TemplateHelper:
                 args = f"{self.ARGS_START}{', '.join(arg_parts)}{self.ARGS_END}"
             else:
                 args = f"{self.ARGS_START}{self.ARGS_END}"
+
+            if self.ARGS_BEFORE_TYPE:
+                args_before = f"{args}{self.ARGS_TO_TYPE}"
+                args_after = ""
+            else:
+                args_before = ""
+                args_after = f"{self.ARGS_TO_TYPE}{args}"
         else:
-            args = ""
+            args_before = args_after = ""
 
         if link and ref.id:
-            return (f"{ref.prefix or ''}"
-                    f"{self.context.link_to_element(ref.id, ref.name)}{nested}{args}"
-                    f"{ref.suffix or ''}").strip()
+            return (f"{args_before}{ref.prefix or ''}"
+                    f"{self.context.link_to_element(ref.id, ref.name)}{nested}"
+                    f"{args_after}{ref.suffix or ''}").strip()
         else:
-            return f"{ref.prefix or ''}{ref.name}{nested}{args}{ref.suffix or ''}".strip()
+            return (f"{args_before}{ref.prefix or ''}{ref.name}{nested}"
+                    f"{args_after}{ref.suffix or ''}".strip())
 
     def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
         if default_value and param.default_value:
