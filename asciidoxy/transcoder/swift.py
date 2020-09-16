@@ -15,7 +15,7 @@
 
 from typing import Optional, Union
 
-from ..model import ReferableElement, TypeRef, TypeRefBase
+from ..model import Member, ReferableElement, TypeRef, TypeRefBase
 from .base import TranscoderBase
 
 
@@ -50,9 +50,7 @@ class SwiftTranscoder(TranscoderBase):
 
         name = self.convert_bridged_type(name)
 
-        if name.startswith("initWith"):
-            name = "init"
-        elif ":" in name:
+        if ":" in name:
             name = name.split(":", maxsplit=1)[0]
 
         return name
@@ -62,16 +60,28 @@ class SwiftTranscoder(TranscoderBase):
 
         full_name = self.convert_bridged_type(full_name)
 
-        if source_element.name.startswith("initWith"):
-            if "." in full_name:
-                prefix, _ = full_name.rsplit(".", maxsplit=1)
-                full_name = f"{prefix}.init"
-            else:
-                full_name = "init"
-        elif ":" in full_name:
+        if ":" in full_name:
             full_name = full_name.split(":", maxsplit=1)[0]
 
         return full_name
+
+    def _member(self, member: Member) -> Member:
+        transcoded = super()._member(member)
+
+        if transcoded.kind == "function" and "With" in transcoded.name and transcoded.params:
+            method_name, _, first_param_name = transcoded.name.partition("With")
+            transcoded.name = method_name
+            if transcoded.namespace:
+                transcoded.full_name = f"{transcoded.namespace}.{method_name}"
+            else:
+                transcoded.full_name = method_name
+
+            if method_name == "init":
+                transcoded.params[0].name = f"{first_param_name[0].lower()}{first_param_name[1:]}"
+            else:
+                transcoded.params[0].name = f"with{first_param_name}"
+
+        return transcoded
 
     def type_ref(self, type_ref: TypeRef) -> TypeRef:
         transcoded = super().type_ref(type_ref)

@@ -22,7 +22,7 @@ Traffic event details.
 
 |*Methods*
 |
-`xref:swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262[updateWithCause]`::
+`xref:swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262[update]`::
 Update the traffic event data.
 
 |===
@@ -42,12 +42,12 @@ Traffic event details.
 
 
 '''
-[[swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,updateWithCause]]
+[[swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,update]]
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-func updateWithCause(cause: Integer,
-                     delay: Integer) -> Any
+func update(withCause: Integer,
+            delay: Integer) -> Any
 ----
 
 Update the traffic event data.
@@ -58,7 +58,7 @@ Verifies the new information before updating.
 |===
 | Parameters
 |
-`cause: Integer`::
+`withCause: Integer`::
 New TPEG cause code.
 
 `delay: Integer`::

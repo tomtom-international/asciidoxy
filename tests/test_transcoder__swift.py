@@ -42,9 +42,10 @@ def test_transcode_member__single_argument(transcoder):
     transcoded = transcoder.member(member)
 
     assert transcoded.language == "swift"
-    assert transcoded.name == "updateWithName"
-    assert transcoded.full_name == "com.asciidoxy.geometry.updateWithName"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
     assert len(transcoded.params) == 1
+    assert transcoded.params[0].name == "withName"
 
 
 def test_transcode_member__multiple_arguments(transcoder):
@@ -57,9 +58,10 @@ def test_transcode_member__multiple_arguments(transcoder):
     transcoded = transcoder.member(member)
 
     assert transcoded.language == "swift"
-    assert transcoded.name == "updateWithName"
-    assert transcoded.full_name == "com.asciidoxy.geometry.updateWithName"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
     assert len(transcoded.params) == 3
+    assert transcoded.params[0].name == "withName"
 
 
 def test_transcode_member__init(transcoder):
@@ -78,18 +80,21 @@ def test_transcode_member__init__single_argument(transcoder):
     assert transcoded.language == "swift"
     assert transcoded.full_name == "com.asciidoxy.geometry.init"
     assert len(transcoded.params) == 1
+    assert transcoded.params[0].name == "name"
 
 
 def test_transcode_member__init__multiple_arguments(transcoder):
     member = make_member("objc",
                          name="initWithName:andAge",
-                         params=[make_parameter("name"),
+                         params=[make_parameter("nameValue"),
                                  make_parameter("age")])
     transcoded = transcoder.member(member)
 
     assert transcoded.language == "swift"
     assert transcoded.full_name == "com.asciidoxy.geometry.init"
     assert len(transcoded.params) == 2
+    assert transcoded.params[0].name == "name"
+    assert transcoded.params[1].name == "age"
 
 
 def test_transcode_member__block(transcoder):
@@ -124,8 +129,8 @@ def test_transcode_member__block(transcoder):
     ("NSURLRequest", "URLRequest"),
     ("NSUUID", "UUID"),
     ("init:", "init"),
-    ("initWithName:", "init"),
-    ("initWithName:andAge:", "init"),
+    ("initWithName:", "initWithName"),
+    ("initWithName:andAge:", "initWithName"),
     ("BOOL", "Bool"),
 ])
 def test_convert_name(transcoder, objc_name, swift_name):
@@ -138,8 +143,8 @@ def test_convert_name(transcoder, objc_name, swift_name):
     ("NSURL", "URL", "URL"),
     ("NSUUID", "UUID", "UUID"),
     ("init:", "MyClass.init:", "MyClass.init"),
-    ("initWithName:", "MyClass.initWithName:", "MyClass.init"),
-    ("initWithName:andAge:", "MyClass.initWithName:andAge:", "MyClass.init"),
+    ("initWithName:", "MyClass.initWithName:", "MyClass.initWithName"),
+    ("initWithName:andAge:", "MyClass.initWithName:andAge:", "MyClass.initWithName"),
 ])
 def test_convert_full_name(transcoder, objc_name, objc_full_name, swift_full_name):
     element = make_referable(ReferableElement, lang="objc", name=objc_name)
