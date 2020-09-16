@@ -43,16 +43,13 @@ Check if the coordinate is valid.
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-func init() -> instancetype;
+func init();
 ----
 
 Default constructor.
 
 
 
-[cols='h,5a']
-|===
-|===
 
 '''
 [[swift-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]

@@ -48,7 +48,8 @@ class SwiftTemplateHelper(TemplateHelper):
         return self.public_static_methods()
 
     def public_constructors(self) -> Iterator[Member]:
-        return (m for m in super().public_methods() if m.name.startswith("init"))
+        assert self.element is not None
+        assert self.insert_filter is not None
 
-    def public_methods(self) -> Iterator[Member]:
-        return (m for m in super().public_methods() if not m.name.startswith("init"))
+        return (m for m in self.insert_filter.members(self.element)
+                if m.kind == "function" and m.name == "init" and m.prot == "public")

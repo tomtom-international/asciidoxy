@@ -65,29 +65,37 @@ def test_transcode_member__multiple_arguments(transcoder):
 
 
 def test_transcode_member__init(transcoder):
-    member = make_member("objc", name="init")
+    member = make_member("objc",
+                         name="init",
+                         returns=make_return_value(make_type_ref("objc", "instancetype")))
     transcoded = transcoder.member(member)
 
     assert transcoded.language == "swift"
     assert transcoded.full_name == "com.asciidoxy.geometry.init"
     assert not transcoded.params
+    assert not transcoded.returns
 
 
 def test_transcode_member__init__single_argument(transcoder):
-    member = make_member("objc", name="initWithName:", params=[make_parameter("name")])
+    member = make_member("objc",
+                         name="initWithName:",
+                         params=[make_parameter("name")],
+                         returns=make_return_value(make_type_ref("objc", "instancetype")))
     transcoded = transcoder.member(member)
 
     assert transcoded.language == "swift"
     assert transcoded.full_name == "com.asciidoxy.geometry.init"
     assert len(transcoded.params) == 1
     assert transcoded.params[0].name == "name"
+    assert not transcoded.returns
 
 
 def test_transcode_member__init__multiple_arguments(transcoder):
     member = make_member("objc",
                          name="initWithName:andAge",
                          params=[make_parameter("nameValue"),
-                                 make_parameter("age")])
+                                 make_parameter("age")],
+                         returns=make_return_value(make_type_ref("objc", "instancetype")))
     transcoded = transcoder.member(member)
 
     assert transcoded.language == "swift"
@@ -95,6 +103,7 @@ def test_transcode_member__init__multiple_arguments(transcoder):
     assert len(transcoded.params) == 2
     assert transcoded.params[0].name == "name"
     assert transcoded.params[1].name == "age"
+    assert not transcoded.returns
 
 
 def test_transcode_member__block(transcoder):

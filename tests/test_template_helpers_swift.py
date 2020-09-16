@@ -78,6 +78,9 @@ def swift_class():
     for inner_type in ("class", "protocol", "struct"):
         compound.inner_classes.append(generate_nested_type(inner_type))
 
+    compound.members.append(
+        generate_member_function(prot="public", name="init", has_return_value=False))
+
     return compound
 
 
@@ -99,6 +102,11 @@ def test_public_type_methods(helper):
 def test_public_properties(helper):
     result = [m.name for m in helper.public_properties()]
     assert result == ["PublicProperty"]
+
+
+def test_public_constructors(helper):
+    result = [m.name for m in helper.public_constructors()]
+    assert sorted(result) == sorted(["init"])
 
 
 def test_public_simple_enclosed_types(helper):

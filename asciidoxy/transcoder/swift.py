@@ -81,6 +81,9 @@ class SwiftTranscoder(TranscoderBase):
             else:
                 transcoded.params[0].name = f"with{first_param_name}"
 
+        if transcoded.kind == "function" and transcoded.name == "init":
+            transcoded.returns = None
+
         return transcoded
 
     def type_ref(self, type_ref: TypeRef) -> TypeRef:
