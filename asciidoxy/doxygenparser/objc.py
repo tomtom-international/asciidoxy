@@ -44,7 +44,8 @@ class ObjectiveCTraits(LanguageTraits):
     ARGS_ENDS = ")",
     SEPARATORS = ",",
     OPERATORS = "*",
-    QUALIFIERS = "nullable", "const", "__weak", "__strong", "__nonnull", "_Nullable", "_Nonnull",
+    QUALIFIERS = ("nullable", "const", "__weak", "__strong", "__nonnull", "_Nullable", "_Nonnull",
+                  "__autoreleasing")
     BUILT_IN_NAMES = ("char", "unsigned", "signed", "int", "short", "long", "float", "double",
                       "void", "bool", "BOOL", "id", "instancetype")
     BLOCKS = "^",
