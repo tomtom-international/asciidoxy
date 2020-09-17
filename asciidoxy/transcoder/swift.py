@@ -15,7 +15,7 @@
 
 from typing import Optional, Union
 
-from ..model import Member, ReferableElement, TypeRef, TypeRefBase
+from ..model import Member, ReferableElement, ThrowsClause, TypeRef, TypeRefBase
 from .base import TranscoderBase
 
 
@@ -48,7 +48,7 @@ class SwiftTranscoder(TranscoderBase):
     def convert_name(self, source_element: Union[ReferableElement, TypeRefBase]) -> str:
         name = source_element.name
 
-        name = self.convert_bridged_type(name)
+        name = self.convert_bridged_type_name(name)
 
         if ":" in name:
             name = name.split(":", maxsplit=1)[0]
@@ -58,7 +58,7 @@ class SwiftTranscoder(TranscoderBase):
     def convert_full_name(self, source_element: ReferableElement) -> str:
         full_name = source_element.full_name
 
-        full_name = self.convert_bridged_type(full_name)
+        full_name = self.convert_bridged_type_name(full_name)
 
         if ":" in full_name:
             full_name = full_name.split(":", maxsplit=1)[0]
@@ -67,7 +67,13 @@ class SwiftTranscoder(TranscoderBase):
 
     def _member(self, member: Member) -> Member:
         transcoded = super()._member(member)
+        transcoded = self.remove_with_from_function(transcoded)
+        transcoded = self.remove_return_type_from_constructor(transcoded)
+        transcoded = self.replace_nserror_with_exception(member, transcoded)
+        return transcoded
 
+    @staticmethod
+    def remove_with_from_function(transcoded: Member) -> Member:
         if transcoded.kind == "function" and "With" in transcoded.name and transcoded.params:
             method_name, _, first_param_name = transcoded.name.partition("With")
             transcoded.name = method_name
@@ -80,9 +86,49 @@ class SwiftTranscoder(TranscoderBase):
                 transcoded.params[0].name = f"{first_param_name[0].lower()}{first_param_name[1:]}"
             else:
                 transcoded.params[0].name = f"with{first_param_name}"
+        return transcoded
 
+    @staticmethod
+    def remove_return_type_from_constructor(transcoded: Member) -> Member:
         if transcoded.kind == "function" and transcoded.name == "init":
             transcoded.returns = None
+        return transcoded
+
+    @staticmethod
+    def replace_nserror_with_exception(original: Member, transcoded: Member) -> Member:
+        # https://developer.apple.com/documentation/swift/cocoa_design_patterns/about_imported_cocoa_error_parameters
+        if (original.kind == "function" and original.params
+                and "NS_SWIFT_NOTHROW" not in original.args):
+            for original_param, param in zip(reversed(original.params),
+                                             reversed(transcoded.params)):
+                if (original_param.type is not None and original_param.type.name == "NSError"
+                        and original_param.type.suffix
+                        and original_param.type.suffix.count("*") == 2):
+                    assert param.type
+                    throws_clause = ThrowsClause("swift")
+                    throws_clause.type = param.type
+                    throws_clause.description = param.description
+                    transcoded.exceptions.append(throws_clause)
+                    transcoded.params.remove(param)
+
+                    if transcoded.returns is not None and transcoded.returns.type is not None:
+                        if transcoded.returns.type.name == "Bool":
+                            transcoded.returns = None
+                        elif (transcoded.returns.type is not None and transcoded.returns.type.suffix
+                              and "?" in transcoded.returns.type.suffix):
+                            transcoded.returns.type.suffix = transcoded.returns.type.suffix.replace(
+                                "?", "")
+
+                    if not transcoded.params and transcoded.name.endswith("AndReturnError"):
+                        transcoded.name = transcoded.name[:-14]
+                        transcoded.full_name = transcoded.full_name[:-14]
+
+                    break
+                elif param.type is not None and param.type.args:
+                    # If there are closures, the NSError does not need to be the last parameter
+                    continue
+                else:
+                    break
 
         return transcoded
 
@@ -113,7 +159,7 @@ class SwiftTranscoder(TranscoderBase):
         return transcoded
 
     @classmethod
-    def convert_bridged_type(cls, name: str) -> str:
+    def convert_bridged_type_name(cls, name: str) -> str:
         if name in cls.BRIDGED_FOUNDATION_TYPES:
             return cls.BRIDGED_FOUNDATION_TYPES[name]
         elif name.startswith("NS") and name not in cls.UNBRIDGED_FOUNDATION_TYPES:

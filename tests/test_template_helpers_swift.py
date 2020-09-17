@@ -16,7 +16,8 @@
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Compound, InnerTypeReference, Member, Parameter, ReturnValue, TypeRef
+from asciidoxy.model import (Compound, InnerTypeReference, Member, Parameter, ReturnValue,
+                             ThrowsClause, TypeRef)
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 
 
@@ -69,10 +70,21 @@ def swift_class():
         # add some method
         compound.members.append(
             generate_member_function(prot=visibility, name=visibility.capitalize() + "Method"))
+        # add some method without return type
+        compound.members.append(
+            generate_member_function(prot=visibility,
+                                     name=visibility.capitalize() + "MethodNoReturn",
+                                     has_return_value=False))
         # add static method
         compound.members.append(
             generate_member_function(prot=visibility,
                                      name=visibility.capitalize() + "TypeMethod",
+                                     is_static=True))
+        # add static method without return type
+        compound.members.append(
+            generate_member_function(prot=visibility,
+                                     name=visibility.capitalize() + "TypeMethodNoReturn",
+                                     has_return_value=False,
                                      is_static=True))
 
     for inner_type in ("class", "protocol", "struct"):
@@ -91,12 +103,12 @@ def helper(empty_context, swift_class):
 
 def test_public_methods(helper):
     result = [m.name for m in helper.public_methods()]
-    assert sorted(result) == sorted(["PublicMethod"])
+    assert sorted(result) == sorted(["PublicMethod", "PublicMethodNoReturn"])
 
 
 def test_public_type_methods(helper):
     result = [m.name for m in helper.public_type_methods()]
-    assert sorted(result) == sorted(["PublicTypeMethod"])
+    assert sorted(result) == sorted(["PublicTypeMethod", "PublicTypeMethodNoReturn"])
 
 
 def test_public_properties(helper):
@@ -131,12 +143,28 @@ def test_method_signature__no_params_no_return(helper):
     assert helper.method_signature(method) == "func start()"
 
 
+def test_method_signature__no_params_no_return__throws(helper):
+    method = Member("swift")
+    method.name = "start"
+    method.exceptions = [ThrowsClause("swift")]
+    assert helper.method_signature(method) == "func start() throws"
+
+
 def test_method_signature__no_params_simple_return(helper):
     method = Member("swift")
     method.name = "start"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("swift", name="Int")
     assert helper.method_signature(method) == "func start() -> Int"
+
+
+def test_method_signature__no_params_simple_return__throws(helper):
+    method = Member("swift")
+    method.name = "start"
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("swift", name="Int")
+    method.exceptions = [ThrowsClause("swift")]
+    assert helper.method_signature(method) == "func start() throws -> Int"
 
 
 def test_method_signature__no_params_link_return(helper):
@@ -146,6 +174,17 @@ def test_method_signature__no_params_link_return(helper):
     method.returns.type = TypeRef("swift", name="Value")
     method.returns.type.id = "swift-value"
     assert helper.method_signature(method) == "func retrieveValue() -> xref:swift-value[Value]"
+
+
+def test_method_signature__no_params_link_return__throws(helper):
+    method = Member("swift")
+    method.name = "retrieveValue"
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("swift", name="Value")
+    method.returns.type.id = "swift-value"
+    method.exceptions = [ThrowsClause("swift")]
+    assert (
+        helper.method_signature(method) == "func retrieveValue() throws -> xref:swift-value[Value]")
 
 
 def test_method_signature__one_param(helper):

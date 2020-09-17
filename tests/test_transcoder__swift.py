@@ -122,6 +122,268 @@ def test_transcode_member__block(transcoder):
     assert transcoded.kind == "closure"
 
 
+def test_transcode_member__only_argument_nserror__no_return(transcoder):
+    member = make_member("objc",
+                         name="update:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**"))
+                         ])
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert not transcoded.params
+    assert len(transcoded.exceptions) == 1
+    assert transcoded.exceptions[0].type
+    assert transcoded.exceptions[0].type.name == "Error"
+    assert not transcoded.exceptions[0].type.prefix
+    assert not transcoded.exceptions[0].type.suffix
+
+
+def test_transcode_member__only_argument_nserror__bool_return(transcoder):
+    member = make_member("objc",
+                         name="update:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**"))
+                         ],
+                         returns=make_return_value(make_type_ref("objc", name="BOOL")))
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert not transcoded.params
+    assert len(transcoded.exceptions) == 1
+    assert transcoded.exceptions[0].type
+    assert transcoded.exceptions[0].type.name == "Error"
+    assert not transcoded.exceptions[0].type.prefix
+    assert not transcoded.exceptions[0].type.suffix
+    assert not transcoded.returns
+
+
+def test_transcode_member__only_argument_nserror__other_return(transcoder):
+    member = make_member("objc",
+                         name="update:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**"))
+                         ],
+                         returns=make_return_value(make_type_ref("objc", name="NSString")))
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert not transcoded.params
+    assert len(transcoded.exceptions) == 1
+    assert transcoded.exceptions[0].type
+    assert transcoded.exceptions[0].type.name == "Error"
+    assert not transcoded.exceptions[0].type.prefix
+    assert not transcoded.exceptions[0].type.suffix
+    assert transcoded.returns
+    assert transcoded.returns.type
+    assert transcoded.returns.type.name == "String"
+
+
+def test_transcode_member__last_argument_nserror__bool_return(transcoder):
+    member = make_member("objc",
+                         name="update:",
+                         kind="function",
+                         params=[
+                             make_parameter("value", type_=make_type_ref("objc", "NSString")),
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**"))
+                         ],
+                         returns=make_return_value(make_type_ref("objc", name="BOOL")))
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert len(transcoded.params) == 1
+    assert transcoded.params[0].type
+    assert transcoded.params[0].type.name == "String"
+    assert len(transcoded.exceptions) == 1
+    assert transcoded.exceptions[0].type
+    assert transcoded.exceptions[0].type.name == "Error"
+    assert not transcoded.exceptions[0].type.prefix
+    assert not transcoded.exceptions[0].type.suffix
+    assert not transcoded.returns
+
+
+def test_transcode_member__nserror_not_last(transcoder):
+    member = make_member("objc",
+                         name="update:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**")),
+                             make_parameter("value", type_=make_type_ref("objc", "NSString")),
+                         ],
+                         returns=make_return_value(make_type_ref("objc", name="BOOL")))
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert len(transcoded.params) == 2
+    assert not transcoded.exceptions
+    assert transcoded.returns
+
+
+def test_transcode_member__only_argument_nserror__with_error(transcoder):
+    member = make_member("objc",
+                         name="updateWithError:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**"))
+                         ])
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert not transcoded.params
+    assert len(transcoded.exceptions) == 1
+    assert transcoded.exceptions[0].type
+    assert transcoded.exceptions[0].type.name == "Error"
+    assert not transcoded.exceptions[0].type.prefix
+    assert not transcoded.exceptions[0].type.suffix
+
+
+def test_transcode_member__only_argument_nserror__and_return_error(transcoder):
+    member = make_member("objc",
+                         name="updateAndReturnError:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**"))
+                         ])
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert not transcoded.params
+    assert len(transcoded.exceptions) == 1
+    assert transcoded.exceptions[0].type
+    assert transcoded.exceptions[0].type.name == "Error"
+    assert not transcoded.exceptions[0].type.prefix
+    assert not transcoded.exceptions[0].type.suffix
+
+
+def test_transcode_member__return_optional_removed(transcoder):
+    member = make_member("objc",
+                         name="updateAndReturnError:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**")),
+                         ],
+                         returns=make_return_value(
+                             make_type_ref("objc", name="NSString", prefix="", suffix="?")))
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert not transcoded.params
+    assert len(transcoded.exceptions) == 1
+    assert transcoded.exceptions[0].type
+    assert transcoded.exceptions[0].type.name == "Error"
+    assert not transcoded.exceptions[0].type.prefix
+    assert not transcoded.exceptions[0].type.suffix
+    assert transcoded.returns
+    assert transcoded.returns.type
+    assert transcoded.returns.type.name == "String"
+    assert not transcoded.returns.type.suffix
+
+
+def test_transcode_member__nserror_followed_by_closure(transcoder):
+    member = make_member("objc",
+                         name="update:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**")),
+                             make_parameter("callback",
+                                            type_=make_type_ref("objc",
+                                                                "void",
+                                                                prefix="",
+                                                                suffix=""))
+                         ])
+    member.params[1].type.args = [make_parameter("value")]
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert len(transcoded.params) == 1
+    assert transcoded.params[0].name == "callback"
+    assert len(transcoded.exceptions) == 1
+    assert transcoded.exceptions[0].type
+    assert transcoded.exceptions[0].type.name == "Error"
+    assert not transcoded.exceptions[0].type.prefix
+    assert not transcoded.exceptions[0].type.suffix
+
+
+def test_transcode_member__only_argument_nserror__swift_nothrow(transcoder):
+    member = make_member("objc",
+                         name="update:",
+                         kind="function",
+                         params=[
+                             make_parameter("error",
+                                            type_=make_type_ref("objc",
+                                                                "NSError",
+                                                                prefix="",
+                                                                suffix="**"))
+                         ],
+                         returns=make_return_value(make_type_ref("objc", name="BOOL")))
+    member.args = "([error] NSError ** NS_SWIFT_NOTHROW)"
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.name == "update"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert len(transcoded.params) == 1
+    assert not transcoded.exceptions
+    assert transcoded.returns
+
+
 @pytest.mark.parametrize("objc_name, swift_name", [
     ("NSObject", "NSObject"),
     ("NSAutoReleasePool", "NSAutoReleasePool"),
