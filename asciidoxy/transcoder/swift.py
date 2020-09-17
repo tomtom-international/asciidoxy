@@ -70,6 +70,7 @@ class SwiftTranscoder(TranscoderBase):
         transcoded = self.remove_with_from_function(transcoded)
         transcoded = self.remove_return_type_from_constructor(transcoded)
         transcoded = self.replace_nserror_with_exception(member, transcoded)
+        transcoded = self.remove_void_return_type(transcoded)
         return transcoded
 
     @staticmethod
@@ -91,6 +92,13 @@ class SwiftTranscoder(TranscoderBase):
     @staticmethod
     def remove_return_type_from_constructor(transcoded: Member) -> Member:
         if transcoded.kind == "function" and transcoded.name == "init":
+            transcoded.returns = None
+        return transcoded
+
+    @staticmethod
+    def remove_void_return_type(transcoded: Member) -> Member:
+        if (transcoded.kind == "function" and transcoded.returns is not None
+                and transcoded.returns.type is not None and transcoded.returns.type.name == "void"):
             transcoded.returns = None
         return transcoded
 

@@ -384,6 +384,18 @@ def test_transcode_member__only_argument_nserror__swift_nothrow(transcoder):
     assert transcoded.returns
 
 
+def test_transcode_member__void_return(transcoder):
+    member = make_member("objc",
+                         name="update",
+                         kind="function",
+                         returns=make_return_value(make_type_ref("objc", name="void")))
+    transcoded = transcoder.member(member)
+
+    assert transcoded.language == "swift"
+    assert transcoded.full_name == "com.asciidoxy.geometry.update"
+    assert transcoded.returns is None
+
+
 @pytest.mark.parametrize("objc_name, swift_name", [
     ("NSObject", "NSObject"),
     ("NSAutoReleasePool", "NSAutoReleasePool"),
