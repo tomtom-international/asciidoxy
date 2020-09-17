@@ -17,7 +17,7 @@ A coordinate has a latitude, longitude, and an altitude.
 
 |*Constructors*
 |
-`xref:swift-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22[init]`::
+`xref:swift-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22[init()]`::
 Default constructor.
 
 |*Properties*
@@ -31,7 +31,7 @@ The altitude in meters.
 
 |*Methods*
 |
-`xref:swift-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321[isValid]`::
+`xref:swift-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321[isValid()]`::
 Check if the coordinate is valid.
 
 |===
@@ -43,7 +43,7 @@ Check if the coordinate is valid.
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-func init();
+func init()
 ----
 
 Default constructor.

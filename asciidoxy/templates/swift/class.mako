@@ -51,7 +51,7 @@ ${enclosed.brief}
 |*Constructors*
 |
 % for constructor in helper.public_constructors():
-`xref:${constructor.id}[${constructor.name}]`::
+`xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
@@ -71,7 +71,7 @@ ${prop.brief}
 |*Type methods*
 |
 % for method in helper.public_type_methods():
-`xref:${method.id}[${method.name}]`::
+`xref:${method.id}[${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -81,7 +81,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in helper.public_methods():
-`xref:${method.id}[${method.name}]`::
+`xref:${method.id}[${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
@@ -101,7 +101,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ${api_context.insert(constructor)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(constructor)};
+${helper.method_signature(constructor)}
 ----
 
 ${constructor.brief}

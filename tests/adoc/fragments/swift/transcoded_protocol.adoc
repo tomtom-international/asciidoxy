@@ -22,7 +22,7 @@ Traffic event details.
 
 |*Methods*
 |
-`xref:swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262[update]`::
+`xref:swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262[update(Integer, Integer)]`::
 Update the traffic event data.
 
 |===
