@@ -174,6 +174,7 @@ async def test_http_package_not_a_tarfile(aiohttp_server, tmp_path):
     with pytest.raises(DownloadError):
         await collect([spec], tmp_path)
 
+
 async def test_http_package_name_interpolation_in_file_names(aiohttp_server, tmp_path):
     server = await start_server(aiohttp_server, web.get("/test/1.0.0/test", xml_file_response))
 
@@ -187,8 +188,10 @@ async def test_http_package_name_interpolation_in_file_names(aiohttp_server, tmp
 
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
+
 async def test_http_package_version_interpolation_in_file_names(aiohttp_server, tmp_path):
-    server = await start_server(aiohttp_server, web.get("/test/1.0.0/documentation-1.0.0", xml_file_response))
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/documentation-1.0.0", xml_file_response))
 
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
@@ -200,8 +203,10 @@ async def test_http_package_version_interpolation_in_file_names(aiohttp_server, 
 
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
+
 async def test_http_package_version_and_name_interpolation_in_file_names(aiohttp_server, tmp_path):
-    server = await start_server(aiohttp_server, web.get("/test/1.0.0/test-1.0.0", xml_file_response))
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/test-1.0.0",
+                                                        xml_file_response))
 
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
@@ -721,6 +726,7 @@ version = "1.0.0"
 
     with pytest.raises(SpecificationError):
         specs_from_file(spec_file)
+
 
 def test_specs_from_file__name_and_version_interpolation(tmp_path):
     spec_file = tmp_path / "spec.toml"

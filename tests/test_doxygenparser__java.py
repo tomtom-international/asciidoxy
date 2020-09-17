@@ -118,9 +118,7 @@ def test_parse_java_method(api_reference):
 
 @pytest.mark.parametrize("api_reference_set", [["java/default"]])
 def test_parse_java_method__with_return_type_annotation(api_reference):
-    member = api_reference.find("com.asciidoxy.Nullability.getData",
-                                kind="function",
-                                lang="java")
+    member = api_reference.find("com.asciidoxy.Nullability.getData", kind="function", lang="java")
 
     assert member is not None
     assert member.returns
@@ -131,9 +129,7 @@ def test_parse_java_method__with_return_type_annotation(api_reference):
 
 @pytest.mark.parametrize("api_reference_set", [["java/default"]])
 def test_parse_java_method__with_parameter_type_annotation(api_reference):
-    member = api_reference.find("com.asciidoxy.Nullability.setData",
-                                kind="function",
-                                lang="java")
+    member = api_reference.find("com.asciidoxy.Nullability.setData", kind="function", lang="java")
 
     assert member is not None
     assert len(member.params) == 1
