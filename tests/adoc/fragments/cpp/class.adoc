@@ -24,13 +24,13 @@ Default constructor.
 
 |*Methods*
 |
-`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11[double Latitude()]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11[double Latitude() const]`::
 Latitude.
-`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1[double Longitude()]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1[double Longitude() const]`::
 Longitude.
-`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483[double Altitude()]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483[double Altitude() const]`::
 Altitude.
-`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[bool IsValid()]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[bool IsValid() const]`::
 Check if the coordinate is valid.
 `xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a[void Update(const Coordinate &)]`::
 Update from another coordinate.

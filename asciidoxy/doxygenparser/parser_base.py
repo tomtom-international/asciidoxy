@@ -179,7 +179,8 @@ class ParserBase(ABC):
             self.parse_description(memberdef_element.find("detaileddescription")))
         member.returns = self.parse_returns(memberdef_element, member)
         member.enumvalues = self.parse_enumvalues(memberdef_element, member.full_name)
-        member.static = _yes_no_to_bool(memberdef_element.get("static", "false"))
+        member.static = _yes_no_to_bool(memberdef_element.get("static", "no"))
+        member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
 
         self._driver.register(member)
         return member

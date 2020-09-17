@@ -20,6 +20,13 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== Unreleased
+
+=== Added
+
+  - [AD-10] Support const methods in {Cpp}.
+
+
 == 0.6.1 (27 Jul 2020)
 
 === Added

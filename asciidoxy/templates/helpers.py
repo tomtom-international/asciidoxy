@@ -112,6 +112,8 @@ class TemplateHelper:
         return self._method_join(static, return_type)
 
     def _method_suffix(self, method: Member, *, link: bool = True) -> str:
+        if method.const:
+            return " const"
         return ""
 
     @staticmethod

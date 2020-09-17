@@ -84,7 +84,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in helper.public_methods():
-`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
+`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${" const" if method.const else ""}]`::
 ${method.brief}
 % endfor
 

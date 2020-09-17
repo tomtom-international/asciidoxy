@@ -491,6 +491,18 @@ def test_method_signature__no_params(empty_context):
     assert helper.method_signature(method) == "void ShortMethod()"
 
 
+def test_method_signature__const(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+    method.const = True
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    helper = TemplateHelper(empty_context)
+    assert helper.method_signature(method) == "void ShortMethod() const"
+
+
 def test_method_signature__single_param(empty_context):
     method = Member("lang")
     method.name = "ShortMethod"

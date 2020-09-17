@@ -97,6 +97,7 @@ def test_parse_cpp_member_function_no_return_value(api_reference):
     assert member.static is False
     assert member.include == "coordinate.hpp"
     assert member.namespace == "asciidoxy::geometry::Coordinate"
+    assert member.const is False
 
     assert len(member.params) == 0
     assert len(member.exceptions) == 0
@@ -124,6 +125,7 @@ def test_parse_cpp_member_function_only_return_value(api_reference):
     assert member.static is False
     assert member.include == "coordinate.hpp"
     assert member.namespace == "asciidoxy::geometry::Coordinate"
+    assert member.const is True
 
     assert len(member.params) == 0
     assert len(member.exceptions) == 0
@@ -162,6 +164,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
     assert member.static is False
     assert member.include == "traffic_event.hpp"
     assert member.namespace == "asciidoxy::traffic::TrafficEvent"
+    assert member.const is False
 
     assert len(member.exceptions) == 0
     assert len(member.enumvalues) == 0
