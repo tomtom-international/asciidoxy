@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kind="class" language="Java" prot="public">
+    <compoundname>com::asciidoxy::traffic::TrafficEvent::TrafficEventData</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a51a0931fa2f88d90d361e0585272bfe3" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int com.asciidoxy.traffic.TrafficEvent.TrafficEventData.cause</definition>
+        <argsstring></argsstring>
+        <name>cause</name>
+        <briefdescription>
+<para>TPEG cause code. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="60" column="16" bodyfile="TrafficEvent.java" bodystart="60" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af7dbd73363f684515059c2f1d9f726de" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int com.asciidoxy.traffic.TrafficEvent.TrafficEventData.delay</definition>
+        <argsstring></argsstring>
+        <name>delay</name>
+        <briefdescription>
+<para>Delay caused by the traffic event in seconds. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="65" column="16" bodyfile="TrafficEvent.java" bodystart="65" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1affd2d871785d9ad999a9ac288c1fbb7c" prot="public" static="no" mutable="no">
+        <type><ref refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kindref="compound">Severity</ref></type>
+        <definition>Severity com.asciidoxy.traffic.TrafficEvent.TrafficEventData.severity</definition>
+        <argsstring></argsstring>
+        <name>severity</name>
+        <briefdescription>
+<para><ref refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kindref="compound">Severity</ref> of the event. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="70" column="21" bodyfile="TrafficEvent.java" bodystart="70" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Details about a traffic event. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>Use the cause and delay to properly inform your users. </para>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="1">
+        <label>com.asciidoxy.traffic.TrafficEvent.TrafficEventData</label>
+        <link refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>severity</edgelabel>
+        </childnode>
+      </node>
+      <node id="2">
+        <label>com.asciidoxy.traffic.TrafficEvent.Severity</label>
+        <link refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"/>
+      </node>
+    </collaborationgraph>
+    <location file="TrafficEvent.java" line="56" column="9" bodyfile="TrafficEvent.java" bodystart="56" bodyend="71"/>
+    <listofallmembers>
+      <member refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a51a0931fa2f88d90d361e0585272bfe3" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>cause</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af7dbd73363f684515059c2f1d9f726de" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>delay</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1affd2d871785d9ad999a9ac288c1fbb7c" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent::TrafficEventData</scope><name>severity</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

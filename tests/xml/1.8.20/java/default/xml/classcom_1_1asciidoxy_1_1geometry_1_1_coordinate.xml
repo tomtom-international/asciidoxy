@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate" kind="class" language="Java" prot="public">
+    <compoundname>com::asciidoxy::geometry::Coordinate</compoundname>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1adb25dbe9730f09641d0a383c9d3e9086" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double com.asciidoxy.geometry.Coordinate.latitude_</definition>
+        <argsstring></argsstring>
+        <name>latitude_</name>
+        <initializer>= 0.0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Coordinate.java" line="59" column="18" bodyfile="Coordinate.java" bodystart="59" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a769b86ee126dbe5d1c1d252353239295" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double com.asciidoxy.geometry.Coordinate.longitude_</definition>
+        <argsstring></argsstring>
+        <name>longitude_</name>
+        <initializer>= 0.0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Coordinate.java" line="60" column="18" bodyfile="Coordinate.java" bodystart="60" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1af2da697bf021f0310f9b5027ea8c3b81" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double com.asciidoxy.geometry.Coordinate.altitude_</definition>
+        <argsstring></argsstring>
+        <name>altitude_</name>
+        <initializer>= 0.0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Coordinate.java" line="61" column="18" bodyfile="Coordinate.java" bodystart="61" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1ab88068a456629b5519234b68de8c375f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>com.asciidoxy.geometry.Coordinate.Coordinate</definition>
+        <argsstring>()</argsstring>
+        <name>Coordinate</name>
+        <briefdescription>
+<para>Default constructor. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Coordinate.java" line="27" column="10" bodyfile="Coordinate.java" bodystart="27" bodyend="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a1430fa173dddd5b12f049044f86e4244" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>double</type>
+        <definition>double com.asciidoxy.geometry.Coordinate.Latitude</definition>
+        <argsstring>()</argsstring>
+        <name>Latitude</name>
+        <briefdescription>
+<para>Latitude. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>The latitude in degrees. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Coordinate.java" line="34" column="17" bodyfile="Coordinate.java" bodystart="34" bodyend="34"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1afe78701035a481e3ee4f5611355a54ed" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>double</type>
+        <definition>double com.asciidoxy.geometry.Coordinate.Longitude</definition>
+        <argsstring>()</argsstring>
+        <name>Longitude</name>
+        <briefdescription>
+<para>Longitude. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>The longitude in degrees. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Coordinate.java" line="41" column="17" bodyfile="Coordinate.java" bodystart="41" bodyend="41"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a7da297a2e2933bb44990d2e61a22f4cd" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>double</type>
+        <definition>double com.asciidoxy.geometry.Coordinate.Altitude</definition>
+        <argsstring>()</argsstring>
+        <name>Altitude</name>
+        <briefdescription>
+<para>Altitude. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>The altitude in meters. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Coordinate.java" line="48" column="17" bodyfile="Coordinate.java" bodystart="48" bodyend="48"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1aa2c0aedf89e6586b74745b58e166eba7" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>boolean</type>
+        <definition>boolean com.asciidoxy.geometry.Coordinate.IsValid</definition>
+        <argsstring>()</argsstring>
+        <name>IsValid</name>
+        <briefdescription>
+<para>Check if the coordinate is valid. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>A coordinate is valid if its values are within WGS84 bounds.</para>
+<para><simplesect kind="return"><para>True if valid, false if not. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Coordinate.java" line="57" column="18" bodyfile="Coordinate.java" bodystart="57" bodyend="57"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Class to hold information about a coordinate. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>A coordinate has a latitude, longitude, and an altitude. </para>
+    </detaileddescription>
+    <location file="Coordinate.java" line="23" column="7" bodyfile="Coordinate.java" bodystart="23" bodyend="62"/>
+    <listofallmembers>
+      <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a7da297a2e2933bb44990d2e61a22f4cd" prot="public" virt="non-virtual"><scope>com::asciidoxy::geometry::Coordinate</scope><name>Altitude</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1af2da697bf021f0310f9b5027ea8c3b81" prot="private" virt="non-virtual"><scope>com::asciidoxy::geometry::Coordinate</scope><name>altitude_</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1ab88068a456629b5519234b68de8c375f" prot="public" virt="non-virtual"><scope>com::asciidoxy::geometry::Coordinate</scope><name>Coordinate</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1aa2c0aedf89e6586b74745b58e166eba7" prot="public" virt="non-virtual"><scope>com::asciidoxy::geometry::Coordinate</scope><name>IsValid</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a1430fa173dddd5b12f049044f86e4244" prot="public" virt="non-virtual"><scope>com::asciidoxy::geometry::Coordinate</scope><name>Latitude</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1adb25dbe9730f09641d0a383c9d3e9086" prot="private" virt="non-virtual"><scope>com::asciidoxy::geometry::Coordinate</scope><name>latitude_</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1afe78701035a481e3ee4f5611355a54ed" prot="public" virt="non-virtual"><scope>com::asciidoxy::geometry::Coordinate</scope><name>Longitude</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a769b86ee126dbe5d1c1d252353239295" prot="private" virt="non-virtual"><scope>com::asciidoxy::geometry::Coordinate</scope><name>longitude_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

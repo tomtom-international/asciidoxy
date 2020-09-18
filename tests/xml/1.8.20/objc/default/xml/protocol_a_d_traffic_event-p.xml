@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="protocol_a_d_traffic_event-p" kind="protocol" language="Objective-C" prot="public">
+    <compoundname>ADTrafficEvent-p</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">&lt;NSObjectNSObject&gt;</basecompoundref>
+    <includes refid="_a_d_traffic_event_8h" local="no">ADTrafficEvent.h</includes>
+      <sectiondef kind="property">
+      <memberdef kind="property" id="protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b" prot="public" static="no" readable="yes" writable="no" gettable="no" privategettable="no" protectedgettable="no" settable="no" privatesettable="no" protectedsettable="no" accessor="assign">
+        <type><ref refid="interface_traffic_event_data" kindref="compound">TrafficEventData</ref></type>
+        <definition>TrafficEventData ADTrafficEvent-p::data</definition>
+        <argsstring></argsstring>
+        <name>data</name>
+        <read></read>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Traffic event details. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADTrafficEvent.h" line="85" column="19" bodyfile="ADTrafficEvent.h" bodystart="85" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type>id</type>
+        <definition>id ADTrafficEvent-p::updateWithCause:andDelay:</definition>
+        <argsstring>(NSInteger cause,[andDelay] NSInteger delay)</argsstring>
+        <name>updateWithCause:andDelay:</name>
+        <param>
+          <type>NSInteger</type>
+          <declname>cause</declname>
+        </param>
+        <param>
+          <attributes>[andDelay]</attributes>
+          <type>NSInteger</type>
+          <declname>delay</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Update the traffic event data.</para>
+<para>Verifies the new information before updating.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>cause</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>New TPEG cause code. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delay</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>New delay in seconds. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>True if the update is valid. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADTrafficEvent.h" line="85" column="19"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Information about a traffic event. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>&lt;ADTrafficEvent&gt;</label>
+        <link refid="protocol_a_d_traffic_event-p"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>&lt;NSObjectNSObject&gt;</label>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>&lt;ADTrafficEvent&gt;</label>
+        <link refid="protocol_a_d_traffic_event-p"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>data</edgelabel>
+        </childnode>
+      </node>
+      <node id="2">
+        <label>&lt;NSObjectNSObject&gt;</label>
+      </node>
+      <node id="3">
+        <label>TrafficEventData</label>
+        <link refid="interface_traffic_event_data"/>
+        <childnode refid="4" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>NSObject</label>
+      </node>
+    </collaborationgraph>
+    <location file="ADTrafficEvent.h" line="80" column="11" bodyfile="ADTrafficEvent.h" bodystart="80" bodyend="-1"/>
+    <listofallmembers>
+      <member refid="protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b" prot="public" virt="non-virtual"><scope>ADTrafficEvent-p</scope><name>data</name></member>
+      <member refid="protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262" prot="public" virt="virtual"><scope>ADTrafficEvent-p</scope><name>updateWithCause:andDelay:</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
