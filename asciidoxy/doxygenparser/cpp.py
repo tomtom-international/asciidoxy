@@ -13,13 +13,17 @@
 # limitations under the License.
 """Support for parsing C++ documentation."""
 
+import re
 import string
+
+import xml.etree.ElementTree as ET
 
 from typing import List, Optional
 
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser, find_tokens
+from ..model import Compound, Member
 
 
 class CppTraits(LanguageTraits):
@@ -132,3 +136,15 @@ class CppParser(ParserBase):
     """Parser for C++ documentation."""
     TRAITS = CppTraits
     TYPE_PARSER = CppTypeParser
+
+    DEFAULTED_RE = re.compile(r"=\s*default\s*$")
+    DELETED_RE = re.compile(r"=\s*delete\s*$")
+
+    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
+        member = super().parse_member(memberdef_element, parent)
+
+        if member is not None and member.kind == "function" and member.args:
+            member.default = self.DEFAULTED_RE.search(member.args) is not None
+            member.deleted = self.DELETED_RE.search(member.args) is not None
+
+        return member

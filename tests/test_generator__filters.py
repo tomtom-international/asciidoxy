@@ -134,8 +134,8 @@ def test_member_filter__prot(cpp_class):
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
     assert sorted(member_names) == sorted([
         "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
-        "ProtectedStruct", "ProtectedTrash", "MyClass", "operator++", "ProtectedMethod",
-        "ProtectedStaticMethod"
+        "ProtectedStruct", "ProtectedTrash", "MyClass", "MyClass", "MyClass", "operator++",
+        "operator=", "operator=", "ProtectedMethod", "ProtectedStaticMethod"
     ])
 
 
@@ -344,12 +344,13 @@ def test_insertion_filter__compound__no_filters(cpp_class_with_inner_classes):
     ]
     assert sorted(member_names) == sorted([
         "PublicVariable", "PublicEnum", "PublicClass", "PublicTypedef", "PublicStruct",
-        "PublicTrash", "MyClass", "operator++", "PublicMethod", "PublicStaticMethod",
-        "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
-        "ProtectedStruct", "ProtectedTrash", "MyClass", "operator++", "ProtectedMethod",
-        "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum", "PrivateClass", "PrivateTypedef",
-        "PrivateStruct", "PrivateTrash", "MyClass", "operator++", "PrivateMethod",
-        "PrivateStaticMethod"
+        "PublicTrash", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass",
+        "operator++", "PublicMethod", "PublicStaticMethod", "ProtectedVariable", "ProtectedEnum",
+        "ProtectedClass", "ProtectedTypedef", "ProtectedStruct", "ProtectedTrash", "MyClass",
+        "operator++", "ProtectedMethod", "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum",
+        "PrivateClass", "PrivateTypedef", "PrivateStruct", "PrivateTrash", "MyClass", "operator++",
+        "PrivateMethod", "PrivateStaticMethod", "operator=", "operator=", "operator=", "operator=",
+        "operator=", "operator="
     ])
 
     inner_class_names = [
@@ -398,10 +399,11 @@ def test_insertion_filter__compound__filter_inner_classes(cpp_class_with_inner_c
         "PublicVariable", "PublicEnum", "PublicClass", "PublicTypedef", "PublicStruct",
         "PublicTrash", "MyClass", "operator++", "PublicMethod", "PublicStaticMethod",
         "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
-        "ProtectedStruct", "ProtectedTrash", "MyClass", "operator++", "ProtectedMethod",
-        "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum", "PrivateClass", "PrivateTypedef",
-        "PrivateStruct", "PrivateTrash", "MyClass", "operator++", "PrivateMethod",
-        "PrivateStaticMethod"
+        "ProtectedStruct", "ProtectedTrash", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass",
+        "MyClass", "MyClass", "operator++", "ProtectedMethod", "ProtectedStaticMethod",
+        "PrivateVariable", "PrivateEnum", "PrivateClass", "PrivateTypedef", "PrivateStruct",
+        "PrivateTrash", "MyClass", "operator++", "PrivateMethod", "PrivateStaticMethod",
+        "operator=", "operator=", "operator=", "operator=", "operator=", "operator="
     ])
 
     inner_class_names = [
@@ -429,7 +431,8 @@ def test_insertion_filter__compound__filter_enum_values(cpp_class_with_inner_cla
         "ProtectedStruct", "ProtectedTrash", "MyClass", "operator++", "ProtectedMethod",
         "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum", "PrivateClass", "PrivateTypedef",
         "PrivateStruct", "PrivateTrash", "MyClass", "operator++", "PrivateMethod",
-        "PrivateStaticMethod"
+        "PrivateStaticMethod", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass",
+        "operator=", "operator=", "operator=", "operator=", "operator=", "operator="
     ])
 
     inner_class_names = [

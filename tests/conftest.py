@@ -153,7 +153,9 @@ def cpp_class():
     def generate_member_function(prot: str,
                                  name: str,
                                  has_return_value: bool = True,
-                                 is_static: bool = False) -> Member:
+                                 is_static: bool = False,
+                                 is_deleted: bool = False,
+                                 is_default: bool = False) -> Member:
         member = Member("cpp")
         member.kind = "function"
         member.name = name
@@ -162,6 +164,10 @@ def cpp_class():
             member.returns = ReturnValue()
         if is_static:
             member.static = True
+        if is_deleted:
+            member.deleted = True
+        if is_default:
+            member.default = True
         return member
 
     # fill class with typical members
@@ -169,15 +175,33 @@ def cpp_class():
         for member_type in ("variable", "enum", "class", "typedef", "struct", "trash"):
             compound.members.append(generate_member(kind=member_type, prot=visibility))
 
-        # adds constructors
+        # constructor
         compound.members.append(
             generate_member_function(prot=visibility, name="MyClass", has_return_value=False))
-        # add some operator
+        # default constructor
+        compound.members.append(
+            generate_member_function(prot=visibility,
+                                     name="MyClass",
+                                     has_return_value=False,
+                                     is_default=True))
+        # deleted constructor
+        compound.members.append(
+            generate_member_function(prot=visibility,
+                                     name="MyClass",
+                                     has_return_value=False,
+                                     is_deleted=True))
+        # operator
         compound.members.append(generate_member_function(prot=visibility, name="operator++"))
-        # add some method
+        # default operator
+        compound.members.append(
+            generate_member_function(prot=visibility, name="operator=", is_default=True))
+        # deleted operator
+        compound.members.append(
+            generate_member_function(prot=visibility, name="operator=", is_deleted=True))
+        # method
         compound.members.append(
             generate_member_function(prot=visibility, name=visibility.capitalize() + "Method"))
-        # add static method
+        # static method
         compound.members.append(
             generate_member_function(prot=visibility,
                                      name=visibility.capitalize() + "StaticMethod",

@@ -2,6 +2,7 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
   <compounddef id="namespaceasciidoxy_1_1system" kind="namespace" language="C++">
     <compoundname>asciidoxy::system</compoundname>
+    <innerclass refid="classasciidoxy_1_1system_1_1_move_only" prot="public">asciidoxy::system::MoveOnly</innerclass>
     <innerclass refid="classasciidoxy_1_1system_1_1_service" prot="public">asciidoxy::system::Service</innerclass>
     <innerclass refid="classasciidoxy_1_1system_1_1_service_starter" prot="public">asciidoxy::system::ServiceStarter</innerclass>
       <sectiondef kind="func">
@@ -40,6 +41,6 @@
     </briefdescription>
     <detaileddescription>
     </detaileddescription>
-    <location file="service.hpp" line="18" column="1"/>
+    <location file="move_only.hpp" line="18" column="1"/>
   </compounddef>
 </doxygen>

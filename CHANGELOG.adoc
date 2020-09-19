@@ -26,6 +26,10 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
   - [AD-10] Support const methods in {Cpp}.
 
+=== Fixed
+
+  - [AD-34] Hide default and deleted members in {Cpp}.
+
 
 == 0.6.1 (27 Jul 2020)
 

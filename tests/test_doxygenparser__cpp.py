@@ -341,3 +341,23 @@ def test_parse_cpp_member_function_with_std_function_argument(api_reference):
     assert not arg_2.type.suffix
     assert not arg_2.type.nested
     assert not arg_2.type.args
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function__deleted(api_reference):
+    member = api_reference.find("asciidoxy::system::MoveOnly::MoveOnly(const MoveOnly&)",
+                                kind="function",
+                                lang="cpp")
+    assert member is not None
+    assert member.deleted is True
+    assert member.default is False
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function__default(api_reference):
+    member = api_reference.find("asciidoxy::system::MoveOnly::operator=(MoveOnly&&)",
+                                kind="function",
+                                lang="cpp")
+    assert member is not None
+    assert member.deleted is False
+    assert member.default is True

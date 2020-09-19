@@ -195,6 +195,8 @@ class Member(ReferableElement):
         include:     Name of the include (file) required to use this member.
         namespace:   Namespace, or scope, the member is contained in.
         const:       The member is constant, not changing itself or its parent.
+        deleted:     The member is marked as deleted.
+        default:     The member is a default generated member.
     """
 
     definition: str = ""
@@ -210,6 +212,8 @@ class Member(ReferableElement):
     include: Optional[str] = None
     namespace: Optional[str] = None
     const: bool = False
+    deleted: bool = False
+    default: bool = False
 
     def __init__(self, language: str):
         super().__init__(language)

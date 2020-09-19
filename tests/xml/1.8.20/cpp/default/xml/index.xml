@@ -27,6 +27,14 @@
   <compound refid="class_logger" kind="class"><name>Logger</name>
     <member refid="class_logger_1adfed6b5c5cb7fab63527144e705c1fa8" kind="function"><name>Log</name></member>
   </compound>
+  <compound refid="classasciidoxy_1_1system_1_1_move_only" kind="class"><name>asciidoxy::system::MoveOnly</name>
+    <member refid="classasciidoxy_1_1system_1_1_move_only_1ad7318b4b1da7355aeaf145e5597318b8" kind="variable"><name>~MoveOnly</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_move_only_1a6dc67ce1f9071ebb2bf144874b589ba1" kind="function"><name>MoveOnly</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_move_only_1a5e9079fbfbaa072035069d70e4627747" kind="function"><name>MoveOnly</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_move_only_1a330464b08592a825ef29c34fb27981e8" kind="function"><name>MoveOnly</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_move_only_1a0a96fb07ea0d648c1077a30cab963f6c" kind="function"><name>operator=</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_move_only_1a52622305a840ea66ccc83df35563a920" kind="function"><name>operator=</name></member>
+  </compound>
   <compound refid="classasciidoxy_1_1system_1_1_service" kind="interface"><name>asciidoxy::system::Service</name>
     <member refid="classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8" kind="function"><name>Start</name></member>
     <member refid="classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0" kind="function"><name>Stop</name></member>
@@ -72,6 +80,8 @@
   <compound refid="coordinate_8hpp" kind="file"><name>coordinate.hpp</name>
   </compound>
   <compound refid="logger_8hpp" kind="file"><name>logger.hpp</name>
+  </compound>
+  <compound refid="move__only_8hpp" kind="file"><name>move_only.hpp</name>
   </compound>
   <compound refid="overloads_8hpp" kind="file"><name>overloads.hpp</name>
   </compound>
