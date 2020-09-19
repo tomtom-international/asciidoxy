@@ -361,3 +361,10 @@ def test_parse_cpp_member_function__default(api_reference):
     assert member is not None
     assert member.deleted is False
     assert member.default is True
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp__include_file_for_free_functions(api_reference):
+    function = api_reference.find("asciidoxy::system::CreateService", kind="function", lang="cpp")
+    assert function is not None
+    assert function.include == "service.hpp"

@@ -165,7 +165,7 @@ class ParserBase(ABC):
         member.name = self.TRAITS.short_name(name)
         member.full_name = self.TRAITS.full_name(name, parent.full_name)
         member.namespace = self.TRAITS.namespace(member.full_name)
-        member.include = parent.include
+        member.include = self.find_include(memberdef_element)
 
         if self.TRAITS.is_member_blacklisted(member.kind, member.name):
             return None
@@ -237,6 +237,8 @@ class ParserBase(ABC):
         if include is None:
             location_element = element.find("location")
             if location_element is not None:
-                include = location_element.get("file", None)
+                include = location_element.get("declfile", None)
+                if include is None:
+                    include = location_element.get("file", None)
 
         return include

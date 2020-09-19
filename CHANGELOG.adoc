@@ -29,6 +29,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Fixed
 
   - [AD-34] Hide default and deleted members in {Cpp}.
+  - Correctly detect include file for free functions.
 
 
 == 0.6.1 (27 Jul 2020)
