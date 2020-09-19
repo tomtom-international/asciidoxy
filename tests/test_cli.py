@@ -87,7 +87,8 @@ def test_help():
     assert exc_info.value.code == 0
 
 
-def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, adoc_data):
+def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, adoc_data,
+                      event_loop):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -105,7 +106,7 @@ def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, a
 
 
 def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destination_dir,
-                                  adoc_data):
+                                  adoc_data, event_loop):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -128,7 +129,7 @@ def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destin
 
 
 def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
-                     adoc_data):
+                     adoc_data, event_loop):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -156,8 +157,8 @@ def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, desti
     assert processed_file.is_file()
 
 
-def test_forward_unknown_options(asciidoctor_mock, build_dir, spec_file, destination_dir,
-                                 adoc_data):
+def test_forward_unknown_options(asciidoctor_mock, build_dir, spec_file, destination_dir, adoc_data,
+                                 event_loop):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([

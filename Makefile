@@ -79,7 +79,7 @@ type-check: ## Check typing with mypy
 	mypy asciidoxy
 
 test: ## run tests quickly with the default Python
-	pytest
+	pytest -n auto
 
 test-all: ## run tests on every Python version with tox
 	tox -s
