@@ -36,6 +36,9 @@ class CppTemplateHelper(TemplateHelper):
         return (m for m in super().public_static_methods() if not m.name.startswith("operator"))
 
     def public_methods(self) -> Iterator[Member]:
-        # TODO: Handle operators and destructors separately
         return (m for m in super().public_methods()
                 if (not m.name.startswith("operator") and not m.default and not m.deleted))
+
+    def public_operators(self) -> Iterator[Member]:
+        return (m for m in super().public_methods()
+                if (m.name.startswith("operator") and not m.default and not m.deleted))

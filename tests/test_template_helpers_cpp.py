@@ -85,6 +85,23 @@ def test_public_methods__filter_no_match(helper):
     assert len(result) == 0
 
 
+def test_public_operators__no_filter(helper):
+    result = [m.name for m in helper.public_operators()]
+    assert result == ["operator++"]
+
+
+def test_public_operators__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="ALL")
+    result = [m.name for m in helper.public_operators()]
+    assert result == ["operator++"]
+
+
+def test_public_operators__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.public_operators()]
+    assert len(result) == 0
+
+
 def test_public_static_methods__no_filter(helper):
     result = [m.name for m in helper.public_static_methods()]
     assert result == ["PublicStaticMethod"]

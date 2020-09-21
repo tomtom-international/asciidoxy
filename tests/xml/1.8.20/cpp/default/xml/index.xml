@@ -12,6 +12,7 @@
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ac5f3b7b213473d7fedbdc7ccda7816f6" kind="variable"><name>altitude_</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318" kind="function"><name>Coordinate</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0" kind="function"><name>~Coordinate</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038" kind="function"><name>operator+</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11" kind="function"><name>Latitude</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1" kind="function"><name>Longitude</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483" kind="function"><name>Altitude</name></member>

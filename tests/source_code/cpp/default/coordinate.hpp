@@ -43,6 +43,11 @@ class Coordinate {
   ~Coordinate();
 
   /**
+   * Coordinates can be added.
+   */
+  Coordinate operator+(const Coordinate& other) const;
+
+  /**
    * Latitude.
    *
    * @returns The latitude in degrees.

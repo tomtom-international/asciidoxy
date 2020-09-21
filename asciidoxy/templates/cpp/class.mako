@@ -71,6 +71,16 @@ ${destructor.brief}
 
 % endif
 ###################################################################################################
+% if has(helper.public_operators()):
+|*Operators*
+|
+% for operator in helper.public_operators():
+`xref:${operator.id}[${operator.name}${helper.type_list(operator.params)}]`::
+${operator.brief}
+% endfor
+
+% endif
+###################################################################################################
 % if has(helper.public_variables()):
 |*Variables*
 |
@@ -116,6 +126,11 @@ ${api.insert_fragment(constructor, insert_filter, kind_override="method")}
 #################################################################################### Destructors ##
 % for destructor in helper.public_destructors():
 ${api.insert_fragment(destructor, insert_filter, kind_override="method")}
+'''
+% endfor
+###################################################################################### Operators ##
+% for operator in helper.public_operators():
+${api.insert_fragment(operator, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Variables ##

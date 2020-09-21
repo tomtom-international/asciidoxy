@@ -27,6 +27,11 @@ Default constructor.
 `xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0[~Coordinate()]`::
 Destructor.
 
+|*Operators*
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038[operator+(const Coordinate &)]`::
+Coordinates can be added.
+
 |*Methods*
 |
 `xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11[double Latitude() const]`::
@@ -54,6 +59,8 @@ Update from separate values.
 include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318.adoc[leveloffset=+1]
 '''
 include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038.adoc[leveloffset=+1]
 '''
 include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11.adoc[leveloffset=+1]
 '''
