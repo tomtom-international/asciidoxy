@@ -14,8 +14,9 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any, chain
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
+from itertools import chain
 %>
 <%
 helper = CppTemplateHelper(api_context, element, insert_filter)

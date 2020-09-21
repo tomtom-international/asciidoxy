@@ -177,8 +177,3 @@ def has(elements):
 
 def has_any(*elements):
     return any(has(e) for e in elements)
-
-
-def chain(first_collection, second_collection):
-    yield from first_collection
-    yield from second_collection

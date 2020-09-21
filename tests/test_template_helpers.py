@@ -19,7 +19,7 @@ import pytest
 
 from unittest.mock import call, patch
 
-from asciidoxy.templates.helpers import has, has_any, chain, TemplateHelper
+from asciidoxy.templates.helpers import has, has_any, TemplateHelper
 from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
 
 
@@ -468,28 +468,6 @@ def test_has_any__list_and_generator():
     assert has_any([41], empty_gen()) is True
     assert has_any([], single_item_gen()) is True
     assert has_any(empty_gen(), [42]) is True
-
-
-def test_chain():
-    def gen_empty():
-        return []
-
-    def gen_one():
-        return [1]
-
-    def gen_two():
-        return [2, 3]
-
-    def collect_chained(first_gen, second_gen):
-        generated_values = []
-        for value in chain(first_gen, second_gen):
-            generated_values.append(value)
-        return generated_values
-
-    assert collect_chained(gen_one(), gen_two()) == [1, 2, 3]
-    assert collect_chained(gen_empty(), gen_empty()) == []
-    assert collect_chained(gen_empty(), gen_two()) == [2, 3]
-    assert collect_chained(gen_one(), gen_empty()) == [1]
 
 
 def test_type_and_name(empty_context):
