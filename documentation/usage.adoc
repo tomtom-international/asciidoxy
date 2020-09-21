@@ -105,7 +105,7 @@ asciidoxy --help
 <%
 import subprocess
 %>
-${subprocess.run("asciidoxy --help", capture_output=True, shell=True, encoding="utf-8").stdout}
+${subprocess.run("asciidoxy --help", stdout=subprocess.PIPE, shell=True, encoding="utf-8").stdout}
 ----
 
 == Preparing API reference
