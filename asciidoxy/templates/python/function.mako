@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import has
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
 %>
 <%
@@ -30,7 +30,7 @@ ${element.brief}
 
 ${element.description}
 
-% if has(params(element)) or has(insert_filter.exceptions(element)) or element.returns:
+% if has_any(params(element), insert_filter.exceptions(element)) or element.returns:
 [cols='h,5a']
 |===
 % if has(params(element)):
