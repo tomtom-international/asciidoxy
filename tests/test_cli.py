@@ -176,7 +176,7 @@ def test_forward_unknown_options(asciidoctor_mock, build_dir, spec_file, destina
 
 
 def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
-                           adoc_data):
+                           adoc_data, event_loop):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -204,7 +204,7 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
     assert processed_file.is_file()
 
 
-def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_data):
+def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_data, event_loop):
     in_file = adoc_data / "no_api_reference.input.adoc"
 
     main([str(in_file), "--destination-dir", str(destination_dir), "--build-dir", str(build_dir)])
