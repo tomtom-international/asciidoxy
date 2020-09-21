@@ -19,7 +19,7 @@ import pytest
 
 from unittest.mock import call, patch
 
-from asciidoxy.templates.helpers import has, chain, TemplateHelper
+from asciidoxy.templates.helpers import has, has_any, chain, TemplateHelper
 from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
 
 
@@ -426,6 +426,48 @@ def test_has__generator():
         return None
 
     assert has(none_gen()) is True
+
+
+def test_has_any__list():
+    assert has_any() is False
+    assert has_any([]) is False
+    assert has_any([], [], []) is False
+    assert has_any([1], [], []) is True
+    assert has_any([], [2], []) is True
+    assert has_any([], [], [3]) is True
+
+
+def test_has_any__generator():
+    def empty_gen():
+        if False:
+            yield 1
+        return None
+
+    def single_item_gen():
+        yield 1
+        return None
+
+    assert has_any(empty_gen(), empty_gen()) is False
+    assert has_any(single_item_gen(), empty_gen()) is True
+    assert has_any(empty_gen(), single_item_gen()) is True
+
+
+def test_has_any__list_and_generator():
+    def empty_gen():
+        if False:
+            yield 1
+        return None
+
+    def single_item_gen():
+        yield 1
+        return None
+
+    assert has_any(empty_gen(), []) is False
+    assert has_any([], empty_gen(), []) is False
+    assert has_any(single_item_gen(), []) is True
+    assert has_any([41], empty_gen()) is True
+    assert has_any([], single_item_gen()) is True
+    assert has_any(empty_gen(), [42]) is True
 
 
 def test_chain():

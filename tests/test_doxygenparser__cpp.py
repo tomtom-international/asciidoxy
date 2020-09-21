@@ -30,12 +30,13 @@ def test_parse_cpp_class(api_reference):
     assert cpp_class.include == "coordinate.hpp"
     assert cpp_class.namespace == "asciidoxy::geometry"
 
-    assert len(cpp_class.members) == 13
+    assert len(cpp_class.members) == 14
     assert len(cpp_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in cpp_class.members)
     assert member_names == sorted([
         "Coordinate",
+        "~Coordinate",
         "Latitude",
         "Longitude",
         "Altitude",

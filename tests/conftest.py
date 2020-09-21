@@ -190,6 +190,10 @@ def cpp_class():
                                      name="MyClass",
                                      has_return_value=False,
                                      is_deleted=True))
+        # destructor
+        compound.members.append(
+            generate_member_function(prot=visibility, name="~MyClass", has_return_value=False))
+
         # operator
         compound.members.append(generate_member_function(prot=visibility, name="operator++"))
         # default operator

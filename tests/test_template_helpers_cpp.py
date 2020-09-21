@@ -47,6 +47,27 @@ def test_public_constructors__filter_no_match(helper):
     assert len(result) == 0
 
 
+def test_public_destructors__no_filter(helper):
+    result = list(helper.public_destructors())
+    assert len(result) == 1
+    assert result[0].name == "~MyClass"
+    assert result[0].prot == "public"
+
+
+def test_public_destructors__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="~MyClass")
+    result = list(helper.public_destructors())
+    assert len(result) == 1
+    assert result[0].name == "~MyClass"
+    assert result[0].prot == "public"
+
+
+def test_public_destructors__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="OtherClass")
+    result = list(helper.public_destructors())
+    assert len(result) == 0
+
+
 def test_public_methods__no_filter(helper):
     result = [m.name for m in helper.public_methods()]
     assert result == ["PublicMethod"]

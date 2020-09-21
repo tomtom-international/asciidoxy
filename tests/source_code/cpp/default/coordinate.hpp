@@ -38,6 +38,11 @@ class Coordinate {
   Coordinate();
 
   /**
+   * Destructor.
+   */
+  ~Coordinate();
+
+  /**
    * Latitude.
    *
    * @returns The latitude in degrees.

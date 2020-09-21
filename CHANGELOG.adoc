@@ -24,11 +24,12 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 === Added
 
-  - [AD-10] Support const methods in {Cpp}.
+  - {Cpp}: [AD-10] Support const methods.
+  - {Cpp}: Show destructors.
 
 === Fixed
 
-  - [AD-34] Hide default and deleted members in {Cpp}.
+  - {Cpp}: [AD-34] Hide default and deleted members.
   - Correctly detect include file for free functions.
 
 

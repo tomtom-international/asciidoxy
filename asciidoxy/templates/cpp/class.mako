@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, chain
+from asciidoxy.templates.helpers import has, has_any, chain
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 %>
 <%
@@ -41,7 +41,7 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if (has(helper.public_simple_enclosed_types()) or has(helper.public_complex_enclosed_types())):
+% if (has_any(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types())):
 |*Enclosed types*
 |
 % for enclosed in chain(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types()):
@@ -57,6 +57,16 @@ ${enclosed.brief}
 % for constructor in helper.public_constructors():
 `xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
+% endfor
+
+% endif
+###################################################################################################
+% if has(helper.public_destructors()):
+|*Destructors*
+|
+% for destructor in helper.public_destructors():
+`xref:${destructor.id}[${destructor.name}()]`::
+${destructor.brief}
 % endfor
 
 % endif
@@ -101,6 +111,11 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ################################################################################### Constructors ##
 % for constructor in helper.public_constructors():
 ${api.insert_fragment(constructor, insert_filter, kind_override="method")}
+'''
+% endfor
+#################################################################################### Destructors ##
+% for destructor in helper.public_destructors():
+${api.insert_fragment(destructor, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Variables ##

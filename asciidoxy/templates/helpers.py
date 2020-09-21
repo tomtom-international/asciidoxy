@@ -172,7 +172,11 @@ class TemplateHelper:
 
 
 def has(elements):
-    return len(list(elements)) > 0
+    return any(True for _ in elements)
+
+
+def has_any(*elements):
+    return any(has(e) for e in elements)
 
 
 def chain(first_collection, second_collection):

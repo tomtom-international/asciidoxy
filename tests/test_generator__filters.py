@@ -135,7 +135,7 @@ def test_member_filter__prot(cpp_class):
     assert sorted(member_names) == sorted([
         "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
         "ProtectedStruct", "ProtectedTrash", "MyClass", "MyClass", "MyClass", "operator++",
-        "operator=", "operator=", "ProtectedMethod", "ProtectedStaticMethod"
+        "operator=", "operator=", "ProtectedMethod", "ProtectedStaticMethod", "~MyClass"
     ])
 
 
@@ -350,7 +350,7 @@ def test_insertion_filter__compound__no_filters(cpp_class_with_inner_classes):
         "operator++", "ProtectedMethod", "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum",
         "PrivateClass", "PrivateTypedef", "PrivateStruct", "PrivateTrash", "MyClass", "operator++",
         "PrivateMethod", "PrivateStaticMethod", "operator=", "operator=", "operator=", "operator=",
-        "operator=", "operator="
+        "operator=", "operator=", "~MyClass", "~MyClass", "~MyClass"
     ])
 
     inner_class_names = [
@@ -403,7 +403,8 @@ def test_insertion_filter__compound__filter_inner_classes(cpp_class_with_inner_c
         "MyClass", "MyClass", "operator++", "ProtectedMethod", "ProtectedStaticMethod",
         "PrivateVariable", "PrivateEnum", "PrivateClass", "PrivateTypedef", "PrivateStruct",
         "PrivateTrash", "MyClass", "operator++", "PrivateMethod", "PrivateStaticMethod",
-        "operator=", "operator=", "operator=", "operator=", "operator=", "operator="
+        "operator=", "operator=", "operator=", "operator=", "operator=", "operator=", "~MyClass",
+        "~MyClass", "~MyClass"
     ])
 
     inner_class_names = [
@@ -432,7 +433,8 @@ def test_insertion_filter__compound__filter_enum_values(cpp_class_with_inner_cla
         "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum", "PrivateClass", "PrivateTypedef",
         "PrivateStruct", "PrivateTrash", "MyClass", "operator++", "PrivateMethod",
         "PrivateStaticMethod", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass",
-        "operator=", "operator=", "operator=", "operator=", "operator=", "operator="
+        "operator=", "operator=", "operator=", "operator=", "operator=", "operator=", "~MyClass",
+        "~MyClass", "~MyClass"
     ])
 
     inner_class_names = [

@@ -22,6 +22,11 @@ A coordinate has a latitude, longitude, and an altitude.
 `xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318[Coordinate()]`::
 Default constructor.
 
+|*Destructors*
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0[~Coordinate()]`::
+Destructor.
+
 |*Methods*
 |
 `xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11[double Latitude() const]`::
@@ -49,6 +54,8 @@ Update from separate values.
 == Members
 
 include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0.adoc[leveloffset=+1]
 '''
 include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11.adoc[leveloffset=+1]
 '''
