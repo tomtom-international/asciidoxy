@@ -234,9 +234,11 @@ class InnerTypeReference(TypeRefBase):
 
     Attributes:
         referred_object: Element being referenced.
+        prot:            Protection level of the inner type.
     """
 
     referred_object: Optional["Compound"] = None
+    prot: str = ""
 
     def resolve(self, reference_target):
         self.referred_object = reference_target

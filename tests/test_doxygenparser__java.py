@@ -59,6 +59,7 @@ def test_parse_java_class_with_nested_class(api_reference):
     assert nested_class.namespace == "com.asciidoxy.traffic.TrafficEvent"
     assert nested_class.language == "java"
     assert nested_class.id == "java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"
+    assert nested_class.prot == "public"
 
     assert nested_class.referred_object is not None
     assert nested_class.referred_object.id == nested_class.id
@@ -71,6 +72,7 @@ def test_parse_java_class_with_nested_class(api_reference):
     assert nested_class.id == ("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_"
                                "traffic_event_data")
     assert nested_class.language == "java"
+    assert nested_class.prot == "public"
 
     assert nested_class.referred_object is not None
     assert nested_class.referred_object.id == nested_class.id

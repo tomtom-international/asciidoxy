@@ -52,6 +52,15 @@ def java_class():
         member_variable.returns.type = TypeRef("java")
         return member_variable
 
+    def generate_inner_type_reference(prot: str, name: str) -> InnerTypeReference:
+        nested_class = Compound("java")
+        nested_class.name = name
+        inner_class_reference = InnerTypeReference(language="java")
+        inner_class_reference.name = nested_class.name
+        inner_class_reference.referred_object = nested_class
+        inner_class_reference.prot = prot
+        return inner_class_reference
+
     # fill class with typical members
     for visibility in ("public", "protected", "private"):
         for member_type in ("enum", "class", "trash"):
@@ -77,13 +86,9 @@ def java_class():
         final_member_variable.returns.type.prefix = "final "
         compound.members.append(final_member_variable)
 
-    # insert nested type
-    nested_class = Compound("java")
-    nested_class.name = "NestedClass"
-    inner_class_reference = InnerTypeReference(language="java")
-    inner_class_reference.name = nested_class.name
-    inner_class_reference.referred_object = nested_class
-    compound.inner_classes.append(inner_class_reference)
+        # add nested type
+        compound.inner_classes.append(
+            generate_inner_type_reference(visibility, f"{visibility.capitalize()}Type"))
 
     return compound
 
@@ -167,13 +172,13 @@ def test_public_constants__filter_no_match(helper):
 
 def test_public_complex_enclosed_types__no_filter(helper):
     result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["NestedClass"]
+    assert result == ["PublicType", "ProtectedType"]
 
 
 def test_public_complex_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="Nested")
+    helper.insert_filter = InsertionFilter(inner_classes="Public")
     result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["NestedClass"]
+    assert result == ["PublicType"]
 
 
 def test_public_complex_enclosed_types__filter_no_match(helper):

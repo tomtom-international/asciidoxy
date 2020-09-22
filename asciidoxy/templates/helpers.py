@@ -154,14 +154,14 @@ class TemplateHelper:
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.prot in ("public", "protected", None) and m.kind in ["enum", "typedef"])
+                if m.prot in ("public", "protected") and m.kind in ("enum", "typedef"))
 
     def public_complex_enclosed_types(self) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m.referred_object for m in self.insert_filter.inner_classes(self.element)
-                if m.referred_object is not None)
+                if m.referred_object is not None and m.prot in ("public", "protected"))
 
     def public_variables(self) -> Iterator[Member]:
         assert self.element is not None

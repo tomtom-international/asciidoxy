@@ -67,6 +67,7 @@ def test_parse_cpp_class_with_nested_class(api_reference):
     assert nested_class.id == ("cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_"
                                "event_data")
     assert nested_class.language == "cpp"
+    assert nested_class.prot == "public"
 
     assert nested_class.referred_object is not None
     assert nested_class.referred_object.id == nested_class.id

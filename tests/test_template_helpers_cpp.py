@@ -156,13 +156,13 @@ def test_public_simple_enclosed_types__filter_no_match(helper):
 
 def test_public_complex_enclosed_types__no_filter(helper):
     result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["NestedClass"]
+    assert result == ["PublicType", "ProtectedType"]
 
 
 def test_public_complex_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="Nested")
+    helper.insert_filter = InsertionFilter(inner_classes="Protected")
     result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["NestedClass"]
+    assert result == ["ProtectedType"]
 
 
 def test_public_complex_enclosed_types__filter_no_match(helper):

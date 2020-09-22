@@ -191,15 +191,12 @@ class ParserBase(ABC):
         inner_classes = []
 
         for xml_inner_class in parent_compound.iterfind("innerclass"):
-            type_visibility = xml_inner_class.get("prot")
-            if type_visibility not in ("public", "protected", None):
-                continue
-
             inner_type = InnerTypeReference(parent.language)
             inner_type.id = self.TRAITS.unique_id(xml_inner_class.get("refid"))
             inner_type.name = \
                 self.TRAITS.cleanup_name(xml_inner_class.text if xml_inner_class.text else "")
             inner_type.namespace = parent.full_name
+            inner_type.prot = xml_inner_class.get("prot", "")
 
             inner_classes.append(inner_type)
             self._driver.unresolved_ref(inner_type)

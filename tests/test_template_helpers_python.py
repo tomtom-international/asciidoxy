@@ -53,6 +53,7 @@ def python_class():
         inner_class_reference = InnerTypeReference(language="python")
         inner_class_reference.name = nested_class.name
         inner_class_reference.referred_object = nested_class
+        inner_class_reference.prot = "public"
         return inner_class_reference
 
     compound.members = [

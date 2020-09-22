@@ -146,7 +146,7 @@ def cpp_class():
     def generate_member(kind: str, prot: str) -> Member:
         member = Member("cpp")
         member.kind = kind
-        member.name = prot.capitalize() + kind.capitalize()
+        member.name = f"{prot.capitalize()}{kind.capitalize()}"
         member.prot = prot
         return member
 
@@ -169,6 +169,15 @@ def cpp_class():
         if is_default:
             member.default = True
         return member
+
+    def generate_inner_class_reference(prot: str, name: str):
+        nested_class = Compound("cpp")
+        nested_class.name = name
+        inner_class_reference = InnerTypeReference(language="cpp")
+        inner_class_reference.name = nested_class.name
+        inner_class_reference.referred_object = nested_class
+        inner_class_reference.prot = prot
+        return inner_class_reference
 
     # fill class with typical members
     for visibility in ("public", "protected", "private"):
@@ -204,20 +213,15 @@ def cpp_class():
             generate_member_function(prot=visibility, name="operator=", is_deleted=True))
         # method
         compound.members.append(
-            generate_member_function(prot=visibility, name=visibility.capitalize() + "Method"))
+            generate_member_function(prot=visibility, name=f"{visibility.capitalize()}Method"))
         # static method
         compound.members.append(
             generate_member_function(prot=visibility,
                                      name=visibility.capitalize() + "StaticMethod",
                                      is_static=True))
-
-    # insert nested type
-    nested_class = Compound("cpp")
-    nested_class.name = "NestedClass"
-    inner_class_reference = InnerTypeReference(language="cpp")
-    inner_class_reference.name = nested_class.name
-    inner_class_reference.referred_object = nested_class
-    compound.inner_classes.append(inner_class_reference)
+        # nested type
+        compound.inner_classes.append(
+            generate_inner_class_reference(visibility, name=f"{visibility.capitalize()}Type"))
 
     return compound
 

@@ -159,6 +159,7 @@ def cpp_class_with_inner_classes(cpp_class):
     inner_class_reference = InnerTypeReference(language="cpp")
     inner_class_reference.name = nested_class.name
     inner_class_reference.referred_object = nested_class
+    inner_class_reference.prot = "public"
     cpp_class.inner_classes.append(inner_class_reference)
 
     nested_class = Compound("cpp")
@@ -167,6 +168,7 @@ def cpp_class_with_inner_classes(cpp_class):
     inner_class_reference = InnerTypeReference(language="cpp")
     inner_class_reference.name = nested_class.name
     inner_class_reference.referred_object = nested_class
+    inner_class_reference.prot = "public"
     cpp_class.inner_classes.append(inner_class_reference)
 
     enum_value = EnumValue("cpp")
@@ -189,7 +191,7 @@ def test_inner_class_filter__name(cpp_class_with_inner_classes):
     inner_class_names = [
         m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)
     ]
-    assert sorted(inner_class_names) == sorted(["NestedClass", "NestedStruct"])
+    assert sorted(inner_class_names) == sorted(["NestedStruct"])
 
 
 def test_inner_class_filter__kind(cpp_class_with_inner_classes):
@@ -357,7 +359,8 @@ def test_insertion_filter__compound__no_filters(cpp_class_with_inner_classes):
         inner_class.name
         for inner_class in insertion_filter.inner_classes(cpp_class_with_inner_classes)
     ]
-    assert sorted(inner_class_names) == sorted(["NestedClass", "NestedStruct", "AnotherStruct"])
+    assert sorted(inner_class_names) == sorted(
+        ["NestedStruct", "AnotherStruct", "PublicType", "ProtectedType", "PrivateType"])
 
     enum_names = [
         enum_value.name for enum_value in insertion_filter.enum_values(cpp_class_with_inner_classes)
@@ -381,7 +384,8 @@ def test_insertion_filter__compound__filter_members(cpp_class_with_inner_classes
         inner_class.name
         for inner_class in insertion_filter.inner_classes(cpp_class_with_inner_classes)
     ]
-    assert sorted(inner_class_names) == sorted(["NestedClass", "NestedStruct", "AnotherStruct"])
+    assert sorted(inner_class_names) == sorted(
+        ["NestedStruct", "AnotherStruct", "PublicType", "ProtectedType", "PrivateType"])
 
     enum_names = [
         enum_value.name for enum_value in insertion_filter.enum_values(cpp_class_with_inner_classes)
@@ -441,7 +445,8 @@ def test_insertion_filter__compound__filter_enum_values(cpp_class_with_inner_cla
         inner_class.name
         for inner_class in insertion_filter.inner_classes(cpp_class_with_inner_classes)
     ]
-    assert sorted(inner_class_names) == sorted(["NestedClass", "NestedStruct", "AnotherStruct"])
+    assert sorted(inner_class_names) == sorted(
+        ["NestedStruct", "AnotherStruct", "PublicType", "ProtectedType", "PrivateType"])
 
     enum_names = [
         enum_value.name for enum_value in insertion_filter.enum_values(cpp_class_with_inner_classes)
