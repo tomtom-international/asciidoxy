@@ -47,6 +47,27 @@ def test_public_constructors__filter_no_match(helper):
     assert len(result) == 0
 
 
+def test_public_destructors__no_filter(helper):
+    result = list(helper.public_destructors())
+    assert len(result) == 1
+    assert result[0].name == "~MyClass"
+    assert result[0].prot == "public"
+
+
+def test_public_destructors__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="~MyClass")
+    result = list(helper.public_destructors())
+    assert len(result) == 1
+    assert result[0].name == "~MyClass"
+    assert result[0].prot == "public"
+
+
+def test_public_destructors__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="OtherClass")
+    result = list(helper.public_destructors())
+    assert len(result) == 0
+
+
 def test_public_methods__no_filter(helper):
     result = [m.name for m in helper.public_methods()]
     assert result == ["PublicMethod"]
@@ -61,6 +82,23 @@ def test_public_methods__filter_match(helper):
 def test_public_methods__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="PublicThing")
     result = [m.name for m in helper.public_methods()]
+    assert len(result) == 0
+
+
+def test_public_operators__no_filter(helper):
+    result = [m.name for m in helper.public_operators()]
+    assert result == ["operator++"]
+
+
+def test_public_operators__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="ALL")
+    result = [m.name for m in helper.public_operators()]
+    assert result == ["operator++"]
+
+
+def test_public_operators__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.public_operators()]
     assert len(result) == 0
 
 
@@ -118,13 +156,13 @@ def test_public_simple_enclosed_types__filter_no_match(helper):
 
 def test_public_complex_enclosed_types__no_filter(helper):
     result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["NestedClass"]
+    assert result == ["PublicType", "ProtectedType"]
 
 
 def test_public_complex_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="Nested")
+    helper.insert_filter = InsertionFilter(inner_classes="Protected")
     result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["NestedClass"]
+    assert result == ["ProtectedType"]
 
 
 def test_public_complex_enclosed_types__filter_no_match(helper):

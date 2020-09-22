@@ -14,8 +14,9 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, chain
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
+from itertools import chain
 %>
 <%
 helper = CppTemplateHelper(api_context, element, insert_filter)
@@ -41,7 +42,7 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if (has(helper.public_simple_enclosed_types()) or has(helper.public_complex_enclosed_types())):
+% if (has_any(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types())):
 |*Enclosed types*
 |
 % for enclosed in chain(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types()):
@@ -57,6 +58,26 @@ ${enclosed.brief}
 % for constructor in helper.public_constructors():
 `xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
+% endfor
+
+% endif
+###################################################################################################
+% if has(helper.public_destructors()):
+|*Destructors*
+|
+% for destructor in helper.public_destructors():
+`xref:${destructor.id}[${destructor.name}()]`::
+${destructor.brief}
+% endfor
+
+% endif
+###################################################################################################
+% if has(helper.public_operators()):
+|*Operators*
+|
+% for operator in helper.public_operators():
+`xref:${operator.id}[${operator.name}${helper.type_list(operator.params)}]`::
+${operator.brief}
 % endfor
 
 % endif
@@ -84,7 +105,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in helper.public_methods():
-`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
+`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${" const" if method.const else ""}]`::
 ${method.brief}
 % endfor
 
@@ -101,6 +122,16 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ################################################################################### Constructors ##
 % for constructor in helper.public_constructors():
 ${api.insert_fragment(constructor, insert_filter, kind_override="method")}
+'''
+% endfor
+#################################################################################### Destructors ##
+% for destructor in helper.public_destructors():
+${api.insert_fragment(destructor, insert_filter, kind_override="method")}
+'''
+% endfor
+###################################################################################### Operators ##
+% for operator in helper.public_operators():
+${api.insert_fragment(operator, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Variables ##

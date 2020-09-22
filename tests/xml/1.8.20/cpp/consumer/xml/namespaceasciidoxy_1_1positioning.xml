@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="namespaceasciidoxy_1_1positioning" kind="namespace" language="C++">
+    <compoundname>asciidoxy::positioning</compoundname>
+    <innerclass refid="classasciidoxy_1_1positioning_1_1_positioning" prot="public">asciidoxy::positioning::Positioning</innerclass>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="positioning_8hpp_1a0f8564df8a29ae75727fca0d3bf0c2ee" prot="public" static="no">
+        <type>asciidoxy::traffic::TrafficEvent</type>
+        <definition>using asciidoxy::positioning::Traffic = typedef asciidoxy::traffic::TrafficEvent</definition>
+        <argsstring></argsstring>
+        <name>Traffic</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="positioning.hpp" line="70" column="1" bodyfile="positioning.hpp" bodystart="70" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="positioning.hpp" line="21" column="1"/>
+  </compounddef>
+</doxygen>

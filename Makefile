@@ -79,10 +79,13 @@ type-check: ## Check typing with mypy
 	mypy asciidoxy
 
 test: ## run tests quickly with the default Python
-	pytest
+	pytest --numprocesses=auto --maxprocesses=6
 
 test-all: ## run tests on every Python version with tox
 	tox -s
+
+generate-test-xml: ## generate Doxygen XML files required for test cases
+	cd tests/source_code; python3 generate_xml.py doxygen
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source asciidoxy -m pytest

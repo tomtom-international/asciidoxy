@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="move__only_8hpp" kind="file" language="C++">
+    <compoundname>move_only.hpp</compoundname>
+    <innerclass refid="classasciidoxy_1_1system_1_1_move_only" prot="public">asciidoxy::system::MoveOnly</innerclass>
+    <innernamespace refid="namespaceasciidoxy">asciidoxy</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1system">asciidoxy::system</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="2"><highlight class="comment"><sp/>*<sp/>Copyright<sp/>(C)<sp/>2019-2020,<sp/>TomTom<sp/>(http://tomtom.com).</highlight></codeline>
+<codeline lineno="3"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="4"><highlight class="comment"><sp/>*<sp/>Licensed<sp/>under<sp/>the<sp/>Apache<sp/>License,<sp/>Version<sp/>2.0<sp/>(the<sp/>&quot;License&quot;);</highlight></codeline>
+<codeline lineno="5"><highlight class="comment"><sp/>*<sp/>you<sp/>may<sp/>not<sp/>use<sp/>this<sp/>file<sp/>except<sp/>in<sp/>compliance<sp/>with<sp/>the<sp/>License.</highlight></codeline>
+<codeline lineno="6"><highlight class="comment"><sp/>*<sp/>You<sp/>may<sp/>obtain<sp/>a<sp/>copy<sp/>of<sp/>the<sp/>License<sp/>at</highlight></codeline>
+<codeline lineno="7"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="8"><highlight class="comment"><sp/>*<sp/><sp/><sp/>http://www.apache.org/licenses/LICENSE-2.0</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="10"><highlight class="comment"><sp/>*<sp/>Unless<sp/>required<sp/>by<sp/>applicable<sp/>law<sp/>or<sp/>agreed<sp/>to<sp/>in<sp/>writing,<sp/>software</highlight></codeline>
+<codeline lineno="11"><highlight class="comment"><sp/>*<sp/>distributed<sp/>under<sp/>the<sp/>License<sp/>is<sp/>distributed<sp/>on<sp/>an<sp/>&quot;AS<sp/>IS&quot;<sp/>BASIS,</highlight></codeline>
+<codeline lineno="12"><highlight class="comment"><sp/>*<sp/>WITHOUT<sp/>WARRANTIES<sp/>OR<sp/>CONDITIONS<sp/>OF<sp/>ANY<sp/>KIND,<sp/>either<sp/>express<sp/>or<sp/>implied.</highlight></codeline>
+<codeline lineno="13"><highlight class="comment"><sp/>*<sp/>See<sp/>the<sp/>License<sp/>for<sp/>the<sp/>specific<sp/>language<sp/>governing<sp/>permissions<sp/>and</highlight></codeline>
+<codeline lineno="14"><highlight class="comment"><sp/>*<sp/>limitations<sp/>under<sp/>the<sp/>License.</highlight></codeline>
+<codeline lineno="15"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">asciidoxy<sp/>{</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">system<sp/>{</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23" refid="classasciidoxy_1_1system_1_1_move_only" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref><sp/>{</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/></highlight><highlight class="keyword">protected</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="28" refid="classasciidoxy_1_1system_1_1_move_only_1a6dc67ce1f9071ebb2bf144874b589ba1" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classasciidoxy_1_1system_1_1_move_only_1a6dc67ce1f9071ebb2bf144874b589ba1" kindref="member">MoveOnly</ref>()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="34" refid="classasciidoxy_1_1system_1_1_move_only_1ad7318b4b1da7355aeaf145e5597318b8" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>~<ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="39" refid="classasciidoxy_1_1system_1_1_move_only_1a5e9079fbfbaa072035069d70e4627747" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/><ref refid="classasciidoxy_1_1system_1_1_move_only_1a5e9079fbfbaa072035069d70e4627747" kindref="member">MoveOnly</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref>&amp;)<sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44" refid="classasciidoxy_1_1system_1_1_move_only_1a330464b08592a825ef29c34fb27981e8" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/><ref refid="classasciidoxy_1_1system_1_1_move_only_1a330464b08592a825ef29c34fb27981e8" kindref="member">MoveOnly</ref>(<ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref>&amp;&amp;)<sp/>noexcept<sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="49" refid="classasciidoxy_1_1system_1_1_move_only_1a0a96fb07ea0d648c1077a30cab963f6c" refkind="member"><highlight class="normal"><sp/><sp/>virtual<sp/><ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref>&amp;<sp/>operator=(const<sp/><ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref>&amp;)<sp/>=<sp/>delete;</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="54" refid="classasciidoxy_1_1system_1_1_move_only_1a52622305a840ea66ccc83df35563a920" refkind="member"><highlight class="normal"><sp/><sp/>virtual<sp/><ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref>&amp;<sp/>operator=(<ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref>&amp;&amp;)<sp/>noexcept<sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="55"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal">}<sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>system</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="58"><highlight class="normal">}<sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="move_only.hpp"/>
+  </compounddef>
+</doxygen>

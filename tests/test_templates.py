@@ -31,27 +31,30 @@ def _read_fragment(include_statement: str) -> str:
     return content
 
 
-@pytest.mark.parametrize(
-    "element_name,language,expected_result",
-    [("asciidoxy::geometry::Coordinate", "cpp", "fragments/cpp/class.adoc"),
-     ("asciidoxy::traffic::TrafficEvent::Severity", "cpp", "fragments/cpp/enum.adoc"),
-     ("asciidoxy::system::Service", "cpp", "fragments/cpp/interface.adoc"),
-     ("asciidoxy::traffic::TrafficEvent::TrafficEventData", "cpp", "fragments/cpp/struct.adoc"),
-     ("asciidoxy::traffic::TpegCauseCode", "cpp", "fragments/cpp/typedef.adoc"),
-     ("asciidoxy::traffic::TrafficEvent", "cpp", "fragments/cpp/nested.adoc"),
-     ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", "fragments/cpp/function.adoc"),
-     ("asciidoxy::system::CreateService", "cpp", "fragments/cpp/free_function.adoc"),
-     ("com.asciidoxy.geometry.Coordinate", "java", "fragments/java/class.adoc"),
-     ("com.asciidoxy.traffic.TrafficEvent.Severity", "java", "fragments/java/enum.adoc"),
-     ("com.asciidoxy.system.Service", "java", "fragments/java/interface.adoc"),
-     ("com.asciidoxy.traffic.TrafficEvent", "java", "fragments/java/nested.adoc"),
-     ("ADTrafficEvent", "objc", "fragments/objc/protocol.adoc"),
-     ("TrafficEventData.ADSeverity", "objc", "fragments/objc/enum.adoc"),
-     ("ADCoordinate", "objc", "fragments/objc/interface.adoc"),
-     ("OnTrafficEventCallback", "objc", "fragments/objc/block.adoc"),
-     ("TpegCauseCode", "objc", "fragments/objc/typedef.adoc"),
-     ("asciidoxy.geometry.Coordinate", "python", "fragments/python/class.adoc"),
-     ("asciidoxy.traffic.TrafficEvent.update", "python", "fragments/python/function.adoc")])
+@pytest.mark.parametrize("element_name,language,expected_result", [
+    ("asciidoxy::geometry::Coordinate", "cpp", "fragments/cpp/class.adoc"),
+    ("asciidoxy::traffic::TrafficEvent::Severity", "cpp", "fragments/cpp/enum.adoc"),
+    ("asciidoxy::system::Service", "cpp", "fragments/cpp/interface.adoc"),
+    ("asciidoxy::traffic::TrafficEvent::TrafficEventData", "cpp", "fragments/cpp/struct.adoc"),
+    ("asciidoxy::traffic::TpegCauseCode", "cpp", "fragments/cpp/typedef.adoc"),
+    ("asciidoxy::traffic::TrafficEvent", "cpp", "fragments/cpp/nested.adoc"),
+    ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", "fragments/cpp/function.adoc"),
+    ("asciidoxy::system::CreateService", "cpp", "fragments/cpp/free_function.adoc"),
+    ("asciidoxy::geometry::Point::increment", "cpp", "fragments/cpp/function_default_value.adoc"),
+    ("com.asciidoxy.geometry.Coordinate", "java", "fragments/java/class.adoc"),
+    ("com.asciidoxy.traffic.TrafficEvent.Severity", "java", "fragments/java/enum.adoc"),
+    ("com.asciidoxy.system.Service", "java", "fragments/java/interface.adoc"),
+    ("com.asciidoxy.traffic.TrafficEvent", "java", "fragments/java/nested.adoc"),
+    ("ADTrafficEvent", "objc", "fragments/objc/protocol.adoc"),
+    ("TrafficEventData.ADSeverity", "objc", "fragments/objc/enum.adoc"),
+    ("ADCoordinate", "objc", "fragments/objc/interface.adoc"),
+    ("OnTrafficEventCallback", "objc", "fragments/objc/block.adoc"),
+    ("TpegCauseCode", "objc", "fragments/objc/typedef.adoc"),
+    ("asciidoxy.geometry.Coordinate", "python", "fragments/python/class.adoc"),
+    ("asciidoxy.traffic.TrafficEvent.update", "python", "fragments/python/function.adoc"),
+    ("asciidoxy.default_values.Point.increment", "python",
+     "fragments/python/function_default_value.adoc"),
+])
 def test_fragment(api, adoc_data, fragment_dir, element_name, language, expected_result,
                   update_expected_results):
     result = api.insert(element_name, lang=language)

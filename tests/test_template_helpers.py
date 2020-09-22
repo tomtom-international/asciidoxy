@@ -19,7 +19,7 @@ import pytest
 
 from unittest.mock import call, patch
 
-from asciidoxy.templates.helpers import has, chain, TemplateHelper
+from asciidoxy.templates.helpers import has, has_any, TemplateHelper
 from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
 
 
@@ -428,29 +428,49 @@ def test_has__generator():
     assert has(none_gen()) is True
 
 
-def test_chain():
-    def gen_empty():
-        return []
-
-    def gen_one():
-        return [1]
-
-    def gen_two():
-        return [2, 3]
-
-    def collect_chained(first_gen, second_gen):
-        generated_values = []
-        for value in chain(first_gen, second_gen):
-            generated_values.append(value)
-        return generated_values
-
-    assert collect_chained(gen_one(), gen_two()) == [1, 2, 3]
-    assert collect_chained(gen_empty(), gen_empty()) == []
-    assert collect_chained(gen_empty(), gen_two()) == [2, 3]
-    assert collect_chained(gen_one(), gen_empty()) == [1]
+def test_has_any__list():
+    assert has_any() is False
+    assert has_any([]) is False
+    assert has_any([], [], []) is False
+    assert has_any([1], [], []) is True
+    assert has_any([], [2], []) is True
+    assert has_any([], [], [3]) is True
 
 
-def test_type_and_name(empty_context):
+def test_has_any__generator():
+    def empty_gen():
+        if False:
+            yield 1
+        return None
+
+    def single_item_gen():
+        yield 1
+        return None
+
+    assert has_any(empty_gen(), empty_gen()) is False
+    assert has_any(single_item_gen(), empty_gen()) is True
+    assert has_any(empty_gen(), single_item_gen()) is True
+
+
+def test_has_any__list_and_generator():
+    def empty_gen():
+        if False:
+            yield 1
+        return None
+
+    def single_item_gen():
+        yield 1
+        return None
+
+    assert has_any(empty_gen(), []) is False
+    assert has_any([], empty_gen(), []) is False
+    assert has_any(single_item_gen(), []) is True
+    assert has_any([41], empty_gen()) is True
+    assert has_any([], single_item_gen()) is True
+    assert has_any(empty_gen(), [42]) is True
+
+
+def test_parameter(empty_context):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -462,10 +482,25 @@ def test_type_and_name(empty_context):
     param.name = "arg"
 
     helper = TemplateHelper(empty_context)
-    assert helper.type_and_name(param) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
+    assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_type_and_name__no_name(empty_context):
+def test_parameter__no_link(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+
+    helper = TemplateHelper(empty_context)
+    assert helper.parameter(param, link=False) == "const MyType & arg"
+
+
+def test_parameter__no_name(empty_context):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -477,7 +512,41 @@ def test_type_and_name__no_name(empty_context):
     param.name = ""
 
     helper = TemplateHelper(empty_context)
-    assert helper.type_and_name(param) == "const xref:lang-tomtom_1_MyType[MyType] &"
+    assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] &"
+
+
+def test_parameter__default_value(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.default_value = "12"
+
+    helper = TemplateHelper(empty_context)
+    assert helper.parameter(
+        param, default_value=True) == "const xref:lang-tomtom_1_MyType[MyType] & arg = 12"
+
+
+def test_parameter__ignore_default_value(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.default_value = "12"
+
+    helper = TemplateHelper(empty_context)
+    assert helper.parameter(param,
+                            default_value=False) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
 def test_method_signature__no_params(empty_context):
@@ -489,6 +558,18 @@ def test_method_signature__no_params(empty_context):
 
     helper = TemplateHelper(empty_context)
     assert helper.method_signature(method) == "void ShortMethod()"
+
+
+def test_method_signature__const(empty_context):
+    method = Member("lang")
+    method.name = "ShortMethod"
+    method.const = True
+
+    method.returns = ReturnValue()
+    method.returns.type = TypeRef("lang", "void")
+
+    helper = TemplateHelper(empty_context)
+    assert helper.method_signature(method) == "void ShortMethod() const"
 
 
 def test_method_signature__single_param(empty_context):

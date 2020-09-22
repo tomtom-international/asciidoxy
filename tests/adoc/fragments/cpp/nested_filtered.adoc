@@ -31,11 +31,11 @@ Construct a traffic event from data.
 
 |*Methods*
 |
-`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28[const TrafficEventData & Data()]`::
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28[const TrafficEventData & Data() const]`::
 Get the traffic event details.
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b[bool Update(int, int)]`::
 Update the traffic event data.
-`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf[std::shared_ptr&lt;TrafficEventData&gt; SharedData()]`::
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf[std::shared_ptr&lt;TrafficEventData&gt; SharedData() const]`::
 Get a shared pointer to a copy of the data.
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17[long CalculateDelay()]`::
 Calculate the current delay.

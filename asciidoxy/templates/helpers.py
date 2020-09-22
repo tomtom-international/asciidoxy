@@ -58,7 +58,7 @@ class TemplateHelper:
 
         if not skip_args and ref.args is not None:
             if len(ref.args) > 0:
-                arg_parts = (f"{self.type_and_name(a, link=link)}" for a in ref.args)
+                arg_parts = (f"{self.parameter(a, link=link)}" for a in ref.args)
                 args = f"{self.ARGS_START}{', '.join(arg_parts)}{self.ARGS_END}"
             else:
                 args = f"{self.ARGS_START}{self.ARGS_END}"
@@ -72,11 +72,15 @@ class TemplateHelper:
         else:
             return f"{ref.prefix or ''}{ref.name}{nested}{args}{ref.suffix or ''}".strip()
 
-    def type_and_name(self, param: Parameter, *, link: bool = True) -> str:
-        return f"{self.print_ref(param.type, link=link)} {param.name}".strip()
+    def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
+        if default_value and param.default_value:
+            defval = f" = {param.default_value}"
+        else:
+            defval = ""
+        return f"{self.print_ref(param.type, link=link)} {param.name}{defval}".strip()
 
     def argument_list(self, params: Sequence[Parameter], *, link: bool = True) -> str:
-        return f"({', '.join(self.type_and_name(p, link=link) for p in params)})"
+        return f"({', '.join(self.parameter(p, link=link) for p in params)})"
 
     def type_list(self, params: Sequence[Parameter], *, link: bool = False) -> str:
         return f"({', '.join(self.print_ref(p.type, link=link) for p in params)})"
@@ -92,7 +96,9 @@ class TemplateHelper:
             self._method_join(self._method_prefix(method, link=False), method.name))
         suffix_length = len(self._method_suffix(method, link=False))
 
-        param_sizes = [len(self.type_and_name(p, link=False)) for p in method.params]
+        param_sizes = [
+            len(self.parameter(p, link=False, default_value=True)) for p in method.params
+        ]
         indent_size = method_without_params_length + 1
         first_indent = ""
 
@@ -101,7 +107,8 @@ class TemplateHelper:
             first_indent = "\n    "
 
         param_separator = f",\n{' ' * indent_size}"
-        formatted_params = f"{param_separator.join(self.type_and_name(p) for p in method.params)}"
+        formatted_params = param_separator.join(
+            self.parameter(p, default_value=True) for p in method.params)
 
         return (f"{method_without_params}({first_indent}{formatted_params}){suffix}")
 
@@ -112,6 +119,8 @@ class TemplateHelper:
         return self._method_join(static, return_type)
 
     def _method_suffix(self, method: Member, *, link: bool = True) -> str:
+        if method.const:
+            return " const"
         return ""
 
     @staticmethod
@@ -145,14 +154,14 @@ class TemplateHelper:
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.prot in ("public", "protected", None) and m.kind in ["enum", "typedef"])
+                if m.prot in ("public", "protected") and m.kind in ("enum", "typedef"))
 
     def public_complex_enclosed_types(self) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m.referred_object for m in self.insert_filter.inner_classes(self.element)
-                if m.referred_object is not None)
+                if m.referred_object is not None and m.prot in ("public", "protected"))
 
     def public_variables(self) -> Iterator[Member]:
         assert self.element is not None
@@ -170,9 +179,8 @@ class TemplateHelper:
 
 
 def has(elements):
-    return len(list(elements)) > 0
+    return any(True for _ in elements)
 
 
-def chain(first_collection, second_collection):
-    yield from first_collection
-    yield from second_collection
+def has_any(*elements):
+    return any(has(e) for e in elements)

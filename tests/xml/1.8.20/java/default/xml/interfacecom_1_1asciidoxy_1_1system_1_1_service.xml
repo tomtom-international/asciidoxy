@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="interfacecom_1_1asciidoxy_1_1system_1_1_service" kind="interface" language="Java" prot="public">
+    <compoundname>com::asciidoxy::system::Service</compoundname>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void com.asciidoxy.system.Service.Start</definition>
+        <argsstring>()</argsstring>
+        <name>Start</name>
+        <briefdescription>
+<para>Start the service. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Service.java" line="26" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="interfacecom_1_1asciidoxy_1_1system_1_1_service_1ad536a549ed8f7722de70a708fb415bcc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void com.asciidoxy.system.Service.Stop</definition>
+        <argsstring>()</argsstring>
+        <name>Stop</name>
+        <briefdescription>
+<para>Stop the service. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Service.java" line="31" column="8"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Base class for services. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="Service.java" line="22" column="18" bodyfile="Service.java" bodystart="22" bodyend="32"/>
+    <listofallmembers>
+      <member refid="interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c" prot="public" virt="non-virtual"><scope>com::asciidoxy::system::Service</scope><name>Start</name></member>
+      <member refid="interfacecom_1_1asciidoxy_1_1system_1_1_service_1ad536a549ed8f7722de70a708fb415bcc" prot="public" virt="non-virtual"><scope>com::asciidoxy::system::Service</scope><name>Stop</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="class_logger" kind="class" language="Java" prot="public">
+    <compoundname>Logger</compoundname>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_logger_1ab09f580b42942fa55f3e50997bd98047" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void Logger.Log</definition>
+        <argsstring>(string message)</argsstring>
+        <name>Log</name>
+        <param>
+          <type>string</type>
+          <declname>message</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Logger.java" line="20" column="15" bodyfile="Logger.java" bodystart="20" bodyend="20"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="Logger.java" line="19" column="7" bodyfile="Logger.java" bodystart="19" bodyend="21"/>
+    <listofallmembers>
+      <member refid="class_logger_1ab09f580b42942fa55f3e50997bd98047" prot="public" virt="non-virtual"><scope>Logger</scope><name>Log</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

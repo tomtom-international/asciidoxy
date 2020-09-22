@@ -119,15 +119,17 @@ class Parameter:
     Representation of doxygen type paramType
 
     Attributes:
-        type:        Reference to the type of the parameter.
-        name:        Name used for the parameter.
-        description: Explanation of the parameter.
+        type:          Reference to the type of the parameter.
+        name:          Name used for the parameter.
+        description:   Explanation of the parameter.
+        default_value: Default value for the parameter.
     """
 
     # doxygen based fields
     type: Optional[TypeRef] = None
     name: str = ""
     description: str = ""
+    default_value: Optional[str] = None
 
 
 class ReturnValue:
@@ -194,6 +196,9 @@ class Member(ReferableElement):
         static:      True if this is a static member.
         include:     Name of the include (file) required to use this member.
         namespace:   Namespace, or scope, the member is contained in.
+        const:       The member is constant, not changing itself or its parent.
+        deleted:     The member is marked as deleted.
+        default:     The member is a default generated member.
     """
 
     definition: str = ""
@@ -208,6 +213,9 @@ class Member(ReferableElement):
     static: bool = False
     include: Optional[str] = None
     namespace: Optional[str] = None
+    const: bool = False
+    deleted: bool = False
+    default: bool = False
 
     def __init__(self, language: str):
         super().__init__(language)
@@ -226,9 +234,11 @@ class InnerTypeReference(TypeRefBase):
 
     Attributes:
         referred_object: Element being referenced.
+        prot:            Protection level of the inner type.
     """
 
     referred_object: Optional["Compound"] = None
+    prot: str = ""
 
     def resolve(self, reference_target):
         self.referred_object = reference_target

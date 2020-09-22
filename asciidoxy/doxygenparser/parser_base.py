@@ -78,7 +78,8 @@ class ParserBase(ABC):
             param.type = self.parse_type(param_element.find("type"),
                                          param_element.find("array"),
                                          parent=parent)
-            param.name = param_element.findtext("declname") or ""
+            param.name = param_element.findtext("declname", "")
+            param.default_value = param_element.findtext("defval", "")
 
             matching_descriptions = [desc for name, desc in descriptions if name == param.name]
             if matching_descriptions:
@@ -165,7 +166,7 @@ class ParserBase(ABC):
         member.name = self.TRAITS.short_name(name)
         member.full_name = self.TRAITS.full_name(name, parent.full_name)
         member.namespace = self.TRAITS.namespace(member.full_name)
-        member.include = parent.include
+        member.include = self.find_include(memberdef_element)
 
         if self.TRAITS.is_member_blacklisted(member.kind, member.name):
             return None
@@ -179,7 +180,8 @@ class ParserBase(ABC):
             self.parse_description(memberdef_element.find("detaileddescription")))
         member.returns = self.parse_returns(memberdef_element, member)
         member.enumvalues = self.parse_enumvalues(memberdef_element, member.full_name)
-        member.static = _yes_no_to_bool(memberdef_element.get("static", "false"))
+        member.static = _yes_no_to_bool(memberdef_element.get("static", "no"))
+        member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
 
         self._driver.register(member)
         return member
@@ -189,15 +191,12 @@ class ParserBase(ABC):
         inner_classes = []
 
         for xml_inner_class in parent_compound.iterfind("innerclass"):
-            type_visibility = xml_inner_class.get("prot")
-            if type_visibility not in ("public", "protected", None):
-                continue
-
             inner_type = InnerTypeReference(parent.language)
             inner_type.id = self.TRAITS.unique_id(xml_inner_class.get("refid"))
             inner_type.name = \
                 self.TRAITS.cleanup_name(xml_inner_class.text if xml_inner_class.text else "")
             inner_type.namespace = parent.full_name
+            inner_type.prot = xml_inner_class.get("prot", "")
 
             inner_classes.append(inner_type)
             self._driver.unresolved_ref(inner_type)
@@ -236,6 +235,8 @@ class ParserBase(ABC):
         if include is None:
             location_element = element.find("location")
             if location_element is not None:
-                include = location_element.get("file", None)
+                include = location_element.get("declfile", None)
+                if include is None:
+                    include = location_element.get("file", None)
 
         return include

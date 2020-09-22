@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1geometry_1_1_invalid_coordinate" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::geometry::InvalidCoordinate</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">exception</basecompoundref>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_invalid_coordinate_1a3b0057e2237f2ecfe3ebc94ca2ba6a12" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const char *</type>
+        <definition>const char* asciidoxy::geometry::InvalidCoordinate::what</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>what</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="25" column="14"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>asciidoxy::geometry::InvalidCoordinate</label>
+        <link refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>std::exception</label>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>asciidoxy::geometry::InvalidCoordinate</label>
+        <link refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>std::exception</label>
+      </node>
+    </collaborationgraph>
+    <location file="coordinate.hpp" line="23" column="1" bodyfile="coordinate.hpp" bodystart="23" bodyend="26"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate_1a3b0057e2237f2ecfe3ebc94ca2ba6a12" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::InvalidCoordinate</scope><name>what</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

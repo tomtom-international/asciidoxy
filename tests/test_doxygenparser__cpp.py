@@ -30,12 +30,14 @@ def test_parse_cpp_class(api_reference):
     assert cpp_class.include == "coordinate.hpp"
     assert cpp_class.namespace == "asciidoxy::geometry"
 
-    assert len(cpp_class.members) == 13
+    assert len(cpp_class.members) == 15
     assert len(cpp_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in cpp_class.members)
     assert member_names == sorted([
         "Coordinate",
+        "~Coordinate",
+        "operator+",
         "Latitude",
         "Longitude",
         "Altitude",
@@ -65,6 +67,7 @@ def test_parse_cpp_class_with_nested_class(api_reference):
     assert nested_class.id == ("cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_"
                                "event_data")
     assert nested_class.language == "cpp"
+    assert nested_class.prot == "public"
 
     assert nested_class.referred_object is not None
     assert nested_class.referred_object.id == nested_class.id
@@ -97,6 +100,7 @@ def test_parse_cpp_member_function_no_return_value(api_reference):
     assert member.static is False
     assert member.include == "coordinate.hpp"
     assert member.namespace == "asciidoxy::geometry::Coordinate"
+    assert member.const is False
 
     assert len(member.params) == 0
     assert len(member.exceptions) == 0
@@ -124,6 +128,7 @@ def test_parse_cpp_member_function_only_return_value(api_reference):
     assert member.static is False
     assert member.include == "coordinate.hpp"
     assert member.namespace == "asciidoxy::geometry::Coordinate"
+    assert member.const is True
 
     assert len(member.params) == 0
     assert len(member.exceptions) == 0
@@ -162,6 +167,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
     assert member.static is False
     assert member.include == "traffic_event.hpp"
     assert member.namespace == "asciidoxy::traffic::TrafficEvent"
+    assert member.const is False
 
     assert len(member.exceptions) == 0
     assert len(member.enumvalues) == 0
@@ -171,6 +177,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
 
     assert param1.name == "cause"
     assert param1.description == "New TPEG cause code."
+    assert not param1.default_value
 
     assert param1.type is not None
     assert param1.type.id is None
@@ -185,6 +192,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
 
     assert param2.name == "delay"
     assert param2.description == "New delay in seconds."
+    assert not param2.default_value
 
     assert param2.type is not None
     assert param2.type.id is None
@@ -338,3 +346,62 @@ def test_parse_cpp_member_function_with_std_function_argument(api_reference):
     assert not arg_2.type.suffix
     assert not arg_2.type.nested
     assert not arg_2.type.args
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function__deleted(api_reference):
+    member = api_reference.find("asciidoxy::system::MoveOnly::MoveOnly(const MoveOnly&)",
+                                kind="function",
+                                lang="cpp")
+    assert member is not None
+    assert member.deleted is True
+    assert member.default is False
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function__default(api_reference):
+    member = api_reference.find("asciidoxy::system::MoveOnly::operator=(MoveOnly&&)",
+                                kind="function",
+                                lang="cpp")
+    assert member is not None
+    assert member.deleted is False
+    assert member.default is True
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp__include_file_for_free_functions(api_reference):
+    function = api_reference.find("asciidoxy::system::CreateService", kind="function", lang="cpp")
+    assert function is not None
+    assert function.include == "service.hpp"
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp__default_parameter_values__constructor(api_reference):
+    member = api_reference.find("asciidoxy::geometry::Point::Point", kind="function", lang="cpp")
+    assert member is not None
+    assert len(member.params) == 2
+
+    param1 = member.params[0]
+    assert param1.name == "x"
+    assert param1.default_value == "0"
+
+    param2 = member.params[1]
+    assert param2.name == "y"
+    assert param2.default_value == "1"
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp__default_parameter_values__method(api_reference):
+    member = api_reference.find("asciidoxy::geometry::Point::increment",
+                                kind="function",
+                                lang="cpp")
+    assert member is not None
+    assert len(member.params) == 2
+
+    param1 = member.params[0]
+    assert param1.name == "x"
+    assert param1.default_value == "2"
+
+    param2 = member.params[1]
+    assert param2.name == "y"
+    assert param2.default_value == "3"

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="namespaceasciidoxy_1_1traffic_1_1geometry" kind="namespace" language="C++">
+    <compoundname>asciidoxy::traffic::geometry</compoundname>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="use__same__from__multiple__namespaces_8hpp_1af30b1aaeff7d7434d667e176017a219e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Convertor</type>
+        <definition>Convertor asciidoxy::traffic::geometry::CreateConvertor</definition>
+        <argsstring>()</argsstring>
+        <name>CreateConvertor</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a convertor in a namespace without its own convertor. Ambiguous reference to return type. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="use_same_from_multiple_namespaces.hpp" line="47" column="11" declfile="use_same_from_multiple_namespaces.hpp" declline="47" declcolumn="11"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="use_same_from_multiple_namespaces.hpp" line="42" column="1"/>
+  </compounddef>
+</doxygen>

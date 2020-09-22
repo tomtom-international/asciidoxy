@@ -20,6 +20,21 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.6.2 (22 Sep 2020)
+
+=== Added
+
+  - {Cpp}: [AD-10] Support const methods.
+  - {Cpp}: Show destructors and operators for classes.
+  - [AD-8] Support default values for parameters.
+
+=== Fixed
+
+  - {Cpp}: [AD-34] Hide default and deleted members.
+  - Correctly detect include file for free functions.
+  - [AD-33] Inner types can now be filtered by visibility (only public and protected for now).
+
+
 == 0.6.1 (27 Jul 2020)
 
 === Added

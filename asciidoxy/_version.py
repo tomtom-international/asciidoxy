@@ -16,7 +16,7 @@
 __title__ = "asciidoxy"
 __description__ = "AsciiDoxy generates API documentation from Doxygen XML output to AsciiDoc."
 __url__ = "https://asciidoxy.org"
-__version__ = "0.6.1"
+__version__ = "0.6.2"
 __author__ = "Rob van der Most"
 __author_email__ = "Rob.vanderMost@TomTom.com"
 __license__ = "Apache 2.0"

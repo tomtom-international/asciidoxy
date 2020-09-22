@@ -59,6 +59,7 @@ def test_parse_java_class_with_nested_class(api_reference):
     assert nested_class.namespace == "com.asciidoxy.traffic.TrafficEvent"
     assert nested_class.language == "java"
     assert nested_class.id == "java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"
+    assert nested_class.prot == "public"
 
     assert nested_class.referred_object is not None
     assert nested_class.referred_object.id == nested_class.id
@@ -71,6 +72,7 @@ def test_parse_java_class_with_nested_class(api_reference):
     assert nested_class.id == ("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_"
                                "traffic_event_data")
     assert nested_class.language == "java"
+    assert nested_class.prot == "public"
 
     assert nested_class.referred_object is not None
     assert nested_class.referred_object.id == nested_class.id
@@ -118,9 +120,7 @@ def test_parse_java_method(api_reference):
 
 @pytest.mark.parametrize("api_reference_set", [["java/default"]])
 def test_parse_java_method__with_return_type_annotation(api_reference):
-    member = api_reference.find("com.asciidoxy.Nullability.getData",
-                                kind="function",
-                                lang="java")
+    member = api_reference.find("com.asciidoxy.Nullability.getData", kind="function", lang="java")
 
     assert member is not None
     assert member.returns
@@ -131,9 +131,7 @@ def test_parse_java_method__with_return_type_annotation(api_reference):
 
 @pytest.mark.parametrize("api_reference_set", [["java/default"]])
 def test_parse_java_method__with_parameter_type_annotation(api_reference):
-    member = api_reference.find("com.asciidoxy.Nullability.setData",
-                                kind="function",
-                                lang="java")
+    member = api_reference.find("com.asciidoxy.Nullability.setData", kind="function", lang="java")
 
     assert member is not None
     assert len(member.params) == 1

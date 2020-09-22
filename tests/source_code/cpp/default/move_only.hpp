@@ -1,0 +1,58 @@
+/*
+ * Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace asciidoxy {
+namespace system {
+
+/**
+ * Base class for objects that cannot be copied, but can be moved.
+ */
+class MoveOnly {
+ protected:
+  /**
+   * Default constructor.
+   */
+  MoveOnly() = default;
+
+ public:
+  /**
+   * Default virtual destructor.
+   */
+  virtual ~MoveOnly = default;
+
+  /**
+   * Deleted copy constructor.
+   */
+  virtual MoveOnly(const MoveOnly&) = delete;
+
+  /**
+   * Default move constructor.
+   */
+  virtual MoveOnly(MoveOnly&&) noexcept = default;
+
+  /**
+   * Deleted copy assignment.
+   */
+  virtual MoveOnly& operator=(const MoveOnly&) = delete;
+
+  /**
+   * Default move assignment.
+   */
+  virtual MoveOnly& operator=(MoveOnly&&) noexcept = default;
+};
+
+} // namespace system
+} // namespace asciidoxy

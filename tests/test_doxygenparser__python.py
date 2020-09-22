@@ -53,6 +53,7 @@ def test_parse_python_class_with_nested_class(api_reference):
     assert nested_class.namespace == "asciidoxy.traffic.TrafficEvent"
     assert nested_class.language == "python"
     assert nested_class.id == "python-classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"
+    assert nested_class.prot == "public"
 
     assert nested_class.referred_object
     assert nested_class.referred_object.id == nested_class.id
@@ -65,6 +66,7 @@ def test_parse_python_class_with_nested_class(api_reference):
     assert nested_class.id == ("python-classasciidoxy_1_1traffic_1_1_traffic_event_1_1_"
                                "traffic_event_data")
     assert nested_class.language == "python"
+    assert nested_class.prot == "public"
 
     assert nested_class.referred_object
     assert nested_class.referred_object.id == nested_class.id
@@ -99,16 +101,19 @@ def test_parse_python_method(api_reference):
     assert member.params[0].type.name == "self"
     assert not member.params[0].name
     assert not member.params[0].description
+    assert not member.params[0].default_value
 
     assert member.params[1].type
     assert member.params[1].type.name == "int"
     assert member.params[1].name == "cause"
     assert member.params[1].description == "New TPEG cause code."
+    assert not member.params[2].default_value
 
     assert member.params[2].type
     assert member.params[2].type.name == "int"
     assert member.params[2].name == "delay"
     assert member.params[2].description == "New delay in seconds."
+    assert not member.params[2].default_value
 
     assert len(member.exceptions) == 0
     assert len(member.enumvalues) == 0
@@ -301,3 +306,35 @@ def test_parse_python_nested_argument_and_return_type(api_reference):
     assert len(member.returns.type.nested) == 1
     assert member.returns.type.nested[0].name == "Coordinate"
     assert member.returns.type.nested[0].namespace == "asciidoxy.geometry.Coordinate"
+
+
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python__default_parameter_value__init(api_reference):
+    member = api_reference.find("asciidoxy.default_values.Point.__init__")
+    assert member is not None
+    assert len(member.params) == 3
+
+    assert not member.params[0].name
+    assert not member.params[0].default_value
+
+    assert member.params[1].name == "x"
+    assert member.params[1].default_value == "0"
+
+    assert member.params[2].name == "y"
+    assert member.params[2].default_value == "1"
+
+
+@pytest.mark.parametrize("api_reference_set", [["python/default"]])
+def test_parse_python__default_parameter_value__method(api_reference):
+    member = api_reference.find("asciidoxy.default_values.Point.increment")
+    assert member is not None
+    assert len(member.params) == 3
+
+    assert not member.params[0].name
+    assert not member.params[0].default_value
+
+    assert member.params[1].name == "x"
+    assert member.params[1].default_value == "2"
+
+    assert member.params[2].name == "y"
+    assert member.params[2].default_value == "3"

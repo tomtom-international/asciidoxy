@@ -22,15 +22,25 @@ A coordinate has a latitude, longitude, and an altitude.
 `xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318[Coordinate()]`::
 Default constructor.
 
+|*Destructors*
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0[~Coordinate()]`::
+Destructor.
+
+|*Operators*
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038[operator+(const Coordinate &)]`::
+Coordinates can be added.
+
 |*Methods*
 |
-`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11[double Latitude()]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11[double Latitude() const]`::
 Latitude.
-`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1[double Longitude()]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1[double Longitude() const]`::
 Longitude.
-`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483[double Altitude()]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483[double Altitude() const]`::
 Altitude.
-`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[bool IsValid()]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[bool IsValid() const]`::
 Check if the coordinate is valid.
 `xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a[void Update(const Coordinate &)]`::
 Update from another coordinate.
@@ -49,6 +59,10 @@ Update from separate values.
 == Members
 
 include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0.adoc[leveloffset=+1]
+'''
+include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038.adoc[leveloffset=+1]
 '''
 include::DIRECTORY/cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11.adoc[leveloffset=+1]
 '''

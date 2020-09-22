@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1positioning_1_1_positioning" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::positioning::Positioning</compoundname>
+    <includes refid="positioning_8hpp" local="no">positioning.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1positioning_1_1_positioning_1a247800ba0e71099b54c958f764f29917" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>asciidoxy::geometry::Coordinate</type>
+        <definition>asciidoxy::geometry::Coordinate asciidoxy::positioning::Positioning::CurrentPosition</definition>
+        <argsstring>() const</argsstring>
+        <name>CurrentPosition</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Retrieve the current position.</para>
+<para><simplesect kind="return"><para>Coordinates of the current position. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="positioning.hpp" line="33" column="35"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1positioning_1_1_positioning_1a8f374afbae18da9cbb1198f99d9f0cc8" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool asciidoxy::positioning::Positioning::IsNearby</definition>
+        <argsstring>(asciidoxy::geometry::Coordinate coord) const</argsstring>
+        <name>IsNearby</name>
+        <param>
+          <type>asciidoxy::geometry::Coordinate</type>
+          <declname>coord</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Check if the given coordinates are nearby.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>coord</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Coordinates to check. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>True if the coordinates are nearby. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="positioning.hpp" line="41" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1positioning_1_1_positioning_1af0fb232aa368c066236edf2bab3fa323" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::positioning::Positioning::Override</definition>
+        <argsstring>(asciidoxy::geometry::Coordinate coord)</argsstring>
+        <name>Override</name>
+        <param>
+          <type>asciidoxy::geometry::Coordinate</type>
+          <declname>coord</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Override the current position.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>coord</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Coordinate to use for the current position. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>asciidoxy::geometry::InvalidCoordinate</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown if the given coordinates are not valid. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="positioning.hpp" line="49" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1positioning_1_1_positioning_1aeb978fa087b26c153150d3e5a93c5121" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>std::vector&lt; traffic::TrafficEvent &gt;</type>
+        <definition>std::vector&lt;traffic::TrafficEvent&gt; asciidoxy::positioning::Positioning::TrafficNearby</definition>
+        <argsstring>() const</argsstring>
+        <name>TrafficNearby</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get nearby traffic.</para>
+<para><parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>geometry::InvalidCoordinate</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Thrown if the current position is not valid. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="positioning.hpp" line="56" column="15"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1positioning_1_1_positioning_1af799f1baf9c2ea33f106a9484d2ce2ea" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool asciidoxy::positioning::Positioning::InTraffic</definition>
+        <argsstring>(const traffic::TrafficEvent &amp;event) const</argsstring>
+        <name>InTraffic</name>
+        <param>
+          <type>const traffic::TrafficEvent &amp;</type>
+          <declname>event</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Are we currently in the given traffic event?</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>event</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The traffic event to check. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>True if we are in the traffic event. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="positioning.hpp" line="64" column="8"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1positioning_1_1_positioning" kindref="compound">Positioning</ref> engine. </para>
+    </detaileddescription>
+    <location file="positioning.hpp" line="26" column="1" bodyfile="positioning.hpp" bodystart="26" bodyend="65"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1positioning_1_1_positioning_1a247800ba0e71099b54c958f764f29917" prot="public" virt="non-virtual"><scope>asciidoxy::positioning::Positioning</scope><name>CurrentPosition</name></member>
+      <member refid="classasciidoxy_1_1positioning_1_1_positioning_1af799f1baf9c2ea33f106a9484d2ce2ea" prot="public" virt="non-virtual"><scope>asciidoxy::positioning::Positioning</scope><name>InTraffic</name></member>
+      <member refid="classasciidoxy_1_1positioning_1_1_positioning_1a8f374afbae18da9cbb1198f99d9f0cc8" prot="public" virt="non-virtual"><scope>asciidoxy::positioning::Positioning</scope><name>IsNearby</name></member>
+      <member refid="classasciidoxy_1_1positioning_1_1_positioning_1af0fb232aa368c066236edf2bab3fa323" prot="public" virt="non-virtual"><scope>asciidoxy::positioning::Positioning</scope><name>Override</name></member>
+      <member refid="classasciidoxy_1_1positioning_1_1_positioning_1aeb978fa087b26c153150d3e5a93c5121" prot="public" virt="non-virtual"><scope>asciidoxy::positioning::Positioning</scope><name>TrafficNearby</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

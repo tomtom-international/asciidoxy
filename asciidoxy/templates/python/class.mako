@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, chain
+from asciidoxy.templates.helpers import has
 from asciidoxy.templates.python.helpers import PythonTemplateHelper
 %>
 <%

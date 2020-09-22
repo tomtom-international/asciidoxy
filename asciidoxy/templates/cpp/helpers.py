@@ -20,8 +20,25 @@ from asciidoxy.templates.helpers import TemplateHelper
 
 
 class CppTemplateHelper(TemplateHelper):
+    def public_constructors(self) -> Iterator[Member]:
+        return (m for m in super().public_constructors() if (not m.default and not m.deleted))
+
+    def public_destructors(self) -> Iterator[Member]:
+        assert self.element is not None
+        assert self.insert_filter is not None
+
+        destructor_name = f"~{self.element.name}"
+        return (m for m in self.insert_filter.members(self.element)
+                if (m.kind == "function" and m.name == destructor_name and m.prot == "public"
+                    and not m.default and not m.deleted))
+
     def public_static_methods(self) -> Iterator[Member]:
         return (m for m in super().public_static_methods() if not m.name.startswith("operator"))
 
     def public_methods(self) -> Iterator[Member]:
-        return (m for m in super().public_methods() if not m.name.startswith("operator"))
+        return (m for m in super().public_methods()
+                if (not m.name.startswith("operator") and not m.default and not m.deleted))
+
+    def public_operators(self) -> Iterator[Member]:
+        return (m for m in super().public_methods()
+                if (m.name.startswith("operator") and not m.default and not m.deleted))

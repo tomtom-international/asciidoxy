@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event" kind="class" language="Java" prot="public">
+    <compoundname>com::asciidoxy::traffic::TrafficEvent</compoundname>
+    <innerclass refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" prot="public">com::asciidoxy::traffic::TrafficEvent::Severity</innerclass>
+    <innerclass refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" prot="public">com::asciidoxy::traffic::TrafficEvent::TrafficEventData</innerclass>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a715ec226575d1ab31cf11159b20d803c" prot="private" static="no" mutable="no">
+        <type><ref refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref></type>
+        <definition>TrafficEventData com.asciidoxy.traffic.TrafficEvent.data_</definition>
+        <argsstring></argsstring>
+        <name>data_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="98" column="28" bodyfile="TrafficEvent.java" bodystart="98" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>com.asciidoxy.traffic.TrafficEvent.TrafficEvent</definition>
+        <argsstring>(TrafficEventData data)</argsstring>
+        <name>TrafficEvent</name>
+        <param>
+          <type><ref refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref></type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+<para>Construct a traffic event from data. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>data</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The data to contain. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="78" column="10" bodyfile="TrafficEvent.java" bodystart="78" bodyend="78"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kindref="compound">TrafficEventData</ref></type>
+        <definition>TrafficEventData com.asciidoxy.traffic.TrafficEvent.Data</definition>
+        <argsstring>()</argsstring>
+        <name>Data</name>
+        <briefdescription>
+<para>Get the traffic event details. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Traffic event details. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="85" column="27" bodyfile="TrafficEvent.java" bodystart="85" bodyend="85"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a72847da5fa4e03763f089c5d044085d4" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>boolean</type>
+        <definition>boolean com.asciidoxy.traffic.TrafficEvent.Update</definition>
+        <argsstring>(int cause, int delay)</argsstring>
+        <name>Update</name>
+        <param>
+          <type>int</type>
+          <declname>cause</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>delay</declname>
+        </param>
+        <briefdescription>
+<para>Update the traffic event data. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Verifies the new information before updating.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>cause</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>New TPEG cause code. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delay</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>New delay in seconds. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>True if the update is valid. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="96" column="18" bodyfile="TrafficEvent.java" bodystart="96" bodyend="96"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Information about a traffic event. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="TrafficEvent.java" line="21" column="7" bodyfile="TrafficEvent.java" bodystart="21" bodyend="99"/>
+    <listofallmembers>
+      <member refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent</scope><name>Data</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a715ec226575d1ab31cf11159b20d803c" prot="private" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent</scope><name>data_</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent</scope><name>TrafficEvent</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a72847da5fa4e03763f089c5d044085d4" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent</scope><name>Update</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

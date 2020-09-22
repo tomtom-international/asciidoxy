@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1system_1_1_service" kind="interface" language="C++" prot="public" abstract="yes">
+    <compoundname>asciidoxy::system::Service</compoundname>
+    <includes refid="service_8hpp" local="no">service.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void asciidoxy::system::Service::Start</definition>
+        <argsstring>()=0</argsstring>
+        <name>Start</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Start the service. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="service.hpp" line="29" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void asciidoxy::system::Service::Stop</definition>
+        <argsstring>()=0</argsstring>
+        <name>Stop</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Stop the service. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="service.hpp" line="34" column="16"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>This is an interface for service classes. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>Base class for services. </para>
+    </detaileddescription>
+    <location file="service.hpp" line="23" column="1" bodyfile="service.hpp" bodystart="23" bodyend="35"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8" prot="public" virt="pure-virtual"><scope>asciidoxy::system::Service</scope><name>Start</name></member>
+      <member refid="classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0" prot="public" virt="pure-virtual"><scope>asciidoxy::system::Service</scope><name>Stop</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
