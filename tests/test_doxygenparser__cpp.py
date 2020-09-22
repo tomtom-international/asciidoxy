@@ -176,6 +176,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
 
     assert param1.name == "cause"
     assert param1.description == "New TPEG cause code."
+    assert not param1.default_value
 
     assert param1.type is not None
     assert param1.type.id is None
@@ -190,6 +191,7 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
 
     assert param2.name == "delay"
     assert param2.description == "New delay in seconds."
+    assert not param2.default_value
 
     assert param2.type is not None
     assert param2.type.id is None
@@ -370,3 +372,35 @@ def test_parse_cpp__include_file_for_free_functions(api_reference):
     function = api_reference.find("asciidoxy::system::CreateService", kind="function", lang="cpp")
     assert function is not None
     assert function.include == "service.hpp"
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp__default_parameter_values__constructor(api_reference):
+    member = api_reference.find("asciidoxy::geometry::Point::Point", kind="function", lang="cpp")
+    assert member is not None
+    assert len(member.params) == 2
+
+    param1 = member.params[0]
+    assert param1.name == "x"
+    assert param1.default_value == "0"
+
+    param2 = member.params[1]
+    assert param2.name == "y"
+    assert param2.default_value == "1"
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp__default_parameter_values__method(api_reference):
+    member = api_reference.find("asciidoxy::geometry::Point::increment",
+                                kind="function",
+                                lang="cpp")
+    assert member is not None
+    assert len(member.params) == 2
+
+    param1 = member.params[0]
+    assert param1.name == "x"
+    assert param1.default_value == "2"
+
+    param2 = member.params[1]
+    assert param2.name == "y"
+    assert param2.default_value == "3"

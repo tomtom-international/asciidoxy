@@ -5,6 +5,7 @@
     <innerclass refid="classasciidoxy_1_1geometry_1_1_convertor" prot="public">asciidoxy::geometry::Convertor</innerclass>
     <innerclass refid="classasciidoxy_1_1geometry_1_1_coordinate" prot="public">asciidoxy::geometry::Coordinate</innerclass>
     <innerclass refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate" prot="public">asciidoxy::geometry::InvalidCoordinate</innerclass>
+    <innerclass refid="classasciidoxy_1_1geometry_1_1_point" prot="public">asciidoxy::geometry::Point</innerclass>
     <briefdescription>
     </briefdescription>
     <detaileddescription>

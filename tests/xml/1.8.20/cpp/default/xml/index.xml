@@ -2,9 +2,9 @@
 <doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.20" xml:lang="en-US">
   <compound refid="classasciidoxy_1_1_convertor" kind="class"><name>asciidoxy::Convertor</name>
   </compound>
-  <compound refid="classasciidoxy_1_1geometry_1_1_convertor" kind="class"><name>asciidoxy::geometry::Convertor</name>
-  </compound>
   <compound refid="classasciidoxy_1_1traffic_1_1_convertor" kind="class"><name>asciidoxy::traffic::Convertor</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1geometry_1_1_convertor" kind="class"><name>asciidoxy::geometry::Convertor</name>
   </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_coordinate" kind="class"><name>asciidoxy::geometry::Coordinate</name>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a52b32f5ac1d5690a56645ba6cc45ed3d" kind="variable"><name>latitude_</name></member>
@@ -36,6 +36,10 @@
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a330464b08592a825ef29c34fb27981e8" kind="function"><name>MoveOnly</name></member>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a0a96fb07ea0d648c1077a30cab963f6c" kind="function"><name>operator=</name></member>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a52622305a840ea66ccc83df35563a920" kind="function"><name>operator=</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1geometry_1_1_point" kind="class"><name>asciidoxy::geometry::Point</name>
+    <member refid="classasciidoxy_1_1geometry_1_1_point_1aabf939f4746751aeb2f1e9e3553eecb4" kind="function"><name>Point</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8" kind="function"><name>increment</name></member>
   </compound>
   <compound refid="classasciidoxy_1_1system_1_1_service" kind="interface"><name>asciidoxy::system::Service</name>
     <member refid="classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8" kind="function"><name>Start</name></member>
@@ -80,6 +84,8 @@
     <member refid="overloads_8hpp_1aebc2b625b914c709f972b5b8eca35d39" kind="function"><name>to_string</name></member>
   </compound>
   <compound refid="coordinate_8hpp" kind="file"><name>coordinate.hpp</name>
+  </compound>
+  <compound refid="default__values_8hpp" kind="file"><name>default_values.hpp</name>
   </compound>
   <compound refid="logger_8hpp" kind="file"><name>logger.hpp</name>
   </compound>

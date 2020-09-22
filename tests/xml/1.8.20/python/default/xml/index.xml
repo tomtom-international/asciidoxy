@@ -10,6 +10,10 @@
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa" kind="function"><name>from_string_safe</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d" kind="function"><name>combine</name></member>
   </compound>
+  <compound refid="classasciidoxy_1_1default__values_1_1_point" kind="class"><name>asciidoxy::default_values::Point</name>
+    <member refid="classasciidoxy_1_1default__values_1_1_point_1ae2454dfa3e6bcf10d9c36975f310b781" kind="function"><name>__init__</name></member>
+    <member refid="classasciidoxy_1_1default__values_1_1_point_1a7afa9cd9fcbec61efa64cb0f3108c17b" kind="function"><name>increment</name></member>
+  </compound>
   <compound refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kind="class"><name>asciidoxy::traffic::TrafficEvent::Severity</name>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a968ab64546e92ecef1cd973413c0287a" kind="variable"><name>Low</name></member>
     <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a93d3da27d0cf28919dabd7e4584d255f" kind="variable"><name>Medium</name></member>
@@ -31,11 +35,15 @@
   </compound>
   <compound refid="namespaceasciidoxy" kind="namespace"><name>asciidoxy</name>
   </compound>
+  <compound refid="namespaceasciidoxy_1_1default__values" kind="namespace"><name>asciidoxy::default_values</name>
+  </compound>
   <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
   </compound>
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
   </compound>
   <compound refid="____init_____8py" kind="file"><name>__init__.py</name>
+  </compound>
+  <compound refid="default__values_8py" kind="file"><name>default_values.py</name>
   </compound>
   <compound refid="geometry_8py" kind="file"><name>geometry.py</name>
   </compound>

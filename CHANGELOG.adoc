@@ -26,6 +26,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
   - {Cpp}: [AD-10] Support const methods.
   - {Cpp}: Show destructors and operators for classes.
+  - [AD-8] Support default values for parameters.
 
 === Fixed
 

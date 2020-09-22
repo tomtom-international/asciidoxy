@@ -29,8 +29,12 @@ ${element.description}
 | Parameters
 |
 % for param in element.params:
-`${helper.type_and_name(param)}`::
+`${helper.parameter(param)}`::
 ${param.description}
+% if param.default_value:
++
+*Default value*: `${param.default_value}`
+% endif
 
 % endfor
 % endif

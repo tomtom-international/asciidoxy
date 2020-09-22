@@ -78,7 +78,8 @@ class ParserBase(ABC):
             param.type = self.parse_type(param_element.find("type"),
                                          param_element.find("array"),
                                          parent=parent)
-            param.name = param_element.findtext("declname") or ""
+            param.name = param_element.findtext("declname", "")
+            param.default_value = param_element.findtext("defval", "")
 
             matching_descriptions = [desc for name, desc in descriptions if name == param.name]
             if matching_descriptions:

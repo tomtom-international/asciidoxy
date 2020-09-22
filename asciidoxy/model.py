@@ -119,15 +119,17 @@ class Parameter:
     Representation of doxygen type paramType
 
     Attributes:
-        type:        Reference to the type of the parameter.
-        name:        Name used for the parameter.
-        description: Explanation of the parameter.
+        type:          Reference to the type of the parameter.
+        name:          Name used for the parameter.
+        description:   Explanation of the parameter.
+        default_value: Default value for the parameter.
     """
 
     # doxygen based fields
     type: Optional[TypeRef] = None
     name: str = ""
     description: str = ""
+    default_value: Optional[str] = None
 
 
 class ReturnValue:

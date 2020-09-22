@@ -470,7 +470,7 @@ def test_has_any__list_and_generator():
     assert has_any(empty_gen(), [42]) is True
 
 
-def test_type_and_name(empty_context):
+def test_parameter(empty_context):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -482,10 +482,25 @@ def test_type_and_name(empty_context):
     param.name = "arg"
 
     helper = TemplateHelper(empty_context)
-    assert helper.type_and_name(param) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
+    assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_type_and_name__no_name(empty_context):
+def test_parameter__no_link(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+
+    helper = TemplateHelper(empty_context)
+    assert helper.parameter(param, link=False) == "const MyType & arg"
+
+
+def test_parameter__no_name(empty_context):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -497,7 +512,41 @@ def test_type_and_name__no_name(empty_context):
     param.name = ""
 
     helper = TemplateHelper(empty_context)
-    assert helper.type_and_name(param) == "const xref:lang-tomtom_1_MyType[MyType] &"
+    assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] &"
+
+
+def test_parameter__default_value(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.default_value = "12"
+
+    helper = TemplateHelper(empty_context)
+    assert helper.parameter(
+        param, default_value=True) == "const xref:lang-tomtom_1_MyType[MyType] & arg = 12"
+
+
+def test_parameter__ignore_default_value(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.default_value = "12"
+
+    helper = TemplateHelper(empty_context)
+    assert helper.parameter(param,
+                            default_value=False) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
 def test_method_signature__no_params(empty_context):

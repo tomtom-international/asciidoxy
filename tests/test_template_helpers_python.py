@@ -392,3 +392,58 @@ def test_method_signature__ignore_param_type_xref_length(empty_context):
     helper = PythonTemplateHelper(empty_context)
     assert (
         helper.method_signature(method) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")
+
+
+def test_parameter(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.parameter(param) == "arg: xref:lang-tomtom_1_MyType[MyType]"
+
+
+def test_parameter__no_link(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.parameter(param, link=False) == "arg: MyType"
+
+
+def test_parameter__default_value(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.default_value = "12"
+
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.parameter(param,
+                            default_value=True) == "arg: xref:lang-tomtom_1_MyType[MyType] = 12"
+
+
+def test_parameter__ignore_default_value(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.default_value = "12"
+
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.parameter(param, default_value=False) == "arg: xref:lang-tomtom_1_MyType[MyType]"

@@ -2,6 +2,7 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
   <compounddef id="namespaceasciidoxy" kind="namespace" language="Python">
     <compoundname>asciidoxy</compoundname>
+    <innernamespace refid="namespaceasciidoxy_1_1default__values">asciidoxy::default_values</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1geometry">asciidoxy::geometry</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1traffic">asciidoxy::traffic</innernamespace>
     <briefdescription>
