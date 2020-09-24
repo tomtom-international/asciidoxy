@@ -23,12 +23,17 @@ class SwiftTemplateHelper(TemplateHelper):
     ARGS_BEFORE_TYPE = True
     ARGS_TO_TYPE = " -> "
 
-    def type_and_name(self, param: Parameter, *, link: bool = True) -> str:
+    def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
+        if default_value and param.default_value:
+            defval = f" = {param.default_value}"
+        else:
+            defval = ""
+
         if param.type is None or not param.type.name:
-            return param.name
+            return f"{param.name}{defval}"
         if not param.name:
             return self.print_ref(param.type, link=link)
-        return (f"{param.name}: {self.print_ref(param.type, link=link)}".strip())
+        return (f"{param.name}: {self.print_ref(param.type, link=link)}{defval}".strip())
 
     def _method_prefix(self, method: Member, *, link: bool = True) -> str:
         return "func"

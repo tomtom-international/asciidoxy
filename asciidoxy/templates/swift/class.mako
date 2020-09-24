@@ -115,7 +115,7 @@ ${constructor.description}
 | Parameters
 |
 % for param in constructor.params:
-`${helper.type_and_name(param)}`::
+`${helper.parameter(param)}`::
 ${param.description}
 
 % endfor
@@ -169,7 +169,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${helper.type_and_name(param)}`::
+`${helper.parameter(param)}`::
 ${param.description}
 
 % endfor
@@ -215,7 +215,7 @@ ${method.description}
 | Parameters
 |
 % for param in method.params:
-`${helper.type_and_name(param)}`::
+`${helper.parameter(param)}`::
 ${param.description}
 
 % endfor

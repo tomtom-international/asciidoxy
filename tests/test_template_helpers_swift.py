@@ -52,12 +52,13 @@ def swift_class():
         property.kind = "property"
         return property
 
-    def generate_nested_type(kind: str) -> InnerTypeReference:
+    def generate_nested_type(kind: str, prot: str) -> InnerTypeReference:
         nested_class = Compound("swift")
-        nested_class.name = f"Nested{kind.capitalize()}"
+        nested_class.name = f"{prot.capitalize()}{kind.capitalize()}"
         inner_class_reference = InnerTypeReference(language="swift")
         inner_class_reference.name = nested_class.name
         inner_class_reference.referred_object = nested_class
+        inner_class_reference.prot = prot
         return inner_class_reference
 
     # fill class with typical members
@@ -87,8 +88,8 @@ def swift_class():
                                      has_return_value=False,
                                      is_static=True))
 
-    for inner_type in ("class", "protocol", "struct"):
-        compound.inner_classes.append(generate_nested_type(inner_type))
+        for inner_type in ("class", "protocol", "struct"):
+            compound.inner_classes.append(generate_nested_type(inner_type, visibility))
 
     compound.members.append(
         generate_member_function(prot="public", name="init", has_return_value=False))
@@ -131,9 +132,9 @@ def test_public_simple_enclosed_types(helper):
 def test_public_complex_enclosed_types(helper):
     result = [m.name for m in helper.public_complex_enclosed_types()]
     assert sorted(result) == sorted([
-        "NestedClass",
-        "NestedProtocol",
-        "NestedStruct",
+        "PublicClass",
+        "PublicProtocol",
+        "PublicStruct",
     ])
 
 
@@ -268,3 +269,54 @@ def test_closure_definition__no_params__return_type(helper):
 
     assert (helper.closure_definition(closure) ==
             "typealias SuccessClosure = () -> xref:swift-data[Data]")
+
+
+def test_parameter(helper):
+    ref = TypeRef("swift")
+    ref.name = "MyType"
+    ref.id = "swift-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+
+    assert helper.parameter(param) == "arg: xref:swift-tomtom_1_MyType[MyType]"
+
+
+def test_parameter__no_link(helper):
+    ref = TypeRef("swift")
+    ref.name = "MyType"
+    ref.id = "swift-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+
+    assert helper.parameter(param, link=False) == "arg: MyType"
+
+
+def test_parameter__default_value(helper):
+    ref = TypeRef("swift")
+    ref.name = "MyType"
+    ref.id = "swift-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.default_value = "12"
+
+    assert helper.parameter(param,
+                            default_value=True) == "arg: xref:swift-tomtom_1_MyType[MyType] = 12"
+
+
+def test_parameter__ignore_default_value(helper):
+    ref = TypeRef("swift")
+    ref.name = "MyType"
+    ref.id = "swift-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.default_value = "12"
+
+    assert helper.parameter(param, default_value=False) == "arg: xref:swift-tomtom_1_MyType[MyType]"
