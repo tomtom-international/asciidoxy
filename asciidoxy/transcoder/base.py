@@ -142,6 +142,9 @@ class TranscoderBase(ABC):
         transcoded.static = member.static
         transcoded.include = member.include
         transcoded.namespace = member.namespace
+        transcoded.const = member.const
+        transcoded.deleted = member.deleted
+        transcoded.default = member.default
 
         return transcoded
 
@@ -163,6 +166,7 @@ class TranscoderBase(ABC):
         transcoded.type = self.type_ref(parameter.type) if parameter.type else None
         transcoded.name = parameter.name
         transcoded.description = parameter.description
+        transcoded.default_value = parameter.default_value
 
         return transcoded
 

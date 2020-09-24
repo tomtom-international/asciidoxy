@@ -86,6 +86,9 @@ def make_member(lang: str,
     member.static = False
     member.include = "include.file"
     member.namespace = "com.asciidoxy.geometry"
+    member.const = True
+    member.deleted = False
+    member.default = False
     return member
 
 
@@ -118,6 +121,7 @@ def make_parameter(name: str, type_: Optional[TypeRef] = None) -> Parameter:
     param.type = type_
     param.name = name
     param.description = "Description"
+    param.default_value = "42"
     return param
 
 
@@ -259,6 +263,9 @@ def test_transcode_member__no_nested_elements(transcoder):
     assert transcoded.static is False
     assert transcoded.include == "include.file"
     assert transcoded.namespace == "com.asciidoxy.geometry"
+    assert transcoded.const is True
+    assert transcoded.deleted is False
+    assert transcoded.default is False
 
     assert not transcoded.params
     assert not transcoded.exceptions
@@ -459,6 +466,7 @@ def test_transcode_parameter__no_type(transcoder):
     assert not transcoded.type
     assert transcoded.name == "argument"
     assert transcoded.description == "Description"
+    assert transcoded.default_value == "42"
 
 
 def test_transcode_parameter__with_type(transcoder):
@@ -471,6 +479,7 @@ def test_transcode_parameter__with_type(transcoder):
     assert transcoded.type.name == "MyType"
     assert transcoded.name == "argument"
     assert transcoded.description == "Description"
+    assert transcoded.default_value == "42"
 
     assert param.type.language == "asm"
 
