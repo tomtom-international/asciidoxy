@@ -202,10 +202,19 @@ def test_inner_class_filter__kind(cpp_class_with_inner_classes):
     assert sorted(inner_class_names) == sorted(["NestedStruct", "AnotherStruct"])
 
 
+def test_inner_class_filter__prot(cpp_class_with_inner_classes):
+    inner_class_filter = InnerClassFilter.from_spec({"prot": ["NONE", "protected"]})
+    inner_class_names = [
+        m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)
+    ]
+    assert sorted(inner_class_names) == sorted(["ProtectedType"])
+
+
 def test_inner_class_filter__all(cpp_class_with_inner_classes):
     inner_class_filter = InnerClassFilter.from_spec({
         "name": ["NONE", "Nested.*"],
-        "kind": ["NONE", "struct"]
+        "kind": ["NONE", "struct"],
+        "prot": ["NONE", "public"],
     })
     inner_class_names = [
         m.name for m in cpp_class_with_inner_classes.inner_classes if inner_class_filter(m)
