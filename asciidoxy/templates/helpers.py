@@ -77,10 +77,10 @@ class TemplateHelper:
         if link and ref.id:
             return (f"{args_before}{ref.prefix or ''}"
                     f"{self.context.link_to_element(ref.id, ref.name)}{nested}"
-                    f"{args_after}{ref.suffix or ''}").strip()
+                    f"{ref.suffix or ''}{args_after}").strip()
         else:
             return (f"{args_before}{ref.prefix or ''}{ref.name}{nested}"
-                    f"{args_after}{ref.suffix or ''}".strip())
+                    f"{ref.suffix or ''}{args_after}".strip())
 
     def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
         if default_value and param.default_value:

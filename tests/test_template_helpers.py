@@ -155,7 +155,7 @@ def test_print_ref__link__empty_args(context_mock):
     ref.args = []
 
     helper = TemplateHelper(context_mock)
-    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType]() &"
+    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType] &()"
     context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
@@ -186,7 +186,7 @@ def test_print_ref__link__nested_and_args_custom_start_and_end(context_mock):
 
     helper = TestHelper(context_mock)
     assert (helper.print_ref(ref) ==
-            "const xref:lang-tomtom_1_MyType[MyType]{Nested1;@xref:lang-argtype[ArgType]# &")
+            "const xref:lang-tomtom_1_MyType[MyType]{Nested1; &@xref:lang-argtype[ArgType]#")
 
 
 def test_print_ref__no_link__empty(context_mock):
@@ -292,7 +292,7 @@ def test_print_ref__no_link__empty_args(context_mock):
     ref.args = []
 
     helper = TemplateHelper(context_mock)
-    assert helper.print_ref(ref, link=False) == "const MyType() &"
+    assert helper.print_ref(ref, link=False) == "const MyType &()"
 
 
 def test_print_ref__no_link__nested_and_args_custom_start_and_end(context_mock):
@@ -321,7 +321,7 @@ def test_print_ref__no_link__nested_and_args_custom_start_and_end(context_mock):
         ARGS_END: str = "#"
 
     helper = TestHelper(context_mock)
-    assert (helper.print_ref(ref, link=False) == "const MyType{Nested1;@ArgType# &")
+    assert (helper.print_ref(ref, link=False) == "const MyType{Nested1; &@ArgType#")
 
 
 def test_argument_list__empty(empty_context):

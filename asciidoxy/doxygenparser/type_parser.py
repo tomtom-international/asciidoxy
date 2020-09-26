@@ -257,16 +257,20 @@ class TypeParser:
         tokens[:0] = cls.remove_trailing_whitespace(names)
 
         nested_types: Optional[List[TypeRef]] = []
-        arg_types: Optional[List[Parameter]] = []
         try:
             nested_types, tokens = cls.nested_types(tokens, driver, parent)
-            arg_types, tokens = cls.arg_types(tokens, driver, parent)
         except TypeParseError as e:
             logger.warning(f"Failed to parse nested types: {e}")
             return fallback()
 
         suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
-        cls.remove_trailing_whitespace(suffixes)
+        tokens[:0] = cls.remove_trailing_whitespace(suffixes)
+
+        arg_types: Optional[List[Parameter]] = []
+        try:
+            arg_types, tokens = cls.arg_types(tokens, driver, parent)
+        except TypeParseError as e:
+            logger.warning(f"Failed to parse args: {e}")
 
         if not names:
             logger.warning(f"No name found in `{'`,`'.join(t.text for t in original_tokens)}`")

@@ -577,7 +577,7 @@ def _match_type(actual, expected):
 def test_type_parser__type_from_tokens(prefixes, names, nested_types, arg_types, suffixes):
     driver_mock = MagicMock()
     type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens +
-                                           arg_types.tokens + suffixes,
+                                           suffixes + arg_types.tokens,
                                            driver=driver_mock)
     assert type_ref.prefix == "".join(p.text for p in prefixes)
     assert type_ref.name == names.expected_types[0].name
