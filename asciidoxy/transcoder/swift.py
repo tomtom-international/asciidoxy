@@ -164,6 +164,13 @@ class SwiftTranscoder(TranscoderBase):
                 assert len(transcoded.nested) == 1
                 transcoded = transcoded.nested[0]
 
+        if (type_ref.returns is not None and type_ref.returns.prefix
+                and "nullable" in type_ref.returns.prefix):
+            transcoded.suffix = f"?{transcoded.suffix or ''}"
+
+            if transcoded.returns is not None and transcoded.returns.suffix:
+                transcoded.returns.suffix = transcoded.returns.suffix.replace("?", "").strip()
+
         return transcoded
 
     @classmethod

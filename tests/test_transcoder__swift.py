@@ -481,3 +481,46 @@ def test_transcode_type_ref__id_type(transcoder):
     assert not transcoded.prefix
     assert not transcoded.suffix
     assert not transcoded.nested
+
+
+def test_transcode_type_ref__closure(transcoder):
+    type_ref = make_type_ref("objc", name="", prefix="", suffix="")
+    type_ref.returns = make_type_ref("objc", "Coordinate", prefix="", suffix="")
+    type_ref.args = [
+        make_parameter("arg1"),
+        make_parameter("arg2", make_type_ref("objc", "MyType", prefix="", suffix="")),
+    ]
+
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded is not type_ref
+    assert transcoded.language == "swift"
+    assert not transcoded.name
+    assert not transcoded.nested
+    assert len(transcoded.args) == 2
+    assert transcoded.returns is not None
+    assert not transcoded.prefix
+    assert not transcoded.suffix
+
+
+def test_transcode_type_ref__nullable_closure(transcoder):
+    type_ref = make_type_ref("objc", name="", prefix="", suffix="")
+    type_ref.returns = make_type_ref("objc", "Coordinate", prefix="nullable ", suffix="")
+    type_ref.args = [
+        make_parameter("arg1"),
+        make_parameter("arg2", make_type_ref("objc", "MyType", prefix="", suffix="")),
+    ]
+
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded is not type_ref
+    assert transcoded.language == "swift"
+    assert not transcoded.name
+    assert not transcoded.nested
+    assert len(transcoded.args) == 2
+
+    assert transcoded.returns is not None
+    assert not transcoded.prefix
+    assert transcoded.suffix == "?"
+    assert not transcoded.returns.prefix
+    assert not transcoded.returns.suffix
