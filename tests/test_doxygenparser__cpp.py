@@ -319,12 +319,22 @@ def test_parse_cpp_member_function_with_std_function_argument(api_reference):
     assert not param.type.args
 
     nested = param.type.nested[0]
+    assert nested.kind == "closure"
     assert not nested.id
     assert not nested.prefix
-    assert nested.name == "void"
+    assert not nested.name
     assert not nested.suffix
     assert not nested.nested
     assert len(nested.args) == 2
+
+    assert nested.returns is not None
+    assert not nested.returns.id
+    assert not nested.returns.prefix
+    assert nested.returns.name == "void"
+    assert not nested.returns.suffix
+    assert not nested.returns.nested
+    assert not nested.returns.args
+    assert not nested.returns.nested
 
     arg_1 = nested.args[0]
     assert not arg_1.name

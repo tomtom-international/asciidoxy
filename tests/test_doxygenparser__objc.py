@@ -132,10 +132,16 @@ def test_parse_objc_block(api_reference):
     assert element.returns.type is not None
 
     block_type = element.returns.type
-    assert block_type.name == "void"
+    assert not block_type.name
     assert block_type.language == "objc"
     assert block_type.namespace is None
     assert len(block_type.args) == 2
+
+    assert block_type.returns is not None
+    assert block_type.returns.name == "void"
+    assert block_type.returns.language == "objc"
+    assert block_type.returns.namespace is None
+    assert not block_type.returns.args
 
     arg = block_type.args[0]
     assert not arg.name

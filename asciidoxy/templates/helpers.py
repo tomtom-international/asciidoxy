@@ -48,10 +48,20 @@ class TemplateHelper:
         if ref is None:
             return ""
 
-        if ref.nested is not None:
-            if len(ref.nested) > 0:
+        outer_prefix = ""
+        outer_suffix = ""
+        inner_ref = ref
+        if ref.returns is not None:
+            inner_ref = ref.returns
+
+            if ref.prefix or ref.suffix:
+                outer_prefix = f"{ref.prefix or ''}("
+                outer_suffix = f"){ref.suffix or ''}"
+
+        if inner_ref.nested is not None:
+            if len(inner_ref.nested) > 0:
                 nested_parts = (self.print_ref(r, link=link, skip_args=skip_args)
-                                for r in ref.nested)
+                                for r in inner_ref.nested)
                 nested = (f"{self.NESTED_START}{', '.join(nested_parts)}{self.NESTED_END}")
             else:
                 nested = f"{self.NESTED_START}{self.NESTED_END}"
@@ -74,13 +84,13 @@ class TemplateHelper:
         else:
             args_before = args_after = ""
 
-        if link and ref.id:
-            return (f"{args_before}{ref.prefix or ''}"
-                    f"{self.context.link_to_element(ref.id, ref.name)}{nested}"
-                    f"{ref.suffix or ''}{args_after}").strip()
+        if link and inner_ref.id:
+            return (f"{outer_prefix}{args_before}{inner_ref.prefix or ''}"
+                    f"{self.context.link_to_element(inner_ref.id, inner_ref.name)}{nested}"
+                    f"{inner_ref.suffix or ''}{args_after}{outer_suffix}").strip()
         else:
-            return (f"{args_before}{ref.prefix or ''}{ref.name}{nested}"
-                    f"{ref.suffix or ''}{args_after}".strip())
+            return (f"{outer_prefix}{args_before}{inner_ref.prefix or ''}{inner_ref.name}{nested}"
+                    f"{inner_ref.suffix or ''}{args_after}{outer_suffix}".strip())
 
     def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
         if default_value and param.default_value:

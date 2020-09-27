@@ -210,7 +210,8 @@ def test_method_signature__closure_param(helper):
 
     param1 = Parameter()
     param1.name = "arg1"
-    param1.type = TypeRef("objc", "Type1")
+    param1.type = TypeRef("objc")
+    param1.type.returns = TypeRef("objc", "Type1")
     param1.type.args = [Parameter()]
     param1.type.args[0].type = TypeRef("objc", "Type2")
     param1.type.args[0].name = "arg2"

@@ -118,7 +118,7 @@ def test_print_ref__link__empty_nested_types(context_mock):
     context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
-def test_print_ref__link__args(context_mock):
+def test_print_ref__link__closure(context_mock):
     arg1_type = TypeRef("lang")
     arg1_type.name = "ArgType1"
     arg1_type.id = "lang-argtype1"
@@ -133,33 +133,39 @@ def test_print_ref__link__args(context_mock):
     arg2.name = "value"
     arg2.type = arg2_type
 
+    return_type = TypeRef("lang")
+    return_type.name = "MyType"
+    return_type.id = "lang-tomtom_1_MyType"
+
     ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.id = "lang-tomtom_1_MyType"
     ref.args = [arg1, arg2]
+    ref.returns = return_type
 
     helper = TemplateHelper(context_mock)
     assert (helper.print_ref(ref) ==
             "xref:lang-tomtom_1_MyType[MyType](xref:lang-argtype1[ArgType1], ArgType2 value)")
     context_mock.link_to_element.assert_has_calls(
         [call(arg1_type.id, arg1_type.name),
-         call(ref.id, ref.name)])
+         call(return_type.id, return_type.name)])
 
 
-def test_print_ref__link__empty_args(context_mock):
+def test_print_ref__link__empty_closure(context_mock):
+    return_type = TypeRef("lang")
+    return_type.name = "MyType"
+    return_type.prefix = "const "
+    return_type.suffix = " &"
+    return_type.id = "lang-tomtom_1_MyType"
+
     ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.prefix = "const "
-    ref.suffix = " &"
-    ref.id = "lang-tomtom_1_MyType"
     ref.args = []
+    ref.returns = return_type
 
     helper = TemplateHelper(context_mock)
     assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType] &()"
-    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+    context_mock.link_to_element.assert_called_once_with(return_type.id, return_type.name)
 
 
-def test_print_ref__link__nested_and_args_custom_start_and_end(context_mock):
+def test_print_ref__link__closure_with_nested_types__custom_start_and_end(context_mock):
     nested_type = TypeRef("lang")
     nested_type.name = "Nested1"
 
@@ -170,13 +176,16 @@ def test_print_ref__link__nested_and_args_custom_start_and_end(context_mock):
     arg = Parameter()
     arg.type = arg_type
 
+    return_type = TypeRef("lang")
+    return_type.name = "MyType"
+    return_type.prefix = "const "
+    return_type.suffix = " &"
+    return_type.id = "lang-tomtom_1_MyType"
+    return_type.nested = [nested_type]
+
     ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.prefix = "const "
-    ref.suffix = " &"
-    ref.id = "lang-tomtom_1_MyType"
-    ref.nested = [nested_type]
     ref.args = [arg]
+    ref.returns = return_type
 
     class TestHelper(TemplateHelper):
         NESTED_START: str = "{"
@@ -259,7 +268,7 @@ def test_print_ref__no_link__empty_nested_types(context_mock):
     assert helper.print_ref(ref, link=False) == "const MyType&lt;&gt; &"
 
 
-def test_print_ref__no_link__args(context_mock):
+def test_print_ref__no_link__closure(context_mock):
     arg1_type = TypeRef("lang")
     arg1_type.name = "ArgType1"
     arg1_type.id = "lang-argtype1"
@@ -274,28 +283,36 @@ def test_print_ref__no_link__args(context_mock):
     arg2.name = "value"
     arg2.type = arg2_type
 
+    return_type = TypeRef("lang")
+    return_type.name = "MyType"
+    return_type.id = "lang-tomtom_1_MyType"
+    return_type.prefix = "const "
+    return_type.suffix = "&"
+
     ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.id = "lang-tomtom_1_MyType"
+    ref.returns = return_type
     ref.args = [arg1, arg2]
 
     helper = TemplateHelper(context_mock)
-    assert helper.print_ref(ref, link=False) == "MyType(ArgType1, ArgType2 value)"
+    assert helper.print_ref(ref, link=False) == "const MyType&(ArgType1, ArgType2 value)"
 
 
-def test_print_ref__no_link__empty_args(context_mock):
+def test_print_ref__no_link__empty_closure(context_mock):
+    return_type = TypeRef("lang")
+    return_type.name = "MyType"
+    return_type.prefix = "const "
+    return_type.suffix = " &"
+    return_type.id = "lang-tomtom_1_MyType"
+
     ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.prefix = "const "
-    ref.suffix = " &"
-    ref.id = "lang-tomtom_1_MyType"
     ref.args = []
+    ref.returns = return_type
 
     helper = TemplateHelper(context_mock)
     assert helper.print_ref(ref, link=False) == "const MyType &()"
 
 
-def test_print_ref__no_link__nested_and_args_custom_start_and_end(context_mock):
+def test_print_ref__no_link__closure_with_nested_type__custom_start_and_end(context_mock):
     nested_type = TypeRef("lang")
     nested_type.name = "Nested1"
 
@@ -306,13 +323,16 @@ def test_print_ref__no_link__nested_and_args_custom_start_and_end(context_mock):
     arg = Parameter()
     arg.type = arg_type
 
+    return_type = TypeRef("lang")
+    return_type.name = "MyType"
+    return_type.prefix = "const "
+    return_type.suffix = " &"
+    return_type.id = "lang-tomtom_1_MyType"
+    return_type.nested = [nested_type]
+
     ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.prefix = "const "
-    ref.suffix = " &"
-    ref.id = "lang-tomtom_1_MyType"
-    ref.nested = [nested_type]
     ref.args = [arg]
+    ref.returns = return_type
 
     class TestHelper(TemplateHelper):
         NESTED_START: str = "{"
@@ -322,6 +342,37 @@ def test_print_ref__no_link__nested_and_args_custom_start_and_end(context_mock):
 
     helper = TestHelper(context_mock)
     assert (helper.print_ref(ref, link=False) == "const MyType{Nested1; &@ArgType#")
+
+
+def test_print_ref__no_link__closure_prefix_suffix(context_mock):
+    arg1_type = TypeRef("lang")
+    arg1_type.name = "ArgType1"
+    arg1_type.id = "lang-argtype1"
+
+    arg1 = Parameter()
+    arg1.type = arg1_type
+
+    arg2_type = TypeRef("lang")
+    arg2_type.name = "ArgType2"
+
+    arg2 = Parameter()
+    arg2.name = "value"
+    arg2.type = arg2_type
+
+    return_type = TypeRef("lang")
+    return_type.name = "MyType"
+    return_type.id = "lang-tomtom_1_MyType"
+    return_type.prefix = "const "
+    return_type.suffix = "&"
+
+    ref = TypeRef("lang")
+    ref.returns = return_type
+    ref.args = [arg1, arg2]
+    ref.prefix = "final "
+    ref.suffix = "*"
+
+    helper = TemplateHelper(context_mock)
+    assert helper.print_ref(ref, link=False) == "final (const MyType&(ArgType1, ArgType2 value))*"
 
 
 def test_argument_list__empty(empty_context):

@@ -157,6 +157,8 @@ class TranscoderBase(ABC):
         transcoded.nested = [self.type_ref(tr)
                              for tr in type_ref.nested] if type_ref.nested else None
         transcoded.args = [self.parameter(a) for a in type_ref.args] if type_ref.args else None
+        transcoded.returns = (self.type_ref(type_ref.returns)
+                              if type_ref.returns is not None else None)
 
         return transcoded
 

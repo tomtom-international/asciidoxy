@@ -29,7 +29,7 @@ class SwiftTemplateHelper(TemplateHelper):
         else:
             defval = ""
 
-        if param.type is None or not param.type.name:
+        if param.type is None:
             return f"{param.name}{defval}"
         if not param.name:
             return self.print_ref(param.type, link=link)

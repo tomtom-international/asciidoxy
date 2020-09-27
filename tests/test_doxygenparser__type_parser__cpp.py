@@ -332,13 +332,23 @@ def test_parse_cpp_type_with_function_arguments():
 
     assert type_ref is not None
     assert not type_ref.id
-    assert not type_ref.kind
+    assert type_ref.kind == "closure"
     assert type_ref.language == "cpp"
-    assert type_ref.name == "MyType"
+    assert not type_ref.name
     assert not type_ref.prefix
     assert not type_ref.suffix
     assert not type_ref.nested
     assert len(type_ref.args) == 2
+
+    assert type_ref.returns is not None
+    assert not type_ref.returns.id
+    assert not type_ref.returns.kind
+    assert type_ref.returns.language == "cpp"
+    assert type_ref.returns.name == "MyType"
+    assert not type_ref.returns.prefix
+    assert not type_ref.returns.suffix
+    assert not type_ref.returns.nested
+    assert not type_ref.returns.args
 
     assert not type_ref.args[0].name
     assert type_ref.args[0].type.name == "Message"
@@ -364,13 +374,23 @@ def test_parse_cpp_type_with_function_arguments__with_prefix_and_suffix():
 
     assert type_ref is not None
     assert not type_ref.id
-    assert not type_ref.kind
+    assert type_ref.kind == "closure"
     assert type_ref.language == "cpp"
-    assert type_ref.name == "MyType"
-    assert type_ref.prefix == "const "
-    assert type_ref.suffix == "&"
+    assert not type_ref.name
+    assert not type_ref.prefix
+    assert not type_ref.suffix
     assert not type_ref.nested
     assert len(type_ref.args) == 2
+
+    assert type_ref.returns is not None
+    assert not type_ref.returns.id
+    assert not type_ref.returns.kind
+    assert type_ref.returns.language == "cpp"
+    assert type_ref.returns.name == "MyType"
+    assert type_ref.returns.prefix == "const "
+    assert type_ref.returns.suffix == "&"
+    assert not type_ref.returns.nested
+    assert not type_ref.returns.args
 
     assert not type_ref.args[0].name
     assert type_ref.args[0].type.name == "Message"
@@ -397,13 +417,20 @@ def test_parse_cpp_type_with_function_arguments_with_space_in_type(cpp_type_with
 
     assert type_ref is not None
     assert not type_ref.id
-    assert not type_ref.kind
+    assert type_ref.kind == "closure"
     assert type_ref.language == "cpp"
-    assert type_ref.name == "MyType"
+    assert not type_ref.name
     assert not type_ref.prefix
     assert not type_ref.suffix
     assert not type_ref.nested
     assert len(type_ref.args) == 1
+
+    assert type_ref.returns is not None
+    assert type_ref.returns.name == "MyType"
+    assert not type_ref.returns.prefix
+    assert not type_ref.returns.suffix
+    assert not type_ref.returns.nested
+    assert not type_ref.returns.args
 
     assert_equal_or_none_if_empty(type_ref.args[0].name, arg_name.strip())
     assert type_ref.args[0].type.name == cpp_type_with_space

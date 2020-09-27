@@ -561,7 +561,7 @@ def arg_types(request):
     return request.param
 
 
-def _match_type(actual, expected):
+def _match_expected_type(actual, expected):
     assert_equal_or_none_if_empty(actual.prefix, expected.prefix)
     assert actual.name == expected.name
     assert_equal_or_none_if_empty(actual.suffix, expected.suffix)
@@ -574,37 +574,71 @@ def _match_type(actual, expected):
     assert actual.language == "mylang"
 
 
+def _match_type(actual,
+                *,
+                name=None,
+                prefix=None,
+                suffix=None,
+                kind=None,
+                refid=None,
+                nested=None,
+                args=None):
+    assert_equal_or_none_if_empty(actual.name, name)
+    assert_equal_or_none_if_empty(actual.prefix, prefix)
+    assert_equal_or_none_if_empty(actual.suffix, suffix)
+    assert_equal_or_none_if_empty(actual.kind, kind)
+
+    if refid is None:
+        assert actual.id is None
+    else:
+        assert actual.id == f"mylang-{refid}"
+
+    assert actual.language == "mylang"
+
+    if nested:
+        assert len(nested) == len(actual.nested)
+
+        for actual, expected in zip(actual.nested, nested):
+            _match_expected_type(actual, expected)
+    else:
+        assert not actual.nested
+
+    if args:
+        assert len(args) == len(actual.args)
+
+        for actual, expected in zip(actual.args, args):
+            assert_equal_or_none_if_empty(actual.name, expected.arg_name)
+            _match_expected_type(actual.type, expected)
+    else:
+        assert not actual.args
+
+
 def test_type_parser__type_from_tokens(prefixes, names, nested_types, arg_types, suffixes):
     driver_mock = MagicMock()
     type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens +
                                            suffixes + arg_types.tokens,
                                            driver=driver_mock)
-    assert type_ref.prefix == "".join(p.text for p in prefixes)
-    assert type_ref.name == names.expected_types[0].name
-    assert type_ref.kind == names.expected_types[0].kind
-    if names.expected_types[0].refid is None:
-        assert type_ref.id is None
-    else:
-        assert type_ref.id == f"mylang-{names.expected_types[0].refid}"
-    assert type_ref.suffix == "".join(s.text for s in suffixes)
-    assert type_ref.language == "mylang"
-
-    if nested_types.expected_types:
-        assert len(nested_types.expected_types) == len(type_ref.nested)
-
-        for actual, expected in zip(type_ref.nested, nested_types.expected_types):
-            _match_type(actual, expected)
-    else:
-        assert not type_ref.nested
+    assert type_ref is not None
 
     if arg_types.expected_types:
-        assert len(arg_types.expected_types) == len(type_ref.args)
+        _match_type(type_ref, kind="closure", args=arg_types.expected_types)
+        assert type_ref.returns is not None
+        _match_type(type_ref.returns,
+                    name=names.expected_types[0].name,
+                    prefix="".join(p.text for p in prefixes),
+                    suffix="".join(s.text for s in suffixes),
+                    kind=names.expected_types[0].kind,
+                    refid=names.expected_types[0].refid,
+                    nested=nested_types.expected_types)
 
-        for actual, expected in zip(type_ref.args, arg_types.expected_types):
-            assert_equal_or_none_if_empty(actual.name, expected.arg_name)
-            _match_type(actual.type, expected)
     else:
-        assert not type_ref.args
+        _match_type(type_ref,
+                    name=names.expected_types[0].name,
+                    prefix="".join(p.text for p in prefixes),
+                    suffix="".join(s.text for s in suffixes),
+                    kind=names.expected_types[0].kind,
+                    refid=names.expected_types[0].refid,
+                    nested=nested_types.expected_types)
 
     unresolved_types = []
     if not names.expected_types[0].refid:
@@ -761,7 +795,7 @@ def test_type_parser__type_from_tokens__do_not_register_builtin_types():
 ])
 def test_type_parser__type_from_tokens__unexpected_trailing_tokens(tokens, expected):
     type_ref = TestParser.type_from_tokens(tokens)
-    _match_type(type_ref, expected)
+    _match_expected_type(type_ref, expected)
 
 
 @pytest.mark.parametrize("tokens,expected", [
@@ -778,7 +812,7 @@ def test_type_parser__type_from_tokens__unexpected_trailing_tokens(tokens, expec
 ])
 def test_type_parser__type_from_tokens__invalid_token_sequence(tokens, expected):
     type_ref = TestParser.type_from_tokens(tokens)
-    _match_type(type_ref, expected)
+    _match_expected_type(type_ref, expected)
 
 
 def test_type_parser__type_from_tokens__calls_cleanup_name():
@@ -1076,25 +1110,13 @@ def test_type_parser__parse_xml__nested_types_and_args():
     type_ref = TestParser.parse_xml(element)
 
     assert type_ref is not None
-    assert type_ref.prefix == "const "
-    assert type_ref.name == "MyType"
+    assert not type_ref.prefix
+    assert not type_ref.name
     assert not type_ref.suffix
-    assert type_ref.id == "mylang-my_type"
-    assert type_ref.kind == "compound"
-    assert len(type_ref.nested) == 2
+    assert not type_ref.id
+    assert type_ref.kind == "closure"
+    assert not type_ref.nested
     assert len(type_ref.args) == 2
-
-    assert not type_ref.nested[0].prefix
-    assert type_ref.nested[0].name == "NestedType"
-    assert not type_ref.nested[0].suffix
-    assert type_ref.nested[0].id == "mylang-nested_type"
-    assert type_ref.nested[0].kind == "compound"
-
-    assert not type_ref.nested[1].prefix
-    assert type_ref.nested[1].name == "OtherNestedType"
-    assert not type_ref.nested[1].suffix
-    assert not type_ref.nested[1].id
-    assert not type_ref.nested[1].kind
 
     assert type_ref.args[0].name == "arg_name"
     assert type_ref.args[0].type.prefix == "const "
@@ -1109,6 +1131,27 @@ def test_type_parser__parse_xml__nested_types_and_args():
     assert not type_ref.args[1].type.suffix
     assert not type_ref.args[1].type.id
     assert not type_ref.args[1].type.kind
+
+    assert type_ref.returns is not None
+    assert type_ref.returns.prefix == "const "
+    assert type_ref.returns.name == "MyType"
+    assert not type_ref.returns.suffix
+    assert type_ref.returns.id == "mylang-my_type"
+    assert type_ref.returns.kind == "compound"
+    assert len(type_ref.returns.nested) == 2
+    assert not type_ref.returns.args
+
+    assert not type_ref.returns.nested[0].prefix
+    assert type_ref.returns.nested[0].name == "NestedType"
+    assert not type_ref.returns.nested[0].suffix
+    assert type_ref.returns.nested[0].id == "mylang-nested_type"
+    assert type_ref.returns.nested[0].kind == "compound"
+
+    assert not type_ref.returns.nested[1].prefix
+    assert type_ref.returns.nested[1].name == "OtherNestedType"
+    assert not type_ref.returns.nested[1].suffix
+    assert not type_ref.returns.nested[1].id
+    assert not type_ref.returns.nested[1].kind
 
 
 @pytest.mark.parametrize("tokens, pattern, expected", [

@@ -429,7 +429,8 @@ def test_transcode_type_ref__nested_types(transcoder):
 
 
 def test_transcode_type_ref__args(transcoder):
-    type_ref = make_type_ref("asm", "Coordinate")
+    type_ref = make_type_ref("asm", name="")
+    type_ref.returns = make_type_ref("asm", "Coordinate")
     type_ref.args = [
         make_parameter("arg1"),
         make_parameter("arg2", make_type_ref("asm", "MyType")),
@@ -440,8 +441,10 @@ def test_transcode_type_ref__args(transcoder):
     assert transcoded is not type_ref
 
     assert transcoded.language == "smalltalk"
+    assert not transcoded.name
     assert not transcoded.nested
     assert len(transcoded.args) == 2
+    assert transcoded.returns is not None
 
     assert not transcoded.args[0].type
     assert transcoded.args[0].name == "arg1"
@@ -456,6 +459,9 @@ def test_transcode_type_ref__args(transcoder):
 
     assert type_ref.args[1].type.id == "asm-mytype"
     assert type_ref.args[1].type.language == "asm"
+
+    assert transcoded.returns.language == "smalltalk"
+    assert transcoded.returns.name == "Coordinate"
 
 
 def test_transcode_parameter__no_type(transcoder):

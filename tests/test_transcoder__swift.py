@@ -341,12 +341,10 @@ def test_transcode_member__nserror_followed_by_closure(transcoder):
                                                                 prefix="",
                                                                 suffix="**")),
                              make_parameter("callback",
-                                            type_=make_type_ref("objc",
-                                                                "void",
-                                                                prefix="",
-                                                                suffix=""))
+                                            type_=make_type_ref("objc", "", prefix="", suffix=""))
                          ])
     member.params[1].type.args = [make_parameter("value")]
+    member.params[1].returns = make_type_ref("objc", "void", prefix="", suffix="")
     transcoded = transcoder.member(member)
 
     assert transcoded.language == "swift"
