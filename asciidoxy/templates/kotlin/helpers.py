@@ -28,34 +28,22 @@ class KotlinTemplateHelper(TemplateHelper):
                 if (m.kind == "variable" and m.prot == "public" and m.returns and m.returns.type
                     and m.returns.type.prefix and "final" in m.returns.type.prefix))
 
-    def name_colon_type(self, param: Parameter, *, link: bool = True) -> str:
-        return f"{param.name}: {self.print_ref(param.type, link=link)}".strip()
-
-    def type_and_name(self, param: Parameter, *, link: bool = True) -> str:
-        return self.name_colon_type(param, link=link)
-
-    def method_signature(self, method: Member, max_width: int = 80) -> str:
-        method_without_params = self._method_join("fun", method.name)
-
-        if method.returns and method.returns.type.name != "void":
-            suffix = ": " + self.print_ref(method.returns.type, link=True)
+    def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
+        if default_value and param.default_value:
+            defval = f" = {param.default_value}"
         else:
-            suffix = ""
+            defval = ""
 
-        if not method.params:
-            return (f"{method_without_params}(){suffix}")
+        if param.type is None:
+            return f"{param.name}{defval}"
+        if not param.name:
+            return self.print_ref(param.type, link=link)
+        return (f"{param.name}: {self.print_ref(param.type, link=link)}{defval}".strip())
 
-        suffix_length = len(self._method_suffix(method, link=False))
+    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
+        return "func"
 
-        param_sizes = [len(self.name_colon_type(p, link=False)) for p in method.params]
-        indent_size = len(method_without_params) + 1
-        first_indent = ""
-
-        if any(indent_size + size + 1 + suffix_length > max_width for size in param_sizes):
-            indent_size = 4
-            first_indent = "\n    "
-
-        param_separator = f",\n{' ' * indent_size}"
-        formatted_params = f"{param_separator.join(self.type_and_name(p) for p in method.params)}"
-
-        return (f"{method_without_params}({first_indent}{formatted_params}){suffix}")
+    def _method_suffix(self, method: Member, *, link: bool = True) -> str:
+        if method.returns:
+            return f": {self.print_ref(method.returns.type, link=link)}"
+        return ""
