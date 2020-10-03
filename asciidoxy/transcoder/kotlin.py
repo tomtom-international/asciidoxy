@@ -16,36 +16,87 @@
 from typing import Union
 
 from .base import TranscoderBase
-from ..model import ReferableElement, TypeRefBase
+from ..model import Member, ReferableElement, TypeRef, TypeRefBase
 
-_JAVA_TO_KOTLIN_TYPE_MAPPING = {
-    # Integral
+# https://kotlinlang.org/docs/reference/java-interop.html#mapped-types
+_MAPPED_TYPES = {
+    # Java primitives
     "byte": "Byte",
-    "Byte": "Byte",
     "short": "Short",
-    "Short": "Short",
     "int": "Int",
-    "Integer": "Int",
     "long": "Long",
-    "Long": "Long",
-    # Floating-point
-    "float": "Float",
-    "Float": "Float",
-    "double": "Double",
-    "Double": "Double",
-    # Other
-    "boolean": "Boolean",
-    "Boolean": "Boolean",
     "char": "Char",
+    "float": "Float",
+    "double": "Double",
+    "boolean": "Boolean",
+
+    # Java non-primitive built-ins
+    "java.lang.Object": "Any",
+    "java.lang.Cloneable": "Cloneable",
+    "java.lang.Comparable": "Comparable",
+    "java.lang.Enum": "Enum",
+    "java.lang.Annotation": "Annotation",
+    "java.lang.CharSequence": "CharSequence",
+    "java.lang.String": "String",
+    "java.lang.Number": "Number",
+    "java.lang.Throwable": "Throwable",
+    "Object": "Any",
+
+    # Java boxed types
+    "java.lang.Byte": "Byte",
+    "java.lang.Short": "Short",
+    "java.lang.Integer": "Int",
+    "Integer": "Int",
+    "java.lang.Long": "Long",
+    "java.lang.Character": "Char",
     "Character": "Char",
+    "java.lang.Float": "Float",
+    "java.lang.Double": "Double",
+    "java.lang.Boolean": "Boolean",
+
+    # Other
+    "void": "Unit",
 }
 
+_NULLABLE_MAPPED_TYPES = [
+    "java.lang.Byte",
+    "java.lang.Short",
+    "java.lang.Integer",
+    "java.lang.Long",
+    "java.lang.Character",
+    "java.lang.Float",
+    "java.lang.Double",
+    "java.lang.Boolean",
+    "Byte",
+    "Short",
+    "Integer",
+    "Long",
+    "Character",
+    "Float",
+    "Double",
+    "Boolean",
+]
 
-def _to_kotlin_type(typename: str):
-    if typename in _JAVA_TO_KOTLIN_TYPE_MAPPING:
-        return _JAVA_TO_KOTLIN_TYPE_MAPPING[typename]
-    else:
-        return typename
+_NULLABLE_OR_NOT_MAPPED_TYPES = [
+    "java.lang.Object",
+    "java.lang.Cloneable",
+    "java.lang.Comparable",
+    "java.lang.Enum",
+    "java.lang.Annotation",
+    "java.lang.CharSequence",
+    "java.lang.String",
+    "java.lang.Number",
+    "java.lang.Throwable",
+    "Object",
+    "Cloneable",
+    "Comparable",
+    "Enum",
+    "Annotation",
+    "CharSequence",
+    "String",
+    "Number",
+    "Throwable",
+]
 
 
 class KotlinTranscoder(TranscoderBase):
@@ -53,7 +104,35 @@ class KotlinTranscoder(TranscoderBase):
     TARGET = "kotlin"
 
     def convert_name(self, source_element: Union[ReferableElement, TypeRefBase]) -> str:
-        return _to_kotlin_type(source_element.name)
+        return _MAPPED_TYPES.get(source_element.name, source_element.name)
 
     def convert_full_name(self, source_element: ReferableElement) -> str:
-        return _to_kotlin_type(source_element.full_name)
+        return _MAPPED_TYPES.get(source_element.full_name, source_element.full_name)
+
+    def _member(self, member: Member) -> Member:
+        transcoded = super()._member(member)
+
+        if (transcoded.returns is not None and transcoded.returns.type is not None
+                and transcoded.returns.type.name == "Unit"):
+            transcoded.returns = None
+
+        return transcoded
+
+    def type_ref(self, type_ref: TypeRef) -> TypeRef:
+        transcoded = super().type_ref(type_ref)
+
+        if type_ref.name in _NULLABLE_MAPPED_TYPES:
+            if transcoded.suffix:
+                if "?" not in transcoded.suffix:
+                    transcoded.suffix = f"?{transcoded.suffix}"
+            else:
+                transcoded.suffix = "?"
+
+        if type_ref.name in _NULLABLE_OR_NOT_MAPPED_TYPES:
+            if transcoded.suffix:
+                if "!" not in transcoded.suffix:
+                    transcoded.suffix = f"!{transcoded.suffix}"
+            else:
+                transcoded.suffix = "!"
+
+        return transcoded
