@@ -41,7 +41,7 @@ class KotlinTemplateHelper(TemplateHelper):
         return (f"{param.name}: {self.print_ref(param.type, link=link)}{defval}".strip())
 
     def _method_prefix(self, method: Member, *, link: bool = True) -> str:
-        return "func"
+        return "fun"
 
     def _method_suffix(self, method: Member, *, link: bool = True) -> str:
         if method.returns:
