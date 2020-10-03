@@ -69,6 +69,16 @@ ${constructor.brief}
 
 % endif
 ###################################################################################################
+% if has(helper.public_properties()):
+|*Properties*
+|
+% for prop in helper.public_properties():
+`xref:${prop.id}[${prop.name}]`::
+${prop.brief}
+% endfor
+
+% endif
+###################################################################################################
 % if has(java_helper.public_static_methods()):
 |*Static Java methods*
 |
@@ -101,7 +111,7 @@ ${method.brief}
 ${api_context.insert(constant)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
-const val ${constant.name}: ${constant.returns.type.name} 
+const val ${constant.name}: ${constant.returns.type.name}
 ----
 
 ${constant.brief}
@@ -146,6 +156,21 @@ ${exception.description}
 %endif
 |===
 % endif
+'''
+% endfor
+##################################################################################### Properties ##
+% for prop in helper.public_properties():
+[[${prop.id},${prop.name}]]
+${api_context.insert(prop)}
+[source,kotlin,subs="-specialchars,macros+"]
+----
+val ${prop.name}: ${prop.returns.type.name}
+----
+
+${prop.brief}
+
+${prop.description}
+
 '''
 % endfor
 ################################################################################# Static methods ##

@@ -13,10 +13,10 @@
 # limitations under the License.
 """Transcoding Java reference into Kotlin."""
 
-from typing import Union
+from typing import List, Union
 
 from .base import TranscoderBase
-from ..model import Member, ReferableElement, TypeRef, TypeRefBase
+from ..model import Compound, Member, ReferableElement, TypeRef, TypeRefBase
 
 # https://kotlinlang.org/docs/reference/java-interop.html#mapped-types
 _MAPPED_TYPES = {
@@ -136,3 +136,43 @@ class KotlinTranscoder(TranscoderBase):
                 transcoded.suffix = "!"
 
         return transcoded
+
+    def _compound(self, compound: Compound) -> Compound:
+        transcoded = super()._compound(compound)
+        self.transform_properties(transcoded.members)
+        return transcoded
+
+    @staticmethod
+    def transform_properties(members: List[Member]) -> List[Member]:
+        getters = {
+            m.name: m
+            for m in members
+            if ((m.name.startswith("get") or m.name.startswith("is")) and len(m.params) == 0)
+            and m.returns is not None
+        }
+        setters = {
+            m.name: m
+            for m in members
+            if (m.name.startswith("set") and len(m.params) == 1) and m.returns is None
+        }
+
+        for getter_name, getter in getters.items():
+            if getter_name.startswith("get"):
+                property_name = getter_name[3:]
+            else:
+                property_name = getter_name[2:]
+
+            setter = setters.get(f"set{property_name}", None)
+            if setter is None:
+                continue
+
+            if getter.name.startswith("get"):
+                getter.name = f"{property_name[0].lower()}{property_name[1:]}"
+                if getter.namespace:
+                    getter.full_name = f"{getter.namespace}.{getter.name}"
+                else:
+                    getter.full_name = getter.name
+            getter.kind = "property"
+            members.remove(setter)
+
+        return members

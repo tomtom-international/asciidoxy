@@ -18,7 +18,8 @@ import pytest
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.kotlin import KotlinTranscoder
 
-from .test_transcoder__base import make_member, make_return_value, make_type_ref
+from .test_transcoder__base import (make_compound, make_member, make_parameter, make_return_value,
+                                    make_type_ref)
 
 
 @pytest.fixture
@@ -86,3 +87,101 @@ def test_transcode_member__void_return(transcoder):
                              make_type_ref(lang="java", name="void", prefix="", suffix="")))
     transcoded = transcoder.member(member)
     assert not transcoded.returns
+
+
+def test_transcode_compound__property(transcoder):
+    compound = make_compound(lang="java",
+                             name="MyClass",
+                             members=[
+                                 make_member(lang="java",
+                                             name="setName",
+                                             params=[
+                                                 make_parameter(name="value",
+                                                                type_=make_type_ref(lang="java",
+                                                                                    name="string",
+                                                                                    prefix="",
+                                                                                    suffix=""))
+                                             ]),
+                                 make_member(lang="java",
+                                             name="getName",
+                                             returns=make_return_value(
+                                                 make_type_ref(lang="java",
+                                                               name="string",
+                                                               prefix="",
+                                                               suffix="")))
+                             ])
+    transcoded = transcoder.compound(compound)
+
+    assert len(transcoded.members) == 1
+    prop = transcoded.members[0]
+    assert prop.name == "name"
+    assert not prop.params
+    assert prop.returns is not None
+    assert prop.returns.type is not None
+    assert prop.returns.type.name == "string"
+
+
+def test_transcode_compound__boolean_property(transcoder):
+    compound = make_compound(lang="java",
+                             name="MyClass",
+                             members=[
+                                 make_member(lang="java",
+                                             name="setReadOnly",
+                                             params=[
+                                                 make_parameter(name="value",
+                                                                type_=make_type_ref(lang="java",
+                                                                                    name="boolean",
+                                                                                    prefix="",
+                                                                                    suffix=""))
+                                             ]),
+                                 make_member(lang="java",
+                                             name="isReadOnly",
+                                             returns=make_return_value(
+                                                 make_type_ref(lang="java",
+                                                               name="boolean",
+                                                               prefix="",
+                                                               suffix="")))
+                             ])
+    transcoded = transcoder.compound(compound)
+
+    assert len(transcoded.members) == 1
+    prop = transcoded.members[0]
+    assert prop.name == "isReadOnly"
+    assert not prop.params
+    assert prop.returns is not None
+    assert prop.returns.type is not None
+    assert prop.returns.type.name == "Boolean"
+
+
+def test_transcode_compound__single_getter_setter_is_no_property(transcoder):
+    compound = make_compound(lang="java",
+                             name="MyClass",
+                             members=[
+                                 make_member(lang="java",
+                                             name="setName",
+                                             params=[
+                                                 make_parameter(name="value",
+                                                                type_=make_type_ref(lang="java",
+                                                                                    name="string",
+                                                                                    prefix="",
+                                                                                    suffix=""))
+                                             ]),
+                                 make_member(lang="java",
+                                             name="getAddress",
+                                             returns=make_return_value(
+                                                 make_type_ref(lang="java",
+                                                               name="string",
+                                                               prefix="",
+                                                               suffix=""))),
+                                 make_member(lang="java",
+                                             name="isReadOnly",
+                                             returns=make_return_value(
+                                                 make_type_ref(lang="java",
+                                                               name="boolean",
+                                                               prefix="",
+                                                               suffix="")))
+                             ])
+    transcoded = transcoder.compound(compound)
+
+    member_names = (m.name for m in transcoded.members)
+    assert sorted(member_names) == sorted(["setName", "getAddress", "isReadOnly"])
