@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= Java
+= Kotlin transcoded from Java
 :notitle:
 :icons: font
 :doctype: book
@@ -39,8 +39,9 @@ https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = {doctitle}
 
-This is an example demonstrating documentation for a Java project. The used source code files come
-from the https://gitbox.apache.org/repos/asf?p=commons-io.git[Apache Commons IO] project.
+This is an example demonstrating documentation for a Java project transcoded to Kotlin. The used
+source code files come from the https://gitbox.apache.org/repos/asf?p=commons-io.git[Apache Commons
+IO] project.
 
 NOTE: This is not meant to be complete documentation. Some links in the documentation may not work
 due to missing documentation.
@@ -55,15 +56,13 @@ include::Doxyfile[]
 [source,python]
 ----
 ${"""
-${api.language("java")}  <1>
+${api.language("kotlin", source="java")}
 ${api.insert("org.apache.commons.io.FileCleaningTracker")}
 ${api.insert("org.apache.commons.io.FileDeleteStrategy")}
 """}
 ----
-<1> Explicitly setting the language is required for this document, because we are transcoding the
-same classes to Kotlin. Without setting the language, AsciiDoxy does not know whether it needs to
-insert the Java or Kotlin version.
 
-${api.language("java")}
+${api.language("kotlin", source="java")}
 ${api.insert("org.apache.commons.io.FileCleaningTracker")}
 ${api.insert("org.apache.commons.io.FileDeleteStrategy")}
+

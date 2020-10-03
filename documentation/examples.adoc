@@ -45,6 +45,7 @@ using AsciiDoxy.
 
 ${api.include("examples/cpp/example-cpp.adoc", link_text="{Cpp}", link_prefix=". ")}
 ${api.include("examples/java/example-java.adoc", link_text="Java", link_prefix=". ")}
+${api.include("examples/java/example-kotlin-transcoded.adoc", link_text="Kotlin transcoded from Java", link_prefix=". ")}
 ${api.include("examples/objc/example-objc.adoc", link_text="Objective C", link_prefix=". ")}
 ${api.include("examples/objc/example-swift-transcoded.adoc", link_text="Swift transcoded from Objective C", link_prefix=". ")}
 ${api.include("examples/python/example-python.adoc", link_text="Python", link_prefix=". ")}
