@@ -155,6 +155,18 @@ _NONNULL_ANNOTATIONS = [
     "@androidx.annotation.RecentlyNonNull",
 ]
 
+# https://kotlinlang.org/docs/reference/java-interop.html#java-arrays
+_PRIMITIVE_ARRAY_TYPES = [
+    "byte",
+    "short",
+    "int",
+    "long",
+    "char",
+    "float",
+    "double",
+    "boolean",
+]
+
 
 class KotlinTranscoder(TranscoderBase):
     SOURCE = "java"
@@ -177,6 +189,7 @@ class KotlinTranscoder(TranscoderBase):
 
     def type_ref(self, type_ref: TypeRef) -> TypeRef:
         transcoded = super().type_ref(type_ref)
+        transcoded = transform_array(type_ref, transcoded)
         transcoded = set_nullability(type_ref, transcoded)
 
         if transcoded.prefix:
@@ -256,3 +269,24 @@ def strip_annotations(text: Optional[str], annotations: List[str]) -> Tuple[bool
 
     result = " ".join(token for token in text.split(" ") if token not in annotations)
     return len(text) != len(result), result
+
+
+def transform_array(type_ref: TypeRef, transcoded: TypeRef) -> TypeRef:
+    if not transcoded.suffix or "[]" not in transcoded.suffix:
+        return transcoded
+
+    if type_ref.name in _PRIMITIVE_ARRAY_TYPES:
+        transcoded.name = f"{type_ref.name[0].upper()}{type_ref.name[1:]}Array"
+        transcoded.suffix = (type_ref.suffix.replace("[]", "!")
+                             if type_ref.suffix is not None else "")
+        return transcoded
+
+    array_type = TypeRef("kotlin", "Array")
+    array_type.prefix = transcoded.prefix
+    array_type.suffix = transcoded.suffix.replace("[]", "")
+
+    transcoded.prefix = "(out) "
+    transcoded.suffix = ""
+    array_type.nested = [transcoded]
+
+    return array_type

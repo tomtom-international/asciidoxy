@@ -256,6 +256,81 @@ def test_transcode_type_ref__wildcard_generic_super(transcoder):
     assert transcoded.nested[0].suffix == "!"
 
 
+@pytest.mark.parametrize("java_type, kotlin_type", [
+    ("int", "IntArray"),
+    ("byte", "ByteArray"),
+    ("short", "ShortArray"),
+    ("long", "LongArray"),
+    ("char", "CharArray"),
+    ("float", "FloatArray"),
+    ("double", "DoubleArray"),
+    ("boolean", "BooleanArray"),
+])
+def test_transcode_type_ref__primitive_array(transcoder, java_type, kotlin_type):
+    type_ref = make_type_ref(lang="java", name=java_type, prefix="", suffix="[]")
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded.name == kotlin_type
+    assert not transcoded.prefix
+    assert transcoded.suffix == "!"
+
+
+def test_transcode_type_ref__array(transcoder):
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix="", suffix="[]")
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded.name == "Array"
+    assert not transcoded.prefix
+    assert transcoded.suffix == "!"
+
+    assert len(transcoded.nested) == 1
+    assert transcoded.nested[0].name == "MyClass"
+    assert transcoded.nested[0].prefix == "(out) "
+    assert not transcoded.nested[0].suffix
+
+
+def test_transcode_type_ref__array__prefix(transcoder):
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix="final ", suffix="[]")
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded.name == "Array"
+    assert transcoded.prefix == "final "
+    assert transcoded.suffix == "!"
+
+    assert len(transcoded.nested) == 1
+    assert transcoded.nested[0].name == "MyClass"
+    assert transcoded.nested[0].prefix == "(out) "
+    assert not transcoded.nested[0].suffix
+
+
+def test_transcode_type_ref__array__nonnull(transcoder):
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix="@NonNull ", suffix="[]")
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded.name == "Array"
+    assert not transcoded.prefix
+    assert not transcoded.suffix
+
+    assert len(transcoded.nested) == 1
+    assert transcoded.nested[0].name == "MyClass"
+    assert transcoded.nested[0].prefix == "(out) "
+    assert not transcoded.nested[0].suffix
+
+
+def test_transcode_type_ref__array__nullable(transcoder):
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix="@Nullable ", suffix="[]")
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded.name == "Array"
+    assert not transcoded.prefix
+    assert transcoded.suffix == "?"
+
+    assert len(transcoded.nested) == 1
+    assert transcoded.nested[0].name == "MyClass"
+    assert transcoded.nested[0].prefix == "(out) "
+    assert not transcoded.nested[0].suffix
+
+
 def test_transcode_member__void_return(transcoder):
     member = make_member(lang="java",
                          name="update",
