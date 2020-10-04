@@ -226,6 +226,36 @@ def test_transcode_type_ref__all_nonnull_annotations(transcoder, annotation):
     assert not transcoded.suffix
 
 
+def test_transcode_type_ref__wildcard_generic_extends(transcoder):
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix="", suffix="")
+    type_ref.nested = [make_type_ref(lang="java", name="Base", prefix="? extends ", suffix="")]
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert transcoded.suffix == "!"
+    assert len(transcoded.nested) == 1
+
+    assert transcoded.nested[0].name == "Base"
+    assert transcoded.nested[0].prefix == "out "
+    assert transcoded.nested[0].suffix == "!"
+
+
+def test_transcode_type_ref__wildcard_generic_super(transcoder):
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix="", suffix="")
+    type_ref.nested = [make_type_ref(lang="java", name="Base", prefix="? super ", suffix="")]
+    transcoded = transcoder.type_ref(type_ref)
+
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert transcoded.suffix == "!"
+    assert len(transcoded.nested) == 1
+
+    assert transcoded.nested[0].name == "Base"
+    assert transcoded.nested[0].prefix == "in "
+    assert transcoded.nested[0].suffix == "!"
+
+
 def test_transcode_member__void_return(transcoder):
     member = make_member(lang="java",
                          name="update",

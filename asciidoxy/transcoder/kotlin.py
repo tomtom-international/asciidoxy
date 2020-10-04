@@ -179,6 +179,10 @@ class KotlinTranscoder(TranscoderBase):
         transcoded = super().type_ref(type_ref)
         transcoded = set_nullability(type_ref, transcoded)
 
+        if transcoded.prefix:
+            transcoded.prefix = transcoded.prefix.replace("? extends", "out")
+            transcoded.prefix = transcoded.prefix.replace("? super", "in")
+
         return transcoded
 
     def _compound(self, compound: Compound) -> Compound:
