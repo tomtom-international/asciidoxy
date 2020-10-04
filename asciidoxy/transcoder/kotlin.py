@@ -13,7 +13,7 @@
 # limitations under the License.
 """Transcoding Java reference into Kotlin."""
 
-from typing import List, Union
+from typing import List, Optional, Tuple, Union
 
 from .base import TranscoderBase
 from ..model import Compound, Member, ReferableElement, TypeRef, TypeRefBase
@@ -98,6 +98,63 @@ _NULLABLE_OR_NOT_MAPPED_TYPES = [
     "Throwable",
 ]
 
+_NONNULL_MAPPED_TYPES = [
+    "byte",
+    "short",
+    "int",
+    "long",
+    "char",
+    "float",
+    "double",
+    "boolean",
+    "void",
+]
+
+# https://kotlinlang.org/docs/reference/java-interop.html#nullability-annotations
+# https://github.com/JetBrains/kotlin/blob/master/core/compiler.common.jvm/src/org/jetbrains/kotlin/load/java/JvmAnnotationNames.kt
+_NULLABLE_ANNOTATIONS = [
+    "@Nullable",
+    "@CheckForNull",
+    "@PossiblyNull",
+    "@NullableDecl",
+    "@RecentlyNullable",
+    "@org.jetbrains.annotations.Nullable",
+    "@androidx.annotation.Nullable",
+    "@android.support.annotation.Nullable",
+    "@android.annotation.Nullable",
+    "@com.android.annotations.Nullable",
+    "@org.eclipse.jdt.annotation.Nullable",
+    "@org.checkerframework.checker.nullness.qual.Nullable",
+    "@javax.annotation.Nullable",
+    "@javax.annotation.CheckForNull",
+    "@edu.umd.cs.findbugs.annotations.CheckForNull",
+    "@edu.umd.cs.findbugs.annotations.Nullable",
+    "@edu.umd.cs.findbugs.annotations.PossiblyNull",
+    "@io.reactivex.annotations.Nullable",
+    "@org.checkerframework.checker.nullness.compatqual.NullableDecl",
+    "@androidx.annotation.RecentlyNullable",
+]
+
+_NONNULL_ANNOTATIONS = [
+    "@NotNull",
+    "@NonNull",
+    "@NonNullDecl",
+    "@RecentlyNonNull",
+    "@org.jetbrains.annotations.NotNull",
+    "@edu.umd.cs.findbugs.annotations.NonNull",
+    "@androidx.annotation.NonNull",
+    "@android.support.annotation.NonNull",
+    "@android.annotation.NonNull",
+    "@com.android.annotations.NonNull",
+    "@org.eclipse.jdt.annotation.NonNull",
+    "@org.checkerframework.checker.nullness.qual.NonNull",
+    "@lombok.NonNull",
+    "@io.reactivex.annotations.NonNull"
+    "@javax.annotation.Nonnull",
+    "@org.checkerframework.checker.nullness.compatqual.NonNullDecl",
+    "@androidx.annotation.RecentlyNonNull",
+]
+
 
 class KotlinTranscoder(TranscoderBase):
     SOURCE = "java"
@@ -120,59 +177,78 @@ class KotlinTranscoder(TranscoderBase):
 
     def type_ref(self, type_ref: TypeRef) -> TypeRef:
         transcoded = super().type_ref(type_ref)
-
-        if type_ref.name in _NULLABLE_MAPPED_TYPES:
-            if transcoded.suffix:
-                if "?" not in transcoded.suffix:
-                    transcoded.suffix = f"?{transcoded.suffix}"
-            else:
-                transcoded.suffix = "?"
-
-        if type_ref.name in _NULLABLE_OR_NOT_MAPPED_TYPES:
-            if transcoded.suffix:
-                if "!" not in transcoded.suffix:
-                    transcoded.suffix = f"!{transcoded.suffix}"
-            else:
-                transcoded.suffix = "!"
+        transcoded = set_nullability(type_ref, transcoded)
 
         return transcoded
 
     def _compound(self, compound: Compound) -> Compound:
         transcoded = super()._compound(compound)
-        self.transform_properties(transcoded.members)
+        transform_properties(transcoded.members)
         return transcoded
 
-    @staticmethod
-    def transform_properties(members: List[Member]) -> List[Member]:
-        getters = {
-            m.name: m
-            for m in members
-            if ((m.name.startswith("get") or m.name.startswith("is")) and len(m.params) == 0)
-            and m.returns is not None
-        }
-        setters = {
-            m.name: m
-            for m in members
-            if (m.name.startswith("set") and len(m.params) == 1) and m.returns is None
-        }
 
-        for getter_name, getter in getters.items():
-            if getter_name.startswith("get"):
-                property_name = getter_name[3:]
+def transform_properties(members: List[Member]) -> List[Member]:
+    getters = {
+        m.name: m
+        for m in members
+        if ((m.name.startswith("get") or m.name.startswith("is")) and len(m.params) == 0)
+        and m.returns is not None
+    }
+    setters = {
+        m.name: m
+        for m in members if (m.name.startswith("set") and len(m.params) == 1) and m.returns is None
+    }
+
+    for getter_name, getter in getters.items():
+        if getter_name.startswith("get"):
+            property_name = getter_name[3:]
+        else:
+            property_name = getter_name[2:]
+
+        setter = setters.get(f"set{property_name}", None)
+        if setter is None:
+            continue
+
+        if getter.name.startswith("get"):
+            getter.name = f"{property_name[0].lower()}{property_name[1:]}"
+            if getter.namespace:
+                getter.full_name = f"{getter.namespace}.{getter.name}"
             else:
-                property_name = getter_name[2:]
+                getter.full_name = getter.name
+        getter.kind = "property"
+        members.remove(setter)
 
-            setter = setters.get(f"set{property_name}", None)
-            if setter is None:
-                continue
+    return members
 
-            if getter.name.startswith("get"):
-                getter.name = f"{property_name[0].lower()}{property_name[1:]}"
-                if getter.namespace:
-                    getter.full_name = f"{getter.namespace}.{getter.name}"
-                else:
-                    getter.full_name = getter.name
-            getter.kind = "property"
-            members.remove(setter)
 
-        return members
+def set_nullability(type_ref: TypeRef, transcoded: TypeRef) -> TypeRef:
+    nullable_prefix, transcoded.prefix = strip_annotations(transcoded.prefix, _NULLABLE_ANNOTATIONS)
+    nullable_suffix, transcoded.suffix = strip_annotations(transcoded.suffix, _NULLABLE_ANNOTATIONS)
+    nonnull_prefix, transcoded.prefix = strip_annotations(transcoded.prefix, _NONNULL_ANNOTATIONS)
+    nonnull_suffix, transcoded.suffix = strip_annotations(transcoded.suffix, _NONNULL_ANNOTATIONS)
+
+    kotlin_nullable = "!"
+    if nullable_prefix or nullable_suffix:
+        kotlin_nullable = "?"
+    elif nonnull_prefix or nonnull_suffix:
+        kotlin_nullable = ""
+    elif type_ref.name in _NULLABLE_MAPPED_TYPES:
+        kotlin_nullable = "?"
+    elif type_ref.name in _NONNULL_MAPPED_TYPES:
+        kotlin_nullable = ""
+
+    if kotlin_nullable:
+        if transcoded.suffix:
+            transcoded.suffix = f"{kotlin_nullable}{transcoded.suffix}"
+        else:
+            transcoded.suffix = kotlin_nullable
+
+    return transcoded
+
+
+def strip_annotations(text: Optional[str], annotations: List[str]) -> Tuple[bool, Optional[str]]:
+    if not text:
+        return False, text
+
+    result = " ".join(token for token in text.split(" ") if token not in annotations)
+    return len(text) != len(result), result

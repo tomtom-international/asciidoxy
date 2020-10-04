@@ -71,6 +71,7 @@ def transcoder():
     ("Double", "Double", "?"),
     ("Boolean", "Boolean", "?"),
     ("void", "Unit", ""),
+    ("MyClass", "MyClass", "!"),
 ])
 def test_transcode_type_ref__mapped_types(transcoder, java_type, kotlin_type, kotlin_suffix):
     type_ref = make_type_ref(lang="java", name=java_type, prefix="", suffix="")
@@ -78,6 +79,151 @@ def test_transcode_type_ref__mapped_types(transcoder, java_type, kotlin_type, ko
     assert transcoded.name == kotlin_type
     assert not transcoded.prefix
     assert transcoded.suffix == kotlin_suffix
+
+
+@pytest.mark.parametrize("java_type, kotlin_type", [
+    ("java.lang.Object", "Any"),
+    ("java.lang.Cloneable", "Cloneable"),
+    ("java.lang.Comparable", "Comparable"),
+    ("java.lang.Enum", "Enum"),
+    ("java.lang.Annotation", "Annotation"),
+    ("java.lang.CharSequence", "CharSequence"),
+    ("java.lang.String", "String"),
+    ("java.lang.Number", "Number"),
+    ("java.lang.Throwable", "Throwable"),
+    ("Object", "Any"),
+    ("Cloneable", "Cloneable"),
+    ("Comparable", "Comparable"),
+    ("Enum", "Enum"),
+    ("Annotation", "Annotation"),
+    ("CharSequence", "CharSequence"),
+    ("String", "String"),
+    ("Number", "Number"),
+    ("Throwable", "Throwable"),
+    ("java.lang.Byte", "Byte"),
+    ("java.lang.Short", "Short"),
+    ("java.lang.Integer", "Int"),
+    ("java.lang.Long", "Long"),
+    ("java.lang.Character", "Char"),
+    ("java.lang.Float", "Float"),
+    ("java.lang.Double", "Double"),
+    ("java.lang.Boolean", "Boolean"),
+    ("Byte", "Byte"),
+    ("Short", "Short"),
+    ("Integer", "Int"),
+    ("Long", "Long"),
+    ("Character", "Char"),
+    ("Float", "Float"),
+    ("Double", "Double"),
+    ("Boolean", "Boolean"),
+])
+def test_transcode_type_ref__nonnull_annotated_types(transcoder, java_type, kotlin_type):
+    type_ref = make_type_ref(lang="java", name=java_type, prefix="@NonNull ", suffix="")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == kotlin_type
+    assert not transcoded.prefix
+    assert not transcoded.suffix
+
+
+@pytest.mark.parametrize("java_type, kotlin_type", [
+    ("java.lang.Object", "Any"),
+    ("java.lang.Cloneable", "Cloneable"),
+    ("java.lang.Comparable", "Comparable"),
+    ("java.lang.Enum", "Enum"),
+    ("java.lang.Annotation", "Annotation"),
+    ("java.lang.CharSequence", "CharSequence"),
+    ("java.lang.String", "String"),
+    ("java.lang.Number", "Number"),
+    ("java.lang.Throwable", "Throwable"),
+    ("Object", "Any"),
+    ("Cloneable", "Cloneable"),
+    ("Comparable", "Comparable"),
+    ("Enum", "Enum"),
+    ("Annotation", "Annotation"),
+    ("CharSequence", "CharSequence"),
+    ("String", "String"),
+    ("Number", "Number"),
+    ("Throwable", "Throwable"),
+    ("java.lang.Byte", "Byte"),
+    ("java.lang.Short", "Short"),
+    ("java.lang.Integer", "Int"),
+    ("java.lang.Long", "Long"),
+    ("java.lang.Character", "Char"),
+    ("java.lang.Float", "Float"),
+    ("java.lang.Double", "Double"),
+    ("java.lang.Boolean", "Boolean"),
+    ("Byte", "Byte"),
+    ("Short", "Short"),
+    ("Integer", "Int"),
+    ("Long", "Long"),
+    ("Character", "Char"),
+    ("Float", "Float"),
+    ("Double", "Double"),
+    ("Boolean", "Boolean"),
+])
+def test_transcode_type_ref__nullable_annotated_types(transcoder, java_type, kotlin_type):
+    type_ref = make_type_ref(lang="java", name=java_type, prefix="@Nullable ", suffix="")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == kotlin_type
+    assert not transcoded.prefix
+    assert transcoded.suffix == "?"
+
+
+@pytest.mark.parametrize("annotation", [
+    "@Nullable",
+    "@CheckForNull",
+    "@PossiblyNull",
+    "@NullableDecl",
+    "@RecentlyNullable",
+    "@org.jetbrains.annotations.Nullable",
+    "@androidx.annotation.Nullable",
+    "@android.support.annotation.Nullable",
+    "@android.annotation.Nullable",
+    "@com.android.annotations.Nullable",
+    "@org.eclipse.jdt.annotation.Nullable",
+    "@org.checkerframework.checker.nullness.qual.Nullable",
+    "@javax.annotation.Nullable",
+    "@javax.annotation.CheckForNull",
+    "@edu.umd.cs.findbugs.annotations.CheckForNull",
+    "@edu.umd.cs.findbugs.annotations.Nullable",
+    "@edu.umd.cs.findbugs.annotations.PossiblyNull",
+    "@io.reactivex.annotations.Nullable",
+    "@org.checkerframework.checker.nullness.compatqual.NullableDecl",
+    "@androidx.annotation.RecentlyNullable",
+])
+def test_transcode_type_ref__all_nullable_annotations(transcoder, annotation):
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix=f"{annotation} ", suffix="")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert transcoded.suffix == "?"
+
+
+@pytest.mark.parametrize("annotation", [
+    "@NotNull",
+    "@NonNull",
+    "@NonNullDecl",
+    "@RecentlyNonNull",
+    "@org.jetbrains.annotations.NotNull",
+    "@edu.umd.cs.findbugs.annotations.NonNull",
+    "@androidx.annotation.NonNull",
+    "@android.support.annotation.NonNull",
+    "@android.annotation.NonNull",
+    "@com.android.annotations.NonNull",
+    "@org.eclipse.jdt.annotation.NonNull",
+    "@org.checkerframework.checker.nullness.qual.NonNull",
+    "@lombok.NonNull",
+    "@io.reactivex.annotations.NonNull"
+    "@javax.annotation.Nonnull",
+    "@org.checkerframework.checker.nullness.compatqual.NonNullDecl",
+    "@androidx.annotation.RecentlyNonNull",
+])
+def test_transcode_type_ref__all_nonnull_annotations(transcoder, annotation):
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix=f"{annotation} ", suffix="")
+    transcoded = transcoder.type_ref(type_ref)
+    assert transcoded.name == "MyClass"
+    assert not transcoded.prefix
+    assert not transcoded.suffix
 
 
 def test_transcode_member__void_return(transcoder):
