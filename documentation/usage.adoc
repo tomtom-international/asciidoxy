@@ -46,7 +46,7 @@ documentation.
 
 To run AsciiDoxy you need at least:
 
-- https://www.python.org/[python 3.6, 3.7 or 3.8]
+- https://www.python.org/[python 3.6, 3.7, 3.8, or 3.9]
 - https://asciidoctor.org/[AsciiDoctor]
 
 To extract documentation from source code you need:
@@ -55,7 +55,7 @@ To extract documentation from source code you need:
 
 AsciiDoxy has been tested with:
 
-- python: 3.6, 3.7, 3.8
+- python: 3.6, 3.7, 3.8, 3.9
 - AsciiDoctor: 2.0.10
 - Doxygen: 1.8.16, 1.8.18, 1.8.20
 
