@@ -125,6 +125,7 @@ class Parameter:
         name:          Name used for the parameter.
         description:   Explanation of the parameter.
         default_value: Default value for the parameter.
+        prefix:        Prefix for the parameter declaration.
     """
 
     # doxygen based fields
@@ -132,6 +133,7 @@ class Parameter:
     name: str = ""
     description: str = ""
     default_value: Optional[str] = None
+    prefix: Optional[str] = None
 
 
 class ReturnValue:

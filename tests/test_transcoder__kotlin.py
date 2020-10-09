@@ -436,3 +436,27 @@ def test_transcode_compound__single_getter_setter_is_no_property(transcoder):
 
     member_names = (m.name for m in transcoded.members)
     assert sorted(member_names) == sorted(["setName", "getAddress", "isReadOnly"])
+
+
+def test_transcode_parameter__vararg(transcoder):
+    param = make_parameter(name="values",
+                           type_=make_type_ref(lang="java", name="Type", prefix="", suffix="..."))
+    transcoded = transcoder.parameter(param)
+
+    assert transcoded.prefix == "vararg "
+    assert transcoded.type is not None
+    assert transcoded.type.name == "Type"
+    assert not transcoded.type.prefix
+    assert not transcoded.type.suffix
+
+
+def test_transcode_parameter__vararg__boxed_type(transcoder):
+    param = make_parameter(name="values",
+                           type_=make_type_ref(lang="java", name="Short", prefix="", suffix="..."))
+    transcoded = transcoder.parameter(param)
+
+    assert transcoded.prefix == "vararg "
+    assert transcoded.type is not None
+    assert transcoded.type.name == "Short"
+    assert not transcoded.type.prefix
+    assert not transcoded.type.suffix

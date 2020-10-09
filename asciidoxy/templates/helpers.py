@@ -97,7 +97,8 @@ class TemplateHelper:
             defval = f" = {param.default_value}"
         else:
             defval = ""
-        return f"{self.print_ref(param.type, link=link)} {param.name}{defval}".strip()
+        prefix = param.prefix or ""
+        return f"{prefix}{self.print_ref(param.type, link=link)} {param.name}{defval}".strip()
 
     def argument_list(self, params: Sequence[Parameter], *, link: bool = True) -> str:
         return f"({', '.join(self.parameter(p, link=link) for p in params)})"

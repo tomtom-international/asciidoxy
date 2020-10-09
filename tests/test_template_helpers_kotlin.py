@@ -182,6 +182,19 @@ def test_parameter__ignore_default_value(helper):
                             default_value=False) == "arg: xref:kotlin-tomtom_1_MyType[MyType]"
 
 
+def test_parameter__prefix(helper):
+    ref = TypeRef("kotlin")
+    ref.name = "MyType"
+    ref.id = "kotlin-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.prefix = "vararg "
+
+    assert helper.parameter(param) == "vararg arg: xref:kotlin-tomtom_1_MyType[MyType]"
+
+
 def test_method_signature__no_params_no_return(helper):
     method = Member("kotlin")
     method.name = "start"

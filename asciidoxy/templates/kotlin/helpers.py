@@ -33,12 +33,13 @@ class KotlinTemplateHelper(TemplateHelper):
             defval = f" = {param.default_value}"
         else:
             defval = ""
+        prefix = param.prefix or ""
 
         if param.type is None:
-            return f"{param.name}{defval}"
+            return f"{prefix}{param.name}{defval}"
         if not param.name:
-            return self.print_ref(param.type, link=link)
-        return (f"{param.name}: {self.print_ref(param.type, link=link)}{defval}".strip())
+            return f"{prefix}{self.print_ref(param.type, link=link)}"
+        return (f"{prefix}{param.name}: {self.print_ref(param.type, link=link)}{defval}".strip())
 
     def _method_prefix(self, method: Member, *, link: bool = True) -> str:
         return "fun"

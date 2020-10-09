@@ -16,7 +16,7 @@
 from typing import List, Optional, Tuple, Union
 
 from .base import TranscoderBase
-from ..model import Compound, Member, ReferableElement, TypeRef, TypeRefBase
+from ..model import Compound, Member, Parameter, ReferableElement, TypeRef, TypeRefBase
 
 # https://kotlinlang.org/docs/reference/java-interop.html#mapped-types
 _MAPPED_TYPES = {
@@ -198,6 +198,11 @@ class KotlinTranscoder(TranscoderBase):
 
         return transcoded
 
+    def parameter(self, parameter: Parameter) -> Parameter:
+        transcoded = super().parameter(parameter)
+        transcoded = transform_vararg(parameter)
+        return transcoded
+
     def _compound(self, compound: Compound) -> Compound:
         transcoded = super()._compound(compound)
         transform_properties(transcoded.members)
@@ -290,3 +295,14 @@ def transform_array(type_ref: TypeRef, transcoded: TypeRef) -> TypeRef:
     array_type.nested = [transcoded]
 
     return array_type
+
+
+def transform_vararg(param: Parameter) -> Parameter:
+    if param.type is None or not param.type.suffix or "..." not in param.type.suffix:
+        return param
+
+    param.prefix = "vararg "
+    param.type.suffix = param.type.suffix.replace("...", "")
+    param.type.suffix = param.type.suffix.replace("?", "")
+    param.type.suffix = param.type.suffix.replace("!", "")
+    return param

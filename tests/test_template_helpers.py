@@ -600,6 +600,22 @@ def test_parameter__ignore_default_value(empty_context):
                             default_value=False) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
+def test_parameter_prefix(empty_context):
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.prefix = "vararg "
+
+    helper = TemplateHelper(empty_context)
+    assert helper.parameter(param) == "vararg const xref:lang-tomtom_1_MyType[MyType] & arg"
+
+
 def test_method_signature__no_params(empty_context):
     method = Member("lang")
     method.name = "ShortMethod"
