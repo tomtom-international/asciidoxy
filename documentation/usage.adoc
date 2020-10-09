@@ -725,6 +725,42 @@ ${api.language(None)}   # <4>
 <3> Set the default language to Java.
 <4> Remove the default language.
 
+=== Transcoding
+
+In some ecosystems multiple languages can be used together. Elements written in one language can
+directly be used in the other language. The compiler or interpreter makes sure calls are translated
+appropriately. AsciiDoxy supports generating documentation that shows how to use elements written in
+one language in the other language. It is called "transcoding".
+
+[source,python]
+----
+${"""
+${api.language(<language>, source=<source_language>)}
+"""}
+----
+
+Other languages will be ignored, unless overridden with a `lang` argument. Using the extra `lang`
+argument also disables transcoding. This setting also applies to all files included afterwards, but
+resets and the end of the current file.
+
+`language`:: Language to use for all following insert and link directives.
+`source`:: Language to transcode elements from if the element cannot be found for `language`.
+`None` to disable transcoding.
+
+==== Examples
+
+[source,python]
+----
+${"""
+${api.language("kotlin", source="java")} # <1>
+${api.language("swift", source="objc")} # <2>
+${api.language("java", source=None)}   # <3>
+"""}
+----
+<1> Insert elements as Kotlin elements. Transcode from Java if the element is not found.
+<2> Insert elements as Swift elements. Transcode from Objective C if the element is not found.
+<3> Disable transcoding, use Java as default language.
+
 === Search namespace
 
 By default AsciiDoxy searches for API elements using their fully qualified name. For languages that

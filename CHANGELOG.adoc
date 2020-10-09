@@ -22,11 +22,19 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == 0.6.3 (1 Nov 2020)
 
+=== Added
+
+  - Infrastructure for transcoding documentation from one to another language.
+  - Swift: [AD-28] Generating Swift documentation based on Objective C source code.
+  - Kotlin: [AD-27] Generating Kotlin documentation based on Java source code.
+
 === Fixed
 
   - [AD-33] Actually allow filtering of inner classes by visibility.
   - [AD-46] Always fall back to original name if type parsing fails.
   - [AD-48] Java: Support unmangled annotations.
+  - [AD-35] Improve handling of complex closures.
+  - Objective C: Support `__autoreleasing` suffix.
 
 
 == 0.6.2 (22 Sep 2020)

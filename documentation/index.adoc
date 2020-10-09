@@ -49,6 +49,8 @@ Supported languages:
 - Java
 - Objective C
 - Python (using https://github.com/Feneric/doxypypy[doxypypy])
+- Swift (transcoded from Objective C only)
+- Kotlin (transcoded from Java only)
 
 Features:
 
@@ -56,6 +58,7 @@ Features:
 - Collecting API reference information from remote and local sources.
 - Single and multi page HTML output.
 - Single page PDF output.
+- Transcoding: showing how to use elements written in one language in another compatible language.
 
 
 == Credits
