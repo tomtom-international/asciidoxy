@@ -16,67 +16,33 @@
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Compound, Member, Parameter, ReturnValue, TypeRef, InnerTypeReference
+from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
 from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
+
+from .builders import SimpleClassBuilder
 
 
 @pytest.fixture
 def python_class():
-    compound = Compound("python")
-    compound.name = "MyClass"
+    builder = SimpleClassBuilder("python")
+    builder.name("MyClass")
 
-    def generate_member_function(name: str,
-                                 has_return_value: bool = True,
-                                 is_static: bool = False) -> Member:
-        member = Member("python")
-        member.kind = "function"
-        member.name = name
-        member.prot = "public"
-        if has_return_value:
-            member.returns = ReturnValue()
-        if is_static:
-            member.static = True
-        return member
+    builder.member_function(name="__init__", has_return_value=False, static=False),
+    builder.member_function(name="public_static_method", static=True),
+    builder.member_function(name="_private_static_method", static=True),
+    builder.member_function(name="__mangled_private_static_method", static=True),
+    builder.member_function(name="public_method"),
+    builder.member_function(name="_private_method"),
+    builder.member_function(name="__mangled_private_method"),
+    builder.member_function(name="__add__"),
+    builder.member_variable(name="public_variable"),
+    builder.member_variable(name="_private_variable"),
+    builder.member_variable(name="__mangled_private_variable"),
+    builder.inner_class(name="NestedClass"),
+    builder.inner_class(name="_PrivateNestedClass"),
+    builder.inner_class(name="__MangledPrivateNestedClass"),
 
-    def generate_member_variable(name: str) -> Member:
-        member_variable = Member("python")
-        member_variable.kind = "variable"
-        member_variable.name = name
-        member_variable.prot = "public"
-        member_variable.returns = ReturnValue()
-        member_variable.returns.type = TypeRef("python")
-        return member_variable
-
-    def generate_inner_class(name: str) -> InnerTypeReference:
-        nested_class = Compound("python")
-        nested_class.name = name
-        inner_class_reference = InnerTypeReference(language="python")
-        inner_class_reference.name = nested_class.name
-        inner_class_reference.referred_object = nested_class
-        inner_class_reference.prot = "public"
-        return inner_class_reference
-
-    compound.members = [
-        generate_member_function("__init__", has_return_value=False, is_static=False),
-        generate_member_function("public_static_method", is_static=True),
-        generate_member_function("_private_static_method", is_static=True),
-        generate_member_function("__mangled_private_static_method", is_static=True),
-        generate_member_function("public_method"),
-        generate_member_function("_private_method"),
-        generate_member_function("__mangled_private_method"),
-        generate_member_function("__add__"),
-        generate_member_variable("public_variable"),
-        generate_member_variable("_private_variable"),
-        generate_member_variable("__mangled_private_variable"),
-    ]
-
-    compound.inner_classes = [
-        generate_inner_class("NestedClass"),
-        generate_inner_class("_PrivateNestedClass"),
-        generate_inner_class("__MangledPrivateNestedClass"),
-    ]
-
-    return compound
+    return builder.compound
 
 
 def test_params__empty():

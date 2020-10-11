@@ -16,85 +16,47 @@
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import (Compound, InnerTypeReference, Member, Parameter, ReturnValue,
-                             ThrowsClause, TypeRef)
+from asciidoxy.model import Member, Parameter, ReturnValue, ThrowsClause, TypeRef
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
+
+from .builders import SimpleClassBuilder
 
 
 @pytest.fixture
 def swift_class():
-    compound = Compound("swift")
-    compound.name = "MyClass"
-
-    def generate_member(kind: str, prot: str) -> Member:
-        member = Member("swift")
-        member.kind = kind
-        member.name = prot.capitalize() + kind.capitalize()
-        member.prot = prot
-        return member
-
-    def generate_member_function(prot: str,
-                                 name: str,
-                                 has_return_value: bool = True,
-                                 is_static: bool = False) -> Member:
-        member = Member("swift")
-        member.kind = "function"
-        member.name = name
-        member.prot = prot
-        if has_return_value:
-            member.returns = ReturnValue()
-        if is_static:
-            member.static = True
-        return member
-
-    def generate_property(prot: str) -> Member:
-        property = generate_member_function(prot=prot, name=prot.capitalize() + "Property")
-        property.kind = "property"
-        return property
-
-    def generate_nested_type(kind: str, prot: str) -> InnerTypeReference:
-        nested_class = Compound("swift")
-        nested_class.name = f"{prot.capitalize()}{kind.capitalize()}"
-        inner_class_reference = InnerTypeReference(language="swift")
-        inner_class_reference.name = nested_class.name
-        inner_class_reference.referred_object = nested_class
-        inner_class_reference.prot = prot
-        return inner_class_reference
+    builder = SimpleClassBuilder("swift")
+    builder.name("MyClass")
 
     # fill class with typical members
     for visibility in ("public", "internal", "fileprivate", "private"):
         for member_type in ("enum", "trash"):
-            compound.members.append(generate_member(kind=member_type, prot=visibility))
+            builder.simple_member(kind=member_type, prot=visibility)
 
         # add property
-        compound.members.append(generate_property(prot=visibility))
+        builder.member_property(prot=visibility)
         # add some method
-        compound.members.append(
-            generate_member_function(prot=visibility, name=visibility.capitalize() + "Method"))
+        builder.member_function(prot=visibility, name=visibility.capitalize() + "Method")
         # add some method without return type
-        compound.members.append(
-            generate_member_function(prot=visibility,
-                                     name=visibility.capitalize() + "MethodNoReturn",
-                                     has_return_value=False))
+        builder.member_function(prot=visibility,
+                                name=visibility.capitalize() + "MethodNoReturn",
+                                has_return_value=False)
         # add static method
-        compound.members.append(
-            generate_member_function(prot=visibility,
-                                     name=visibility.capitalize() + "TypeMethod",
-                                     is_static=True))
+        builder.member_function(prot=visibility,
+                                name=visibility.capitalize() + "TypeMethod",
+                                static=True)
         # add static method without return type
-        compound.members.append(
-            generate_member_function(prot=visibility,
-                                     name=visibility.capitalize() + "TypeMethodNoReturn",
-                                     has_return_value=False,
-                                     is_static=True))
+        builder.member_function(prot=visibility,
+                                name=visibility.capitalize() + "TypeMethodNoReturn",
+                                has_return_value=False,
+                                static=True)
 
         for inner_type in ("class", "protocol", "struct"):
-            compound.inner_classes.append(generate_nested_type(inner_type, visibility))
+            builder.inner_class(name=f"{visibility.capitalize()}{inner_type.capitalize()}",
+                                prot=visibility)
 
-    compound.members.append(
-        generate_member_function(prot="public", name="init", has_return_value=False))
+    builder.member_function(prot="public", name="init", has_return_value=False)
 
-    return compound
+    return builder.compound
 
 
 @pytest.fixture

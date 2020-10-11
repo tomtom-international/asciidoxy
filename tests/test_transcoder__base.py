@@ -15,13 +15,13 @@
 
 import pytest
 
-from typing import List, Optional, Type
-
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Member, Parameter,
-                             ReferableElement, ReturnValue, ThrowsClause, TypeRef, TypeRefBase)
+from asciidoxy.model import ReturnValue, ThrowsClause
 from asciidoxy.transcoder.base import TranscoderBase, TranscoderError
 from asciidoxy.transcoder.kotlin import KotlinTranscoder
+
+from .builders import (make_compound, make_member, make_type_ref, make_inner_type_ref,
+                       make_parameter, make_enum_value, make_throws_clause, make_return_value)
 
 
 class _TestTranscoder(TranscoderBase):
@@ -32,121 +32,6 @@ class _TestTranscoder(TranscoderBase):
 @pytest.fixture
 def transcoder():
     return _TestTranscoder(ApiReference())
-
-
-def make_referable(cls: Type[ReferableElement], lang: str, name: str) -> ReferableElement:
-    element = cls(lang)
-    element.id = f"{lang}-{name.lower()}"
-    element.name = name
-    element.full_name = f"com.asciidoxy.geometry.{name}"
-    element.kind = "class"
-    return element
-
-
-def make_compound(lang: str,
-                  name: str,
-                  members: Optional[List[Member]] = None,
-                  inner_classes: Optional[List[InnerTypeReference]] = None,
-                  enumvalues: Optional[List[EnumValue]] = None):
-    compound = make_referable(Compound, lang, name)
-    if members is not None:
-        compound.members = members
-    if inner_classes is not None:
-        compound.inner_classes = inner_classes
-    compound.brief = "Brief description"
-    compound.description = "Long description"
-    if enumvalues is not None:
-        compound.enumvalues = enumvalues
-    compound.include = "include.file"
-    compound.namespace = "com.asciidoxy.geometry"
-    return compound
-
-
-def make_member(lang: str,
-                name: str,
-                kind: str = "function",
-                params: Optional[List[Parameter]] = None,
-                exceptions: Optional[List[Exception]] = None,
-                returns: Optional[ReturnValue] = None,
-                enumvalues: Optional[List[EnumValue]] = None) -> Member:
-    member = make_referable(Member, lang, name)
-    member.kind = kind
-    member.definition = "definition"
-    member.args = "args"
-    if params is not None:
-        member.params = params
-    if exceptions is not None:
-        member.exceptions = exceptions
-    member.brief = "Brief description"
-    member.description = "Long description"
-    member.prot = "public"
-    member.returns = returns
-    if enumvalues is not None:
-        member.enumvalues = enumvalues
-    member.static = False
-    member.include = "include.file"
-    member.namespace = "com.asciidoxy.geometry"
-    member.const = True
-    member.deleted = False
-    member.default = False
-    return member
-
-
-def make_type_ref_base(cls: Type[TypeRefBase], lang: str, name: str) -> TypeRefBase:
-    type_ref = cls(lang)
-    type_ref.id = f"{lang}-{name.lower()}"
-    type_ref.name = name
-    type_ref.namespace = "com.asciidoxy.geometry"
-    return type_ref
-
-
-def make_type_ref(lang: str, name: str, prefix: str = "final ", suffix: str = " *") -> TypeRef:
-    type_ref = make_type_ref_base(TypeRef, lang, name)
-    type_ref.kind = "class"
-    type_ref.prefix = prefix
-    type_ref.suffix = suffix
-    return type_ref
-
-
-def make_inner_type_ref(lang: str,
-                        name: str,
-                        element: Optional[Compound] = None) -> InnerTypeReference:
-    type_ref = make_type_ref_base(InnerTypeReference, lang, name)
-    type_ref.referred_object = element
-    return type_ref
-
-
-def make_parameter(name: str, type_: Optional[TypeRef] = None) -> Parameter:
-    param = Parameter()
-    param.type = type_
-    param.name = name
-    param.description = "Description"
-    param.default_value = "42"
-    return param
-
-
-def make_enum_value(lang: str, name: str) -> EnumValue:
-    element = make_referable(EnumValue, lang, name)
-    element.initializer = " = 2"
-    element.brief = "Brief description"
-    element.description = "Long description"
-    element.kind = "enumvalue"
-    return element
-
-
-def make_throws_clause(lang: str, type_ref: Optional[TypeRef] = None) -> ThrowsClause:
-    clause = ThrowsClause(lang)
-    if type_ref is not None:
-        clause.type = type_ref
-    clause.description = "Description"
-    return clause
-
-
-def make_return_value(type_ref: Optional[TypeRef] = None) -> ReturnValue:
-    value = ReturnValue()
-    value.type = type_ref
-    value.description = "Description"
-    return value
 
 
 def test_transcode_compound__no_nested_elements(transcoder):
@@ -186,10 +71,13 @@ def test_transcode_compound__members(transcoder):
 
 
 def test_transcode_compound__inner_classes(transcoder):
-    compound = make_compound(
-        "asm",
-        "Coordinate",
-        inner_classes=[make_inner_type_ref("asm", "Point", make_compound("asm", "Point"))])
+    compound = make_compound("asm",
+                             "Coordinate",
+                             inner_classes=[
+                                 make_inner_type_ref(lang="asm",
+                                                     name="Point",
+                                                     element=make_compound("asm", "Point"))
+                             ])
 
     transcoded = transcoder.compound(compound)
 
@@ -235,10 +123,11 @@ def test_transcode_compound__transcode_only_once(transcoder):
 
 
 def test_transcode_compound__transcode_inner_class_only_once(transcoder):
-    inner_class = make_compound("asm", "Point")
-    compound = make_compound("asm",
-                             "Coordinate",
-                             inner_classes=[make_inner_type_ref("asm", "Point", inner_class)])
+    inner_class = make_compound(lang="asm", name="Point")
+    compound = make_compound(
+        lang="asm",
+        name="Coordinate",
+        inner_classes=[make_inner_type_ref(lang="asm", name="Point", element=inner_class)])
 
     transcoded_inner = transcoder.compound(inner_class)
     transcoded = transcoder.compound(compound)
@@ -246,7 +135,10 @@ def test_transcode_compound__transcode_inner_class_only_once(transcoder):
 
 
 def test_transcode_member__no_nested_elements(transcoder):
-    member = make_member("asm", "getLatitude")
+    member = make_member(lang="asm",
+                         name="getLatitude",
+                         namespace="com.asciidoxy.geometry",
+                         const=True)
 
     transcoded = transcoder.member(member)
 
@@ -369,7 +261,7 @@ def test_transcode_member__transcode_only_once(transcoder):
 
 
 def test_transcode_type_ref__no_nested_elements(transcoder):
-    type_ref = make_type_ref("asm", "Coordinate")
+    type_ref = make_type_ref("asm", "Coordinate", prefix="final ", suffix=" *")
 
     transcoded = transcoder.type_ref(type_ref)
 
@@ -395,8 +287,11 @@ def test_transcode_type_ref__no_nested_elements(transcoder):
 
 
 def test_transcode_type_ref__nested_types(transcoder):
-    type_ref = make_type_ref("asm", "Coordinate")
-    type_ref.nested = [make_type_ref("asm", "Point"), make_type_ref("asm", "System")]
+    type_ref = make_type_ref("asm", "Coordinate", prefix="final ", suffix=" *")
+    type_ref.nested = [
+        make_type_ref("asm", "Point", prefix="final ", suffix=" *"),
+        make_type_ref("asm", "System", prefix="final ", suffix=" *")
+    ]
 
     transcoded = transcoder.type_ref(type_ref)
 
@@ -429,11 +324,11 @@ def test_transcode_type_ref__nested_types(transcoder):
 
 
 def test_transcode_type_ref__args(transcoder):
-    type_ref = make_type_ref("asm", name="")
-    type_ref.returns = make_type_ref("asm", "Coordinate")
+    type_ref = make_type_ref("asm", name="", prefix="final ", suffix=" *")
+    type_ref.returns = make_type_ref("asm", "Coordinate", prefix="final ", suffix=" *")
     type_ref.args = [
         make_parameter("arg1"),
-        make_parameter("arg2", make_type_ref("asm", "MyType")),
+        make_parameter("arg2", make_type_ref("asm", "MyType", prefix="final ", suffix=" *")),
     ]
 
     transcoded = transcoder.type_ref(type_ref)
@@ -476,7 +371,7 @@ def test_transcode_parameter__no_type(transcoder):
 
 
 def test_transcode_parameter__with_type(transcoder):
-    param = make_parameter("argument", make_type_ref("asm", "MyType"))
+    param = make_parameter("argument", make_type_ref("asm", "MyType", prefix="final ", suffix=" *"))
 
     transcoded = transcoder.parameter(param)
 
@@ -503,7 +398,7 @@ def test_transcode_return_value__no_type(transcoder):
 def test_transcode_return_value__with_type(transcoder):
     ret_val = ReturnValue()
     ret_val.description = "Description"
-    ret_val.type = make_type_ref("asm", "MyType")
+    ret_val.type = make_type_ref("asm", "MyType", prefix="final ", suffix=" *")
 
     transcoded = transcoder.return_value(ret_val)
 
@@ -518,7 +413,7 @@ def test_transcode_return_value__with_type(transcoder):
 def test_transcode_throws_clause(transcoder):
     ret_val = ThrowsClause("asm")
     ret_val.description = "Description"
-    ret_val.type = make_type_ref("asm", "MyType")
+    ret_val.type = make_type_ref("asm", "MyType", prefix="final ", suffix=" *")
 
     transcoded = transcoder.throws_clause(ret_val)
 
@@ -578,7 +473,9 @@ def test_transcode_inner_type_reference__empty(transcoder):
 
 
 def test_transcode_inner_type_reference__referred_object(transcoder):
-    ref = make_inner_type_ref("asm", "Coordinate", make_compound("asm", "Coordinate"))
+    ref = make_inner_type_ref(lang="asm",
+                              name="Coordinate",
+                              element=make_compound("asm", "Coordinate"))
 
     transcoded = transcoder.inner_type_reference(ref)
 

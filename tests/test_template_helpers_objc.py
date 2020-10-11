@@ -18,66 +18,35 @@ Tests for Objective C template helpers.
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Compound, Member, ReturnValue, Parameter, TypeRef
+from asciidoxy.model import Member, ReturnValue, Parameter, TypeRef
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
+
+from .builders import SimpleClassBuilder
 
 
 @pytest.fixture
 def objc_class():
-    compound = Compound("objc")
-    compound.name = "MyClass"
-
-    def generate_member(kind: str, prot: str) -> Member:
-        member = Member("objc")
-        member.kind = kind
-        member.name = prot.capitalize() + kind.capitalize()
-        member.prot = prot
-        return member
-
-    def generate_member_function(prot: str,
-                                 name: str,
-                                 has_return_value: bool = True,
-                                 is_static: bool = False) -> Member:
-        member = Member("objc")
-        member.kind = "function"
-        member.name = name
-        member.prot = prot
-        if has_return_value:
-            member.returns = ReturnValue()
-        if is_static:
-            member.static = True
-        return member
-
-    def generate_property(prot: str) -> Member:
-        property = generate_member_function(prot=prot, name=prot.capitalize() + "Property")
-        property.kind = "property"
-        return property
+    builder = SimpleClassBuilder("objc")
+    builder.name("MyClass")
 
     # fill class with typical members
     for visibility in ("public", "protected", "private"):
         for member_type in ("enum", "class", "protocol", "trash"):
-            compound.members.append(generate_member(kind=member_type, prot=visibility))
+            builder.simple_member(kind=member_type, prot=visibility)
 
         # add property
-        compound.members.append(generate_property(prot=visibility))
+        builder.member_property(prot=visibility)
         # add some method
-        compound.members.append(
-            generate_member_function(prot=visibility, name=visibility.capitalize() + "Method"))
+        builder.member_function(prot=visibility, name=visibility.capitalize() + "Method")
         # add static method
-        compound.members.append(
-            generate_member_function(prot=visibility,
-                                     name=visibility.capitalize() + "StaticMethod",
-                                     is_static=True))
+        builder.member_function(prot=visibility,
+                                name=visibility.capitalize() + "StaticMethod",
+                                static=True)
 
     # forbidden method
-    member = Member("objc")
-    member.kind = "function"
-    member.name = "NS_UNAVAILABLE"
-    member.prot = "public"
-    member.returns = ReturnValue()
-    compound.members.append(member)
+    builder.member_function(name="NS_UNAVAILABLE", prot="public")
 
-    return compound
+    return builder.compound
 
 
 @pytest.fixture

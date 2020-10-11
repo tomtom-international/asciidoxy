@@ -18,8 +18,7 @@ import pytest
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.kotlin import KotlinTranscoder
 
-from .test_transcoder__base import (make_compound, make_member, make_parameter, make_return_value,
-                                    make_type_ref)
+from .builders import make_compound, make_member, make_parameter, make_return_value, make_type_ref
 
 
 @pytest.fixture
@@ -74,7 +73,7 @@ def transcoder():
     ("MyClass", "MyClass", "!"),
 ])
 def test_transcode_type_ref__mapped_types(transcoder, java_type, kotlin_type, kotlin_suffix):
-    type_ref = make_type_ref(lang="java", name=java_type, prefix="", suffix="")
+    type_ref = make_type_ref(lang="java", name=java_type)
     transcoded = transcoder.type_ref(type_ref)
     assert transcoded.name == kotlin_type
     assert not transcoded.prefix
@@ -118,7 +117,7 @@ def test_transcode_type_ref__mapped_types(transcoder, java_type, kotlin_type, ko
     ("Boolean", "Boolean"),
 ])
 def test_transcode_type_ref__nonnull_annotated_types(transcoder, java_type, kotlin_type):
-    type_ref = make_type_ref(lang="java", name=java_type, prefix="@NonNull ", suffix="")
+    type_ref = make_type_ref(lang="java", name=java_type, prefix="@NonNull ")
     transcoded = transcoder.type_ref(type_ref)
     assert transcoded.name == kotlin_type
     assert not transcoded.prefix
@@ -162,7 +161,7 @@ def test_transcode_type_ref__nonnull_annotated_types(transcoder, java_type, kotl
     ("Boolean", "Boolean"),
 ])
 def test_transcode_type_ref__nullable_annotated_types(transcoder, java_type, kotlin_type):
-    type_ref = make_type_ref(lang="java", name=java_type, prefix="@Nullable ", suffix="")
+    type_ref = make_type_ref(lang="java", name=java_type, prefix="@Nullable ")
     transcoded = transcoder.type_ref(type_ref)
     assert transcoded.name == kotlin_type
     assert not transcoded.prefix
@@ -192,7 +191,7 @@ def test_transcode_type_ref__nullable_annotated_types(transcoder, java_type, kot
     "@androidx.annotation.RecentlyNullable",
 ])
 def test_transcode_type_ref__all_nullable_annotations(transcoder, annotation):
-    type_ref = make_type_ref(lang="java", name="MyClass", prefix=f"{annotation} ", suffix="")
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix=f"{annotation} ")
     transcoded = transcoder.type_ref(type_ref)
     assert transcoded.name == "MyClass"
     assert not transcoded.prefix
@@ -219,7 +218,7 @@ def test_transcode_type_ref__all_nullable_annotations(transcoder, annotation):
     "@androidx.annotation.RecentlyNonNull",
 ])
 def test_transcode_type_ref__all_nonnull_annotations(transcoder, annotation):
-    type_ref = make_type_ref(lang="java", name="MyClass", prefix=f"{annotation} ", suffix="")
+    type_ref = make_type_ref(lang="java", name="MyClass", prefix=f"{annotation} ")
     transcoded = transcoder.type_ref(type_ref)
     assert transcoded.name == "MyClass"
     assert not transcoded.prefix
@@ -227,8 +226,8 @@ def test_transcode_type_ref__all_nonnull_annotations(transcoder, annotation):
 
 
 def test_transcode_type_ref__wildcard_generic_extends(transcoder):
-    type_ref = make_type_ref(lang="java", name="MyClass", prefix="", suffix="")
-    type_ref.nested = [make_type_ref(lang="java", name="Base", prefix="? extends ", suffix="")]
+    type_ref = make_type_ref(lang="java", name="MyClass")
+    type_ref.nested = [make_type_ref(lang="java", name="Base", prefix="? extends ")]
     transcoded = transcoder.type_ref(type_ref)
 
     assert transcoded.name == "MyClass"
@@ -242,8 +241,8 @@ def test_transcode_type_ref__wildcard_generic_extends(transcoder):
 
 
 def test_transcode_type_ref__wildcard_generic_super(transcoder):
-    type_ref = make_type_ref(lang="java", name="MyClass", prefix="", suffix="")
-    type_ref.nested = [make_type_ref(lang="java", name="Base", prefix="? super ", suffix="")]
+    type_ref = make_type_ref(lang="java", name="MyClass")
+    type_ref.nested = [make_type_ref(lang="java", name="Base", prefix="? super ")]
     transcoded = transcoder.type_ref(type_ref)
 
     assert transcoded.name == "MyClass"
@@ -267,7 +266,7 @@ def test_transcode_type_ref__wildcard_generic_super(transcoder):
     ("boolean", "BooleanArray"),
 ])
 def test_transcode_type_ref__primitive_array(transcoder, java_type, kotlin_type):
-    type_ref = make_type_ref(lang="java", name=java_type, prefix="", suffix="[]")
+    type_ref = make_type_ref(lang="java", name=java_type, suffix="[]")
     transcoded = transcoder.type_ref(type_ref)
 
     assert transcoded.name == kotlin_type
@@ -276,7 +275,7 @@ def test_transcode_type_ref__primitive_array(transcoder, java_type, kotlin_type)
 
 
 def test_transcode_type_ref__array(transcoder):
-    type_ref = make_type_ref(lang="java", name="MyClass", prefix="", suffix="[]")
+    type_ref = make_type_ref(lang="java", name="MyClass", suffix="[]")
     transcoded = transcoder.type_ref(type_ref)
 
     assert transcoded.name == "Array"
@@ -334,8 +333,7 @@ def test_transcode_type_ref__array__nullable(transcoder):
 def test_transcode_member__void_return(transcoder):
     member = make_member(lang="java",
                          name="update",
-                         returns=make_return_value(
-                             make_type_ref(lang="java", name="void", prefix="", suffix="")))
+                         returns=make_return_value(make_type_ref(lang="java", name="void")))
     transcoded = transcoder.member(member)
     assert not transcoded.returns
 
@@ -349,17 +347,12 @@ def test_transcode_compound__property(transcoder):
                                              params=[
                                                  make_parameter(name="value",
                                                                 type_=make_type_ref(lang="java",
-                                                                                    name="string",
-                                                                                    prefix="",
-                                                                                    suffix=""))
+                                                                                    name="string"))
                                              ]),
                                  make_member(lang="java",
                                              name="getName",
                                              returns=make_return_value(
-                                                 make_type_ref(lang="java",
-                                                               name="string",
-                                                               prefix="",
-                                                               suffix="")))
+                                                 make_type_ref(lang="java", name="string")))
                              ])
     transcoded = transcoder.compound(compound)
 
@@ -381,17 +374,12 @@ def test_transcode_compound__boolean_property(transcoder):
                                              params=[
                                                  make_parameter(name="value",
                                                                 type_=make_type_ref(lang="java",
-                                                                                    name="boolean",
-                                                                                    prefix="",
-                                                                                    suffix=""))
+                                                                                    name="boolean"))
                                              ]),
                                  make_member(lang="java",
                                              name="isReadOnly",
                                              returns=make_return_value(
-                                                 make_type_ref(lang="java",
-                                                               name="boolean",
-                                                               prefix="",
-                                                               suffix="")))
+                                                 make_type_ref(lang="java", name="boolean")))
                              ])
     transcoded = transcoder.compound(compound)
 
@@ -405,33 +393,23 @@ def test_transcode_compound__boolean_property(transcoder):
 
 
 def test_transcode_compound__single_getter_setter_is_no_property(transcoder):
-    compound = make_compound(lang="java",
-                             name="MyClass",
-                             members=[
-                                 make_member(lang="java",
-                                             name="setName",
-                                             params=[
-                                                 make_parameter(name="value",
-                                                                type_=make_type_ref(lang="java",
-                                                                                    name="string",
-                                                                                    prefix="",
-                                                                                    suffix=""))
-                                             ]),
-                                 make_member(lang="java",
-                                             name="getAddress",
-                                             returns=make_return_value(
-                                                 make_type_ref(lang="java",
-                                                               name="string",
-                                                               prefix="",
-                                                               suffix=""))),
-                                 make_member(lang="java",
-                                             name="isReadOnly",
-                                             returns=make_return_value(
-                                                 make_type_ref(lang="java",
-                                                               name="boolean",
-                                                               prefix="",
-                                                               suffix="")))
-                             ])
+    compound = make_compound(
+        lang="java",
+        name="MyClass",
+        members=[
+            make_member(lang="java",
+                        name="setName",
+                        params=[
+                            make_parameter(name="value",
+                                           type_=make_type_ref(lang="java", name="string"))
+                        ]),
+            make_member(lang="java",
+                        name="getAddress",
+                        returns=make_return_value(make_type_ref(lang="java", name="string"))),
+            make_member(lang="java",
+                        name="isReadOnly",
+                        returns=make_return_value(make_type_ref(lang="java", name="boolean")))
+        ])
     transcoded = transcoder.compound(compound)
 
     member_names = (m.name for m in transcoded.members)
@@ -440,7 +418,7 @@ def test_transcode_compound__single_getter_setter_is_no_property(transcoder):
 
 def test_transcode_parameter__vararg(transcoder):
     param = make_parameter(name="values",
-                           type_=make_type_ref(lang="java", name="Type", prefix="", suffix="..."))
+                           type_=make_type_ref(lang="java", name="Type", suffix="..."))
     transcoded = transcoder.parameter(param)
 
     assert transcoded.prefix == "vararg "
@@ -452,7 +430,7 @@ def test_transcode_parameter__vararg(transcoder):
 
 def test_transcode_parameter__vararg__boxed_type(transcoder):
     param = make_parameter(name="values",
-                           type_=make_type_ref(lang="java", name="Short", prefix="", suffix="..."))
+                           type_=make_type_ref(lang="java", name="Short", suffix="..."))
     transcoded = transcoder.parameter(param)
 
     assert transcoded.prefix == "vararg "
