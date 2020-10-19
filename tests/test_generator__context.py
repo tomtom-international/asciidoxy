@@ -25,6 +25,7 @@ def test_context_create_sub_context(context):
     context.preprocessing_run = False
     context.warnings_are_errors = True
     context.multipage = True
+    context.embedded = True
 
     sub = context.sub_context()
     assert sub is not context
@@ -40,10 +41,16 @@ def test_context_create_sub_context(context):
     assert sub.preprocessing_run is False
     assert sub.warnings_are_errors is True
     assert sub.multipage is True
+    assert sub.embedded is True
 
     assert sub.reference is context.reference
+    assert sub.progress is context.progress
+
     assert sub.linked is context.linked
     assert sub.inserted is context.inserted
+    assert sub.in_to_out_file_map is context.in_to_out_file_map
+    assert sub.embedded_file_map is context.embedded_file_map
+    assert sub.current_document is context.current_document
 
     sub.namespace = "other"
     sub.language = "objc"

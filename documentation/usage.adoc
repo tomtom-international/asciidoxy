@@ -375,7 +375,7 @@ is set, a relative name.
 `lang`:: Optional. Name of the programming language.
 `kind`:: Optional. Kind of element to insert.
 `leveloffset`:: Optional. Offset for the headers in the reference from the top level of the current
-file.  Defaults to +1.
+file. Defaults to +1. Provide `None` to not set the offset.
 
 Trying to insert an unknown element will result in an error.
 
@@ -613,7 +613,8 @@ ${api.include(<file_name>,
               [leveloffset=<offset>,]
               [link_text=<text>,]
               [link_prefix=<prefix>,]
-              [multipage_link=<bool>],
+              [multipage_link=<bool>,]
+              [always_embed=<bool>,]
               [...])}
 """}
 ----
@@ -636,6 +637,8 @@ numbered list of links.
 `multipage_link`:: By default a link is inserted in multi-page mode. Set this to False to omit
 inserting the link. The included file is still processed. Use <<cross_referencing>> to insert a
 link elsewhere in the document.
+`always_embed`:: Always embed the included file in the current document, even if multipage mode is
+enabled.
 
 You can add additional options. These options are added as attributes to the inserted include
 directive for the API reference fragment. For available attributes see

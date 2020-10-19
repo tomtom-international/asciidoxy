@@ -16,7 +16,7 @@
 import logging
 
 from pathlib import Path
-from typing import Dict, List, MutableMapping, Optional
+from typing import Dict, List, MutableMapping, Optional, Tuple
 
 from tqdm import tqdm
 
@@ -64,6 +64,7 @@ class Context(object):
     preprocessing_run: bool = True
     warnings_are_errors: bool = False
     multipage: bool = False
+    embedded: bool = False
 
     reference: ApiReference
     progress: Optional[tqdm] = None
@@ -71,6 +72,7 @@ class Context(object):
     linked: List[ReferableElement]
     inserted: MutableMapping[str, Path]
     in_to_out_file_map: Dict[Path, Path]
+    embedded_file_map: Dict[Tuple[Path, Path], Path]
     current_document: DocumentTreeNode
 
     def __init__(self, base_dir: Path, build_dir: Path, fragment_dir: Path, reference: ApiReference,
@@ -86,6 +88,7 @@ class Context(object):
         self.linked = []
         self.inserted = {}
         self.in_to_out_file_map = {}
+        self.embedded_file_map = {}
         self.current_document = current_document
 
     def insert(self, element) -> str:
@@ -114,11 +117,13 @@ class Context(object):
         sub.preprocessing_run = self.preprocessing_run
         sub.warnings_are_errors = self.warnings_are_errors
         sub.multipage = self.multipage
+        sub.embedded = self.embedded
 
         # References
         sub.linked = self.linked
         sub.inserted = self.inserted
         sub.in_to_out_file_map = self.in_to_out_file_map
+        sub.embedded_file_map = self.embedded_file_map
         sub.insert_filter = self.insert_filter
         sub.progress = self.progress
 

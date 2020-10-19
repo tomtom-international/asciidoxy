@@ -40,6 +40,8 @@ def sub_document_file(input_file):
 
 @pytest.fixture
 def sub_document_api(sub_document_file, context):
+    context.current_document = DocumentTreeNode(sub_document_file, context.current_document)
+    context.base_dir = sub_document_file.parent
     return Api(sub_document_file, context)
 
 
@@ -383,20 +385,22 @@ def test_cross_document_ref_with_relative_path_multipage(sub_document_api, sub_d
 def test_cross_document_ref_with_absolute_path(sub_document_api, sub_document_file, context):
     anchor = "anchor"
     target_file = sub_document_file.parent / "includes" / "other_file.adoc"
+    target_file_rel_to_base_dir = target_file.relative_to(context.base_dir)
 
     result = sub_document_api.cross_document_ref(target_file, anchor)
-    assert result == (f"<<{target_file.with_name(f'.asciidoxy.{target_file.name}')}"
+    assert result == (f"<<{target_file_rel_to_base_dir.with_name(f'.asciidoxy.{target_file.name}')}"
                       f"#{anchor},{anchor}>>")
 
 
 def test_cross_document_ref_with_absolute_path_multipage(sub_document_api, sub_document_file,
-                                                         multipage):
+                                                         multipage, context):
     anchor = "anchor"
     target_file_rel = Path("includes") / "other_file.adoc"
     target_file = sub_document_file.parent / target_file_rel
+    target_file_rel_to_base_dir = target_file.relative_to(context.base_dir)
 
     result = sub_document_api.cross_document_ref(target_file, anchor)
-    assert result == (f"<<{target_file}#{anchor},{anchor}>>")
+    assert result == (f"<<{target_file_rel_to_base_dir}#{anchor},{anchor}>>")
 
 
 def test_cross_document_ref_with_link_text(sub_document_api, sub_document_file, context):
@@ -418,13 +422,41 @@ def test_include_relative_path(api, context, input_file):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include("includes/another_file.adoc")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include("includes/another_file.adoc")
+        assert result.startswith("include::")
+        assert result.endswith("[leveloffset=+1]")
 
-    file_name = input_file.parent / result[9:-16]
-    assert file_name.is_file()
-    assert file_name.name == ".asciidoxy.another_file.adoc"
+        file_name = input_file.parent / result[9:-16]
+        assert file_name.is_file() is not preprocessing
+        assert file_name.name == ".asciidoxy.another_file.adoc"
+        assert file_name.is_absolute()
+
+
+def test_include_relative_path__parent_directory(context, tmp_path):
+    input_file = tmp_path / "src" / "input_file.adoc"
+    input_file.parent.mkdir(parents=True)
+    input_file.touch()
+
+    include_file = tmp_path / "includes" / "another_file.adoc"
+    include_file.parent.mkdir(parents=True)
+    include_file.touch()
+    context.current_document.children.append(
+        DocumentTreeNode(include_file, context.current_document))
+    context.current_document.in_file = input_file
+
+    api = Api(input_file, context)
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include("../includes/another_file.adoc")
+        assert result.startswith("include::")
+        assert result.endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / result[9:-16]
+        assert file_name.is_file() is not preprocessing
+        assert file_name.name == ".asciidoxy.another_file.adoc"
+        assert file_name.is_absolute()
 
 
 def test_include_relative_path_multipage(api, context, input_file, multipage):
@@ -435,9 +467,12 @@ def test_include_relative_path_multipage(api, context, input_file, multipage):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include(include_file_rel)
-    assert result == f"<<{include_file_rel}#,{include_file_rel}>>"
-    assert include_file.with_name(f".asciidoxy.{include_file.name}").is_file()
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include(include_file_rel)
+        assert result == f"<<{include_file_rel}#,{include_file_rel}>>"
+        assert include_file.with_name(
+            f".asciidoxy.{include_file.name}").is_file() is not preprocessing
 
 
 def test_include_absolute_path(api, context, input_file):
@@ -447,13 +482,16 @@ def test_include_absolute_path(api, context, input_file):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include(os.fspath(include_file))
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include(os.fspath(include_file))
+        assert result.startswith("include::")
+        assert result.endswith("[leveloffset=+1]")
 
-    file_name = input_file.parent / result[9:-16]
-    assert file_name.is_file()
-    assert file_name.name == ".asciidoxy.another_file.adoc"
+        file_name = input_file.parent / result[9:-16]
+        assert file_name.is_file() is not preprocessing
+        assert file_name.name == ".asciidoxy.another_file.adoc"
+        assert file_name.is_absolute()
 
 
 def test_include_absolute_path_multipage(api, context, input_file, multipage):
@@ -464,9 +502,12 @@ def test_include_absolute_path_multipage(api, context, input_file, multipage):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include(include_file)
-    assert result == f"<<{include_file_rel}#,{include_file_rel}>>"
-    assert include_file.with_name(f".asciidoxy.{include_file.name}").is_file()
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include(include_file)
+        assert result == f"<<{include_file_rel}#,{include_file_rel}>>"
+        assert include_file.with_name(
+            f".asciidoxy.{include_file.name}").is_file() is not preprocessing
 
 
 def test_include_with_leveloffset(api, context, input_file):
@@ -476,9 +517,25 @@ def test_include_with_leveloffset(api, context, input_file):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include("includes/another_file.adoc", leveloffset="-1")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=-1]")
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include("includes/another_file.adoc", leveloffset="-1")
+        assert result.startswith("include::")
+        assert result.endswith("[leveloffset=-1]")
+
+
+def test_include_without_leveloffset(api, context, input_file):
+    include_file = input_file.parent / "includes" / "another_file.adoc"
+    include_file.parent.mkdir(parents=True)
+    include_file.touch()
+    context.current_document.children.append(
+        DocumentTreeNode(include_file, context.current_document))
+
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include("includes/another_file.adoc", leveloffset=None)
+        assert result.startswith("include::")
+        assert result.endswith("[]")
 
 
 def test_include_multipage_with_link_text(api, context, input_file, multipage):
@@ -490,8 +547,10 @@ def test_include_multipage_with_link_text(api, context, input_file, multipage):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include(include_file_rel, link_text=link_text)
-    assert result == f"<<{include_file_rel}#,{link_text}>>"
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include(include_file_rel, link_text=link_text)
+        assert result == f"<<{include_file_rel}#,{link_text}>>"
 
 
 def test_include_multipage_with_prefix_text(api, context, input_file, multipage):
@@ -503,8 +562,10 @@ def test_include_multipage_with_prefix_text(api, context, input_file, multipage)
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include(include_file_rel, link_prefix=prefix)
-    assert result == f"{prefix}<<{include_file_rel}#,{include_file_rel}>>"
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include(include_file_rel, link_prefix=prefix)
+        assert result == f"{prefix}<<{include_file_rel}#,{include_file_rel}>>"
 
 
 def test_include_multipage_without_link(api, context, input_file, multipage):
@@ -516,8 +577,10 @@ def test_include_multipage_without_link(api, context, input_file, multipage):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include(include_file_rel, link_prefix=prefix, multipage_link=False)
-    assert result == ""
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include(include_file_rel, link_prefix=prefix, multipage_link=False)
+        assert result == ""
 
 
 def test_include_with_extra_options(api, context, input_file):
@@ -527,14 +590,90 @@ def test_include_with_extra_options(api, context, input_file):
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
 
-    result = api.include("includes/another_file.adoc", lines="1..10", indent=12)
-    assert result.startswith("include::")
-    assert result.endswith("[lines=1..10,indent=12,leveloffset=+1]")
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include("includes/another_file.adoc", lines="1..10", indent=12)
+        assert result.startswith("include::")
+        assert result.endswith("[lines=1..10,indent=12,leveloffset=+1]")
 
 
 def test_include_error_file_not_found(api, input_file):
     with pytest.raises(IncludeFileNotFoundError):
         api.include("non_existing_file.adoc")
+
+
+def test_include__always_embed(api, context, input_file, single_and_multipage):
+    include_file = input_file.parent / "includes" / "another_file.adoc"
+    include_file.parent.mkdir(parents=True)
+    include_file.touch()
+    context.current_document.in_file = input_file
+    context.current_document.children.append(
+        DocumentTreeNode(include_file, context.current_document))
+
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include("includes/another_file.adoc", always_embed=True)
+        assert result.startswith("include::")
+        assert result.endswith("[leveloffset=+1]")
+
+        file_name = Path(result[9:-16])
+        assert file_name.is_file() is not preprocessing
+        assert file_name.is_absolute()
+
+
+def test_include__always_embed__unique_name(api, context, input_file, single_and_multipage):
+    include_file = input_file.parent / "includes" / "another_file.adoc"
+    include_file.parent.mkdir(parents=True)
+    include_file.touch()
+    context.current_document.in_file = input_file
+    context.current_document.children.append(
+        DocumentTreeNode(include_file, context.current_document))
+
+    file_names = []
+
+    for _ in range(10):
+        for preprocessing in (True, False):
+            context.preprocessing_run = preprocessing
+            result = api.include("includes/another_file.adoc", always_embed=True)
+            assert result.startswith("include::")
+            assert result.endswith("[leveloffset=+1]")
+
+            file_name = Path(result[9:-16])
+            assert file_name.is_file() is not preprocessing
+            assert file_name.is_absolute()
+
+            if preprocessing:
+                assert file_name not in file_names
+                file_names.append(file_name)
+
+
+def test_include__always_embed__correct_sub_context(api, context, input_file, single_and_multipage):
+    include_file = input_file.parent / "includes" / "another_file.adoc"
+    include_file.parent.mkdir(parents=True)
+    include_file.write_text(f"""
+${{api.cross_document_ref("../{input_file.name}", "")}}
+""")
+    context.current_document.in_file = input_file
+    context.current_document.children.append(
+        DocumentTreeNode(include_file, context.current_document))
+
+    for preprocessing in (True, False):
+        context.preprocessing_run = preprocessing
+        result = api.include("includes/another_file.adoc", always_embed=True)
+        assert result.startswith("include::")
+        assert result.endswith("[leveloffset=+1]")
+
+        file_name = Path(result[9:-16])
+        assert file_name.is_file() is not preprocessing
+        assert file_name.is_absolute()
+
+    contents = file_name.read_text()
+    if single_and_multipage:
+        # multipage
+        assert "<<input_file.adoc#,>>" in contents
+    else:
+        # singlepage
+        assert "<<includes/.asciidoxy.input_file.adoc#,>>" in contents
 
 
 def test_multipage_toc__default(api, input_file, multipage):
@@ -610,10 +749,30 @@ def test_process_adoc_multi_file(build_dir, single_and_multipage, adoc_data, api
             ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
         content = output_file.read_text()
         content = content.replace(os.fspath(build_dir), "BUILD_DIR")
+        content = content.replace(os.fspath(adoc_data), "SRC_DIR")
         assert content == expected_output_file.read_text()
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == 2 * len(output_files)
+
+
+def test_process_adoc__embedded_file_not_in_output_map(build_dir, single_and_multipage, adoc_data,
+                                                       api_reference):
+    main_doc_file = adoc_data / "embeddedfile_test.input.adoc"
+
+    progress_mock = ProgressMock()
+    output_files = process_adoc(main_doc_file,
+                                build_dir,
+                                api_reference,
+                                warnings_are_errors=True,
+                                multipage=single_and_multipage,
+                                progress=progress_mock)
+    assert len(output_files) == 1
+    assert (
+        output_files[main_doc_file] == main_doc_file.with_name(f".asciidoxy.{main_doc_file.name}"))
+
+    assert progress_mock.ready == progress_mock.total
+    assert progress_mock.total == 4
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])

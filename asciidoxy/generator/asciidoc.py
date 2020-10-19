@@ -16,6 +16,7 @@
 import functools
 import logging
 import os
+import uuid
 
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
@@ -321,7 +322,12 @@ class Api(object):
                 file_path = (self._current_file.parent / file_path).resolve().relative_to(
                     self._context.base_dir)
             referenced_file_name = _out_file_name(file_path)
-        return (f"<<{referenced_file_name}#{anchor},"
+
+        absolute_link_file_path = (referenced_file_name if referenced_file_name.is_absolute() else
+                                   self._current_file.parent / referenced_file_name).resolve()
+        link_file_path = relative_path(self._context.current_document.in_file,
+                                       absolute_link_file_path)
+        return (f"<<{link_file_path}#{anchor},"
                 f"{link_text if link_text is not None else anchor}>>")
 
     def insert_fragment(self,
@@ -374,12 +380,13 @@ class Api(object):
                 link_text: str = "",
                 link_prefix: str = "",
                 multipage_link: bool = True,
+                always_embed: bool = False,
                 **asciidoc_options) -> str:
         """Include another AsciiDoc file, and process it to insert API references.
 
-        If the output format is multi-paged, the method will cause generation of separate output
-        document for the included AsciiDoc document and optional insertion of link referring to the
-        document.
+        If the output format is multi-paged, the method will by default cause generation of
+        separate output document for the included AsciiDoc document and optional insertion of link
+        referring to the document.
 
         Args:
             file_name:         Relative or absolute path to the file to include. Relative paths are
@@ -391,8 +398,10 @@ class Api(object):
             link_prefix:       Optional text which will be inserted before the link when the output
                                    format is multi-paged. It can be used for example to compose a
                                    list of linked subdocuments by setting it to ". ".
-            multipage_link:    True to include a link in a multi-page document (default). Otherwise
+            multipage_link:    True to include a link in a multipage document (default). Otherwise
                                    the separate document is generated but not linked from here.
+            always_embed:      True to always embed the contents in the current document, even in
+                                   multipage mode.
             asciidoc_options:  Any additional option is added as an attribute to the include
                                    directive in single page mode.
 
@@ -408,7 +417,9 @@ class Api(object):
             raise IncludeFileNotFoundError(file_name)
 
         sub_context = self._context.sub_context()
-        if self._context.preprocessing_run:
+        if always_embed:
+            sub_context.embedded = True
+        elif self._context.preprocessing_run:
             sub_context.current_document = DocumentTreeNode(file_path,
                                                             self._context.current_document)
             self._context.current_document.children.append(sub_context.current_document)
@@ -417,7 +428,7 @@ class Api(object):
             assert sub_context.current_document is not None
 
         out_file = _process_adoc(file_path, sub_context)
-        if self._context.multipage:
+        if self._context.multipage and not always_embed:
             if multipage_link:
                 referenced_file = relative_path(self._current_file, file_path)
                 return (f"{link_prefix}"
@@ -425,11 +436,11 @@ class Api(object):
             else:
                 return ""
 
-        asciidoc_options["leveloffset"] = leveloffset
+        if leveloffset:
+            asciidoc_options["leveloffset"] = leveloffset
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
-        rel_path = out_file.relative_to(self._current_file.parent)
-        return f"include::{rel_path}[{attributes}]"
+        return f"include::{out_file}[{attributes}]"
 
     def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
@@ -515,7 +526,8 @@ class Api(object):
             return ""
 
         toc_content = multipage_toc(self._context.current_document, side)
-        with _docinfo_footer_file_name(self._current_file).open(mode="w", encoding="utf-8") as f:
+        with _docinfo_footer_file_name(self._context.current_document.in_file).open(
+                mode="w", encoding="utf-8") as f:
             f.write(toc_content)
         return ":docinfo: private"
 
@@ -567,36 +579,60 @@ def process_adoc(in_file: Path,
     context.multipage = multipage
     context.progress = progress
 
-    _process_adoc(in_file, context)
+    _pre_process_adoc(in_file, context)
     context.linked = []
     context.preprocessing_run = False
-    context.in_to_out_file_map[in_file] = _process_adoc(in_file, context)
+    _process_adoc(in_file, context)
     _check_links(context)
     return context.in_to_out_file_map
 
 
 def _process_adoc(in_file: Path, context: Context):
+    if context.preprocessing_run:
+        return _pre_process_adoc(in_file, context)
+
     logger.info(f"Processing {in_file}")
     api = Api(in_file, context)
-    out_file = _out_file_name(in_file)
+
+    if context.embedded:
+        out_file = context.embedded_file_map[(in_file, context.current_document.in_file)]
+    else:
+        out_file = context.in_to_out_file_map[in_file]
 
     template = Template(filename=os.fspath(in_file), input_encoding="utf-8")
-    if context.preprocessing_run:
-        context.in_to_out_file_map[in_file] = out_file
-
-        if context.progress is not None:
-            context.progress.total = 2 * len(context.in_to_out_file_map)
-            context.progress.update(0)
-
     rendered_doc = template.render(api=api)
 
-    if not context.preprocessing_run:
-        with out_file.open("w", encoding="utf-8") as f:
-            print(rendered_doc, file=f)
-            if context.multipage:
-                nav_bar = navigation_bar(context.current_document)
-                if nav_bar:
-                    print(nav_bar, file=f)
+    with out_file.open("w", encoding="utf-8") as f:
+        print(rendered_doc, file=f)
+        if context.multipage and not context.embedded:
+            nav_bar = navigation_bar(context.current_document)
+            if nav_bar:
+                print(nav_bar, file=f)
+
+    if context.progress is not None:
+        context.progress.update()
+
+    return out_file
+
+
+def _pre_process_adoc(in_file: Path, context: Context):
+    logger.info(f"Preprocessing {in_file}")
+    api = Api(in_file, context)
+
+    if context.embedded:
+        out_file = _embedded_out_file_name(in_file, context)
+        context.embedded_file_map[(in_file, context.current_document.in_file)] = out_file
+    else:
+        out_file = _out_file_name(in_file)
+        context.in_to_out_file_map[in_file] = out_file
+
+    if context.progress is not None:
+        context.progress.total = 2 * (len(context.in_to_out_file_map) +
+                                      len(context.embedded_file_map))
+        context.progress.update(0)
+
+    template = Template(filename=os.fspath(in_file), input_encoding="utf-8")
+    template.render(api=api)
 
     if context.progress is not None:
         context.progress.update()
@@ -619,6 +655,10 @@ def _check_links(context: Context):
 
 def _out_file_name(in_file: Path) -> Path:
     return in_file.parent / f".asciidoxy.{in_file.name}"
+
+
+def _embedded_out_file_name(in_file: Path, context: Context) -> Path:
+    return context.current_document.in_file.parent / f".asciidoxy.{uuid.uuid4()}.{in_file.name}"
 
 
 def _docinfo_footer_file_name(in_file: Path) -> Path:

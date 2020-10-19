@@ -27,6 +27,12 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Infrastructure for transcoding documentation from one to another language.
   - Swift: [AD-28] Generating Swift documentation based on Objective C source code.
   - Kotlin: [AD-27] Generating Kotlin documentation based on Java source code.
+  - [AD-15] Allow forcing to embed an included file in multipage mode.
+
+=== Changed
+
+  - Argument `leveloffset` in `api.include` now supports `None` to prevent adding `leveloffset` in
+    the generated AsciiDoc.
 
 === Fixed
 
@@ -35,6 +41,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - [AD-48] Java: Support unmangled annotations.
   - [AD-35] Improve handling of complex closures.
   - Objective C: Support `__autoreleasing` suffix.
+  - Including files in parent directories no longer raises an exception.
 
 
 == 0.6.2 (22 Sep 2020)
