@@ -242,44 +242,7 @@ def test_parameter(helper):
     param = Parameter()
     param.type = ref
     param.name = "arg"
-
-    assert helper.parameter(param) == "arg: xref:swift-tomtom_1_MyType[MyType]"
-
-
-def test_parameter__no_link(helper):
-    ref = TypeRef("swift")
-    ref.name = "MyType"
-    ref.id = "swift-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
-
-    assert helper.parameter(param, link=False) == "arg: MyType"
-
-
-def test_parameter__default_value(helper):
-    ref = TypeRef("swift")
-    ref.name = "MyType"
-    ref.id = "swift-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
     param.default_value = "12"
 
     assert helper.parameter(param,
                             default_value=True) == "arg: xref:swift-tomtom_1_MyType[MyType] = 12"
-
-
-def test_parameter__ignore_default_value(helper):
-    ref = TypeRef("swift")
-    ref.name = "MyType"
-    ref.id = "swift-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
-    param.default_value = "12"
-
-    assert helper.parameter(param, default_value=False) == "arg: xref:swift-tomtom_1_MyType[MyType]"

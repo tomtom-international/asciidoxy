@@ -600,7 +600,7 @@ def test_parameter__ignore_default_value(empty_context):
                             default_value=False) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_parameter_prefix(empty_context):
+def test_parameter__prefix(empty_context):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -614,6 +614,48 @@ def test_parameter_prefix(empty_context):
 
     helper = TemplateHelper(empty_context)
     assert helper.parameter(param) == "vararg const xref:lang-tomtom_1_MyType[MyType] & arg"
+
+
+def test_parameter__param_name_separator(empty_context):
+    class _TemplateHelper(TemplateHelper):
+        PARAM_NAME_SEP = "_@_"
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.prefix = "vararg "
+    param.default_value = "12"
+
+    helper = _TemplateHelper(empty_context)
+    assert helper.parameter(
+        param, default_value=True) == "vararg const xref:lang-tomtom_1_MyType[MyType] &_@_arg = 12"
+
+
+def test_parameter__param_name_first(empty_context):
+    class _TemplateHelper(TemplateHelper):
+        PARAM_NAME_FIRST = True
+
+    ref = TypeRef("lang")
+    ref.name = "MyType"
+    ref.prefix = "const "
+    ref.suffix = " &"
+    ref.id = "lang-tomtom_1_MyType"
+
+    param = Parameter()
+    param.type = ref
+    param.name = "arg"
+    param.prefix = "vararg "
+    param.default_value = "12"
+
+    helper = _TemplateHelper(empty_context)
+    assert helper.parameter(
+        param, default_value=True) == "vararg arg const xref:lang-tomtom_1_MyType[MyType] & = 12"
 
 
 def test_method_signature__no_params(empty_context):

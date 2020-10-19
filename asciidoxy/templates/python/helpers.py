@@ -22,19 +22,14 @@ from asciidoxy.templates.helpers import TemplateHelper
 class PythonTemplateHelper(TemplateHelper):
     NESTED_START: str = "["
     NESTED_END: str = "]"
+    PARAM_NAME_FIRST = True
+    PARAM_NAME_SEP = ": "
 
     def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
-        if default_value and param.default_value:
-            defval = f" = {param.default_value}"
-        else:
-            defval = ""
-
-        if param.type is None or not param.type.name:
-            return f"{param.name}{defval}"
-        if param.type.name in ("self", "cls"):
+        if param.type is not None and param.type.name in ("self", "cls"):
             return param.type.name
 
-        return (f"{param.name}: {self.print_ref(param.type, link=link)}{defval}".strip())
+        return super().parameter(param, link=link, default_value=default_value)
 
     def _method_prefix(self, method: Member, *, link: bool = True) -> str:
         return "def"

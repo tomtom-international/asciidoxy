@@ -91,61 +91,10 @@ def test_parameter(helper):
     param = Parameter()
     param.type = ref
     param.name = "arg"
-
-    assert helper.parameter(param) == "arg: xref:kotlin-tomtom_1_MyType[MyType]"
-
-
-def test_parameter__no_link(helper):
-    ref = TypeRef("kotlin")
-    ref.name = "MyType"
-    ref.id = "kotlin-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
-
-    assert helper.parameter(param, link=False) == "arg: MyType"
-
-
-def test_parameter__default_value(helper):
-    ref = TypeRef("kotlin")
-    ref.name = "MyType"
-    ref.id = "kotlin-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
     param.default_value = "12"
 
     assert helper.parameter(param,
                             default_value=True) == "arg: xref:kotlin-tomtom_1_MyType[MyType] = 12"
-
-
-def test_parameter__ignore_default_value(helper):
-    ref = TypeRef("kotlin")
-    ref.name = "MyType"
-    ref.id = "kotlin-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
-    param.default_value = "12"
-
-    assert helper.parameter(param,
-                            default_value=False) == "arg: xref:kotlin-tomtom_1_MyType[MyType]"
-
-
-def test_parameter__prefix(helper):
-    ref = TypeRef("kotlin")
-    ref.name = "MyType"
-    ref.id = "kotlin-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
-    param.prefix = "vararg "
-
-    assert helper.parameter(param) == "vararg arg: xref:kotlin-tomtom_1_MyType[MyType]"
 
 
 def test_method_signature__no_params_no_return(helper):

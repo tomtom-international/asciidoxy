@@ -369,32 +369,6 @@ def test_parameter(empty_context):
     param = Parameter()
     param.type = ref
     param.name = "arg"
-
-    helper = PythonTemplateHelper(empty_context)
-    assert helper.parameter(param) == "arg: xref:lang-tomtom_1_MyType[MyType]"
-
-
-def test_parameter__no_link(empty_context):
-    ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.id = "lang-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
-
-    helper = PythonTemplateHelper(empty_context)
-    assert helper.parameter(param, link=False) == "arg: MyType"
-
-
-def test_parameter__default_value(empty_context):
-    ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.id = "lang-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
     param.default_value = "12"
 
     helper = PythonTemplateHelper(empty_context)
@@ -402,15 +376,17 @@ def test_parameter__default_value(empty_context):
                             default_value=True) == "arg: xref:lang-tomtom_1_MyType[MyType] = 12"
 
 
-def test_parameter__ignore_default_value(empty_context):
-    ref = TypeRef("lang")
-    ref.name = "MyType"
-    ref.id = "lang-tomtom_1_MyType"
-
+def test_parameter__self(empty_context):
     param = Parameter()
-    param.type = ref
-    param.name = "arg"
-    param.default_value = "12"
+    param.name = "self"
 
     helper = PythonTemplateHelper(empty_context)
-    assert helper.parameter(param, default_value=False) == "arg: xref:lang-tomtom_1_MyType[MyType]"
+    assert helper.parameter(param, default_value=False) == "self"
+
+
+def test_parameter__cls(empty_context):
+    param = Parameter()
+    param.name = "cls"
+
+    helper = PythonTemplateHelper(empty_context)
+    assert helper.parameter(param, default_value=False) == "cls"

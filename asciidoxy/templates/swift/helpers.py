@@ -15,25 +15,15 @@
 
 from typing import Iterator
 
-from asciidoxy.model import Member, Parameter
+from asciidoxy.model import Member
 from asciidoxy.templates.helpers import TemplateHelper
 
 
 class SwiftTemplateHelper(TemplateHelper):
     ARGS_BEFORE_TYPE = True
     ARGS_TO_TYPE = " -> "
-
-    def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
-        if default_value and param.default_value:
-            defval = f" = {param.default_value}"
-        else:
-            defval = ""
-
-        if param.type is None:
-            return f"{param.name}{defval}"
-        if not param.name:
-            return self.print_ref(param.type, link=link)
-        return (f"{param.name}: {self.print_ref(param.type, link=link)}{defval}".strip())
+    PARAM_NAME_FIRST = True
+    PARAM_NAME_SEP = ": "
 
     def _method_prefix(self, method: Member, *, link: bool = True) -> str:
         return "func"

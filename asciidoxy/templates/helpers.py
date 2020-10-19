@@ -31,6 +31,8 @@ class TemplateHelper:
     ARGS_END: str = ")"
     ARGS_BEFORE_TYPE = False
     ARGS_TO_TYPE = ""
+    PARAM_NAME_FIRST = False
+    PARAM_NAME_SEP = " "
 
     def __init__(self,
                  context: Context,
@@ -98,7 +100,19 @@ class TemplateHelper:
         else:
             defval = ""
         prefix = param.prefix or ""
-        return f"{prefix}{self.print_ref(param.type, link=link)} {param.name}{defval}".strip()
+
+        param_type = self.print_ref(param.type, link=link)
+        if not param_type:
+            type_and_name = param.name
+        else:
+            if not param.name:
+                type_and_name = self.print_ref(param.type, link=link)
+            elif self.PARAM_NAME_FIRST:
+                type_and_name = f"{param.name}{self.PARAM_NAME_SEP}{param_type}"
+            else:
+                type_and_name = f"{param_type}{self.PARAM_NAME_SEP}{param.name}"
+
+        return f"{prefix}{type_and_name}{defval}".strip()
 
     def argument_list(self, params: Sequence[Parameter], *, link: bool = True) -> str:
         return f"({', '.join(self.parameter(p, link=link) for p in params)})"
