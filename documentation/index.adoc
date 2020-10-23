@@ -12,27 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = AsciiDoxy
-:notitle:
-:toc: right
-:toc-title: On this page
-${api.multipage_toc()}
-
-----
-    ___              _ _ ____
-   /   |  __________(_|_) __ \____  _  ____  __
-  / /| | / ___/ ___/ / / / / / __ \| |/_/ / / /
- / ___ |(__  ) /__/ / / /_/ / /_/ />  </ /_/ /
-/_/  |_/____/\___/_/_/_____/\____/_/|_|\__, /
-                                      /____/
-----
-
-[ ${api.cross_document_ref("index.adoc", "", "Home")} |
-${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", "", "Usage")} |
-${api.cross_document_ref("examples.adoc", "", "Examples")} |
-${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
-${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
-https://github.com/tomtom-international/asciidoxy[GitHub] ]
+${api.include("_header.adoc", always_embed=True, leveloffset=None)}
 
 image:https://img.shields.io/badge/License-Apache%202.0-green.svg[License, link=LICENSE]
 image:https://img.shields.io/pypi/dm/asciidoxy[pip downloads, link=https://pypi.org/project/asciidoxy]
