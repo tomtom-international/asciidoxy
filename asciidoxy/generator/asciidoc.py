@@ -303,19 +303,6 @@ class Api(object):
         """
         referenced_file_name = Path(file_name)
 
-        if not self._context.preprocessing_run:
-            absolute_file_path = (referenced_file_name if referenced_file_name.is_absolute() else
-                                  self._current_file.parent / referenced_file_name).resolve()
-            if absolute_file_path not in (
-                    d.in_file for d in self._context.current_document.all_documents_in_tree()):
-                msg = (f"Invalid cross-reference from document '{self._current_file}' "
-                       f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
-                       f"is not included anywhere across whole documentation tree.")
-                if self._context.warnings_are_errors:
-                    raise ConsistencyError(msg)
-                else:
-                    logger.warning(msg)
-
         if not self._context.multipage:
             file_path = Path(file_name)
             if not file_path.is_absolute():
@@ -351,28 +338,24 @@ class Api(object):
         Returns:
             AsciiDoc text to include in the document.
         """
+        return ""
 
+    def _render(self,
+                element,
+                insert_filter: InsertionFilter,
+                kind_override: Optional[str] = None) -> str:
         assert element.id
         assert element.language
-        fragment_file = self._context.fragment_dir / f"{element.id}.adoc"
 
         if kind_override is None:
             kind = element.kind
         else:
             kind = kind_override
 
-        rendered_doc = self._template(element.language, kind).render(element=element,
-                                                                     insert_filter=insert_filter,
-                                                                     api_context=self._context,
-                                                                     api=self)
-
-        if not self._context.preprocessing_run:
-            with fragment_file.open("w", encoding="utf-8") as f:
-                print(rendered_doc, file=f)
-
-        asciidoc_options["leveloffset"] = leveloffset
-        attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
-        return f"include::{fragment_file}[{attributes}]"
+        return self._template(element.language, kind).render(element=element,
+                                                             insert_filter=insert_filter,
+                                                             api_context=self._context,
+                                                             api=self)
 
     def include(self,
                 file_name: str,
@@ -416,18 +399,8 @@ class Api(object):
         if not file_path.is_file():
             raise IncludeFileNotFoundError(file_name)
 
-        sub_context = self._context.sub_context()
-        if always_embed:
-            sub_context.embedded = True
-        elif self._context.preprocessing_run:
-            sub_context.current_document = DocumentTreeNode(file_path,
-                                                            self._context.current_document)
-            self._context.current_document.children.append(sub_context.current_document)
-        else:
-            sub_context.current_document = self._context.current_document.find_child(file_path)
-            assert sub_context.current_document is not None
+        out_file = self._sub_api(file_path, always_embed).process_adoc()
 
-        out_file = _process_adoc(file_path, sub_context)
         if self._context.multipage and not always_embed:
             if multipage_link:
                 referenced_file = relative_path(self._current_file, file_path)
@@ -441,6 +414,16 @@ class Api(object):
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
         return f"include::{out_file}[{attributes}]"
+
+    def _sub_api(self, file_path: Path, embedded: bool = False) -> "Api":
+        sub_context = self._context.sub_context()
+        if embedded:
+            sub_context.embedded = True
+        else:
+            sub_context.current_document = self._context.current_document.find_child(file_path)
+            assert sub_context.current_document is not None
+
+        return self.__class__(file_path, sub_context)
 
     def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
@@ -522,14 +505,7 @@ class Api(object):
         Args:
             side: Show the multipage TOC at the `left` or `right` side.
         """
-        if not self._context.multipage or self._context.preprocessing_run:
-            return ""
-
-        toc_content = multipage_toc(self._context.current_document, side)
-        with _docinfo_footer_file_name(self._context.current_document.in_file).open(
-                mode="w", encoding="utf-8") as f:
-            f.write(toc_content)
-        return ":docinfo: private"
+        return ""
 
     def _template(self, lang: str, kind: str) -> Template:
         key = Api.TemplateKey(lang, kind)
@@ -544,6 +520,142 @@ class Api(object):
             except TopLevelLookupException:
                 raise TemplateMissingError(lang, kind)
         return template
+
+    def process_adoc(self):
+        ...
+
+
+class PreprocessingApi(Api):
+    def _sub_api(self, file_path: Path, embedded: bool = False) -> "Api":
+        sub_context = self._context.sub_context()
+        if embedded:
+            sub_context.embedded = True
+        else:
+            sub_context.current_document = DocumentTreeNode(file_path,
+                                                            self._context.current_document)
+            self._context.current_document.children.append(sub_context.current_document)
+
+        return self.__class__(file_path, sub_context)
+
+    def insert_fragment(self,
+                        element,
+                        insert_filter: InsertionFilter,
+                        leveloffset: str = "+1",
+                        kind_override: Optional[str] = None,
+                        **asciidoc_options) -> str:
+        self._render(element, insert_filter, kind_override)
+        return ""
+
+    def process_adoc(self):
+        logger.info(f"Preprocessing {self._current_file}")
+        self._context.preprocessing_run = True
+
+        if self._context.embedded:
+            out_file = _embedded_out_file_name(self._current_file, self._context)
+            self._context.embedded_file_map[(self._current_file,
+                                             self._context.current_document.in_file)] = out_file
+        else:
+            out_file = _out_file_name(self._current_file)
+            self._context.in_to_out_file_map[self._current_file] = out_file
+
+        if self._context.progress is not None:
+            self._context.progress.total = 2 * (len(self._context.in_to_out_file_map) +
+                                                len(self._context.embedded_file_map))
+            self._context.progress.update(0)
+
+        template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
+        template.render(api=self)
+
+        if self._context.progress is not None:
+            self._context.progress.update()
+
+        return out_file
+
+
+class GeneratingApi(Api):
+    def multipage_toc(self, side: str = "left") -> str:
+        if not self._context.multipage:
+            return ""
+
+        toc_content = multipage_toc(self._context.current_document, side)
+        with _docinfo_footer_file_name(self._context.current_document.in_file).open(
+                mode="w", encoding="utf-8") as f:
+            f.write(toc_content)
+        return ":docinfo: private"
+
+    def cross_document_ref(self, file_name: str, anchor: str, link_text: str = None) -> str:
+        referenced_file_name = Path(file_name)
+
+        absolute_file_path = (referenced_file_name if referenced_file_name.is_absolute() else
+                              self._current_file.parent / referenced_file_name).resolve()
+        if absolute_file_path not in (
+                d.in_file for d in self._context.current_document.all_documents_in_tree()):
+            msg = (f"Invalid cross-reference from document '{self._current_file}' "
+                   f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
+                   f"is not included anywhere across whole documentation tree.")
+            if self._context.warnings_are_errors:
+                raise ConsistencyError(msg)
+            else:
+                logger.warning(msg)
+
+        return super().cross_document_ref(file_name, anchor, link_text)
+
+    def insert_fragment(self,
+                        element,
+                        insert_filter: InsertionFilter,
+                        leveloffset: str = "+1",
+                        kind_override: Optional[str] = None,
+                        **asciidoc_options) -> str:
+        """Generate and insert a documentation fragment.
+
+        Args:
+            element:          Python representation of the element to insert.
+            insertion_filter: Filter for members to insert.
+            leveloffset:      Offset of the top header of the inserted text from the top level
+                                  header of the including document.
+            kind_override:    Override the kind of template to use. None to use the kind of
+                                  `element`.
+            asciidoc_options: Any additional option is added as an attribute to the include
+                                  directive in single page mode.
+
+        Returns:
+            AsciiDoc text to include in the document.
+        """
+        rendered_doc = self._render(element, insert_filter, kind_override)
+
+        fragment_file = self._context.fragment_dir / f"{element.id}.adoc"
+        with fragment_file.open("w", encoding="utf-8") as f:
+            print(rendered_doc, file=f)
+
+        asciidoc_options["leveloffset"] = leveloffset
+        attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
+        return f"include::{fragment_file}[{attributes}]"
+
+    def process_adoc(self):
+        logger.info(f"Processing {self._current_file}")
+        self._context.preprocessing_run = False
+        self._context.linked = []
+
+        if self._context.embedded:
+            out_file = self._context.embedded_file_map[(self._current_file,
+                                                        self._context.current_document.in_file)]
+        else:
+            out_file = self._context.in_to_out_file_map[self._current_file]
+
+        template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
+        rendered_doc = template.render(api=self)
+
+        with out_file.open("w", encoding="utf-8") as f:
+            print(rendered_doc, file=f)
+            if self._context.multipage and not self._context.embedded:
+                nav_bar = navigation_bar(self._context.current_document)
+                if nav_bar:
+                    print(nav_bar, file=f)
+
+        if self._context.progress is not None:
+            self._context.progress.update()
+
+        return out_file
 
 
 def process_adoc(in_file: Path,
@@ -579,65 +691,10 @@ def process_adoc(in_file: Path,
     context.multipage = multipage
     context.progress = progress
 
-    _pre_process_adoc(in_file, context)
-    context.linked = []
-    context.preprocessing_run = False
-    _process_adoc(in_file, context)
+    PreprocessingApi(in_file, context).process_adoc()
+    GeneratingApi(in_file, context).process_adoc()
     _check_links(context)
     return context.in_to_out_file_map
-
-
-def _process_adoc(in_file: Path, context: Context):
-    if context.preprocessing_run:
-        return _pre_process_adoc(in_file, context)
-
-    logger.info(f"Processing {in_file}")
-    api = Api(in_file, context)
-
-    if context.embedded:
-        out_file = context.embedded_file_map[(in_file, context.current_document.in_file)]
-    else:
-        out_file = context.in_to_out_file_map[in_file]
-
-    template = Template(filename=os.fspath(in_file), input_encoding="utf-8")
-    rendered_doc = template.render(api=api)
-
-    with out_file.open("w", encoding="utf-8") as f:
-        print(rendered_doc, file=f)
-        if context.multipage and not context.embedded:
-            nav_bar = navigation_bar(context.current_document)
-            if nav_bar:
-                print(nav_bar, file=f)
-
-    if context.progress is not None:
-        context.progress.update()
-
-    return out_file
-
-
-def _pre_process_adoc(in_file: Path, context: Context):
-    logger.info(f"Preprocessing {in_file}")
-    api = Api(in_file, context)
-
-    if context.embedded:
-        out_file = _embedded_out_file_name(in_file, context)
-        context.embedded_file_map[(in_file, context.current_document.in_file)] = out_file
-    else:
-        out_file = _out_file_name(in_file)
-        context.in_to_out_file_map[in_file] = out_file
-
-    if context.progress is not None:
-        context.progress.total = 2 * (len(context.in_to_out_file_map) +
-                                      len(context.embedded_file_map))
-        context.progress.update(0)
-
-    template = Template(filename=os.fspath(in_file), input_encoding="utf-8")
-    template.render(api=api)
-
-    if context.progress is not None:
-        context.progress.update()
-
-    return out_file
 
 
 def _check_links(context: Context):

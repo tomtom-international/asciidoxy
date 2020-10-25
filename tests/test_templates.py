@@ -55,9 +55,9 @@ def _read_fragment(include_statement: str) -> str:
     ("asciidoxy.default_values.Point.increment", "python",
      "fragments/python/function_default_value.adoc"),
 ])
-def test_fragment(api, adoc_data, fragment_dir, element_name, language, expected_result,
+def test_fragment(generating_api, adoc_data, fragment_dir, element_name, language, expected_result,
                   update_expected_results):
-    result = api.insert(element_name, lang=language)
+    result = generating_api.insert(element_name, lang=language)
     content = _read_fragment(result)
     content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
 
@@ -121,10 +121,10 @@ filtered_testdata = [
 
 
 @pytest.mark.parametrize("element_name,language,filter_spec,expected_result", filtered_testdata)
-def test_global_filter(api, adoc_data, fragment_dir, element_name, language, filter_spec,
+def test_global_filter(generating_api, adoc_data, fragment_dir, element_name, language, filter_spec,
                        expected_result, update_expected_results):
-    api.filter(**filter_spec)
-    result = api.insert(element_name, lang=language)
+    generating_api.filter(**filter_spec)
+    result = generating_api.insert(element_name, lang=language)
     content = _read_fragment(result)
     content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
 
@@ -135,9 +135,9 @@ def test_global_filter(api, adoc_data, fragment_dir, element_name, language, fil
 
 
 @pytest.mark.parametrize("element_name,language,filter_spec,expected_result", filtered_testdata)
-def test_local_filter(api, adoc_data, fragment_dir, element_name, language, filter_spec,
+def test_local_filter(generating_api, adoc_data, fragment_dir, element_name, language, filter_spec,
                       expected_result, update_expected_results):
-    result = api.insert(element_name, lang=language, **filter_spec)
+    result = generating_api.insert(element_name, lang=language, **filter_spec)
     content = _read_fragment(result)
     content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
 
@@ -154,10 +154,10 @@ def test_local_filter(api, adoc_data, fragment_dir, element_name, language, filt
     ("OnTrafficEventCallback", "objc", "swift", "fragments/swift/transcoded_block.adoc"),
     ("TpegCauseCode", "objc", "swift", "fragments/swift/transcoded_typedef.adoc"),
 ])
-def test_transcoded_fragment(api, adoc_data, fragment_dir, element_name, source, target,
+def test_transcoded_fragment(generating_api, adoc_data, fragment_dir, element_name, source, target,
                              expected_result, update_expected_results):
-    api.language(target, source=source)
-    result = api.insert(element_name)
+    generating_api.language(target, source=source)
+    result = generating_api.insert(element_name)
     content = _read_fragment(result)
     content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
 

@@ -19,7 +19,9 @@ from pathlib import Path
 
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.doxygenparser import Driver as ParserDriver
-from asciidoxy.generator.asciidoc import Api, Context, DocumentTreeNode
+from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
+from asciidoxy.generator.context import Context
+from asciidoxy.generator.navigation import DocumentTreeNode
 
 from .builders import SimpleClassBuilder
 
@@ -135,8 +137,13 @@ def context(input_file, build_dir, fragment_dir, api_reference):
 
 
 @pytest.fixture
-def api(input_file, context):
-    return Api(input_file, context)
+def preprocessing_api(input_file, context):
+    return PreprocessingApi(input_file, context)
+
+
+@pytest.fixture
+def generating_api(input_file, context):
+    return GeneratingApi(input_file, context)
 
 
 @pytest.fixture
