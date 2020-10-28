@@ -359,6 +359,68 @@ def test_parse_cpp_member_function_with_std_function_argument(api_reference):
 
 
 @pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function_with_complex_std_function_argument(api_reference):
+    member = api_reference.find(
+        "asciidoxy::relative_namespace::InterfaceWithDetailClasses::DoSomething",
+        kind="function",
+        lang="cpp")
+    assert member is not None
+    assert len(member.params) == 3
+
+    param = member.params[0]
+    assert param.name == "text"
+    assert param.type
+
+    param = member.params[1]
+    assert param.name == "success_callback"
+    assert param.type
+    assert param.type.name == "std::function"
+    assert len(param.type.nested) == 1
+    assert param.type.args is None
+
+    nested = param.type.nested[0]
+    assert not nested.name
+    assert nested.returns
+    assert nested.returns.name == "void"
+    assert len(nested.args) == 1
+
+    arg = nested.args[0]
+    assert not arg.name
+    assert arg.type
+    assert arg.type.name == "std::shared_ptr"
+    assert arg.type.prefix == "const "
+    assert arg.type.suffix == " &"
+    assert arg.type.args is None
+    assert len(arg.type.nested) == 1
+
+    nested_again = arg.type.nested[0]
+    assert nested_again.name == "detail::SuccessDescriptor"
+    assert nested_again.id
+    assert nested_again.args is None
+    assert nested_again.nested is None
+
+    param = member.params[2]
+    assert param.name == "error_callback"
+    assert param.type
+    assert param.type.name == "std::function"
+    assert len(param.type.nested) == 1
+    assert param.type.args is None
+
+    nested = param.type.nested[0]
+    assert not nested.name
+    assert nested.returns
+    assert nested.returns.name == "void"
+    assert len(nested.args) == 1
+
+    arg = nested.args[0]
+    assert not arg.name
+    assert arg.type
+    assert arg.type.name == "detail::ErrorDescriptor"
+    assert arg.type.args is None
+    assert arg.type.nested is None
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_parse_cpp_member_function__deleted(api_reference):
     member = api_reference.find("asciidoxy::system::MoveOnly::MoveOnly(const MoveOnly&)",
                                 kind="function",

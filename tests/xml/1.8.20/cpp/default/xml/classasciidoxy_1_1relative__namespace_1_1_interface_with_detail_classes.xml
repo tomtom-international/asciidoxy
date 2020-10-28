@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::relative_namespace::InterfaceWithDetailClasses</compoundname>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes_1a8c43ece59b1a2ab96463b44396f70ecf" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::relative_namespace::InterfaceWithDetailClasses::DoSomething</definition>
+        <argsstring>(const std::string &amp;text, std::function&lt; void(const std::shared_ptr&lt; detail::SuccessDescriptor &gt; &amp;)&gt; success_callback, std::function&lt; void(detail::ErrorDescriptor)&gt; error_callback)</argsstring>
+        <name>DoSomething</name>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>text</declname>
+        </param>
+        <param>
+          <type>std::function&lt; void(const std::shared_ptr&lt; <ref refid="classasciidoxy_1_1relative__namespace_1_1detail_1_1_success_descriptor" kindref="compound">detail::SuccessDescriptor</ref> &gt; &amp;)&gt;</type>
+          <declname>success_callback</declname>
+        </param>
+        <param>
+          <type>std::function&lt; void(<ref refid="classasciidoxy_1_1relative__namespace_1_1detail_1_1_error_descriptor" kindref="compound">detail::ErrorDescriptor</ref>)&gt;</type>
+          <declname>error_callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Do something with piece of text.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>text</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The text to do something with. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>success_callback</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Invoked when successful. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>error_callback</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Invoked on error. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="relative_namespace.hpp" line="44" column="8"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="relative_namespace.hpp" line="35" column="1" bodyfile="relative_namespace.hpp" bodystart="35" bodyend="47"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes_1a8c43ece59b1a2ab96463b44396f70ecf" prot="public" virt="non-virtual"><scope>asciidoxy::relative_namespace::InterfaceWithDetailClasses</scope><name>DoSomething</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

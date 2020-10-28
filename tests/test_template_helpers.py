@@ -149,6 +149,32 @@ def test_print_ref__link__closure(context_mock):
          call(return_type.id, return_type.name)])
 
 
+def test_print_ref__link__complex_closure(context_mock):
+    ref = TypeRef("lang")
+    ref.name = "std::function"
+    ref.nested = [TypeRef("lang")]
+
+    ref.nested[0].returns = TypeRef("lang")
+    ref.nested[0].returns.name = "void"
+    ref.nested[0].args = [Parameter()]
+
+    ref.nested[0].args[0].type = TypeRef("lang")
+    ref.nested[0].args[0].type.name = "std::shared_ptr"
+    ref.nested[0].args[0].type.prefix = "const "
+    ref.nested[0].args[0].type.suffix = "&"
+    ref.nested[0].args[0].type.nested = [TypeRef("lang")]
+
+    ref.nested[0].args[0].type.nested[0].name = "detail::SuccessDescriptor"
+    ref.nested[0].args[0].type.nested[0].id = "lang-successdescriptor"
+
+    helper = TemplateHelper(context_mock)
+    assert (helper.print_ref(ref) ==
+            "std::function&lt;void(const std::shared_ptr&lt;xref:lang-successdescriptor"
+            "[detail::SuccessDescriptor]&gt;&)&gt;")
+    context_mock.link_to_element.assert_has_calls(
+        [call(ref.nested[0].args[0].type.nested[0].id, ref.nested[0].args[0].type.nested[0].name)])
+
+
 def test_print_ref__link__empty_closure(context_mock):
     return_type = TypeRef("lang")
     return_type.name = "MyType"
