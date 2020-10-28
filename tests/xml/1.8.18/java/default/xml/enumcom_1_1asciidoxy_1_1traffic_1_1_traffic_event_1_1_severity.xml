@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kind="enum" language="Java" prot="public">
+    <compoundname>com::asciidoxy::traffic::TrafficEvent::Severity</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1abb3f4d789ff9e6fdb967133fa1ef1625" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>com.asciidoxy.traffic.TrafficEvent.Severity.Low</definition>
+        <argsstring></argsstring>
+        <name>Low</name>
+        <initializer>= 1</initializer>
+        <briefdescription>
+<para>Low severity. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="31" column="1" bodyfile="TrafficEvent.java" bodystart="31" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1aa9555621413c089cc41f0d6a95c1b61b" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>com.asciidoxy.traffic.TrafficEvent.Severity.Medium</definition>
+        <argsstring></argsstring>
+        <name>Medium</name>
+        <initializer>= 2</initializer>
+        <briefdescription>
+<para>Medium severity. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="36" column="1" bodyfile="TrafficEvent.java" bodystart="36" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a0761f7236594c0ea634494296ce21510" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>com.asciidoxy.traffic.TrafficEvent.Severity.High</definition>
+        <argsstring></argsstring>
+        <name>High</name>
+        <initializer>= 3</initializer>
+        <briefdescription>
+<para>High severity. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Better stay away here. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="43" column="1" bodyfile="TrafficEvent.java" bodystart="43" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a41514643a9ae47d769580925859625f5" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>com.asciidoxy.traffic.TrafficEvent.Severity.Unknown</definition>
+        <argsstring></argsstring>
+        <name>Unknown</name>
+        <initializer>= 4</initializer>
+        <briefdescription>
+<para><ref refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kindref="compound">Severity</ref> unknown. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="TrafficEvent.java" line="49" column="1" bodyfile="TrafficEvent.java" bodystart="48" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para><ref refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kindref="compound">Severity</ref> scale for traffic events. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>The more severe the traffic event, the more likely it is to have a large delay. </para>
+    </detaileddescription>
+    <location file="TrafficEvent.java" line="27" column="10" bodyfile="TrafficEvent.java" bodystart="27" bodyend="49"/>
+    <listofallmembers>
+      <member refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a0761f7236594c0ea634494296ce21510" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent::Severity</scope><name>High</name></member>
+      <member refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1abb3f4d789ff9e6fdb967133fa1ef1625" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent::Severity</scope><name>Low</name></member>
+      <member refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1aa9555621413c089cc41f0d6a95c1b61b" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent::Severity</scope><name>Medium</name></member>
+      <member refid="enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a41514643a9ae47d769580925859625f5" prot="public" virt="non-virtual"><scope>com::asciidoxy::traffic::TrafficEvent::Severity</scope><name>Unknown</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

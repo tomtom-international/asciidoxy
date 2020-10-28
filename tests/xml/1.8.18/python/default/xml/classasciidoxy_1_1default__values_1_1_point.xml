@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1default__values_1_1_point" kind="class" language="Python" prot="public">
+    <compoundname>asciidoxy::default_values::Point</compoundname>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1default__values_1_1_point_1ae2454dfa3e6bcf10d9c36975f310b781" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def asciidoxy.default_values.Point.__init__</definition>
+        <argsstring>(self, int x=0, int y=1)</argsstring>
+        <name>__init__</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>x</declname>
+          <defval>0</defval>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>y</declname>
+          <defval>1</defval>
+        </param>
+        <briefdescription>
+<para>Construct a point. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The X coordinate. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The Y coordinate. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/default_values.py" line="24" column="1" bodyfile="asciidoxy/default_values.py" bodystart="24" bodyend="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1default__values_1_1_point_1a7afa9cd9fcbec61efa64cb0f3108c17b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>&quot;Point&quot;</type>
+        <definition> &quot;Point&quot; asciidoxy.default_values.Point.increment</definition>
+        <argsstring>(self, int x=2, int y=3)</argsstring>
+        <name>increment</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>x</declname>
+          <defval>2</defval>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>y</declname>
+          <defval>3</defval>
+        </param>
+        <briefdescription>
+<para>Create a new incremented point. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value to increment the X coordinate with. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value to increment the Y coordinate with.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A new incremented <ref refid="classasciidoxy_1_1default__values_1_1_point" kindref="compound">Point</ref>. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/default_values.py" line="36" column="1" bodyfile="asciidoxy/default_values.py" bodystart="36" bodyend="38"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Class representing a simple point. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="asciidoxy/default_values.py" line="17" column="1" bodyfile="asciidoxy/default_values.py" bodystart="17" bodyend="38"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1default__values_1_1_point_1ae2454dfa3e6bcf10d9c36975f310b781" prot="public" virt="non-virtual"><scope>asciidoxy::default_values::Point</scope><name>__init__</name></member>
+      <member refid="classasciidoxy_1_1default__values_1_1_point_1a7afa9cd9fcbec61efa64cb0f3108c17b" prot="public" virt="non-virtual"><scope>asciidoxy::default_values::Point</scope><name>increment</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

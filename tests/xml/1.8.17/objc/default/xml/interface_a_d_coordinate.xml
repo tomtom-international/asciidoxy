@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="interface_a_d_coordinate" kind="class" language="Objective-C" prot="public">
+    <compoundname>ADCoordinate</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">NSObject</basecompoundref>
+    <includes refid="_a_d_coordinate_8h" local="no">ADCoordinate.h</includes>
+      <sectiondef kind="property">
+      <memberdef kind="property" id="interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94" prot="public" static="no" readable="yes" writable="no" gettable="no" privategettable="no" protectedgettable="no" settable="no" privatesettable="no" protectedsettable="no" accessor="assign">
+        <type>CLLocationDegrees</type>
+        <definition>CLLocationDegrees ADCoordinate::latitude</definition>
+        <argsstring></argsstring>
+        <name>latitude</name>
+        <read></read>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The latitude in degrees. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADCoordinate.h" line="30" column="20" bodyfile="ADCoordinate.h" bodystart="30" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="property" id="interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e" prot="public" static="no" readable="yes" writable="no" gettable="no" privategettable="no" protectedgettable="no" settable="no" privatesettable="no" protectedsettable="no" accessor="assign">
+        <type>CLLocationDegrees</type>
+        <definition>CLLocationDegrees ADCoordinate::longitude</definition>
+        <argsstring></argsstring>
+        <name>longitude</name>
+        <read></read>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The longitude in degrees. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADCoordinate.h" line="35" column="20" bodyfile="ADCoordinate.h" bodystart="35" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="property" id="interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2" prot="public" static="no" readable="yes" writable="no" gettable="no" privategettable="no" protectedgettable="no" settable="no" privatesettable="no" protectedsettable="no" accessor="assign">
+        <type>CLLocationDistance</type>
+        <definition>CLLocationDistance ADCoordinate::altitude</definition>
+        <argsstring></argsstring>
+        <name>altitude</name>
+        <read></read>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The altitude in meters. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADCoordinate.h" line="40" column="21" bodyfile="ADCoordinate.h" bodystart="40" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type>id</type>
+        <definition>id ADCoordinate::isValid</definition>
+        <argsstring>()</argsstring>
+        <name>isValid</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Check if the coordinate is valid.</para>
+<para>A coordinate is valid if its values are within WGS84 bounds.</para>
+<para><simplesect kind="return"><para>True if valid, false if not. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADCoordinate.h" line="40" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type>instancetype</type>
+        <definition>instancetype ADCoordinate::init</definition>
+        <argsstring>()</argsstring>
+        <name>init</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Default constructor. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADCoordinate.h" line="40" column="21"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Class to hold information about a coordinate.</para>
+<para>A coordinate has a latitude, longitude, and an altitude. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>ADCoordinate</label>
+        <link refid="interface_a_d_coordinate"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>NSObject</label>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>ADCoordinate</label>
+        <link refid="interface_a_d_coordinate"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>NSObject</label>
+      </node>
+    </collaborationgraph>
+    <location file="ADCoordinate.h" line="26" column="1" bodyfile="ADCoordinate.h" bodystart="25" bodyend="-1"/>
+    <listofallmembers>
+      <member refid="interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2" prot="public" virt="non-virtual"><scope>ADCoordinate</scope><name>altitude</name></member>
+      <member refid="interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22" prot="public" virt="virtual"><scope>ADCoordinate</scope><name>init</name></member>
+      <member refid="interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321" prot="public" virt="virtual"><scope>ADCoordinate</scope><name>isValid</name></member>
+      <member refid="interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94" prot="public" virt="non-virtual"><scope>ADCoordinate</scope><name>latitude</name></member>
+      <member refid="interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e" prot="public" virt="non-virtual"><scope>ADCoordinate</scope><name>longitude</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="namespaceasciidoxy" kind="namespace" language="C++">
+    <compoundname>asciidoxy</compoundname>
+    <innernamespace refid="namespaceasciidoxy_1_1geometry">asciidoxy::geometry</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1positioning">asciidoxy::positioning</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1traffic">asciidoxy::traffic</innernamespace>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="use__same__from__multiple__namespaces_8hpp_1a6429f99aedd2660dc8352f7179acfef0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Convertor</type>
+        <definition>Convertor asciidoxy::CreateConvertor</definition>
+        <argsstring>()</argsstring>
+        <name>CreateConvertor</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a convertor from namespace asciidoxy. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="use_same_from_multiple_namespaces.hpp" line="24" column="11" declfile="use_same_from_multiple_namespaces.hpp" declline="24" declcolumn="11"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="positioning.hpp" line="20" column="19"/>
+  </compounddef>
+</doxygen>

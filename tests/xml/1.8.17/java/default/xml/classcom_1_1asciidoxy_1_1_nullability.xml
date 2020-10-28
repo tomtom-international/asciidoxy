@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classcom_1_1asciidoxy_1_1_nullability" kind="class" language="Java" prot="public">
+    <compoundname>com::asciidoxy::Nullability</compoundname>
+    <innerclass refid="classcom_1_1asciidoxy_1_1_nullability_1_1_data_class" prot="public">com::asciidoxy::Nullability::DataClass</innerclass>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1_nullability_1a0a549d793bf1081019cd4e6327850683" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>__AT__Nullable__ <ref refid="classcom_1_1asciidoxy_1_1_nullability_1_1_data_class" kindref="compound">DataClass</ref></type>
+        <definition>__AT__Nullable__ DataClass com.asciidoxy.Nullability.getData</definition>
+        <argsstring>()</argsstring>
+        <name>getData</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Nullability.java" line="28" column="39" bodyfile="Nullability.java" bodystart="28" bodyend="28"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1_nullability_1aa427cd90202fad337f52469a8e1de05b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>__AT__NonNull__ <ref refid="classcom_1_1asciidoxy_1_1_nullability_1_1_data_class" kindref="compound">DataClass</ref></type>
+        <definition>__AT__NonNull__ DataClass com.asciidoxy.Nullability.getDataNonNull</definition>
+        <argsstring>()</argsstring>
+        <name>getDataNonNull</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Nullability.java" line="30" column="38" bodyfile="Nullability.java" bodystart="30" bodyend="30"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1_nullability_1a59b5e671b4bae939d78a6d4b7e5ac702" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void com.asciidoxy.Nullability.setData</definition>
+        <argsstring>(__AT__Nullable__ DataClass data)</argsstring>
+        <name>setData</name>
+        <param>
+          <type>__AT__Nullable__ <ref refid="classcom_1_1asciidoxy_1_1_nullability_1_1_data_class" kindref="compound">DataClass</ref></type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Nullability.java" line="32" column="17" bodyfile="Nullability.java" bodystart="32" bodyend="32"/>
+      </memberdef>
+      <memberdef kind="function" id="classcom_1_1asciidoxy_1_1_nullability_1aa730df21d38a8fd682de682c5a14ad0a" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void com.asciidoxy.Nullability.setDataNonNull</definition>
+        <argsstring>(__AT__NonNull__ DataClass data)</argsstring>
+        <name>setDataNonNull</name>
+        <param>
+          <type>__AT__NonNull__ <ref refid="classcom_1_1asciidoxy_1_1_nullability_1_1_data_class" kindref="compound">DataClass</ref></type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Nullability.java" line="34" column="17" bodyfile="Nullability.java" bodystart="34" bodyend="34"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Class for testing nullability annotations. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="Nullability.java" line="24" column="25" bodyfile="Nullability.java" bodystart="24" bodyend="35"/>
+    <listofallmembers>
+      <member refid="classcom_1_1asciidoxy_1_1_nullability_1a0a549d793bf1081019cd4e6327850683" prot="public" virt="non-virtual"><scope>com::asciidoxy::Nullability</scope><name>getData</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1_nullability_1aa427cd90202fad337f52469a8e1de05b" prot="public" virt="non-virtual"><scope>com::asciidoxy::Nullability</scope><name>getDataNonNull</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1_nullability_1a59b5e671b4bae939d78a6d4b7e5ac702" prot="public" virt="non-virtual"><scope>com::asciidoxy::Nullability</scope><name>setData</name></member>
+      <member refid="classcom_1_1asciidoxy_1_1_nullability_1aa730df21d38a8fd682de682c5a14ad0a" prot="public" virt="non-virtual"><scope>com::asciidoxy::Nullability</scope><name>setDataNonNull</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

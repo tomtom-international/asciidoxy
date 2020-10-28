@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="namespaceasciidoxy_1_1system" kind="namespace" language="C++">
+    <compoundname>asciidoxy::system</compoundname>
+    <innerclass refid="classasciidoxy_1_1system_1_1_move_only" prot="public">asciidoxy::system::MoveOnly</innerclass>
+    <innerclass refid="classasciidoxy_1_1system_1_1_service" prot="public">asciidoxy::system::Service</innerclass>
+    <innerclass refid="classasciidoxy_1_1system_1_1_service_starter" prot="public">asciidoxy::system::ServiceStarter</innerclass>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="service_8hpp_1a7c44d1c4b121bf30bf90a517f8ff9fbc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classasciidoxy_1_1system_1_1_service" kindref="compound">Service</ref> &gt;</type>
+        <definition>std::unique_ptr&lt;Service&gt; asciidoxy::system::CreateService</definition>
+        <argsstring>(std::string name)</argsstring>
+        <name>CreateService</name>
+        <param>
+          <type>std::string</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a new service.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Name of the service to create. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The new service, or an empty pointer if it could not be created. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="service.hpp" line="60" column="17" declfile="service.hpp" declline="60" declcolumn="17"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="move_only.hpp" line="18" column="16"/>
+  </compounddef>
+</doxygen>

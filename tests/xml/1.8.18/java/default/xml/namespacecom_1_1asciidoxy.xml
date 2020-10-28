@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="namespacecom_1_1asciidoxy" kind="namespace" language="Java">
+    <compoundname>com::asciidoxy</compoundname>
+    <innerclass refid="classcom_1_1asciidoxy_1_1_nullability" prot="public">com::asciidoxy::Nullability</innerclass>
+    <innernamespace refid="namespacecom_1_1asciidoxy_1_1geometry">com::asciidoxy::geometry</innernamespace>
+    <innernamespace refid="namespacecom_1_1asciidoxy_1_1system">com::asciidoxy::system</innernamespace>
+    <innernamespace refid="namespacecom_1_1asciidoxy_1_1traffic">com::asciidoxy::traffic</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="[generated]" line="1" column="1"/>
+  </compounddef>
+</doxygen>
