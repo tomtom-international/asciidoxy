@@ -271,6 +271,7 @@ class TypeParser:
             arg_types, tokens = cls.arg_types(tokens, driver, parent)
         except TypeParseError as e:
             logger.warning(f"Failed to parse args: {e}")
+            return fallback()
 
         if not names:
             logger.warning(f"No name found in `{'`,`'.join(t.text for t in original_tokens)}`")

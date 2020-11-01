@@ -40,6 +40,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - [AD-35] Improve handling of complex closures.
   - Objective C: Support `__autoreleasing` suffix.
   - Including files in parent directories no longer raises an exception.
+  - [AD-46] Always fall back to original name if type parsing fails.
 
 
 == 0.6.2 (22 Sep 2020)
