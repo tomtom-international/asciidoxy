@@ -770,11 +770,11 @@ def test_type_parser__type_from_tokens__unexpected_trailing_tokens(tokens, expec
     ([qualifier("const")], ExpectedType(None, "const", None)),
     ([operator("*")], ExpectedType(None, "*", None)),
     ([nested_start()], ExpectedType(None, "<", None)),
-    ([name("MyType"), nested_start()], ExpectedType(None, "MyType", "<")),
-    ([name("MyType"), nested_start(), name("OtherType")], ExpectedType(
-        None, "MyType", "<OtherType")),
+    ([name("MyType"), nested_start()], ExpectedType(None, "MyType<", None)),
+    ([name("MyType"), nested_start(), name("OtherType")
+      ], ExpectedType(None, "MyType<OtherType", None)),
     ([name("MyType"), nested_start(),
-      name("OtherType"), nested_sep()], ExpectedType(None, "MyType", "<OtherType,")),
+      name("OtherType"), nested_sep()], ExpectedType(None, "MyType<OtherType,", None)),
 ])
 def test_type_parser__type_from_tokens__invalid_token_sequence(tokens, expected):
     type_ref = TestParser.type_from_tokens(tokens)

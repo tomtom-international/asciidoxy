@@ -173,15 +173,19 @@ class InnerClassFilter(ElementFilter):
     Attributes:
         name_filter: Filter for the name of the members to include.
         kind_filter: Filter for the kind of the members to include.
+        prot_filter: Filter for the protection level of the members to include.
     """
     name_filter: StringFilter
     kind_filter: StringFilter
+    prot_filter: StringFilter
 
     def __init__(self,
                  name_filter: Optional[StringFilter] = None,
-                 kind_filter: Optional[StringFilter] = None):
+                 kind_filter: Optional[StringFilter] = None,
+                 prot_filter: Optional[StringFilter] = None):
         self.name_filter = name_filter or AllStringFilter()
         self.kind_filter = kind_filter or AllStringFilter()
+        self.prot_filter = prot_filter or AllStringFilter()
 
     def __call__(self, ref: InnerTypeReference) -> bool:
         """Apply the filter to an inner class.
@@ -194,6 +198,8 @@ class InnerClassFilter(ElementFilter):
         if self.name_filter(ref.referred_object.name) is FilterAction.EXCLUDE:
             return False
         if self.kind_filter(ref.referred_object.kind) is FilterAction.EXCLUDE:
+            return False
+        if self.prot_filter(ref.prot) is FilterAction.EXCLUDE:
             return False
         return True
 

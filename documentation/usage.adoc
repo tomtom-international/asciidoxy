@@ -46,7 +46,7 @@ documentation.
 
 To run AsciiDoxy you need at least:
 
-- https://www.python.org/[python 3.6, 3.7 or 3.8]
+- https://www.python.org/[python 3.6, 3.7, 3.8, or 3.9]
 - https://asciidoctor.org/[AsciiDoctor]
 
 To extract documentation from source code you need:
@@ -55,7 +55,7 @@ To extract documentation from source code you need:
 
 AsciiDoxy has been tested with:
 
-- python: 3.6, 3.7, 3.8
+- python: 3.6, 3.7, 3.8, 3.9
 - AsciiDoctor: 2.0.10
 - Doxygen: 1.8.16, 1.8.18, 1.8.20
 
@@ -139,10 +139,11 @@ JAVADOC_AUTOBRIEF      = YES
 OPTIMIZE_OUTPUT_JAVA   = YES
 ----
 
-Doxygen removes all annotations. To trick Doxygen into passing annotations to AsciiDoxy, you need
-to transform them into a name that does not contain `@`. AsciiDoxy supports changing type prefixes
-like `+++__AT__Annotation__+++` back into `@Annotation`. For example to pass through all annotations with
-information about nullability, add the following to the Doxygen file:
+Doxygen does not support all kinds of annotations. For example the annotations of return types are
+removed. To trick Doxygen into passing annotations to AsciiDoxy, you need to transform them into a
+name that does not contain `@`. AsciiDoxy supports changing type prefixes like
+`+++__AT__Annotation__+++` back into `@Annotation`. For example to pass through all annotations
+with information about nullability, add the following to the Doxygen file:
 
 ----
 FILTER_PATTERNS        = *.java="sed -E 's/@(Nullable|NonNull|CheckForNull|PossiblyNull)([[:space:]]+[[:alnum:]_])/__AT__\1__\2/g'"

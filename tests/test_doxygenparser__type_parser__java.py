@@ -66,6 +66,24 @@ def test_parse_java_type_with_mangled_annotation(java_type_prefix):
     assert not type_ref.nested
 
 
+def test_parse_java_type_with_original_annotation(java_type_prefix):
+    type_element = ET.Element("type")
+    type_element.text = f"{java_type_prefix}@Nullable Data"
+
+    driver_mock = MagicMock()
+    type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_called_once_with(type_ref)
+
+    assert type_ref is not None
+    assert type_ref.id is None
+    assert type_ref.kind is None
+    assert type_ref.language == "java"
+    assert type_ref.name == "Data"
+    assert type_ref.prefix == f"{java_type_prefix}@Nullable "
+    assert not type_ref.suffix
+    assert not type_ref.nested
+
+
 @pytest.mark.parametrize("generic_prefix, generic_name",
                          [("? extends ", "Unit"), ("T extends ", "Unit"), ("T extends ", "Unit "),
                           ("? super ", "Unit"), ("T super ", "Unit"), ("", "T "), ("", "T")])

@@ -20,6 +20,15 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.6.3 (1 Nov 2020)
+
+=== Fixed
+
+  - [AD-33] Actually allow filtering of inner classes by visibility.
+  - [AD-46] Always fall back to original name if type parsing fails.
+  - [AD-48] Java: Support unmangled annotations.
+
+
 == 0.6.2 (22 Sep 2020)
 
 === Added

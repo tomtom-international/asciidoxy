@@ -153,7 +153,7 @@ class Api(object):
             members:       Filter to apply to members of a compound. Supports filtering on `name`,
                                `kind`, and `prot`ection level.
             inner_classes: Filter to apply to inner classes of a compound. Supports filtering on
-                               `name` and `kind`.
+                               `name`, `kind`, and `prot`ection level.
             enum_values:   Filter to apply to enum values of a compound or member. Supports
                                filtering on `name` only.
             exceptions:    Filter to apply to exceptions thrown by a member. Supports filtering on
@@ -192,7 +192,7 @@ class Api(object):
             members:              Filter to apply to members of a compound. Supports filtering on
                                       `name`, `kind`, and `prot`ection level.
             inner_classes:        Filter to apply to inner classes of a compound. Supports
-                                      filtering on `name` and `kind`.
+                                      filtering on `name`, `kind`, and `prot`ection level.
             enum_values:          Filter to apply to enum values of a compound or member. Supports
                                       filtering on `name` only.
             exceptions:           Filter to apply to exceptions thrown by a member. Supports

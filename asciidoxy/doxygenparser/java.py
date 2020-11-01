@@ -132,10 +132,12 @@ class JavaTypeParser(TypeParser):
     @staticmethod
     def detect_annotations(tokens: List[Token]) -> List[Token]:
         for token in tokens:
-            if (token.category == TokenCategory.NAME and token.text
-                    and token.text.startswith("__AT__") and token.text.endswith("__")):
-                token.category = TokenCategory.ANNOTATION
-                token.text = f"@{token.text[6:-2]}"
+            if token.category == TokenCategory.NAME and token.text:
+                if token.text.startswith("__AT__") and token.text.endswith("__"):
+                    token.category = TokenCategory.ANNOTATION
+                    token.text = f"@{token.text[6:-2]}"
+                elif token.text.startswith("@"):
+                    token.category = TokenCategory.ANNOTATION
 
         return tokens
 
