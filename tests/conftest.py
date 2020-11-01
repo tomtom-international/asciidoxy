@@ -132,7 +132,6 @@ def context(input_file, build_dir, fragment_dir, api_reference):
                 fragment_dir=fragment_dir,
                 reference=api_reference,
                 current_document=DocumentTreeNode(input_file))
-    c.preprocessing_run = False
     return c
 
 

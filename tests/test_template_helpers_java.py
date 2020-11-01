@@ -52,8 +52,8 @@ def java_class():
 
 
 @pytest.fixture
-def helper(java_class, empty_context):
-    return JavaTemplateHelper(empty_context, java_class, InsertionFilter())
+def helper(java_class, generating_api):
+    return JavaTemplateHelper(generating_api, java_class, InsertionFilter())
 
 
 def test_public_constructors__no_filter(helper):

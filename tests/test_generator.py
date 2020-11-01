@@ -258,14 +258,11 @@ def test_insert_error_when_ambiguous(generating_api):
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
-def test_insert_tracks_all_references(preprocessing_api, generating_api, context):
-    for api in (preprocessing_api, generating_api):
-        context.linked = []
-        api.insert("asciidoxy::positioning::Positioning")
-        assert len(context.linked) == 10
-        linked_names = [link.name for link in context.linked]
-        assert "Coordinate" in linked_names
-        assert "TrafficEvent" in linked_names
+def test_insert_tracks_all_references(preprocessing_api, context):
+    preprocessing_api.insert("asciidoxy::positioning::Positioning")
+    assert len(context.linked) == 2
+    assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
+    assert "cpp-classasciidoxy_1_1traffic_1_1_traffic_event" in context.linked
 
 
 def test_insert_class__global_filter_members(generating_api):
@@ -856,3 +853,39 @@ def test_require_version__optimistic_no_minor_increase(preprocessing_api):
     version = ".".join(version_parts)
     with pytest.raises(IncompatibleVersionError):
         preprocessing_api.require_version(f"~={version}")
+
+
+def test_context_link_to_element_singlepage(context, generating_api):
+    element_id = "element"
+    file_containing_element = "other_file.adoc"
+    link_text = "Link"
+    context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
+    assert generating_api.link_to_element(element_id,
+                                          link_text) == f"xref:{element_id}[{link_text}]"
+
+
+def test_context_link_to_element_multipage(context, multipage, generating_api):
+    element_id = "element"
+    file_containing_element = "other_file.adoc"
+    link_text = "Link"
+    context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
+    assert (generating_api.link_to_element(
+        element_id, link_text) == f"xref:{file_containing_element}#{element_id}[{link_text}]")
+
+
+def test_context_link_to_element_multipage_element_in_the_same_document(
+        context, multipage, generating_api):
+    element_id = "element"
+    link_text = "Link"
+    context.inserted[element_id] = context.current_document.in_file
+    assert (generating_api.link_to_element(element_id,
+                                           link_text) == f"xref:{element_id}[{link_text}]")
+
+
+def test_context_link_to_element_element_not_inserted(context, single_and_multipage,
+                                                      generating_api):
+    element_id = "element"
+    link_text = "Link"
+    assert element_id not in context.inserted
+    assert generating_api.link_to_element(element_id,
+                                          link_text) == f"xref:{element_id}[{link_text}]"

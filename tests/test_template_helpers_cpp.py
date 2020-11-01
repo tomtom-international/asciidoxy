@@ -22,8 +22,8 @@ from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 
 
 @pytest.fixture
-def helper(empty_context, cpp_class):
-    return CppTemplateHelper(empty_context, cpp_class, InsertionFilter())
+def helper(generating_api, cpp_class):
+    return CppTemplateHelper(generating_api, cpp_class, InsertionFilter())
 
 
 def test_public_constructors__no_filter(helper):

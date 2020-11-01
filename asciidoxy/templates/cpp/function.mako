@@ -16,7 +16,7 @@ from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 %>
 
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [%autofit]
 [source,cpp,subs="-specialchars,macros+"]
@@ -25,6 +25,6 @@ ${api_context.insert(element)}
 #include &lt;${element.include}&gt;
 
 % endif
-${CppTemplateHelper(api_context).method_signature(element)}
+${CppTemplateHelper(api).method_signature(element)}
 ----
 <%include file="/cpp/_function.mako"/>

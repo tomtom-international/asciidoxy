@@ -18,11 +18,11 @@ from asciidoxy.templates.helpers import has
 from asciidoxy.templates.python.helpers import PythonTemplateHelper
 %>
 <%
-helper = PythonTemplateHelper(api_context, element, insert_filter)
+helper = PythonTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,python,subs="-specialchars,macros+"]
 ----
@@ -97,7 +97,7 @@ ${api.insert_fragment(constructor, insert_filter)}
 ###################################################################################### Variables ##
 % for variable in helper.public_variables():
 [[${variable.id},${variable.name}]]
-${api_context.insert(variable)}
+${api.inserted(variable)}
 
 [source,python,subs="-specialchars,macros+"]
 ----

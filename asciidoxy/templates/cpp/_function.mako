@@ -16,7 +16,7 @@ from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 %>
 <%
-helper = CppTemplateHelper(api_context)
+helper = CppTemplateHelper(api)
 %>
 ${element.brief}
 

@@ -18,11 +18,11 @@ from asciidoxy.templates.helpers import has
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 %>
 <%
-helper = JavaTemplateHelper(api_context, element, insert_filter)
+helper = JavaTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,java,subs="-specialchars,macros+"]
 ----
@@ -72,7 +72,7 @@ ${method.brief}
 ###################################################################################### Constants ##
 % for constant in helper.public_constants():
 [[${constant.id},${constant.name}]]
-${api_context.insert(constant)}
+${api.inserted(constant)}
 [source,java,subs="-specialchars,macros+"]
 ----
 ${constant.returns.type.name} ${constant.name}
@@ -87,7 +87,7 @@ ${constant.description}
 ################################################################################# Static methods ##
 % for method in helper.public_static_methods():
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)}
@@ -132,7 +132,7 @@ ${exception.description}
 ######################################################################################## Methods ##
 % for method in helper.public_methods():
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)}

@@ -127,8 +127,8 @@ def test_params__no_type():
 
 
 @pytest.fixture
-def helper(empty_context, python_class):
-    return PythonTemplateHelper(empty_context, python_class, InsertionFilter())
+def helper(generating_api, python_class):
+    return PythonTemplateHelper(generating_api, python_class, InsertionFilter())
 
 
 def test_public_static_methods__no_filter(helper):
@@ -216,18 +216,18 @@ def test_public_variables__filter_no_match(helper):
     assert not result
 
 
-def test_method_signature__no_params(empty_context):
+def test_method_signature__no_params(generating_api):
     method = Member("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
     method.returns.type = TypeRef("python", "None")
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert helper.method_signature(method) == "def ShortMethod() -> None"
 
 
-def test_method_signature__single_param(empty_context):
+def test_method_signature__single_param(generating_api):
     method = Member("python")
     method.name = "ShortMethod"
 
@@ -238,11 +238,11 @@ def test_method_signature__single_param(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert helper.method_signature(method) == "def ShortMethod(value: int) -> int"
 
 
-def test_method_signature__single_param__too_wide(empty_context):
+def test_method_signature__single_param__too_wide(generating_api):
     method = Member("python")
     method.name = "ShortMethod"
 
@@ -253,13 +253,13 @@ def test_method_signature__single_param__too_wide(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
 def ShortMethod(
     value: int) -> str""")
 
 
-def test_method_signature__multiple_params(empty_context):
+def test_method_signature__multiple_params(generating_api):
     method = Member("python")
     method.name = "ShortMethod"
 
@@ -274,14 +274,14 @@ def test_method_signature__multiple_params(empty_context):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("python", "str")
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert (helper.method_signature(method) == """\
 def ShortMethod(value: int,
                 other_value: float,
                 text: str) -> None""")
 
 
-def test_method_signature__multiple_params__first_param_too_wide(empty_context):
+def test_method_signature__multiple_params__first_param_too_wide(generating_api):
     method = Member("python")
     method.name = "ShortMethod"
 
@@ -296,7 +296,7 @@ def test_method_signature__multiple_params__first_param_too_wide(empty_context):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("python", "str")
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
 def ShortMethod(
     value: int,
@@ -304,7 +304,7 @@ def ShortMethod(
     text: str) -> None""")
 
 
-def test_method_signature__multiple_params__last_param_too_wide(empty_context):
+def test_method_signature__multiple_params__last_param_too_wide(generating_api):
     method = Member("python")
     method.name = "ShortMethod"
 
@@ -319,7 +319,7 @@ def test_method_signature__multiple_params__last_param_too_wide(empty_context):
     method.params[2].name = "text" * 10
     method.params[2].type = TypeRef("python", "str")
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=40) == f"""\
 def ShortMethod(
     value: int,
@@ -327,7 +327,7 @@ def ShortMethod(
     {"text" * 10}: str) -> Type""")
 
 
-def test_method_signature__ignore_return_type_xref_length(empty_context):
+def test_method_signature__ignore_return_type_xref_length(generating_api):
     method = Member("python")
     method.name = "ShortMethod"
 
@@ -339,12 +339,12 @@ def test_method_signature__ignore_return_type_xref_length(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert (
         helper.method_signature(method) == f"def ShortMethod(value: int) -> xref:{'ab' * 80}[Type]")
 
 
-def test_method_signature__ignore_param_type_xref_length(empty_context):
+def test_method_signature__ignore_param_type_xref_length(generating_api):
     method = Member("python")
     method.name = "ShortMethod"
 
@@ -356,12 +356,12 @@ def test_method_signature__ignore_param_type_xref_length(empty_context):
     method.params[0].type = TypeRef("python", "int")
     method.params[0].type.id = "ab" * 80
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert (
         helper.method_signature(method) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")
 
 
-def test_parameter(empty_context):
+def test_parameter(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.id = "lang-tomtom_1_MyType"
@@ -371,22 +371,22 @@ def test_parameter(empty_context):
     param.name = "arg"
     param.default_value = "12"
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert helper.parameter(param,
                             default_value=True) == "arg: xref:lang-tomtom_1_MyType[MyType] = 12"
 
 
-def test_parameter__self(empty_context):
+def test_parameter__self(generating_api):
     param = Parameter()
     param.name = "self"
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert helper.parameter(param, default_value=False) == "self"
 
 
-def test_parameter__cls(empty_context):
+def test_parameter__cls(generating_api):
     param = Parameter()
     param.name = "cls"
 
-    helper = PythonTemplateHelper(empty_context)
+    helper = PythonTemplateHelper(generating_api)
     assert helper.parameter(param, default_value=False) == "cls"

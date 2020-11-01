@@ -16,12 +16,12 @@
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 %>
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-typedef ${SwiftTemplateHelper(api_context).print_ref(element.returns.type)} ${element.name}
+typedef ${SwiftTemplateHelper(api).print_ref(element.returns.type)} ${element.name}
 ----
 ${element.brief}
 

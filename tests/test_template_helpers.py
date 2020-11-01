@@ -17,72 +17,71 @@ Tests for the shared template helpers.
 
 import pytest
 
-from unittest.mock import call, patch
+from unittest.mock import call, Mock
 
 from asciidoxy.templates.helpers import has, has_any, TemplateHelper
 from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
 
 
 @pytest.fixture
-def context_mock(empty_context):
-    with patch("asciidoxy.generator.asciidoc.Context", wraps=empty_context) as mock:
-        yield mock
+def api_mock(generating_api):
+    return Mock(wraps=generating_api)
 
 
-def test_print_ref__link__empty(context_mock):
+def test_print_ref__link__empty(api_mock):
     ref = TypeRef("lang")
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref) == ""
-    context_mock.assert_not_called()
+    api_mock.link_to_element.assert_not_called()
 
 
-def test_print_ref__link__none(context_mock):
-    helper = TemplateHelper(context_mock)
+def test_print_ref__link__none(api_mock):
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(None) == ""
-    context_mock.assert_not_called()
+    api_mock.link_to_element.assert_not_called()
 
 
-def test_print_ref__link__name_only(context_mock):
+def test_print_ref__link__name_only(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref) == "MyType"
-    context_mock.assert_not_called()
+    api_mock.link_to_element.assert_not_called()
 
 
-def test_print_ref__link__name_prefix_suffix_no_id(context_mock):
+def test_print_ref__link__name_prefix_suffix_no_id(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
     ref.suffix = " &"
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref) == "const MyType &"
-    context_mock.assert_not_called()
+    api_mock.link_to_element.assert_not_called()
 
 
-def test_print_ref__link__name_prefix_suffix_with_id(context_mock):
+def test_print_ref__link__name_prefix_suffix_with_id(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
     ref.suffix = " &"
     ref.id = "lang-tomtom_1_MyType"
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType] &"
-    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+    api_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
-def test_print_ref__link__strip_surrounding_whitespace(context_mock):
+def test_print_ref__link__strip_surrounding_whitespace(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "  const "
     ref.suffix = " &  "
     ref.id = "lang-tomtom_1_MyType"
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType] &"
-    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+    api_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
-def test_print_ref__link__nested_types(context_mock):
+def test_print_ref__link__nested_types(api_mock):
     nested_type_with_id = TypeRef("lang")
     nested_type_with_id.name = "Nested1"
     nested_type_with_id.id = "lang-nested1"
@@ -97,15 +96,15 @@ def test_print_ref__link__nested_types(context_mock):
     ref.id = "lang-tomtom_1_MyType"
     ref.nested = [nested_type_with_id, nested_type_without_id]
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert (helper.print_ref(ref) ==
             "const xref:lang-tomtom_1_MyType[MyType]&lt;xref:lang-nested1[Nested1], Nested2&gt; &")
-    context_mock.link_to_element.assert_has_calls(
+    api_mock.link_to_element.assert_has_calls(
         [call(nested_type_with_id.id, nested_type_with_id.name),
          call(ref.id, ref.name)])
 
 
-def test_print_ref__link__empty_nested_types(context_mock):
+def test_print_ref__link__empty_nested_types(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -113,12 +112,12 @@ def test_print_ref__link__empty_nested_types(context_mock):
     ref.id = "lang-tomtom_1_MyType"
     ref.nested = []
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType]&lt;&gt; &"
-    context_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
+    api_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
-def test_print_ref__link__closure(context_mock):
+def test_print_ref__link__closure(api_mock):
     arg1_type = TypeRef("lang")
     arg1_type.name = "ArgType1"
     arg1_type.id = "lang-argtype1"
@@ -141,15 +140,15 @@ def test_print_ref__link__closure(context_mock):
     ref.args = [arg1, arg2]
     ref.returns = return_type
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert (helper.print_ref(ref) ==
             "xref:lang-tomtom_1_MyType[MyType](xref:lang-argtype1[ArgType1], ArgType2 value)")
-    context_mock.link_to_element.assert_has_calls(
+    api_mock.link_to_element.assert_has_calls(
         [call(arg1_type.id, arg1_type.name),
          call(return_type.id, return_type.name)])
 
 
-def test_print_ref__link__complex_closure(context_mock):
+def test_print_ref__link__complex_closure(api_mock):
     ref = TypeRef("lang")
     ref.name = "std::function"
     ref.nested = [TypeRef("lang")]
@@ -167,15 +166,15 @@ def test_print_ref__link__complex_closure(context_mock):
     ref.nested[0].args[0].type.nested[0].name = "detail::SuccessDescriptor"
     ref.nested[0].args[0].type.nested[0].id = "lang-successdescriptor"
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert (helper.print_ref(ref) ==
             "std::function&lt;void(const std::shared_ptr&lt;xref:lang-successdescriptor"
             "[detail::SuccessDescriptor]&gt;&)&gt;")
-    context_mock.link_to_element.assert_has_calls(
+    api_mock.link_to_element.assert_has_calls(
         [call(ref.nested[0].args[0].type.nested[0].id, ref.nested[0].args[0].type.nested[0].name)])
 
 
-def test_print_ref__link__empty_closure(context_mock):
+def test_print_ref__link__empty_closure(api_mock):
     return_type = TypeRef("lang")
     return_type.name = "MyType"
     return_type.prefix = "const "
@@ -186,12 +185,12 @@ def test_print_ref__link__empty_closure(context_mock):
     ref.args = []
     ref.returns = return_type
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType] &()"
-    context_mock.link_to_element.assert_called_once_with(return_type.id, return_type.name)
+    api_mock.link_to_element.assert_called_once_with(return_type.id, return_type.name)
 
 
-def test_print_ref__link__closure_with_nested_types__custom_start_and_end(context_mock):
+def test_print_ref__link__closure_with_nested_types__custom_start_and_end(api_mock):
     nested_type = TypeRef("lang")
     nested_type.name = "Nested1"
 
@@ -219,51 +218,51 @@ def test_print_ref__link__closure_with_nested_types__custom_start_and_end(contex
         ARGS_START: str = "@"
         ARGS_END: str = "#"
 
-    helper = TestHelper(context_mock)
+    helper = TestHelper(api_mock)
     assert (helper.print_ref(ref) ==
             "const xref:lang-tomtom_1_MyType[MyType]{Nested1; &@xref:lang-argtype[ArgType]#")
 
 
-def test_print_ref__no_link__empty(context_mock):
+def test_print_ref__no_link__empty(api_mock):
     ref = TypeRef("lang")
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == ""
 
 
-def test_print_ref__no_link__none(context_mock):
-    helper = TemplateHelper(context_mock)
+def test_print_ref__no_link__none(api_mock):
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(None, link=False) == ""
 
 
-def test_print_ref__no_link__name_only(context_mock):
+def test_print_ref__no_link__name_only(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.id = "lang-mytype"
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == "MyType"
 
 
-def test_print_ref__no_link__name_prefix_suffix_no_id(context_mock):
+def test_print_ref__no_link__name_prefix_suffix_no_id(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.id = "lang-mytype"
     ref.prefix = "const "
     ref.suffix = " &"
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == "const MyType &"
 
 
-def test_print_ref__no_link__strip_surrounding_whitespace(context_mock):
+def test_print_ref__no_link__strip_surrounding_whitespace(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.id = "lang-mytype"
     ref.prefix = "\tconst "
     ref.suffix = " &  "
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == "const MyType &"
 
 
-def test_print_ref__no_link__nested_types(context_mock):
+def test_print_ref__no_link__nested_types(api_mock):
     nested_type_with_id = TypeRef("lang")
     nested_type_with_id.name = "Nested1"
     nested_type_with_id.id = "lang-nested1"
@@ -278,11 +277,11 @@ def test_print_ref__no_link__nested_types(context_mock):
     ref.id = "lang-tomtom_1_MyType"
     ref.nested = [nested_type_with_id, nested_type_without_id]
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == "const MyType&lt;Nested1, Nested2&gt; &"
 
 
-def test_print_ref__no_link__empty_nested_types(context_mock):
+def test_print_ref__no_link__empty_nested_types(api_mock):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -290,11 +289,11 @@ def test_print_ref__no_link__empty_nested_types(context_mock):
     ref.id = "lang-tomtom_1_MyType"
     ref.nested = []
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == "const MyType&lt;&gt; &"
 
 
-def test_print_ref__no_link__closure(context_mock):
+def test_print_ref__no_link__closure(api_mock):
     arg1_type = TypeRef("lang")
     arg1_type.name = "ArgType1"
     arg1_type.id = "lang-argtype1"
@@ -319,11 +318,11 @@ def test_print_ref__no_link__closure(context_mock):
     ref.returns = return_type
     ref.args = [arg1, arg2]
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == "const MyType&(ArgType1, ArgType2 value)"
 
 
-def test_print_ref__no_link__empty_closure(context_mock):
+def test_print_ref__no_link__empty_closure(api_mock):
     return_type = TypeRef("lang")
     return_type.name = "MyType"
     return_type.prefix = "const "
@@ -334,11 +333,11 @@ def test_print_ref__no_link__empty_closure(context_mock):
     ref.args = []
     ref.returns = return_type
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == "const MyType &()"
 
 
-def test_print_ref__no_link__closure_with_nested_type__custom_start_and_end(context_mock):
+def test_print_ref__no_link__closure_with_nested_type__custom_start_and_end(api_mock):
     nested_type = TypeRef("lang")
     nested_type.name = "Nested1"
 
@@ -366,11 +365,11 @@ def test_print_ref__no_link__closure_with_nested_type__custom_start_and_end(cont
         ARGS_START: str = "@"
         ARGS_END: str = "#"
 
-    helper = TestHelper(context_mock)
+    helper = TestHelper(api_mock)
     assert (helper.print_ref(ref, link=False) == "const MyType{Nested1; &@ArgType#")
 
 
-def test_print_ref__no_link__closure_prefix_suffix(context_mock):
+def test_print_ref__no_link__closure_prefix_suffix(api_mock):
     arg1_type = TypeRef("lang")
     arg1_type.name = "ArgType1"
     arg1_type.id = "lang-argtype1"
@@ -397,16 +396,16 @@ def test_print_ref__no_link__closure_prefix_suffix(context_mock):
     ref.prefix = "final "
     ref.suffix = "*"
 
-    helper = TemplateHelper(context_mock)
+    helper = TemplateHelper(api_mock)
     assert helper.print_ref(ref, link=False) == "final (const MyType&(ArgType1, ArgType2 value))*"
 
 
-def test_argument_list__empty(empty_context):
-    helper = TemplateHelper(empty_context)
+def test_argument_list__empty(generating_api):
+    helper = TemplateHelper(generating_api)
     assert helper.argument_list([]) == "()"
 
 
-def test_argument_list(empty_context):
+def test_argument_list(generating_api):
     type1 = TypeRef("lang")
     type1.prefix = "const "
     type1.name = "Type1"
@@ -431,13 +430,13 @@ def test_argument_list(empty_context):
     param3.type = type3
     param3.name = "arg3"
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert (helper.argument_list([param1, param2,
                                   param3]) == "(const Type1, xref:lang-type2[Type2] & arg2, "
             "Type3&lt;const Type1, xref:lang-type2[Type2] &&gt; arg3)")
 
 
-def test_type_list(empty_context):
+def test_type_list(generating_api):
     type1 = TypeRef("lang")
     type1.prefix = "const "
     type1.name = "Type1"
@@ -463,7 +462,7 @@ def test_type_list(empty_context):
     param3.type = type3
     param3.name = "arg3"
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert (helper.type_list([param1, param2, param3
                               ]) == "(const Type1, Type2 &, Type3&lt;const Type1, Type2 &&gt;)")
 
@@ -547,7 +546,7 @@ def test_has_any__list_and_generator():
     assert has_any(empty_gen(), [42]) is True
 
 
-def test_parameter(empty_context):
+def test_parameter(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -558,11 +557,11 @@ def test_parameter(empty_context):
     param.type = ref
     param.name = "arg"
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_parameter__no_link(empty_context):
+def test_parameter__no_link(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -573,11 +572,11 @@ def test_parameter__no_link(empty_context):
     param.type = ref
     param.name = "arg"
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param, link=False) == "const MyType & arg"
 
 
-def test_parameter__no_name(empty_context):
+def test_parameter__no_name(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -588,11 +587,11 @@ def test_parameter__no_name(empty_context):
     param.type = ref
     param.name = ""
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] &"
 
 
-def test_parameter__default_value(empty_context):
+def test_parameter__default_value(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -604,12 +603,12 @@ def test_parameter__default_value(empty_context):
     param.name = "arg"
     param.default_value = "12"
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(
         param, default_value=True) == "const xref:lang-tomtom_1_MyType[MyType] & arg = 12"
 
 
-def test_parameter__ignore_default_value(empty_context):
+def test_parameter__ignore_default_value(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -621,12 +620,12 @@ def test_parameter__ignore_default_value(empty_context):
     param.name = "arg"
     param.default_value = "12"
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param,
                             default_value=False) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_parameter__prefix(empty_context):
+def test_parameter__prefix(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -638,11 +637,11 @@ def test_parameter__prefix(empty_context):
     param.name = "arg"
     param.prefix = "vararg "
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param) == "vararg const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_parameter__param_name_separator(empty_context):
+def test_parameter__param_name_separator(generating_api):
     class _TemplateHelper(TemplateHelper):
         PARAM_NAME_SEP = "_@_"
 
@@ -658,12 +657,12 @@ def test_parameter__param_name_separator(empty_context):
     param.prefix = "vararg "
     param.default_value = "12"
 
-    helper = _TemplateHelper(empty_context)
+    helper = _TemplateHelper(generating_api)
     assert helper.parameter(
         param, default_value=True) == "vararg const xref:lang-tomtom_1_MyType[MyType] &_@_arg = 12"
 
 
-def test_parameter__param_name_first(empty_context):
+def test_parameter__param_name_first(generating_api):
     class _TemplateHelper(TemplateHelper):
         PARAM_NAME_FIRST = True
 
@@ -679,23 +678,23 @@ def test_parameter__param_name_first(empty_context):
     param.prefix = "vararg "
     param.default_value = "12"
 
-    helper = _TemplateHelper(empty_context)
+    helper = _TemplateHelper(generating_api)
     assert helper.parameter(
         param, default_value=True) == "vararg arg const xref:lang-tomtom_1_MyType[MyType] & = 12"
 
 
-def test_method_signature__no_params(empty_context):
+def test_method_signature__no_params(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
     method.returns.type = TypeRef("lang", "void")
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.method_signature(method) == "void ShortMethod()"
 
 
-def test_method_signature__const(empty_context):
+def test_method_signature__const(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
     method.const = True
@@ -703,11 +702,11 @@ def test_method_signature__const(empty_context):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("lang", "void")
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.method_signature(method) == "void ShortMethod() const"
 
 
-def test_method_signature__single_param(empty_context):
+def test_method_signature__single_param(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -718,11 +717,11 @@ def test_method_signature__single_param(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("lang", "int")
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert helper.method_signature(method) == "void ShortMethod(int value)"
 
 
-def test_method_signature__single_param__too_wide(empty_context):
+def test_method_signature__single_param__too_wide(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -733,13 +732,13 @@ def test_method_signature__single_param__too_wide(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("lang", "int")
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
 void ShortMethod(
     int value)""")
 
 
-def test_method_signature__multiple_params(empty_context):
+def test_method_signature__multiple_params(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -754,14 +753,14 @@ def test_method_signature__multiple_params(empty_context):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("lang", "std::string")
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method) == """\
 void ShortMethod(int value,
                  double other_value,
                  std::string text)""")
 
 
-def test_method_signature__multiple_params__first_param_too_wide(empty_context):
+def test_method_signature__multiple_params__first_param_too_wide(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -776,7 +775,7 @@ def test_method_signature__multiple_params__first_param_too_wide(empty_context):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("lang", "std::string")
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
 void ShortMethod(
     int value,
@@ -784,7 +783,7 @@ void ShortMethod(
     std::string text)""")
 
 
-def test_method_signature__multiple_params__last_param_too_wide(empty_context):
+def test_method_signature__multiple_params__last_param_too_wide(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -799,7 +798,7 @@ def test_method_signature__multiple_params__last_param_too_wide(empty_context):
     method.params[2].name = "text" * 10
     method.params[2].type = TypeRef("lang", "std::string")
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=40) == f"""\
 void ShortMethod(
     int value,
@@ -807,7 +806,7 @@ void ShortMethod(
     std::string {"text" * 10})""")
 
 
-def test_method_signature__ignore_return_type_xref_length(empty_context):
+def test_method_signature__ignore_return_type_xref_length(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -819,11 +818,11 @@ def test_method_signature__ignore_return_type_xref_length(empty_context):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("lang", "int")
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method) == f"xref:{'ab' * 80}[void] ShortMethod(int value)")
 
 
-def test_method_signature__ignore_param_type_xref_length(empty_context):
+def test_method_signature__ignore_param_type_xref_length(generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -835,5 +834,5 @@ def test_method_signature__ignore_param_type_xref_length(empty_context):
     method.params[0].type = TypeRef("lang", "int")
     method.params[0].type.id = "ab" * 80
 
-    helper = TemplateHelper(empty_context)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method) == f"void ShortMethod(xref:{'ab' * 80}[int] value)")

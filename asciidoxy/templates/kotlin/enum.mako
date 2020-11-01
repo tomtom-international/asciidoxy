@@ -18,7 +18,7 @@ from asciidoxy.templates.java.helpers import JavaTemplateHelper
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,java,subs="-specialchars,macros+"]
 ----
@@ -37,8 +37,8 @@ ${element.description}
 [cols='h,5a']
 |===
 
-% for enum in JavaTemplateHelper(api_context, element, insert_filter).public_variables():
-${api_context.insert(enum)}
+% for enum in JavaTemplateHelper(api, element, insert_filter).public_variables():
+${api.inserted(enum)}
 |
 [[${enum.id},${enum.name}]]${enum.name}
 |

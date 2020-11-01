@@ -16,7 +16,7 @@
 import logging
 
 from pathlib import Path
-from typing import Dict, List, MutableMapping, Optional, Tuple
+from typing import Dict, MutableMapping, Optional, Set, Tuple
 
 from tqdm import tqdm
 
@@ -24,7 +24,7 @@ from ..api_reference import ApiReference
 from ..model import ReferableElement
 from .errors import ConsistencyError
 from .filters import InsertionFilter
-from .navigation import DocumentTreeNode, relative_path
+from .navigation import DocumentTreeNode
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,6 @@ class Context(object):
         namespace:          Current namespace to use when looking up references.
         language:           Default language to use when looking up references.
         insert_filter:      Filter used to select members of elements to insert.
-        preprocessing_run:  True when preprocessing. During preprocessing no files are generated.
         warnings_are_errors:True to treat every warning as an error.
         multipage:          True when multi page output is enabled.
         reference:          API reference information.
@@ -61,7 +60,6 @@ class Context(object):
     source_language: Optional[str] = None
     insert_filter: InsertionFilter
 
-    preprocessing_run: bool = True
     warnings_are_errors: bool = False
     multipage: bool = False
     embedded: bool = False
@@ -69,7 +67,7 @@ class Context(object):
     reference: ApiReference
     progress: Optional[tqdm] = None
 
-    linked: List[ReferableElement]
+    linked: Set[str]
     inserted: MutableMapping[str, Path]
     in_to_out_file_map: Dict[Path, Path]
     embedded_file_map: Dict[Tuple[Path, Path], Path]
@@ -85,23 +83,21 @@ class Context(object):
 
         self.reference = reference
 
-        self.linked = []
+        self.linked = set()
         self.inserted = {}
         self.in_to_out_file_map = {}
         self.embedded_file_map = {}
         self.current_document = current_document
 
-    def insert(self, element) -> str:
-        if self.preprocessing_run:
-            if element.id in self.inserted:
-                msg = f"Duplicate insertion of {element.name}"
-                if self.warnings_are_errors:
-                    raise ConsistencyError(msg)
-                else:
-                    logger.warning(msg)
-            self.inserted[element.id] = self.current_document.in_file
-
-        return ""  # Prevent output in templates
+    def insert(self, element: ReferableElement) -> None:
+        assert element.id
+        if element.id in self.inserted:
+            msg = f"Duplicate insertion of {element.name}"
+            if self.warnings_are_errors:
+                raise ConsistencyError(msg)
+            else:
+                logger.warning(msg)
+        self.inserted[element.id] = self.current_document.in_file
 
     def sub_context(self) -> "Context":
         sub = Context(base_dir=self.base_dir,
@@ -114,7 +110,6 @@ class Context(object):
         sub.namespace = self.namespace
         sub.language = self.language
         sub.source_language = self.source_language
-        sub.preprocessing_run = self.preprocessing_run
         sub.warnings_are_errors = self.warnings_are_errors
         sub.multipage = self.multipage
         sub.embedded = self.embedded
@@ -129,21 +124,16 @@ class Context(object):
 
         return sub
 
-    def link_to_element(self,
-                        element_id: str,
-                        link_text: str,
-                        element: Optional[ReferableElement] = None) -> str:
-        def file_part():
-            if not self.multipage or element_id not in self.inserted:
-                return ""
-            containing_file = self.inserted[element_id]
-            assert containing_file is not None
-            if self.current_document.in_file != containing_file:
-                return f"{relative_path(self.current_document.in_file, containing_file)}#"
+    def file_with_element(self, element_id: str) -> Optional[Path]:
+        if not self.multipage or element_id not in self.inserted:
+            return None
 
-        if element is None:
-            element = self.reference.find(target_id=element_id)
-        if element is not None:
-            self.linked.append(element)
+        containing_file = self.inserted[element_id]
+        assert containing_file is not None
+        if self.current_document.in_file != containing_file:
+            return containing_file
+        else:
+            return None
 
-        return f"xref:{file_part() or ''}{element_id}[{link_text}]"
+    def link_to_element(self, element_id: str) -> None:
+        self.linked.add(element_id)

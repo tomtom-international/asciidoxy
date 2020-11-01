@@ -15,13 +15,13 @@
 
 from typing import Iterator, Optional, Sequence
 
-from asciidoxy.generator import Context
+from asciidoxy.generator.asciidoc import Api
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Member, Parameter, TypeRef
 
 
 class TemplateHelper:
-    context: Context
+    api: Api
     element: Optional[Compound]
     insert_filter: Optional[InsertionFilter]
 
@@ -35,10 +35,10 @@ class TemplateHelper:
     PARAM_NAME_SEP = " "
 
     def __init__(self,
-                 context: Context,
+                 api: Api,
                  element: Optional[Compound] = None,
                  insert_filter: Optional[InsertionFilter] = None):
-        self.context = context
+        self.api = api
         self.element = element
         self.insert_filter = insert_filter
 
@@ -88,7 +88,7 @@ class TemplateHelper:
 
         if link and inner_ref.id:
             return (f"{outer_prefix}{args_before}{inner_ref.prefix or ''}"
-                    f"{self.context.link_to_element(inner_ref.id, inner_ref.name)}{nested}"
+                    f"{self.api.link_to_element(inner_ref.id, inner_ref.name)}{nested}"
                     f"{inner_ref.suffix or ''}{args_after}{outer_suffix}").strip()
         else:
             return (f"{outer_prefix}{args_before}{inner_ref.prefix or ''}{inner_ref.name}{nested}"

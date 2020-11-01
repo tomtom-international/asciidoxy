@@ -19,12 +19,12 @@ from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
 %>
 <%
-helper = KotlinTemplateHelper(api_context, element, insert_filter)
-java_helper = JavaTemplateHelper(api_context, element, insert_filter)
+helper = KotlinTemplateHelper(api, element, insert_filter)
+java_helper = JavaTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,kotlin,subs="-specialchars,macros+"]
 ----
@@ -108,7 +108,7 @@ ${method.brief}
 ###################################################################################### Constants ##
 % for constant in helper.public_constants():
 [[${constant.id},${constant.name}]]
-${api_context.insert(constant)}
+${api.inserted(constant)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
 const val ${constant.name}: ${constant.returns.type.name}
@@ -123,7 +123,7 @@ ${constant.description}
 ################################################################################### Constructors ##
 % for constructor in helper.public_constructors():
 [[${constructor.id},${constructor.name}]]
-${api_context.insert(constructor)}
+${api.inserted(constructor)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(constructor)}
@@ -161,7 +161,7 @@ ${exception.description}
 ##################################################################################### Properties ##
 % for prop in helper.public_properties():
 [[${prop.id},${prop.name}]]
-${api_context.insert(prop)}
+${api.inserted(prop)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
 val ${prop.name}: ${prop.returns.type.name}
@@ -176,7 +176,7 @@ ${prop.description}
 ################################################################################# Static methods ##
 % for method in java_helper.public_static_methods():
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
 ${java_helper.method_signature(method)}
@@ -221,7 +221,7 @@ ${exception.description}
 ######################################################################################## Methods ##
 % for method in helper.public_methods():
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)}

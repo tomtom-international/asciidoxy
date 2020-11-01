@@ -50,8 +50,8 @@ def objc_class():
 
 
 @pytest.fixture
-def helper(empty_context, objc_class):
-    return ObjcTemplateHelper(empty_context, objc_class, InsertionFilter())
+def helper(generating_api, objc_class):
+    return ObjcTemplateHelper(generating_api, objc_class, InsertionFilter())
 
 
 def test_public_methods__no_filter(helper):
@@ -129,26 +129,26 @@ def test_public_simple_enclosed_types__filter_no_match(helper):
     assert len(result) == 0
 
 
-def test_objc_method_signature__no_params_simple_return(empty_context):
+def test_objc_method_signature__no_params_simple_return(generating_api):
     method = Member("objc")
     method.name = "start"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="void")
-    helper = ObjcTemplateHelper(empty_context)
+    helper = ObjcTemplateHelper(generating_api)
     assert helper.method_signature(method) == "- (void)start"
 
 
-def test_objc_method_signature__no_params_link_return(empty_context):
+def test_objc_method_signature__no_params_link_return(generating_api):
     method = Member("objc")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="Value")
     method.returns.type.id = "objc-value"
-    helper = ObjcTemplateHelper(empty_context)
+    helper = ObjcTemplateHelper(generating_api)
     assert helper.method_signature(method) == "- (xref:objc-value[Value])retrieveValue"
 
 
-def test_objc_method_signature__one_param(empty_context):
+def test_objc_method_signature__one_param(generating_api):
     method = Member("objc")
     method.name = "setValue:"
     method.returns = ReturnValue()
@@ -160,11 +160,11 @@ def test_objc_method_signature__one_param(empty_context):
     param1.type = TypeRef("objc", "Type1")
     method.params = [param1]
 
-    helper = ObjcTemplateHelper(empty_context)
+    helper = ObjcTemplateHelper(generating_api)
     assert helper.method_signature(method) == "- (xref:objc-value[Value])setValue:(Type1)arg1"
 
 
-def test_objc_method_signature__multiple_params_simple_return(empty_context):
+def test_objc_method_signature__multiple_params_simple_return(generating_api):
     method = Member("objc")
     method.name = "setValue:withUnit:andALongerParam:"
     method.returns = ReturnValue()
@@ -185,14 +185,14 @@ def test_objc_method_signature__multiple_params_simple_return(empty_context):
 
     method.params = [param1, param2, param3]
 
-    helper = ObjcTemplateHelper(empty_context)
+    helper = ObjcTemplateHelper(generating_api)
     assert (helper.method_signature(method) == """\
 - (Value)setValue:(Type1)arg1
          withUnit:(xref:objc-type2[Type2])arg2
   andALongerParam:(Type3)arg3""")
 
 
-def test_objc_method_signature__multiple_params_linked_return(empty_context):
+def test_objc_method_signature__multiple_params_linked_return(generating_api):
     method = Member("objc")
     method.name = "setValue:withUnit:andALongerParam:"
     method.returns = ReturnValue()
@@ -214,18 +214,18 @@ def test_objc_method_signature__multiple_params_linked_return(empty_context):
 
     method.params = [param1, param2, param3]
 
-    helper = ObjcTemplateHelper(empty_context)
+    helper = ObjcTemplateHelper(generating_api)
     assert (helper.method_signature(method) == """\
 - (xref:objc-value[Value])setValue:(Type1)arg1
          withUnit:(xref:objc-type2[Type2])arg2
   andALongerParam:(Type3)arg3""")
 
 
-def test_objc_method_signature__class_method(empty_context):
+def test_objc_method_signature__class_method(generating_api):
     method = Member("objc")
     method.name = "start"
     method.static = True
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="void")
-    helper = ObjcTemplateHelper(empty_context)
+    helper = ObjcTemplateHelper(generating_api)
     assert helper.method_signature(method) == "+ (void)start"

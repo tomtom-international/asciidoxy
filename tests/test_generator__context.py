@@ -17,12 +17,14 @@ from pathlib import Path
 
 from asciidoxy.model import ReferableElement
 
+from .builders import make_compound
 
-def test_context_create_sub_context(context):
+
+def test_create_sub_context(empty_context):
+    context = empty_context
     context.namespace = "ns"
     context.language = "lang"
     context.source_language = "java"
-    context.preprocessing_run = False
     context.warnings_are_errors = True
     context.multipage = True
     context.embedded = True
@@ -38,7 +40,6 @@ def test_context_create_sub_context(context):
     assert sub.language == "lang"
     assert sub.source_language == "java"
 
-    assert sub.preprocessing_run is False
     assert sub.warnings_are_errors is True
     assert sub.multipage is True
     assert sub.embedded is True
@@ -61,38 +62,59 @@ def test_context_create_sub_context(context):
 
     assert len(context.linked) == 0
     assert "element" not in context.inserted
-    sub.linked.append(ReferableElement("element"))
+    sub.linked.add(ReferableElement("element"))
     sub.inserted["element"] = Path("path")
     assert len(context.linked) == 1
     assert "element" in context.inserted
 
 
-def test_context_link_to_element_singlepage(context):
-    element_id = "element"
-    file_containing_element = "other_file.adoc"
-    link_text = "Link"
-    context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
-    assert context.link_to_element(element_id, link_text) == f"xref:{element_id}[{link_text}]"
+def test_file_with_element__different_file(empty_context):
+    empty_context.multipage = True
+
+    empty_context.current_document.in_file = Path("file_1.adoc")
+    empty_context.insert(make_compound(lang="lang", name="type1"))
+    empty_context.insert(make_compound(lang="lang", name="type2"))
+
+    empty_context.current_document.in_file = Path("file_2.adoc")
+    empty_context.insert(make_compound(lang="lang", name="type3"))
+    empty_context.insert(make_compound(lang="lang", name="type4"))
+
+    assert empty_context.file_with_element("lang-type1") == Path("file_1.adoc")
+    assert empty_context.file_with_element("lang-type2") == Path("file_1.adoc")
 
 
-def test_context_link_to_element_multipage(context, multipage):
-    element_id = "element"
-    file_containing_element = "other_file.adoc"
-    link_text = "Link"
-    context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
-    assert (context.link_to_element(
-        element_id, link_text) == f"xref:{file_containing_element}#{element_id}[{link_text}]")
+def test_file_with_element__same_file(empty_context):
+    empty_context.multipage = True
+
+    empty_context.current_document.in_file = Path("file_1.adoc")
+    empty_context.insert(make_compound(lang="lang", name="type1"))
+    empty_context.insert(make_compound(lang="lang", name="type2"))
+
+    empty_context.current_document.in_file = Path("file_2.adoc")
+    empty_context.insert(make_compound(lang="lang", name="type3"))
+    empty_context.insert(make_compound(lang="lang", name="type4"))
+
+    assert empty_context.file_with_element("lang-type3") is None
+    assert empty_context.file_with_element("lang-type4") is None
 
 
-def test_context_link_to_element_multipage_element_in_the_same_document(context, multipage):
-    element_id = "element"
-    link_text = "Link"
-    context.inserted[element_id] = context.current_document.in_file
-    assert (context.link_to_element(element_id, link_text) == f"xref:{element_id}[{link_text}]")
+def test_file_with_element__not_in_singlepage(empty_context):
+    empty_context.multipage = False
+
+    empty_context.current_document.in_file = Path("file_1.adoc")
+    empty_context.insert(make_compound(lang="lang", name="type1"))
+    empty_context.insert(make_compound(lang="lang", name="type2"))
+
+    empty_context.current_document.in_file = Path("file_2.adoc")
+    empty_context.insert(make_compound(lang="lang", name="type3"))
+    empty_context.insert(make_compound(lang="lang", name="type4"))
+
+    assert empty_context.file_with_element("lang-type1") is None
+    assert empty_context.file_with_element("lang-type2") is None
+    assert empty_context.file_with_element("lang-type3") is None
+    assert empty_context.file_with_element("lang-type4") is None
 
 
-def test_context_link_to_element_element_not_inserted(context, single_and_multipage):
-    element_id = "element"
-    link_text = "Link"
-    assert element_id not in context.inserted
-    assert context.link_to_element(element_id, link_text) == f"xref:{element_id}[{link_text}]"
+def test_file_with_element__element_not_found(empty_context):
+    empty_context.multipage = True
+    assert empty_context.file_with_element("element-id-1") is None

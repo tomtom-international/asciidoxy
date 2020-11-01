@@ -19,11 +19,11 @@ from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 from itertools import chain
 %>
 <%
-helper = CppTemplateHelper(api_context, element, insert_filter)
+helper = CppTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
@@ -137,7 +137,7 @@ ${api.insert_fragment(operator, insert_filter, kind_override="method")}
 ###################################################################################### Variables ##
 % for variable in helper.public_variables():
 [[${variable.id},${variable.name}]]
-${api_context.insert(variable)}
+${api.inserted(variable)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----

@@ -14,7 +14,7 @@
 
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
@@ -34,7 +34,7 @@ ${element.description}
 |===
 
 % for value in insert_filter.enum_values(element):
-${api_context.insert(value)}
+${api.inserted(value)}
 | [[${value.id},${value.name}]]${value.name} ${value.initializer}
 |
 ${value.brief}

@@ -18,11 +18,11 @@ from asciidoxy.templates.helpers import has
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 %>
 <%
-helper = SwiftTemplateHelper(api_context, element, insert_filter)
+helper = SwiftTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,swift,subs="-specialchars,macros+"]
 ----
@@ -98,7 +98,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ################################################################################### Constructors ##
 % for constructor in helper.public_constructors():
 [[${constructor.id},${constructor.name}]]
-${api_context.insert(constructor)}
+${api.inserted(constructor)}
 [source,swift,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(constructor)}
@@ -137,7 +137,7 @@ ${exception.description}
 ##################################################################################### Properties ##
 % for prop in helper.public_properties():
 [[${prop.id},${prop.name}]]
-${api_context.insert(prop)}
+${api.inserted(prop)}
 [source,swift,subs="-specialchars,macros+"]
 ----
 var ${prop.name}: ${helper.print_ref(prop.returns.type)}
@@ -152,7 +152,7 @@ ${prop.description}
 ################################################################################### Type methods ##
 % for method in helper.public_type_methods():
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,swift,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)}
@@ -198,7 +198,7 @@ ${exception.description}
 ######################################################################################## Methods ##
 % for method in helper.public_methods():
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,swift,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)}

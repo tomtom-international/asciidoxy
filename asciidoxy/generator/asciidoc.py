@@ -18,6 +18,7 @@ import logging
 import os
 import uuid
 
+from abc import ABC, abstractmethod
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
@@ -44,7 +45,7 @@ from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipa
 logger = logging.getLogger(__name__)
 
 
-class Api(object):
+class Api(ABC):
     """Methods to insert and link to API reference documentation from AsciiDoc files."""
     class TemplateKey(NamedTuple):
         lang: str
@@ -73,56 +74,6 @@ class Api(object):
             return functools.partial(self.link, kind=name[5:])
         else:
             raise AttributeError(name)
-
-    def find_element(self,
-                     name: str,
-                     *,
-                     kind: Optional[str] = None,
-                     lang: Optional[str] = None,
-                     allow_overloads: bool = False) -> ReferableElement:
-        """Find a reference to API documentation.
-
-        Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
-        disambiguate.
-
-        Args:
-            name:            Name of the object to insert.
-            kind:            Kind of object to generate reference documentation for.
-            lang:            Programming language of the object.
-            allow_overloads: True to return the first match of an overload set.
-
-        Returns:
-            An API documentation reference.
-
-        Raises:
-             AmbiguousReferenceError: There are multiple elements matching the criteria.
-             ReferenceNotFoundError: There are no elements matching the criteria.
-        """
-        if lang is not None:
-            lang = safe_language_tag(lang)
-        else:
-            lang = self._context.language
-
-        try:
-            element = self._context.reference.find(name=name,
-                                                   namespace=self._context.namespace,
-                                                   kind=kind,
-                                                   lang=lang,
-                                                   allow_overloads=allow_overloads)
-        except AmbiguousLookupError as ex:
-            raise AmbiguousReferenceError(name, ex.candidates)
-
-        if element is None:
-            if (lang and lang == self._context.language and self._context.source_language):
-                source_element = self.find_element(name,
-                                                   kind=kind,
-                                                   lang=self._context.source_language,
-                                                   allow_overloads=allow_overloads)
-                if source_element is not None:
-                    return TranscoderBase.transcode(source_element, lang, self._context.reference)
-
-            raise ReferenceNotFoundError(name, lang=lang, kind=kind)
-        return element
 
     def filter(self,
                *,
@@ -282,7 +233,7 @@ class Api(object):
         else:
             link_text = element.name
 
-        return self._context.link_to_element(element.id, link_text, element)
+        return self.link_to_element(element.id, link_text)
 
     def cross_document_ref(self, file_name: str, anchor: str, link_text: str = None) -> str:
         """AsciiDoc cross-document reference.
@@ -316,46 +267,6 @@ class Api(object):
                                        absolute_link_file_path)
         return (f"<<{link_file_path}#{anchor},"
                 f"{link_text if link_text is not None else anchor}>>")
-
-    def insert_fragment(self,
-                        element,
-                        insert_filter: InsertionFilter,
-                        leveloffset: str = "+1",
-                        kind_override: Optional[str] = None,
-                        **asciidoc_options) -> str:
-        """Generate and insert a documentation fragment.
-
-        Args:
-            element:          Python representation of the element to insert.
-            insertion_filter: Filter for members to insert.
-            leveloffset:      Offset of the top header of the inserted text from the top level
-                                  header of the including document.
-            kind_override:    Override the kind of template to use. None to use the kind of
-                                  `element`.
-            asciidoc_options: Any additional option is added as an attribute to the include
-                                  directive in single page mode.
-
-        Returns:
-            AsciiDoc text to include in the document.
-        """
-        return ""
-
-    def _render(self,
-                element,
-                insert_filter: InsertionFilter,
-                kind_override: Optional[str] = None) -> str:
-        assert element.id
-        assert element.language
-
-        if kind_override is None:
-            kind = element.kind
-        else:
-            kind = kind_override
-
-        return self._template(element.language, kind).render(element=element,
-                                                             insert_filter=insert_filter,
-                                                             api_context=self._context,
-                                                             api=self)
 
     def include(self,
                 file_name: str,
@@ -414,16 +325,6 @@ class Api(object):
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
         return f"include::{out_file}[{attributes}]"
-
-    def _sub_api(self, file_path: Path, embedded: bool = False) -> "Api":
-        sub_context = self._context.sub_context()
-        if embedded:
-            sub_context.embedded = True
-        else:
-            sub_context.current_document = self._context.current_document.find_child(file_path)
-            assert sub_context.current_document is not None
-
-        return self.__class__(file_path, sub_context)
 
     def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
@@ -507,6 +408,102 @@ class Api(object):
         """
         return ""
 
+    # Internal, non-API methods
+
+    def find_element(self,
+                     name: str,
+                     *,
+                     kind: Optional[str] = None,
+                     lang: Optional[str] = None,
+                     allow_overloads: bool = False) -> ReferableElement:
+        """Find a reference to API documentation.
+
+        Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
+        disambiguate.
+
+        Args:
+            name:            Name of the object to insert.
+            kind:            Kind of object to generate reference documentation for.
+            lang:            Programming language of the object.
+            allow_overloads: True to return the first match of an overload set.
+
+        Returns:
+            An API documentation reference.
+
+        Raises:
+             AmbiguousReferenceError: There are multiple elements matching the criteria.
+             ReferenceNotFoundError: There are no elements matching the criteria.
+        """
+        if lang is not None:
+            lang = safe_language_tag(lang)
+        else:
+            lang = self._context.language
+
+        try:
+            element = self._context.reference.find(name=name,
+                                                   namespace=self._context.namespace,
+                                                   kind=kind,
+                                                   lang=lang,
+                                                   allow_overloads=allow_overloads)
+        except AmbiguousLookupError as ex:
+            raise AmbiguousReferenceError(name, ex.candidates)
+
+        if element is None:
+            if (lang and lang == self._context.language and self._context.source_language):
+                source_element = self.find_element(name,
+                                                   kind=kind,
+                                                   lang=self._context.source_language,
+                                                   allow_overloads=allow_overloads)
+                if source_element is not None:
+                    return TranscoderBase.transcode(source_element, lang, self._context.reference)
+
+            raise ReferenceNotFoundError(name, lang=lang, kind=kind)
+        return element
+
+    @abstractmethod
+    def insert_fragment(self,
+                        element,
+                        insert_filter: InsertionFilter,
+                        leveloffset: str = "+1",
+                        kind_override: Optional[str] = None,
+                        **asciidoc_options) -> str:
+        """Generate and insert a documentation fragment.
+
+        Args:
+            element:          Python representation of the element to insert.
+            insertion_filter: Filter for members to insert.
+            leveloffset:      Offset of the top header of the inserted text from the top level
+                                  header of the including document.
+            kind_override:    Override the kind of template to use. None to use the kind of
+                                  `element`.
+            asciidoc_options: Any additional option is added as an attribute to the include
+                                  directive in single page mode.
+
+        Returns:
+            AsciiDoc text to include in the document.
+        """
+        ...
+
+    def inserted(self, element: ReferableElement) -> str:
+        """Register that an element has been inserted."""
+        return ""
+
+    @abstractmethod
+    def link_to_element(self, element_id: str, link_text: str) -> str:
+        """Insert a link to a specific element."""
+        ...
+
+    @abstractmethod
+    def process_adoc(self) -> Path:
+        """Process the AsciiDoc file.
+
+        Returns
+            Name of the processed output file.
+        """
+        ...
+
+    # "Protected" methods
+
     def _template(self, lang: str, kind: str) -> Template:
         key = Api.TemplateKey(lang, kind)
         template = self._template_cache.get(key, None)
@@ -521,8 +518,32 @@ class Api(object):
                 raise TemplateMissingError(lang, kind)
         return template
 
-    def process_adoc(self):
-        ...
+    def _sub_api(self, file_path: Path, embedded: bool = False) -> "Api":
+        sub_context = self._context.sub_context()
+        if embedded:
+            sub_context.embedded = True
+        else:
+            sub_context.current_document = self._context.current_document.find_child(file_path)
+            assert sub_context.current_document is not None
+
+        return self.__class__(file_path, sub_context)
+
+    def _render(self,
+                element,
+                insert_filter: InsertionFilter,
+                kind_override: Optional[str] = None) -> str:
+        assert element.id
+        assert element.language
+
+        if kind_override is None:
+            kind = element.kind
+        else:
+            kind = kind_override
+
+        return self._template(element.language, kind).render(element=element,
+                                                             insert_filter=insert_filter,
+                                                             api_context=self._context,
+                                                             api=self)
 
 
 class PreprocessingApi(Api):
@@ -546,9 +567,16 @@ class PreprocessingApi(Api):
         self._render(element, insert_filter, kind_override)
         return ""
 
+    def inserted(self, element: ReferableElement) -> str:
+        self._context.insert(element)
+        return ""
+
+    def link_to_element(self, element_id: str, link_text: str) -> str:
+        self._context.link_to_element(element_id)
+        return ""
+
     def process_adoc(self):
         logger.info(f"Preprocessing {self._current_file}")
-        self._context.preprocessing_run = True
 
         if self._context.embedded:
             out_file = _embedded_out_file_name(self._current_file, self._context)
@@ -631,9 +659,17 @@ class GeneratingApi(Api):
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
         return f"include::{fragment_file}[{attributes}]"
 
+    def link_to_element(self, element_id: str, link_text: str) -> str:
+        containing_file = self._context.file_with_element(element_id)
+        if containing_file is not None:
+            file_part = f"{relative_path(self._context.current_document.in_file, containing_file)}#"
+        else:
+            file_part = ""
+
+        return f"xref:{file_part}{element_id}[{link_text}]"
+
     def process_adoc(self):
         logger.info(f"Processing {self._current_file}")
-        self._context.preprocessing_run = False
         self._context.linked = []
 
         if self._context.embedded:
@@ -692,16 +728,16 @@ def process_adoc(in_file: Path,
     context.progress = progress
 
     PreprocessingApi(in_file, context).process_adoc()
-    GeneratingApi(in_file, context).process_adoc()
     _check_links(context)
+    GeneratingApi(in_file, context).process_adoc()
     return context.in_to_out_file_map
 
 
 def _check_links(context: Context):
-    linked = {e.id for e in context.linked}
-    dangling = linked - context.inserted.keys()
+    dangling = context.linked - context.inserted.keys()
     if dangling:
-        names = {f"{e.language}: {e.full_name}" for e in context.linked if e.id in dangling}
+        dangling_elements = {context.reference.find(element_id) for element_id in dangling}
+        names = {f"{e.language}: {e.full_name}" for e in dangling_elements if e is not None}
         msg = ("The following elements are linked to, but not included in the documentation:\n\t" +
                "\n\t".join(names))
         if context.warnings_are_errors:

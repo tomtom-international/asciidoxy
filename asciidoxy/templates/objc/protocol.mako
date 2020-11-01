@@ -18,11 +18,11 @@ from asciidoxy.templates.helpers import has
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 %>
 <%
-helper = ObjcTemplateHelper(api_context, element, insert_filter)
+helper = ObjcTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
@@ -92,7 +92,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ##################################################################################### Properties ##
 % for prop in helper.public_properties():
 [[${prop.id},${prop.name}]]
-${api_context.insert(prop)}
+${api.inserted(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
 @property() ${helper.print_ref(prop.returns.type)} ${prop.name}
@@ -107,7 +107,7 @@ ${prop.description}
 ################################################################################## Class methods ##
 % for method in helper.public_class_methods():
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)};
@@ -153,7 +153,7 @@ ${exception.description}
 ######################################################################################## Methods ##
 % for method in helper.public_methods():
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)};

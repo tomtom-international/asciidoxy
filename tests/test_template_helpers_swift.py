@@ -60,8 +60,8 @@ def swift_class():
 
 
 @pytest.fixture
-def helper(empty_context, swift_class):
-    return SwiftTemplateHelper(empty_context, swift_class, InsertionFilter())
+def helper(generating_api, swift_class):
+    return SwiftTemplateHelper(generating_api, swift_class, InsertionFilter())
 
 
 def test_public_methods(helper):

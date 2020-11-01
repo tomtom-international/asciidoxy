@@ -16,11 +16,11 @@
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 %>
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-using ${element.name} = ${CppTemplateHelper(api_context).print_ref(element.returns.type)}
+using ${element.name} = ${CppTemplateHelper(api).print_ref(element.returns.type)}
 ----
 ${element.brief}
 
