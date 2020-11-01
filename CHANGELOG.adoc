@@ -25,6 +25,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Fixed
 
   - [AD-33] Actually allow filtering of inner classes by visibility.
+  - [AD-46] Always fall back to original name if type parsing fails.
 
 
 == 0.6.2 (22 Sep 2020)
