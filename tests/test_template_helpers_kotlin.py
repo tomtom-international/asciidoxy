@@ -62,25 +62,30 @@ def kotlin_class():
 
 
 @pytest.fixture
-def helper(generating_api, kotlin_class):
-    return KotlinTemplateHelper(generating_api, kotlin_class, InsertionFilter())
+def helper(empty_generating_api, kotlin_class):
+    return KotlinTemplateHelper(empty_generating_api, kotlin_class, InsertionFilter())
 
 
 def test_public_constants__no_filter(helper):
-    result = [m.name for m in helper.public_constants()]
+    result = [m.name for m in helper.constants(prot="public")]
     assert result == ["PublicConstant"]
 
 
 def test_public_constants__filter_match(helper):
     helper.insert_filter = InsertionFilter(members="Public")
-    result = [m.name for m in helper.public_constants()]
+    result = [m.name for m in helper.constants(prot="public")]
     assert result == ["PublicConstant"]
 
 
 def test_public_constants__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_constants()]
+    result = [m.name for m in helper.constants(prot="public")]
     assert len(result) == 0
+
+
+def test_private_constants__no_filter(helper):
+    result = [m.name for m in helper.constants(prot="private")]
+    assert result == ["PrivateConstant"]
 
 
 def test_parameter(helper):

@@ -41,40 +41,40 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(helper.public_simple_enclosed_types()):
+% if has(helper.simple_enclosed_types(prot="public")):
 |*Enclosed types*
 |
-% for enclosed in helper.public_simple_enclosed_types():
+% for enclosed in helper.simple_enclosed_types(prot="public"):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_properties()):
+% if has(helper.properties(prot="public")):
 |*Properties*
 |
-% for prop in helper.public_properties():
+% for prop in helper.properties(prot="public"):
 `xref:${prop.id}[${prop.name}]`::
 ${prop.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_class_methods()):
+% if has(helper.class_methods(prot="public")):
 |*Class methods*
 |
-% for method in helper.public_class_methods():
+% for method in helper.class_methods(prot="public"):
 `xref:${method.id}[${method.name}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_methods()):
+% if has(helper.methods(prot="public")):
 |*Methods*
 |
-% for method in helper.public_methods():
+% for method in helper.methods(prot="public"):
 `xref:${method.id}[${method.name}]`::
 ${method.brief}
 % endfor
@@ -83,14 +83,14 @@ ${method.brief}
 |===
 
 ################################################################################# Enclosed types ##
-% for enclosed in helper.public_simple_enclosed_types():
+% for enclosed in helper.simple_enclosed_types(prot="public"):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 
 == Members
 
 ##################################################################################### Properties ##
-% for prop in helper.public_properties():
+% for prop in helper.properties(prot="public"):
 [[${prop.id},${prop.name}]]
 ${api.inserted(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
@@ -105,7 +105,7 @@ ${prop.description}
 '''
 % endfor
 ################################################################################## Class methods ##
-% for method in helper.public_class_methods():
+% for method in helper.class_methods(prot="public"):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
@@ -151,7 +151,7 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.public_methods():
+% for method in helper.methods(prot="public"):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]

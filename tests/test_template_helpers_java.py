@@ -52,94 +52,27 @@ def java_class():
 
 
 @pytest.fixture
-def helper(java_class, generating_api):
-    return JavaTemplateHelper(generating_api, java_class, InsertionFilter())
-
-
-def test_public_constructors__no_filter(helper):
-    result = list(helper.public_constructors())
-    assert len(result) == 1
-    assert result[0].name == "MyClass"
-    assert result[0].prot == "public"
-
-
-def test_public_constructors__filter_match(helper):
-    helper.insert_filter = InsertionFilter(members="MyClass")
-    result = list(helper.public_constructors())
-    assert len(result) == 1
-    assert result[0].name == "MyClass"
-    assert result[0].prot == "public"
-
-
-def test_public_constructors__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(members="NONE")
-    result = list(helper.public_constructors())
-    assert len(result) == 0
-
-
-def test_public_methods__no_filter(helper):
-    result = [m.name for m in helper.public_methods()]
-    assert sorted(result) == sorted(["PublicMethod"])
-
-
-def test_public_methods__filter_match(helper):
-    helper.insert_filter = InsertionFilter(members="PublicMethod")
-    result = [m.name for m in helper.public_methods()]
-    assert sorted(result) == sorted(["PublicMethod"])
-
-
-def test_public_methods__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_methods()]
-    assert len(result) == 0
-
-
-def test_public_static_methods__no_filter(helper):
-    result = [m.name for m in helper.public_static_methods()]
-    assert sorted(result) == sorted(["PublicStaticMethod"])
-
-
-def test_public_static_methods__filter_match(helper):
-    helper.insert_filter = InsertionFilter(members="Public")
-    result = [m.name for m in helper.public_static_methods()]
-    assert sorted(result) == sorted(["PublicStaticMethod"])
-
-
-def test_public_static_methods__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_static_methods()]
-    assert len(result) == 0
+def helper(java_class, empty_generating_api):
+    return JavaTemplateHelper(empty_generating_api, java_class, InsertionFilter())
 
 
 def test_public_constants__no_filter(helper):
-    result = [m.name for m in helper.public_constants()]
+    result = [m.name for m in helper.constants(prot="public")]
     assert result == ["PublicConstant"]
 
 
 def test_public_constants__filter_match(helper):
     helper.insert_filter = InsertionFilter(members="Public")
-    result = [m.name for m in helper.public_constants()]
+    result = [m.name for m in helper.constants(prot="public")]
     assert result == ["PublicConstant"]
 
 
 def test_public_constants__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_constants()]
+    result = [m.name for m in helper.constants(prot="public")]
     assert len(result) == 0
 
 
-def test_public_complex_enclosed_types__no_filter(helper):
-    result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["PublicType", "ProtectedType"]
-
-
-def test_public_complex_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="Public")
-    result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["PublicType"]
-
-
-def test_public_complex_enclosed_types__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="NONE")
-    result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert len(result) == 0
+def test_private_constants__no_filter(helper):
+    result = [m.name for m in helper.constants(prot="private")]
+    assert result == ["PrivateConstant"]

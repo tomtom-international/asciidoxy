@@ -19,13 +19,19 @@ import pytest
 
 from unittest.mock import call, Mock
 
+from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.templates.helpers import has, has_any, TemplateHelper
 from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
 
 
 @pytest.fixture
-def api_mock(generating_api):
-    return Mock(wraps=generating_api)
+def api_mock(empty_generating_api):
+    return Mock(wraps=empty_generating_api)
+
+
+@pytest.fixture
+def helper(empty_generating_api, cpp_class):
+    return TemplateHelper(empty_generating_api, cpp_class, InsertionFilter())
 
 
 def test_print_ref__link__empty(api_mock):
@@ -400,12 +406,12 @@ def test_print_ref__no_link__closure_prefix_suffix(api_mock):
     assert helper.print_ref(ref, link=False) == "final (const MyType&(ArgType1, ArgType2 value))*"
 
 
-def test_argument_list__empty(generating_api):
-    helper = TemplateHelper(generating_api)
+def test_argument_list__empty(empty_generating_api):
+    helper = TemplateHelper(empty_generating_api)
     assert helper.argument_list([]) == "()"
 
 
-def test_argument_list(generating_api):
+def test_argument_list(empty_generating_api):
     type1 = TypeRef("lang")
     type1.prefix = "const "
     type1.name = "Type1"
@@ -430,13 +436,13 @@ def test_argument_list(generating_api):
     param3.type = type3
     param3.name = "arg3"
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert (helper.argument_list([param1, param2,
                                   param3]) == "(const Type1, xref:lang-type2[Type2] & arg2, "
             "Type3&lt;const Type1, xref:lang-type2[Type2] &&gt; arg3)")
 
 
-def test_type_list(generating_api):
+def test_type_list(empty_generating_api):
     type1 = TypeRef("lang")
     type1.prefix = "const "
     type1.name = "Type1"
@@ -462,7 +468,7 @@ def test_type_list(generating_api):
     param3.type = type3
     param3.name = "arg3"
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert (helper.type_list([param1, param2, param3
                               ]) == "(const Type1, Type2 &, Type3&lt;const Type1, Type2 &&gt;)")
 
@@ -546,7 +552,7 @@ def test_has_any__list_and_generator():
     assert has_any(empty_gen(), [42]) is True
 
 
-def test_parameter(generating_api):
+def test_parameter(empty_generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -557,11 +563,11 @@ def test_parameter(generating_api):
     param.type = ref
     param.name = "arg"
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_parameter__no_link(generating_api):
+def test_parameter__no_link(empty_generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -572,11 +578,11 @@ def test_parameter__no_link(generating_api):
     param.type = ref
     param.name = "arg"
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.parameter(param, link=False) == "const MyType & arg"
 
 
-def test_parameter__no_name(generating_api):
+def test_parameter__no_name(empty_generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -587,11 +593,11 @@ def test_parameter__no_name(generating_api):
     param.type = ref
     param.name = ""
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] &"
 
 
-def test_parameter__default_value(generating_api):
+def test_parameter__default_value(empty_generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -603,12 +609,12 @@ def test_parameter__default_value(generating_api):
     param.name = "arg"
     param.default_value = "12"
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.parameter(
         param, default_value=True) == "const xref:lang-tomtom_1_MyType[MyType] & arg = 12"
 
 
-def test_parameter__ignore_default_value(generating_api):
+def test_parameter__ignore_default_value(empty_generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -620,12 +626,12 @@ def test_parameter__ignore_default_value(generating_api):
     param.name = "arg"
     param.default_value = "12"
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.parameter(param,
                             default_value=False) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_parameter__prefix(generating_api):
+def test_parameter__prefix(empty_generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -637,11 +643,11 @@ def test_parameter__prefix(generating_api):
     param.name = "arg"
     param.prefix = "vararg "
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.parameter(param) == "vararg const xref:lang-tomtom_1_MyType[MyType] & arg"
 
 
-def test_parameter__param_name_separator(generating_api):
+def test_parameter__param_name_separator(empty_generating_api):
     class _TemplateHelper(TemplateHelper):
         PARAM_NAME_SEP = "_@_"
 
@@ -657,12 +663,12 @@ def test_parameter__param_name_separator(generating_api):
     param.prefix = "vararg "
     param.default_value = "12"
 
-    helper = _TemplateHelper(generating_api)
+    helper = _TemplateHelper(empty_generating_api)
     assert helper.parameter(
         param, default_value=True) == "vararg const xref:lang-tomtom_1_MyType[MyType] &_@_arg = 12"
 
 
-def test_parameter__param_name_first(generating_api):
+def test_parameter__param_name_first(empty_generating_api):
     class _TemplateHelper(TemplateHelper):
         PARAM_NAME_FIRST = True
 
@@ -678,23 +684,23 @@ def test_parameter__param_name_first(generating_api):
     param.prefix = "vararg "
     param.default_value = "12"
 
-    helper = _TemplateHelper(generating_api)
+    helper = _TemplateHelper(empty_generating_api)
     assert helper.parameter(
         param, default_value=True) == "vararg arg const xref:lang-tomtom_1_MyType[MyType] & = 12"
 
 
-def test_method_signature__no_params(generating_api):
+def test_method_signature__no_params(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
     method.returns.type = TypeRef("lang", "void")
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.method_signature(method) == "void ShortMethod()"
 
 
-def test_method_signature__const(generating_api):
+def test_method_signature__const(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
     method.const = True
@@ -702,11 +708,11 @@ def test_method_signature__const(generating_api):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("lang", "void")
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.method_signature(method) == "void ShortMethod() const"
 
 
-def test_method_signature__single_param(generating_api):
+def test_method_signature__single_param(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -717,11 +723,11 @@ def test_method_signature__single_param(generating_api):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("lang", "int")
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert helper.method_signature(method) == "void ShortMethod(int value)"
 
 
-def test_method_signature__single_param__too_wide(generating_api):
+def test_method_signature__single_param__too_wide(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -732,13 +738,13 @@ def test_method_signature__single_param__too_wide(generating_api):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("lang", "int")
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
 void ShortMethod(
     int value)""")
 
 
-def test_method_signature__multiple_params(generating_api):
+def test_method_signature__multiple_params(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -753,14 +759,14 @@ def test_method_signature__multiple_params(generating_api):
     method.params[2].name = "text"
     method.params[2].type = TypeRef("lang", "std::string")
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method) == """\
 void ShortMethod(int value,
                  double other_value,
                  std::string text)""")
 
 
-def test_method_signature__multiple_params__first_param_too_wide(generating_api):
+def test_method_signature__multiple_params__first_param_too_wide(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -775,7 +781,7 @@ def test_method_signature__multiple_params__first_param_too_wide(generating_api)
     method.params[2].name = "text"
     method.params[2].type = TypeRef("lang", "std::string")
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
 void ShortMethod(
     int value,
@@ -783,7 +789,7 @@ void ShortMethod(
     std::string text)""")
 
 
-def test_method_signature__multiple_params__last_param_too_wide(generating_api):
+def test_method_signature__multiple_params__last_param_too_wide(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -798,7 +804,7 @@ def test_method_signature__multiple_params__last_param_too_wide(generating_api):
     method.params[2].name = "text" * 10
     method.params[2].type = TypeRef("lang", "std::string")
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method, max_width=40) == f"""\
 void ShortMethod(
     int value,
@@ -806,7 +812,7 @@ void ShortMethod(
     std::string {"text" * 10})""")
 
 
-def test_method_signature__ignore_return_type_xref_length(generating_api):
+def test_method_signature__ignore_return_type_xref_length(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -818,11 +824,11 @@ def test_method_signature__ignore_return_type_xref_length(generating_api):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("lang", "int")
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method) == f"xref:{'ab' * 80}[void] ShortMethod(int value)")
 
 
-def test_method_signature__ignore_param_type_xref_length(generating_api):
+def test_method_signature__ignore_param_type_xref_length(empty_generating_api):
     method = Member("lang")
     method.name = "ShortMethod"
 
@@ -834,5 +840,175 @@ def test_method_signature__ignore_param_type_xref_length(generating_api):
     method.params[0].type = TypeRef("lang", "int")
     method.params[0].type.id = "ab" * 80
 
-    helper = TemplateHelper(generating_api)
+    helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method) == f"void ShortMethod(xref:{'ab' * 80}[int] value)")
+
+
+def test_public_static_methods__no_filter(helper):
+    result = [m.name for m in helper.static_methods(prot="public")]
+    assert result == ["PublicStaticMethod"]
+
+
+def test_public_static_methods__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members=".*Static.*")
+    result = [m.name for m in helper.static_methods(prot="public")]
+    assert result == ["PublicStaticMethod"]
+
+
+def test_public_static_methods__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="Something")
+    result = [m.name for m in helper.static_methods(prot="public")]
+    assert len(result) == 0
+
+
+def test_protected_static_methods__no_filter(helper):
+    result = [m.name for m in helper.static_methods(prot="protected")]
+    assert result == ["ProtectedStaticMethod"]
+
+
+def test_private_static_methods__no_filter(helper):
+    result = [m.name for m in helper.static_methods(prot="private")]
+    assert result == ["PrivateStaticMethod"]
+
+
+def test_public_methods__no_filter(helper):
+    result = [m.name for m in helper.methods(prot="public")]
+    assert sorted(result) == sorted(["PublicMethod", "operator=", "operator=", "operator++"])
+
+
+def test_public_methods__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="Public.*")
+    result = [m.name for m in helper.methods(prot="public")]
+    assert result == ["PublicMethod"]
+
+
+def test_public_methods__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="PublicThing")
+    result = [m.name for m in helper.methods(prot="public")]
+    assert len(result) == 0
+
+
+def test_protected_methods__no_filter(helper):
+    result = [m.name for m in helper.methods(prot="protected")]
+    assert sorted(result) == sorted(["ProtectedMethod", "operator=", "operator=", "operator++"])
+
+
+def test_private_methods__no_filter(helper):
+    result = [m.name for m in helper.methods(prot="private")]
+    assert sorted(result) == sorted(["PrivateMethod", "operator=", "operator=", "operator++"])
+
+
+def test_public_constructors__no_filter(helper):
+    result = list(helper.constructors(prot="public"))
+    assert len(result) == 3
+    assert result[0].name == "MyClass"
+    assert result[0].prot == "public"
+
+
+def test_public_constructors__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="MyClass")
+    result = list(helper.constructors(prot="public"))
+    assert len(result) == 3
+    assert result[0].name == "MyClass"
+    assert result[0].prot == "public"
+
+
+def test_public_constructors__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="OtherClass")
+    result = list(helper.constructors(prot="public"))
+    assert len(result) == 0
+
+
+def test_protected_constructors__no_filter(helper):
+    result = list(helper.constructors(prot="protected"))
+    assert len(result) == 3
+    assert result[0].name == "MyClass"
+    assert result[0].prot == "protected"
+
+
+def test_private_constructors__no_filter(helper):
+    result = list(helper.constructors(prot="private"))
+    assert len(result) == 3
+    assert result[0].name == "MyClass"
+    assert result[0].prot == "private"
+
+
+def test_public_simple_enclosed_types__no_filter(helper):
+    simple_enclosed_types = [m.name for m in helper.simple_enclosed_types(prot="public")]
+    assert sorted(simple_enclosed_types) == sorted(["PublicEnum", "PublicTypedef"])
+
+
+def test_public_simple_enclosed_types__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members=".*Typedef")
+    simple_enclosed_types = [m.name for m in helper.simple_enclosed_types(prot="public")]
+    assert sorted(simple_enclosed_types) == sorted(["PublicTypedef"])
+
+
+def test_public_simple_enclosed_types__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="other")
+    simple_enclosed_types = [m.name for m in helper.simple_enclosed_types(prot="public")]
+    assert len(simple_enclosed_types) == 0
+
+
+def test_protected_simple_enclosed_types__no_filter(helper):
+    simple_enclosed_types = [m.name for m in helper.simple_enclosed_types(prot="protected")]
+    assert sorted(simple_enclosed_types) == sorted(["ProtectedEnum", "ProtectedTypedef"])
+
+
+def test_private_simple_enclosed_types__no_filter(helper):
+    simple_enclosed_types = [m.name for m in helper.simple_enclosed_types(prot="private")]
+    assert sorted(simple_enclosed_types) == sorted(["PrivateEnum", "PrivateTypedef"])
+
+
+def test_public_complex_enclosed_types__no_filter(helper):
+    result = [m.name for m in helper.complex_enclosed_types(prot="public")]
+    assert result == ["PublicType"]
+
+
+def test_public_complex_enclosed_types__filter_match(helper):
+    helper.insert_filter = InsertionFilter(inner_classes=".*Type")
+    result = [m.name for m in helper.complex_enclosed_types(prot="public")]
+    assert result == ["PublicType"]
+
+
+def test_public_complex_enclosed_types__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(inner_classes="NONE")
+    result = [m.name for m in helper.complex_enclosed_types(prot="public")]
+    assert len(result) == 0
+
+
+def test_protected_complex_enclosed_types__no_filter(helper):
+    result = [m.name for m in helper.complex_enclosed_types(prot="protected")]
+    assert result == ["ProtectedType"]
+
+
+def test_private_complex_enclosed_types__no_filter(helper):
+    result = [m.name for m in helper.complex_enclosed_types(prot="private")]
+    assert result == ["PrivateType"]
+
+
+def test_public_variables__no_filter(helper):
+    result = [m.name for m in helper.variables(prot="public")]
+    assert result == ["PublicVariable"]
+
+
+def test_public_variables__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members=".*Var.*")
+    result = [m.name for m in helper.variables(prot="public")]
+    assert result == ["PublicVariable"]
+
+
+def test_public_variables__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.variables(prot="public")]
+    assert len(result) == 0
+
+
+def test_protected_variables__no_filter(helper):
+    result = [m.name for m in helper.variables(prot="protected")]
+    assert result == ["ProtectedVariable"]
+
+
+def test_private_variables__no_filter(helper):
+    result = [m.name for m in helper.variables(prot="private")]
+    assert result == ["PrivateVariable"]

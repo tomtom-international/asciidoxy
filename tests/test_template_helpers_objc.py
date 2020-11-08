@@ -50,63 +50,56 @@ def objc_class():
 
 
 @pytest.fixture
-def helper(generating_api, objc_class):
-    return ObjcTemplateHelper(generating_api, objc_class, InsertionFilter())
-
-
-def test_public_methods__no_filter(helper):
-    result = [m.name for m in helper.public_methods()]
-    assert sorted(result) == sorted(["NS_UNAVAILABLE", "PublicMethod"])
-
-
-def test_public_methods__filter_match(helper):
-    helper.insert_filter = InsertionFilter(members="-NS_")
-    result = [m.name for m in helper.public_methods()]
-    assert sorted(result) == sorted(["PublicMethod"])
-
-
-def test_public_methods__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_methods()]
-    assert len(result) == 0
+def helper(empty_generating_api, objc_class):
+    return ObjcTemplateHelper(empty_generating_api, objc_class, InsertionFilter())
 
 
 def test_public_class_methods__no_filter(helper):
-    result = [m.name for m in helper.public_class_methods()]
+    result = [m.name for m in helper.class_methods(prot="public")]
     assert sorted(result) == sorted(["PublicStaticMethod"])
 
 
 def test_public_class_methods__filter_match(helper):
     helper.insert_filter = InsertionFilter(members="Public")
-    result = [m.name for m in helper.public_class_methods()]
+    result = [m.name for m in helper.class_methods(prot="public")]
     assert sorted(result) == sorted(["PublicStaticMethod"])
 
 
 def test_public_class_methods__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_class_methods()]
+    result = [m.name for m in helper.class_methods(prot="public")]
     assert len(result) == 0
 
 
+def test_private_class_methods__no_filter(helper):
+    result = [m.name for m in helper.class_methods(prot="private")]
+    assert sorted(result) == sorted(["PrivateStaticMethod"])
+
+
 def test_public_properties__no_filter(helper):
-    result = [m.name for m in helper.public_properties()]
+    result = [m.name for m in helper.properties(prot="public")]
     assert result == ["PublicProperty"]
 
 
 def test_public_properties__filter_match(helper):
     helper.insert_filter = InsertionFilter(members="Public")
-    result = [m.name for m in helper.public_properties()]
+    result = [m.name for m in helper.properties(prot="public")]
     assert result == ["PublicProperty"]
 
 
 def test_public_properties__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_properties()]
+    result = [m.name for m in helper.properties(prot="public")]
     assert len(result) == 0
 
 
+def test_private_properties__no_filter(helper):
+    result = [m.name for m in helper.properties(prot="private")]
+    assert result == ["PrivateProperty"]
+
+
 def test_public_simple_enclosed_types__no_filter(helper):
-    result = [m.name for m in helper.public_simple_enclosed_types()]
+    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
     assert sorted(result) == sorted([
         "PublicEnum", "ProtectedEnum", "PrivateEnum", "PublicClass", "ProtectedClass",
         "PrivateClass", "PublicProtocol", "ProtectedProtocol", "PrivateProtocol"
@@ -115,7 +108,7 @@ def test_public_simple_enclosed_types__no_filter(helper):
 
 def test_public_simple_enclosed_types__filter_match(helper):
     helper.insert_filter = InsertionFilter(members=".*Enum")
-    result = [m.name for m in helper.public_simple_enclosed_types()]
+    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
     assert sorted(result) == sorted([
         "PublicEnum",
         "ProtectedEnum",
@@ -125,30 +118,28 @@ def test_public_simple_enclosed_types__filter_match(helper):
 
 def test_public_simple_enclosed_types__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_simple_enclosed_types()]
+    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
     assert len(result) == 0
 
 
-def test_objc_method_signature__no_params_simple_return(generating_api):
+def test_objc_method_signature__no_params_simple_return(helper):
     method = Member("objc")
     method.name = "start"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="void")
-    helper = ObjcTemplateHelper(generating_api)
     assert helper.method_signature(method) == "- (void)start"
 
 
-def test_objc_method_signature__no_params_link_return(generating_api):
+def test_objc_method_signature__no_params_link_return(helper):
     method = Member("objc")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="Value")
     method.returns.type.id = "objc-value"
-    helper = ObjcTemplateHelper(generating_api)
     assert helper.method_signature(method) == "- (xref:objc-value[Value])retrieveValue"
 
 
-def test_objc_method_signature__one_param(generating_api):
+def test_objc_method_signature__one_param(helper):
     method = Member("objc")
     method.name = "setValue:"
     method.returns = ReturnValue()
@@ -160,11 +151,10 @@ def test_objc_method_signature__one_param(generating_api):
     param1.type = TypeRef("objc", "Type1")
     method.params = [param1]
 
-    helper = ObjcTemplateHelper(generating_api)
     assert helper.method_signature(method) == "- (xref:objc-value[Value])setValue:(Type1)arg1"
 
 
-def test_objc_method_signature__multiple_params_simple_return(generating_api):
+def test_objc_method_signature__multiple_params_simple_return(helper):
     method = Member("objc")
     method.name = "setValue:withUnit:andALongerParam:"
     method.returns = ReturnValue()
@@ -185,14 +175,13 @@ def test_objc_method_signature__multiple_params_simple_return(generating_api):
 
     method.params = [param1, param2, param3]
 
-    helper = ObjcTemplateHelper(generating_api)
     assert (helper.method_signature(method) == """\
 - (Value)setValue:(Type1)arg1
          withUnit:(xref:objc-type2[Type2])arg2
   andALongerParam:(Type3)arg3""")
 
 
-def test_objc_method_signature__multiple_params_linked_return(generating_api):
+def test_objc_method_signature__multiple_params_linked_return(helper):
     method = Member("objc")
     method.name = "setValue:withUnit:andALongerParam:"
     method.returns = ReturnValue()
@@ -214,18 +203,16 @@ def test_objc_method_signature__multiple_params_linked_return(generating_api):
 
     method.params = [param1, param2, param3]
 
-    helper = ObjcTemplateHelper(generating_api)
     assert (helper.method_signature(method) == """\
 - (xref:objc-value[Value])setValue:(Type1)arg1
          withUnit:(xref:objc-type2[Type2])arg2
   andALongerParam:(Type3)arg3""")
 
 
-def test_objc_method_signature__class_method(generating_api):
+def test_objc_method_signature__class_method(helper):
     method = Member("objc")
     method.name = "start"
     method.static = True
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="void")
-    helper = ObjcTemplateHelper(generating_api)
     assert helper.method_signature(method) == "+ (void)start"

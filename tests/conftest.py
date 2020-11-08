@@ -219,3 +219,13 @@ def empty_context(input_file, build_dir, fragment_dir):
                    fragment_dir=fragment_dir,
                    reference=ApiReference(),
                    current_document=DocumentTreeNode(input_file))
+
+
+@pytest.fixture
+def empty_preprocessing_api(input_file, empty_context):
+    return PreprocessingApi(input_file, empty_context)
+
+
+@pytest.fixture
+def empty_generating_api(input_file, empty_context):
+    return GeneratingApi(input_file, empty_context)

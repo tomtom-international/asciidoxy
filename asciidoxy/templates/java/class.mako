@@ -37,50 +37,50 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(helper.public_complex_enclosed_types()):
+% if has(helper.complex_enclosed_types(prot="public")):
 |*Enclosed types*
 |
-% for enclosed in helper.public_complex_enclosed_types():
+% for enclosed in helper.complex_enclosed_types(prot="public"):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_constants()):
+% if has(helper.constants(prot="public")):
 |*Constants*
 |
-% for constant in helper.public_constants():
+% for constant in helper.constants(prot="public"):
 `xref:${constant.id}[${constant.returns.type.name} ${constant.name}]`::
 ${constant.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_constructors()):
+% if has(helper.constructors(prot="public")):
 |*Constructors*
 |
-% for constructor in helper.public_constructors():
+% for constructor in helper.constructors(prot="public"):
 `xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_static_methods()):
+% if has(helper.static_methods(prot="public")):
 |*Static methods*
 |
-% for method in helper.public_static_methods():
+% for method in helper.static_methods(prot="public"):
 `xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_methods()):
+% if has(helper.methods(prot="public")):
 |*Methods*
 |
-% for method in helper.public_methods():
+% for method in helper.methods(prot="public"):
 `xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
@@ -90,7 +90,7 @@ ${method.brief}
 
 == Members
 ###################################################################################### Constants ##
-% for constant in helper.public_constants():
+% for constant in helper.constants(prot="public"):
 [[${constant.id},${constant.name}]]
 ${api.inserted(constant)}
 [source,java,subs="-specialchars,macros+"]
@@ -105,7 +105,7 @@ ${constant.description}
 '''
 % endfor
 ################################################################################### Constructors ##
-% for constructor in helper.public_constructors():
+% for constructor in helper.constructors(prot="public"):
 [[${constructor.id},${constructor.name}]]
 ${api.inserted(constructor)}
 [source,java,subs="-specialchars,macros+"]
@@ -143,7 +143,7 @@ ${exception.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in helper.public_static_methods():
+% for method in helper.static_methods(prot="public"):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
@@ -188,7 +188,7 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.public_methods():
+% for method in helper.methods(prot="public"):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
@@ -235,6 +235,6 @@ ${exception.description}
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in helper.public_complex_enclosed_types():
+% for enclosed in helper.complex_enclosed_types(prot="public"):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor

@@ -42,69 +42,69 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if (has_any(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types())):
+% if (has_any(helper.simple_enclosed_types("public"), helper.complex_enclosed_types("public"))):
 |*Enclosed types*
 |
-% for enclosed in chain(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types()):
+% for enclosed in chain(helper.simple_enclosed_types("public"), helper.complex_enclosed_types("public")):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_constructors()):
+% if has(helper.constructors("public")):
 |*Constructors*
 |
-% for constructor in helper.public_constructors():
+% for constructor in helper.constructors("public"):
 `xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_destructors()):
+% if has(helper.destructors("public")):
 |*Destructors*
 |
-% for destructor in helper.public_destructors():
+% for destructor in helper.destructors("public"):
 `xref:${destructor.id}[${destructor.name}()]`::
 ${destructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_operators()):
+% if has(helper.operators("public")):
 |*Operators*
 |
-% for operator in helper.public_operators():
+% for operator in helper.operators("public"):
 `xref:${operator.id}[${operator.name}${helper.type_list(operator.params)}]`::
 ${operator.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_variables()):
+% if has(helper.variables("public")):
 |*Variables*
 |
-% for variable in helper.public_variables():
+% for variable in helper.variables("public"):
 `xref:${variable.id}[${variable.name}]`::
 ${variable.brief}
 % endfor
 % endif
 ###################################################################################################
-% if has(helper.public_static_methods()):
+% if has(helper.static_methods("public")):
 |*Static methods*
 |
-% for method in helper.public_static_methods():
+% for method in helper.static_methods("public"):
 `xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_methods()):
+% if has(helper.methods("public")):
 |*Methods*
 |
-% for method in helper.public_methods():
+% for method in helper.methods("public"):
 `xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${" const" if method.const else ""}]`::
 ${method.brief}
 % endfor
@@ -113,29 +113,29 @@ ${method.brief}
 |===
 
 ##################################################################### Enclosed enums and typedefs ##
-% for enclosed in helper.public_simple_enclosed_types():
+% for enclosed in helper.simple_enclosed_types("public"):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 
 == Members
 
 ################################################################################### Constructors ##
-% for constructor in helper.public_constructors():
+% for constructor in helper.constructors("public"):
 ${api.insert_fragment(constructor, insert_filter, kind_override="method")}
 '''
 % endfor
 #################################################################################### Destructors ##
-% for destructor in helper.public_destructors():
+% for destructor in helper.destructors("public"):
 ${api.insert_fragment(destructor, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Operators ##
-% for operator in helper.public_operators():
+% for operator in helper.operators("public"):
 ${api.insert_fragment(operator, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Variables ##
-% for variable in helper.public_variables():
+% for variable in helper.variables("public"):
 [[${variable.id},${variable.name}]]
 ${api.inserted(variable)}
 
@@ -151,18 +151,18 @@ ${variable.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in helper.public_static_methods():
+% for method in helper.static_methods("public"):
 ${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.public_methods():
+% for method in helper.methods("public"):
 ${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in helper.public_complex_enclosed_types():
+% for enclosed in helper.complex_enclosed_types("public"):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor

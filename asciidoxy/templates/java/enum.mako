@@ -37,7 +37,7 @@ ${element.description}
 [cols='h,5a']
 |===
 
-% for enum in JavaTemplateHelper(api, element, insert_filter).public_variables():
+% for enum in JavaTemplateHelper(api, element, insert_filter).variables(prot="public"):
 ${api.inserted(enum)}
 |
 [[${enum.id},${enum.name}]]${enum.name}

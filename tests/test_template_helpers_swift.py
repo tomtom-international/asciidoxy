@@ -54,49 +54,75 @@ def swift_class():
             builder.inner_class(name=f"{visibility.capitalize()}{inner_type.capitalize()}",
                                 prot=visibility)
 
-    builder.member_function(prot="public", name="init", has_return_value=False)
+        builder.member_function(prot=visibility, name="init", has_return_value=False)
 
     return builder.compound
 
 
 @pytest.fixture
-def helper(generating_api, swift_class):
-    return SwiftTemplateHelper(generating_api, swift_class, InsertionFilter())
+def helper(empty_generating_api, swift_class):
+    return SwiftTemplateHelper(empty_generating_api, swift_class, InsertionFilter())
 
 
 def test_public_methods(helper):
-    result = [m.name for m in helper.public_methods()]
+    result = [m.name for m in helper.methods(prot="public")]
     assert sorted(result) == sorted(["PublicMethod", "PublicMethodNoReturn"])
 
 
 def test_public_type_methods(helper):
-    result = [m.name for m in helper.public_type_methods()]
+    result = [m.name for m in helper.type_methods(prot="public")]
     assert sorted(result) == sorted(["PublicTypeMethod", "PublicTypeMethodNoReturn"])
 
 
 def test_public_properties(helper):
-    result = [m.name for m in helper.public_properties()]
+    result = [m.name for m in helper.properties(prot="public")]
     assert result == ["PublicProperty"]
 
 
+def test_private_methods(helper):
+    result = [m.name for m in helper.methods(prot="private")]
+    assert sorted(result) == sorted(["PrivateMethod", "PrivateMethodNoReturn"])
+
+
 def test_public_constructors(helper):
-    result = [m.name for m in helper.public_constructors()]
+    result = [m.name for m in helper.constructors(prot="public")]
+    assert sorted(result) == sorted(["init"])
+
+
+def test_private_constructors(helper):
+    result = [m.name for m in helper.constructors(prot="private")]
     assert sorted(result) == sorted(["init"])
 
 
 def test_public_simple_enclosed_types(helper):
-    result = [m.name for m in helper.public_simple_enclosed_types()]
+    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
     assert sorted(result) == sorted([
         "PublicEnum",
     ])
 
 
+def test_private_simple_enclosed_types(helper):
+    result = [m.name for m in helper.simple_enclosed_types(prot="private")]
+    assert sorted(result) == sorted([
+        "PrivateEnum",
+    ])
+
+
 def test_public_complex_enclosed_types(helper):
-    result = [m.name for m in helper.public_complex_enclosed_types()]
+    result = [m.name for m in helper.complex_enclosed_types(prot="public")]
     assert sorted(result) == sorted([
         "PublicClass",
         "PublicProtocol",
         "PublicStruct",
+    ])
+
+
+def test_private_complex_enclosed_types(helper):
+    result = [m.name for m in helper.complex_enclosed_types(prot="private")]
+    assert sorted(result) == sorted([
+        "PrivateClass",
+        "PrivateProtocol",
+        "PrivateStruct",
     ])
 
 

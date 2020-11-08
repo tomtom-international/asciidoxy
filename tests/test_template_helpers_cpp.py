@@ -22,12 +22,12 @@ from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 
 
 @pytest.fixture
-def helper(generating_api, cpp_class):
-    return CppTemplateHelper(generating_api, cpp_class, InsertionFilter())
+def helper(empty_generating_api, cpp_class):
+    return CppTemplateHelper(empty_generating_api, cpp_class, InsertionFilter())
 
 
 def test_public_constructors__no_filter(helper):
-    result = list(helper.public_constructors())
+    result = list(helper.constructors(prot="public"))
     assert len(result) == 1
     assert result[0].name == "MyClass"
     assert result[0].prot == "public"
@@ -35,7 +35,7 @@ def test_public_constructors__no_filter(helper):
 
 def test_public_constructors__filter_match(helper):
     helper.insert_filter = InsertionFilter(members="MyClass")
-    result = list(helper.public_constructors())
+    result = list(helper.constructors(prot="public"))
     assert len(result) == 1
     assert result[0].name == "MyClass"
     assert result[0].prot == "public"
@@ -43,12 +43,19 @@ def test_public_constructors__filter_match(helper):
 
 def test_public_constructors__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="OtherClass")
-    result = list(helper.public_constructors())
+    result = list(helper.constructors(prot="public"))
     assert len(result) == 0
 
 
+def test_protected_constructors__no_filter(helper):
+    result = list(helper.constructors(prot="protected"))
+    assert len(result) == 1
+    assert result[0].name == "MyClass"
+    assert result[0].prot == "protected"
+
+
 def test_public_destructors__no_filter(helper):
-    result = list(helper.public_destructors())
+    result = list(helper.destructors(prot="public"))
     assert len(result) == 1
     assert result[0].name == "~MyClass"
     assert result[0].prot == "public"
@@ -56,7 +63,7 @@ def test_public_destructors__no_filter(helper):
 
 def test_public_destructors__filter_match(helper):
     helper.insert_filter = InsertionFilter(members="~MyClass")
-    result = list(helper.public_destructors())
+    result = list(helper.destructors(prot="public"))
     assert len(result) == 1
     assert result[0].name == "~MyClass"
     assert result[0].prot == "public"
@@ -64,108 +71,71 @@ def test_public_destructors__filter_match(helper):
 
 def test_public_destructors__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="OtherClass")
-    result = list(helper.public_destructors())
+    result = list(helper.destructors(prot="public"))
     assert len(result) == 0
 
 
 def test_public_methods__no_filter(helper):
-    result = [m.name for m in helper.public_methods()]
+    result = [m.name for m in helper.methods(prot="public")]
     assert result == ["PublicMethod"]
 
 
 def test_public_methods__filter_match(helper):
     helper.insert_filter = InsertionFilter(members="Public.*")
-    result = [m.name for m in helper.public_methods()]
+    result = [m.name for m in helper.methods(prot="public")]
     assert result == ["PublicMethod"]
 
 
 def test_public_methods__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="PublicThing")
-    result = [m.name for m in helper.public_methods()]
+    result = [m.name for m in helper.methods(prot="public")]
     assert len(result) == 0
 
 
+def test_private_methods__no_filter(helper):
+    result = [m.name for m in helper.methods(prot="private")]
+    assert result == ["PrivateMethod"]
+
+
 def test_public_operators__no_filter(helper):
-    result = [m.name for m in helper.public_operators()]
+    result = [m.name for m in helper.operators(prot="public")]
     assert result == ["operator++"]
 
 
 def test_public_operators__filter_match(helper):
     helper.insert_filter = InsertionFilter(members="ALL")
-    result = [m.name for m in helper.public_operators()]
+    result = [m.name for m in helper.operators(prot="public")]
     assert result == ["operator++"]
 
 
 def test_public_operators__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_operators()]
+    result = [m.name for m in helper.operators(prot="public")]
     assert len(result) == 0
 
 
+def test_private_operators__no_filter(helper):
+    result = [m.name for m in helper.operators(prot="private")]
+    assert result == ["operator++"]
+
+
 def test_public_static_methods__no_filter(helper):
-    result = [m.name for m in helper.public_static_methods()]
+    result = [m.name for m in helper.static_methods(prot="public")]
     assert result == ["PublicStaticMethod"]
 
 
 def test_public_static_methods__filter_match(helper):
     helper.insert_filter = InsertionFilter(members=".*Static.*")
-    result = [m.name for m in helper.public_static_methods()]
+    result = [m.name for m in helper.static_methods(prot="public")]
     assert result == ["PublicStaticMethod"]
 
 
 def test_public_static_methods__filter_no_match(helper):
     helper.insert_filter = InsertionFilter(members="Something")
-    result = [m.name for m in helper.public_static_methods()]
+    result = [m.name for m in helper.static_methods(prot="public")]
     assert len(result) == 0
 
 
-def test_public_variables__no_filter(helper):
-    result = [m.name for m in helper.public_variables()]
-    assert result == ["PublicVariable"]
-
-
-def test_public_variables__filter_match(helper):
-    helper.insert_filter = InsertionFilter(members=".*Var.*")
-    result = [m.name for m in helper.public_variables()]
-    assert result == ["PublicVariable"]
-
-
-def test_public_variables__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.public_variables()]
-    assert len(result) == 0
-
-
-def test_public_simple_enclosed_types__no_filter(helper):
-    simple_enclosed_types = [m.name for m in helper.public_simple_enclosed_types()]
-    assert sorted(simple_enclosed_types) == sorted(
-        ["PublicEnum", "PublicTypedef", "ProtectedEnum", "ProtectedTypedef"])
-
-
-def test_public_simple_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(members=".*Typedef")
-    simple_enclosed_types = [m.name for m in helper.public_simple_enclosed_types()]
-    assert sorted(simple_enclosed_types) == sorted(["PublicTypedef", "ProtectedTypedef"])
-
-
-def test_public_simple_enclosed_types__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(members="other")
-    simple_enclosed_types = [m.name for m in helper.public_simple_enclosed_types()]
-    assert len(simple_enclosed_types) == 0
-
-
-def test_public_complex_enclosed_types__no_filter(helper):
-    result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["PublicType", "ProtectedType"]
-
-
-def test_public_complex_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="Protected")
-    result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert result == ["ProtectedType"]
-
-
-def test_public_complex_enclosed_types__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="NONE")
-    result = [m.name for m in helper.public_complex_enclosed_types()]
-    assert len(result) == 0
+def test_private_static_methods__no_filter(helper):
+    result = [m.name for m in helper.static_methods(prot="private")]
+    assert result == ["PrivateStaticMethod"]

@@ -162,55 +162,55 @@ class TemplateHelper:
     def _method_join(*parts: str) -> str:
         return " ".join(part for part in parts if part)
 
-    def public_static_methods(self) -> Iterator[Member]:
+    def static_methods(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.returns and m.prot == "public" and m.static))
+                if (m.kind == "function" and m.returns and m.prot == prot and m.static))
 
-    def public_methods(self) -> Iterator[Member]:
+    def methods(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.returns and m.prot == "public" and not m.static))
+                if (m.kind == "function" and m.returns and m.prot == prot and not m.static))
 
-    def public_constructors(self) -> Iterator[Member]:
+    def constructors(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         constructor_name = self.element.name
         return (m for m in self.insert_filter.members(self.element)
-                if m.kind == "function" and m.name == constructor_name and m.prot == "public")
+                if m.kind == "function" and m.name == constructor_name and m.prot == prot)
 
-    def public_simple_enclosed_types(self) -> Iterator[Member]:
+    def simple_enclosed_types(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.prot in ("public", "protected") and m.kind in ("enum", "typedef"))
+                if m.prot == prot and m.kind in ("enum", "typedef"))
 
-    def public_complex_enclosed_types(self) -> Iterator[Compound]:
+    def complex_enclosed_types(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m.referred_object for m in self.insert_filter.inner_classes(self.element)
-                if m.referred_object is not None and m.prot in ("public", "protected"))
+                if m.referred_object is not None and m.prot == prot)
 
-    def public_variables(self) -> Iterator[Member]:
+    def variables(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.kind == "variable" and m.prot == "public")
+                if m.kind == "variable" and m.prot == prot)
 
-    def public_properties(self) -> Iterator[Member]:
+    def properties(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.kind == "property" and m.prot == "public")
+                if m.kind == "property" and m.prot == prot)
 
 
 def has(elements):

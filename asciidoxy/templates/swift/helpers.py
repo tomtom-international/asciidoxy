@@ -44,26 +44,25 @@ class SwiftTemplateHelper(TemplateHelper):
         return (f"typealias {closure.name} = {self.argument_list(closure.returns.type.args)}"
                 f" -> {self.print_ref(closure.returns.type, skip_args=True)}")
 
-    def public_static_methods(self) -> Iterator[Member]:
+    def static_methods(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.prot == "public" and m.static))
+                if (m.kind == "function" and m.prot == prot and m.static))
 
-    def public_methods(self) -> Iterator[Member]:
-        assert self.element is not None
-        assert self.insert_filter is not None
-
-        return (m for m in self.insert_filter.members(self.element) if (
-            m.kind == "function" and m.prot == "public" and not m.static and m.name != "init"))
-
-    def public_type_methods(self) -> Iterator[Member]:
-        return self.public_static_methods()
-
-    def public_constructors(self) -> Iterator[Member]:
+    def methods(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.kind == "function" and m.name == "init" and m.prot == "public")
+                if (m.kind == "function" and m.prot == prot and not m.static and m.name != "init"))
+
+    type_methods = static_methods
+
+    def constructors(self, prot: str) -> Iterator[Member]:
+        assert self.element is not None
+        assert self.insert_filter is not None
+
+        return (m for m in self.insert_filter.members(self.element)
+                if m.kind == "function" and m.name == "init" and m.prot == prot)
