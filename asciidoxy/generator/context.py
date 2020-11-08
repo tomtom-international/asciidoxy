@@ -14,6 +14,7 @@
 """Context of the document being generated."""
 
 import logging
+import uuid
 
 from pathlib import Path
 from typing import Dict, MutableMapping, Optional, Set, Tuple
@@ -24,7 +25,7 @@ from ..api_reference import ApiReference
 from ..model import ReferableElement
 from .errors import ConsistencyError
 from .filters import InsertionFilter
-from .navigation import DocumentTreeNode
+from .navigation import DocumentTreeNode, relative_path
 
 logger = logging.getLogger(__name__)
 
@@ -137,3 +138,79 @@ class Context(object):
 
     def link_to_element(self, element_id: str) -> None:
         self.linked.add(element_id)
+
+    def register_adoc_file(self, in_file: Path) -> Path:
+        assert in_file.is_absolute()
+        if self.embedded:
+            out_file = self.embedded_file_map.get((in_file, self.current_document.in_file), None)
+        else:
+            out_file = self.in_to_out_file_map.get(in_file, None)
+
+        if out_file is None:
+            if self.embedded:
+                out_file = _embedded_out_file_name(in_file)
+                self.embedded_file_map[(in_file, self.current_document.in_file)] = out_file
+            else:
+                out_file = _out_file_name(in_file)
+                self.in_to_out_file_map[in_file] = out_file
+
+        return out_file
+
+    def link_to_adoc_file(self, file_name: Path):
+        """Determine the correct path to link to a file.
+
+        The exact path differs for single and multipage mode and whether a file is embedded or not.
+        AsciiDoctor processes links in included files as if they are originating from the top level
+        file.
+        """
+        assert file_name.is_absolute()
+
+        if self.multipage:
+            embedded_file = self.embedded_file_map.get((file_name, self.current_document.in_file))
+            if embedded_file is not None:
+                # File is embedded in the current document, link to generated embedded file
+                return relative_path(self.current_document.in_file, embedded_file)
+            else:
+                # File is not embedded, link to original file name
+                return relative_path(self.current_document.in_file, file_name)
+
+        else:
+            # In singlepage mode all links need to be relative to the root file
+            embedded_file = self.embedded_file_map.get((file_name, self.current_document.in_file))
+            if embedded_file is not None:
+                # File is embedded in the current document, link to generated embedded file
+                return relative_path(self.current_document.root().in_file, embedded_file)
+
+            out_file = self.in_to_out_file_map.get(file_name, None)
+            if out_file is not None:
+                # File has been processed, and as we are in single page mode, it is embedded as
+                # well
+                return relative_path(self.current_document.root().in_file, out_file)
+
+            else:
+                # File is not processed, create relative link from current top level document
+                return relative_path(self.current_document.root().in_file, file_name)
+
+    def docinfo_footer_file(self) -> Path:
+        if self.multipage:
+            in_file = self.current_document.in_file
+        else:
+            in_file = self.current_document.root().in_file
+
+        out_file = self.in_to_out_file_map.get(in_file, None)
+        if out_file is None:
+            out_file = _out_file_name(in_file)
+
+        return _docinfo_footer_file_name(out_file)
+
+
+def _out_file_name(in_file: Path) -> Path:
+    return in_file.parent / f".asciidoxy.{in_file.name}"
+
+
+def _embedded_out_file_name(in_file: Path) -> Path:
+    return in_file.parent / f".asciidoxy.{uuid.uuid4()}.{in_file.name}"
+
+
+def _docinfo_footer_file_name(out_file: Path) -> Path:
+    return out_file.parent / f"{out_file.stem}-docinfo-footer.html"

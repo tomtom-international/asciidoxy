@@ -360,11 +360,13 @@ def test_link_cannot_mix_text_and_full_name(warnings_are_errors, generating_api)
         generating_api.link("asciidoxy::geometry::Coordinate", text="ALT", full_name=True)
 
 
-def test_cross_document_ref_with_relative_path(sub_document_api, sub_document_file, context):
+def test_cross_document_ref_with_relative_path(sub_document_api, sub_document_file, context,
+                                               input_file):
     anchor = "anchor"
     target_file_rel = Path("includes") / "other_file.adoc"
     target_file = sub_document_file.parent / target_file_rel
-    target_file_rel_to_base_dir = target_file.relative_to(context.base_dir)
+    target_file_rel_to_base_dir = target_file.relative_to(input_file.parent)
+    context.register_adoc_file(target_file)
 
     result = sub_document_api.cross_document_ref(target_file_rel, anchor)
     assert result == (f"<<{target_file_rel_to_base_dir.with_name(f'.asciidoxy.{target_file.name}')}"
@@ -380,10 +382,12 @@ def test_cross_document_ref_with_relative_path_multipage(sub_document_api, sub_d
     assert result == (f"<<{target_file_rel}#{anchor},{anchor}>>")
 
 
-def test_cross_document_ref_with_absolute_path(sub_document_api, sub_document_file, context):
+def test_cross_document_ref_with_absolute_path(sub_document_api, sub_document_file, context,
+                                               input_file):
     anchor = "anchor"
     target_file = sub_document_file.parent / "includes" / "other_file.adoc"
-    target_file_rel_to_base_dir = target_file.relative_to(context.base_dir)
+    target_file_rel_to_base_dir = target_file.relative_to(input_file.parent)
+    context.register_adoc_file(target_file)
 
     result = sub_document_api.cross_document_ref(target_file, anchor)
     assert result == (f"<<{target_file_rel_to_base_dir.with_name(f'.asciidoxy.{target_file.name}')}"
@@ -401,12 +405,14 @@ def test_cross_document_ref_with_absolute_path_multipage(sub_document_api, sub_d
     assert result == (f"<<{target_file_rel_to_base_dir}#{anchor},{anchor}>>")
 
 
-def test_cross_document_ref_with_link_text(sub_document_api, sub_document_file, context):
+def test_cross_document_ref_with_link_text(sub_document_api, sub_document_file, context,
+                                           input_file):
     anchor = "anchor"
     link_text = "Link"
     target_file_rel = Path("includes") / "other_file.adoc"
     target_file = sub_document_file.parent / target_file_rel
-    target_file_rel_to_base_dir = target_file.relative_to(context.base_dir)
+    target_file_rel_to_base_dir = target_file.relative_to(input_file.parent)
+    context.register_adoc_file(target_file)
 
     result = sub_document_api.cross_document_ref(target_file_rel, anchor, link_text)
     assert result == (f"<<{target_file_rel_to_base_dir.with_name(f'.asciidoxy.{target_file.name}')}"
@@ -614,8 +620,10 @@ def test_include__always_embed(preprocessing_api, generating_api, context, input
         assert file_name.is_absolute()
 
 
-def test_include__always_embed__unique_name(preprocessing_api, generating_api, context, input_file,
-                                            single_and_multipage):
+def test_include__always_embed__unique_name_for_each_including_file(preprocessing_api,
+                                                                    generating_api, context,
+                                                                    input_file,
+                                                                    single_and_multipage):
     include_file = input_file.parent / "includes" / "another_file.adoc"
     include_file.parent.mkdir(parents=True)
     include_file.touch()
@@ -625,8 +633,12 @@ def test_include__always_embed__unique_name(preprocessing_api, generating_api, c
 
     file_names = []
 
-    for _ in range(10):
+    for i in range(10):
+        in_file = input_file.parent / f"base{i}.adoc"
+        in_file.touch()
+        context.current_document.in_file = in_file
         for api in (preprocessing_api, generating_api):
+            api.current_file = in_file
             result = api.include("includes/another_file.adoc", always_embed=True)
             assert result.startswith("include::")
             assert result.endswith("[leveloffset=+1]")
@@ -650,6 +662,7 @@ ${{api.cross_document_ref("../{input_file.name}", "")}}
     context.current_document.in_file = input_file
     context.current_document.children.append(
         DocumentTreeNode(include_file, context.current_document))
+    context.register_adoc_file(input_file)
 
     for api in (preprocessing_api, generating_api):
         result = api.include("includes/another_file.adoc", always_embed=True)
@@ -663,10 +676,10 @@ ${{api.cross_document_ref("../{input_file.name}", "")}}
     contents = file_name.read_text()
     if single_and_multipage:
         # multipage
-        assert "<<input_file.adoc#,>>" in contents
+        assert "<<input_file.adoc#,>>" in contents, contents
     else:
         # singlepage
-        assert "<<includes/.asciidoxy.input_file.adoc#,>>" in contents
+        assert "<<.asciidoxy.input_file.adoc#,>>" in contents, contents
 
 
 def test_multipage_toc__default(generating_api, input_file, multipage):

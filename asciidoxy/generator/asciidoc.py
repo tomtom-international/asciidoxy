@@ -16,7 +16,6 @@
 import functools
 import logging
 import os
-import uuid
 
 from abc import ABC, abstractmethod
 from mako.exceptions import TopLevelLookupException
@@ -253,18 +252,9 @@ class Api(ABC):
             AsciiDoc cross-document reference.
         """
         referenced_file_name = Path(file_name)
-
-        if not self._context.multipage:
-            file_path = Path(file_name)
-            if not file_path.is_absolute():
-                file_path = (self._current_file.parent / file_path).resolve().relative_to(
-                    self._context.base_dir)
-            referenced_file_name = _out_file_name(file_path)
-
-        absolute_link_file_path = (referenced_file_name if referenced_file_name.is_absolute() else
-                                   self._current_file.parent / referenced_file_name).resolve()
-        link_file_path = relative_path(self._context.current_document.in_file,
-                                       absolute_link_file_path)
+        absolute_file_path = (referenced_file_name if referenced_file_name.is_absolute() else
+                              self._current_file.parent / referenced_file_name).resolve()
+        link_file_path = self._context.link_to_adoc_file(absolute_file_path)
         return (f"<<{link_file_path}#{anchor},"
                 f"{link_text if link_text is not None else anchor}>>")
 
@@ -578,13 +568,7 @@ class PreprocessingApi(Api):
     def process_adoc(self):
         logger.info(f"Preprocessing {self._current_file}")
 
-        if self._context.embedded:
-            out_file = _embedded_out_file_name(self._current_file, self._context)
-            self._context.embedded_file_map[(self._current_file,
-                                             self._context.current_document.in_file)] = out_file
-        else:
-            out_file = _out_file_name(self._current_file)
-            self._context.in_to_out_file_map[self._current_file] = out_file
+        out_file = self._context.register_adoc_file(self._current_file)
 
         if self._context.progress is not None:
             self._context.progress.total = 2 * (len(self._context.in_to_out_file_map) +
@@ -606,8 +590,7 @@ class GeneratingApi(Api):
             return ""
 
         toc_content = multipage_toc(self._context.current_document, side)
-        with _docinfo_footer_file_name(self._context.current_document.in_file).open(
-                mode="w", encoding="utf-8") as f:
+        with self._context.docinfo_footer_file().open(mode="w", encoding="utf-8") as f:
             f.write(toc_content)
         return ":docinfo: private"
 
@@ -672,11 +655,7 @@ class GeneratingApi(Api):
         logger.info(f"Processing {self._current_file}")
         self._context.linked = []
 
-        if self._context.embedded:
-            out_file = self._context.embedded_file_map[(self._current_file,
-                                                        self._context.current_document.in_file)]
-        else:
-            out_file = self._context.in_to_out_file_map[self._current_file]
+        out_file = self._context.register_adoc_file(self._current_file)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
         rendered_doc = template.render(api=self)
@@ -744,15 +723,3 @@ def _check_links(context: Context):
             raise ConsistencyError(msg)
         else:
             logger.warning(msg)
-
-
-def _out_file_name(in_file: Path) -> Path:
-    return in_file.parent / f".asciidoxy.{in_file.name}"
-
-
-def _embedded_out_file_name(in_file: Path, context: Context) -> Path:
-    return context.current_document.in_file.parent / f".asciidoxy.{uuid.uuid4()}.{in_file.name}"
-
-
-def _docinfo_footer_file_name(in_file: Path) -> Path:
-    return in_file.parent / f".asciidoxy.{in_file.stem}-docinfo-footer.html"

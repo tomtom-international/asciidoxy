@@ -17,6 +17,7 @@
 
 export DOC_BUILD_DIR := $(BUILD_DIR)/doc
 export DOXYGEN_BUILD_DIR := $(DOC_BUILD_DIR)/doxygen
+MULTIPAGE ?= --multipage
 
 docs: $(DOC_BUILD_DIR)/output/index.html
 
@@ -60,5 +61,5 @@ $(ADOC_OUT_FILES): $(ADOC_IN_FILES) $(DOC_BUILD_DIR)/asciidoxy $(CURDIR)/asciido
 		--build-dir $(DOC_BUILD_DIR)/asciidoxy \
 		--destination-dir $(DOC_BUILD_DIR)/output \
 		--spec-file asciidoxy.toml \
-		--debug --multipage \
+		--debug $(MULTIPAGE) \
 		-a linkcss
