@@ -43,10 +43,6 @@ Calculate the current delay.
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0[void RegisterTrafficCallback(std::function&lt;void(const TrafficEventData &, int delay)&gt;)]`::
 Register a callback to receive updates for the traffic event.
 
-|*Private Variables*
-|
-`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad[data_]`::
-
 |===
 
 include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9.adoc[leveloffset=+1]
@@ -66,19 +62,6 @@ include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33
 include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17.adoc[leveloffset=+1]
 '''
 include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0.adoc[leveloffset=+1]
-'''
-[[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad,data_]]
-
-
-[source,cpp,subs="-specialchars,macros+"]
-----
-xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData] data_
-----
-
-
-
-
-
 '''
 
 

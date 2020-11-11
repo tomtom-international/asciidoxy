@@ -69,7 +69,10 @@ def test_fragment(generating_api, adoc_data, fragment_dir, element_name, languag
 
 filtered_testdata = [
     ("asciidoxy::geometry::Coordinate", "cpp", {
-        "members": "-Altitude"
+        "members": {
+            "name": "-Altitude",
+            "prot": "ALL"
+        }
     }, "fragments/cpp/class_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent::Severity", "cpp", {
         "enum_values": ["+Medium", "+High"]
@@ -81,6 +84,9 @@ filtered_testdata = [
         "members": "-delay"
     }, "fragments/cpp/struct_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent", "cpp", {
+        "members": {
+            "prot": "ALL"
+        },
         "inner_classes": ["+Severity", "-TrafficEventData"]
     }, "fragments/cpp/nested_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", {

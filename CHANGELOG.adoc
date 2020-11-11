@@ -26,7 +26,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Swift: [AD-28] Generating Swift documentation based on Objective C source code.
   - Kotlin: [AD-27] Generating Kotlin documentation based on Java source code.
   - [AD-15] Allow forcing to embed an included file in multipage mode.
-  - [AD-37] Show members for other visibility levels than public.
+  - [AD-37] Show members for other visibility levels than public. By default only public and
+    protected members are shown. Use `api.filter` to change.
 
 === Changed
 

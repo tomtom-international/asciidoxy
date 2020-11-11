@@ -80,7 +80,7 @@ class Context(object):
         self.build_dir = build_dir
         self.fragment_dir = fragment_dir
 
-        self.insert_filter = InsertionFilter()
+        self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]})
 
         self.reference = reference
 
