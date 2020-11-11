@@ -1,0 +1,20 @@
+
+
+
+= [[kotlin-interfacecom_1_1asciidoxy_1_1system_1_1_service,Service]]Service
+
+
+[source,java,subs="-specialchars,macros+"]
+----
+interface com.asciidoxy.system.Service
+----
+Base class for services.
+
+
+
+[cols='h,5a']
+|===
+|===
+
+== Members
+

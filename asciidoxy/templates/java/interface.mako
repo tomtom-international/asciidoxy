@@ -35,42 +35,44 @@ ${element.description}
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
-
+% for prot in ("public", "protected", "default", "private"):
 ###################################################################################################
-% if has(helper.constants(prot="public")):
+% if has(helper.constants(prot=prot)):
 |*Constants*
 |
-% for constant in helper.constants(prot="public"):
+% for constant in helper.constants(prot=prot):
 `xref:${constant.id}[${constant.returns.type.name} ${constant.name}]`::
 ${constant.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.static_methods(prot="public")):
+% if has(helper.static_methods(prot=prot)):
 |*Static methods*
 |
-% for method in helper.static_methods(prot="public"):
+% for method in helper.static_methods(prot=prot):
 `xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.methods(prot="public")):
+% if has(helper.methods(prot=prot)):
 |*Methods*
 |
-% for method in helper.methods(prot="public"):
+% for method in helper.methods(prot=prot):
 `xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
+% endfor
 |===
 
 == Members
+% for prot in ("public", "protected", "default", "private"):
 ###################################################################################### Constants ##
-% for constant in helper.constants(prot="public"):
+% for constant in helper.constants(prot=prot):
 [[${constant.id},${constant.name}]]
 ${api.inserted(constant)}
 [source,java,subs="-specialchars,macros+"]
@@ -85,7 +87,7 @@ ${constant.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in helper.static_methods(prot="public"):
+% for method in helper.static_methods(prot=prot):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
@@ -130,7 +132,7 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.methods(prot="public"):
+% for method in helper.methods(prot=prot):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
@@ -173,4 +175,5 @@ ${exception.description}
 |===
 % endif
 '''
+% endfor
 % endfor

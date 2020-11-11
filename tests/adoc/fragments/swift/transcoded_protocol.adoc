@@ -14,13 +14,12 @@ Information about a traffic event.
 
 [cols='h,5a']
 |===
-
-|*Properties*
+|*Public Properties*
 |
 `xref:swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b[data]`::
 Traffic event details.
 
-|*Methods*
+|*Public Methods*
 |
 `xref:swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262[update(Integer, Integer)]`::
 Update the traffic event data.
@@ -29,6 +28,7 @@ Update the traffic event data.
 
 
 == Members
+
 
 [[swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,data]]
 
@@ -72,6 +72,12 @@ True if the update is valid.
 |===
 
 '''
+
+
+
+
+
+
 
 
 

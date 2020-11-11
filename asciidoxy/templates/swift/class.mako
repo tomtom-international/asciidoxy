@@ -35,68 +35,71 @@ ${element.description}
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
-
+% for prot in ("open", "public", "internal", "file-private", "private"):
 ###################################################################################################
-% if has(helper.simple_enclosed_types(prot="public")) or has(helper.complex_enclosed_types(prot="public")):
-|*Enclosed types*
+% if has(helper.simple_enclosed_types(prot=prot)) or has(helper.complex_enclosed_types(prot=prot)):
+|*${prot.capitalize()} Enclosed Types*
 |
-% for enclosed in chain(helper.simple_enclosed_types(prot="public"), helper.complex_enclosed_types(prot="public")):
+% for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.constructors(prot="public")):
-|*Constructors*
+% if has(helper.constructors(prot=prot)):
+|*${prot.capitalize()} Constructors*
 |
-% for constructor in helper.constructors(prot="public"):
+% for constructor in helper.constructors(prot=prot):
 `xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.properties(prot="public")):
-|*Properties*
+% if has(helper.properties(prot=prot)):
+|*${prot.capitalize()} Properties*
 |
-% for prop in helper.properties(prot="public"):
+% for prop in helper.properties(prot=prot):
 `xref:${prop.id}[${prop.name}]`::
 ${prop.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.type_methods(prot="public")):
-|*Type methods*
+% if has(helper.type_methods(prot=prot)):
+|*${prot.capitalize()} Type Methods*
 |
-% for method in helper.type_methods(prot="public"):
+% for method in helper.type_methods(prot=prot):
 `xref:${method.id}[${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.methods(prot="public")):
-|*Methods*
+% if has(helper.methods(prot=prot)):
+|*${prot.capitalize()} Methods*
 |
-% for method in helper.methods(prot="public"):
+% for method in helper.methods(prot=prot):
 `xref:${method.id}[${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
+%endfor
 |===
 
 ############################################################################ Simple inner types ##
-% for enclosed in helper.simple_enclosed_types(prot="public"):
+% for prot in ("open", "public", "internal", "file-private", "private"):
+% for enclosed in helper.simple_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
+%endfor
 
 == Members
-
+% for prot in ("open", "public", "internal", "file-private", "private"):
 ################################################################################### Constructors ##
-% for constructor in helper.constructors(prot="public"):
+% for constructor in helper.constructors(prot=prot):
 [[${constructor.id},${constructor.name}]]
 ${api.inserted(constructor)}
 [source,swift,subs="-specialchars,macros+"]
@@ -135,7 +138,7 @@ ${exception.description}
 '''
 % endfor
 ##################################################################################### Properties ##
-% for prop in helper.properties(prot="public"):
+% for prop in helper.properties(prot=prot):
 [[${prop.id},${prop.name}]]
 ${api.inserted(prop)}
 [source,swift,subs="-specialchars,macros+"]
@@ -150,7 +153,7 @@ ${prop.description}
 '''
 % endfor
 ################################################################################### Type methods ##
-% for method in helper.type_methods(prot="public"):
+% for method in helper.type_methods(prot=prot):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,swift,subs="-specialchars,macros+"]
@@ -196,7 +199,7 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.methods(prot="public"):
+% for method in helper.methods(prot=prot):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,swift,subs="-specialchars,macros+"]
@@ -244,6 +247,7 @@ ${exception.description}
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in helper.complex_enclosed_types(prot="public"):
+% for enclosed in helper.complex_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
+% endfor
 % endfor

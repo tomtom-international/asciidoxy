@@ -16,8 +16,7 @@ Use the cause and delay to properly inform your users.
 
 [cols='h,5a']
 |===
-
-|*Variables*
+|*Public Variables*
 |
 `xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675[cause]`::
 TPEG cause code.

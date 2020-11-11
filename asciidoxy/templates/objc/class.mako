@@ -39,58 +39,59 @@ ${element.description}
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
-
+% for prot in ("public", "protected", "private"):
 ###################################################################################################
-% if has(helper.simple_enclosed_types(prot="public")):
-|*Enclosed types*
+% if has(helper.simple_enclosed_types(prot=prot)):
+|*${prot.capitalize()} Enclosed Types*
 |
-% for enclosed in helper.simple_enclosed_types(prot="public"):
+% for enclosed in helper.simple_enclosed_types(prot=prot):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.properties(prot="public")):
-|*Properties*
+% if has(helper.properties(prot=prot)):
+|*${prot.capitalize()} Properties*
 |
-% for prop in helper.properties(prot="public"):
+% for prop in helper.properties(prot=prot):
 `xref:${prop.id}[${prop.name}]`::
 ${prop.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.class_methods(prot="public")):
-|*Class methods*
+% if has(helper.class_methods(prot=prot)):
+|*${prot.capitalize()} Class Methods*
 |
-% for method in helper.class_methods(prot="public"):
+% for method in helper.class_methods(prot=prot):
 `xref:${method.id}[+ ${method.name}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.methods(prot="public")):
-|*Methods*
+% if has(helper.methods(prot=prot)):
+|*${prot.capitalize()} Methods*
 |
-% for method in helper.methods(prot="public"):
+% for method in helper.methods(prot=prot):
 `xref:${method.id}[- ${method.name}]`::
 ${method.brief}
 % endfor
 
 % endif
+% endfor
 |===
 
 ############################################################################ Simple inner types ##
-% for enclosed in helper.simple_enclosed_types(prot="public"):
+% for enclosed in helper.simple_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 
 == Members
-
+% for prot in ("public", "protected", "private"):
 ##################################################################################### Properties ##
-% for prop in helper.properties(prot="public"):
+% for prop in helper.properties(prot=prot):
 [[${prop.id},${prop.name}]]
 ${api.inserted(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
@@ -105,7 +106,7 @@ ${prop.description}
 '''
 % endfor
 ################################################################################## Class methods ##
-% for method in helper.class_methods(prot="public"):
+% for method in helper.class_methods(prot=prot):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
@@ -151,7 +152,7 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.methods(prot="public"):
+% for method in helper.methods(prot=prot):
 [[${method.id},${method.name}]]
 ${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
@@ -195,4 +196,5 @@ ${exception.description}
 % endif
 
 '''
+% endfor
 % endfor

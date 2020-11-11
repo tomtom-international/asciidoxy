@@ -1,0 +1,53 @@
+
+
+= [[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity,com.asciidoxy.traffic.TrafficEvent.Severity]]Severity
+
+
+[source,java,subs="-specialchars,macros+"]
+----
+import TrafficEvent.java
+
+enum com.asciidoxy.traffic.TrafficEvent.Severity
+----
+
+xref:java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity[Severity] scale for traffic events.
+
+The more severe the traffic event, the more likely it is to have a large delay.
+
+[cols='h,5a']
+|===
+
+
+|
+[[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1abb3f4d789ff9e6fdb967133fa1ef1625,Low]]Low
+|
+Low severity.
+
+
+
+
+|
+[[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1aa9555621413c089cc41f0d6a95c1b61b,Medium]]Medium
+|
+Medium severity.
+
+
+
+
+|
+[[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a0761f7236594c0ea634494296ce21510,High]]High
+|
+High severity.
+
+Better stay away here.
+
+
+|
+[[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a41514643a9ae47d769580925859625f5,Unknown]]Unknown
+|
+xref:java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity[Severity] unknown.
+
+
+
+|===
+

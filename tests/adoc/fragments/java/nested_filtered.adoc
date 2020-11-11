@@ -14,18 +14,17 @@ Information about a traffic event.
 
 [cols='h,5a']
 |===
-
-|*Enclosed types*
+|*Public Enclosed Types*
 |
 `xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]`::
 Details about a traffic event.
 
-|*Constructors*
+|*Public Constructors*
 |
 `xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e[TrafficEvent(TrafficEventData)]`::
 Construct a traffic event from data.
 
-|*Methods*
+|*Public Methods*
 |
 `xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac[TrafficEventData Data()]`::
 Get the traffic event details.
@@ -107,4 +106,8 @@ True if the update is valid.
 
 
 include::DIRECTORY/java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data.adoc[leveloffset=+1]
+
+
+
+
 

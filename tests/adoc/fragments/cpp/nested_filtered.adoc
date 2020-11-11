@@ -16,20 +16,19 @@ Information about a traffic event.
 
 [cols='h,5a']
 |===
-
-|*Enclosed types*
+|*Public Enclosed Types*
 |
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[Severity]`::
 Severity scale for traffic events.
 
-|*Constructors*
+|*Public Constructors*
 |
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41[TrafficEvent()]`::
 Default constructor.
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc[TrafficEvent(TrafficEventData)]`::
 Construct a traffic event from data.
 
-|*Methods*
+|*Public Methods*
 |
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28[const TrafficEventData & Data() const]`::
 Get the traffic event details.
@@ -41,6 +40,10 @@ Get a shared pointer to a copy of the data.
 Calculate the current delay.
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0[void RegisterTrafficCallback(std::function&lt;void(const TrafficEventData &, int delay)&gt;)]`::
 Register a callback to receive updates for the traffic event.
+
+|*Private Variables*
+|
+`xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad[data_]`::
 
 |===
 
@@ -61,6 +64,19 @@ include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33
 include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17.adoc[leveloffset=+1]
 '''
 include::DIRECTORY/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0.adoc[leveloffset=+1]
+'''
+[[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad,data_]]
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData] data_
+----
+
+
+
+
+
 '''
 
 

@@ -16,13 +16,12 @@ Information about a traffic event.
 
 [cols='h,5a']
 |===
-
-|*Properties*
+|*Public Properties*
 |
 `xref:objc-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b[data]`::
 Traffic event details.
 
-|*Methods*
+|*Public Methods*
 |
 `xref:objc-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262[updateWithCause:andDelay:]`::
 Update the traffic event data.
@@ -31,7 +30,6 @@ Update the traffic event data.
 
 
 == Members
-
 [[objc-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,data]]
 
 [source,objectivec,subs="-specialchars,macros+"]

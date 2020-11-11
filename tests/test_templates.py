@@ -153,6 +153,14 @@ def test_local_filter(generating_api, adoc_data, fragment_dir, element_name, lan
     ("ADCoordinate", "objc", "swift", "fragments/swift/transcoded_interface.adoc"),
     ("OnTrafficEventCallback", "objc", "swift", "fragments/swift/transcoded_block.adoc"),
     ("TpegCauseCode", "objc", "swift", "fragments/swift/transcoded_typedef.adoc"),
+    ("com.asciidoxy.geometry.Coordinate", "java", "kotlin",
+     "fragments/kotlin/transcoded_class.adoc"),
+    ("com.asciidoxy.traffic.TrafficEvent.Severity", "java", "kotlin",
+     "fragments/kotlin/transcoded_enum.adoc"),
+    ("com.asciidoxy.system.Service", "java", "kotlin",
+     "fragments/kotlin/transcoded_interface.adoc"),
+    ("com.asciidoxy.traffic.TrafficEvent", "java", "kotlin",
+     "fragments/kotlin/transcoded_nested.adoc"),
 ])
 def test_transcoded_fragment(generating_api, adoc_data, fragment_dir, element_name, source, target,
                              expected_result, update_expected_results):
