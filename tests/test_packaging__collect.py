@@ -21,9 +21,9 @@ import toml
 from aiohttp import web
 from pathlib import Path
 
-from asciidoxy.collect import (DownloadError, InvalidPackageError, HttpPackageSpec, Package,
-                               SpecificationError, LocalPackageSpec, collect, specs_from_file,
-                               versions_from_file)
+from asciidoxy.packaging.collect import (DownloadError, InvalidPackageError, HttpPackageSpec,
+                                         Package, SpecificationError, LocalPackageSpec, collect,
+                                         specs_from_file, versions_from_file)
 
 from .shared import ProgressMock
 

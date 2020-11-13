@@ -28,10 +28,10 @@ from mako.exceptions import RichTraceback
 from tqdm import tqdm
 
 from .api_reference import ApiReference
-from .collect import collect, specs_from_file, CollectError, SpecificationError
 from .doxygenparser import Driver as ParserDriver
 from .generator import process_adoc, AsciiDocError
 from .model import json_repr
+from .packaging import collect, specs_from_file, CollectError, SpecificationError
 from ._version import __version__
 
 
