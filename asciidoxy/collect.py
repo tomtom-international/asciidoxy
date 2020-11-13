@@ -78,22 +78,56 @@ class SpecificationError(Exception):
         return f"Invalid specification: {self.message}"
 
 
+def path_from_toml(data: Mapping[str, Any], key: str, root: Path) -> Optional[Path]:
+    value = data.get(key, None)
+    if value is not None:
+        return root / value
+    return None
+
+
 class Package:
     """A package that is ready to be used by AsciiDoxy.
 
     Attributes:
-        name: Name of the package.
-        xml_dirs: List of directories containing XML descriptions of the API.
-        include_dirs: List of directories containing files for inclusion in the documentation.
+        name:           Name of the package.
+        reference_type: Type of API reference information in the package.
+        reference_dir:  Directory containing API reference information.
+        adoc_src_dir:   Directory containing AsciiDoc files and other files to include in the
+                            documentation. Image files should be separate in `adoc_image_dir`.
+        adoc_image_dir: Directory containing images to include in the documentation.
+        adoc_root_doc:  Entry point document for the package. To be linked to if no specific file
+                            in the package is mentioned.
+        scoped:         True if this is a new-style, scoped package.
     """
     name: str
-    xml_dirs: List[Path]
-    include_dirs: List[Path]
+    reference_type: Optional[str] = None
+    reference_dir: Optional[Path] = None
+    adoc_src_dir: Optional[Path] = None
+    adoc_image_dir: Optional[Path] = None
+    adoc_root_doc: Optional[Path] = None
+    scoped: bool = False
 
     def __init__(self, name: str):
         self.name = name
-        self.xml_dirs = []
-        self.include_dirs = []
+
+    def load_from_toml(self, pkg_root: Path, data: Mapping[str, Any]) -> None:
+        package = data.get("package", None)
+        if package is not None:
+            self.name = package.get("name", self.name)
+
+        reference = data.get("reference", None)
+        if reference is not None:
+            self.reference_type = reference.get("type", None)
+            self.reference_dir = path_from_toml(reference, "dir", pkg_root)
+
+        adoc = data.get("asciidoc", None)
+        if adoc is not None:
+            self.adoc_src_dir = path_from_toml(adoc, "src_dir", pkg_root)
+            self.adoc_image_dir = path_from_toml(adoc, "image_dir", pkg_root)
+            if self.adoc_src_dir is not None:
+                self.adoc_root_doc = path_from_toml(adoc, "root_doc", self.adoc_src_dir)
+
+        self.scoped = True
 
 
 PackageSpecT = TypeVar("PackageSpecT", bound="PackageSpec")
@@ -163,18 +197,25 @@ class PackageSpec(ABC):
 
     def _make_package(self, package_dir: Path) -> Package:
         pkg = Package(self.name)
-        if self.xml_subdir:
-            xml_dir = package_dir / self.xml_subdir
-            if xml_dir.is_dir():
-                logger.debug(f"{self.name} has XML subdirectory")
-                pkg.xml_dirs.append(xml_dir)
-        if self.include_subdir:
-            include_dir = package_dir / self.include_subdir
-            if include_dir.is_dir():
-                logger.debug(f"{self.name} has include subdirectory")
-                pkg.include_dirs.append(include_dir)
 
-        if not pkg.xml_dirs and not pkg.include_dirs:
+        pkg_contents_file = package_dir / "contents.toml"
+        if pkg_contents_file.is_file():
+            pkg.load_from_toml(package_dir, toml.load(pkg_contents_file))
+
+        else:
+            if self.xml_subdir:
+                xml_dir = package_dir / self.xml_subdir
+                if xml_dir.is_dir():
+                    logger.debug(f"{self.name} has XML subdirectory, considering doxygen type")
+                    pkg.reference_type = "doxygen"
+                    pkg.reference_dir = xml_dir
+            if self.include_subdir:
+                include_dir = package_dir / self.include_subdir
+                if include_dir.is_dir():
+                    logger.debug(f"{self.name} has include subdirectory")
+                    pkg.adoc_src_dir = include_dir
+
+        if pkg.reference_dir is None and pkg.adoc_src_dir is None:
             raise InvalidPackageError(self.name, "Package does not contain XML or include files.")
         return pkg
 

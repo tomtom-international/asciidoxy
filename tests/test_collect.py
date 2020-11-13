@@ -16,11 +16,12 @@ Tests for collecting source files.
 """
 
 import pytest
+import toml
 
 from aiohttp import web
 from pathlib import Path
 
-from asciidoxy.collect import (DownloadError, InvalidPackageError, HttpPackageSpec,
+from asciidoxy.collect import (DownloadError, InvalidPackageError, HttpPackageSpec, Package,
                                SpecificationError, LocalPackageSpec, collect, specs_from_file,
                                versions_from_file)
 
@@ -41,12 +42,48 @@ async def include_file_response(request):
     return web.FileResponse(Path(__file__).parent / "data" / "adoc.tar.gz")
 
 
+async def package_file_response(request):
+    return web.FileResponse(Path(__file__).parent / "data" / "package.tar.gz")
+
+
 async def error404_response(request):
     return web.Response(status=404)
 
 
 async def text_response(request):
     return web.Response(text="normal text instead of a file")
+
+
+async def test_http_package__contents_toml(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/package",
+                                                        package_file_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.file_names = ["package"]
+
+    packages = await collect([spec], tmp_path)
+
+    assert len(packages) == 1
+    pkg = packages[0]
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+
+    assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
+    assert pkg.reference_dir.is_dir()
+    assert (pkg.reference_dir / "content.xml").is_file()
+
+    assert pkg.adoc_src_dir == tmp_path / "test" / "1.0.0" / "adoc"
+    assert pkg.adoc_src_dir.is_dir()
+    assert (pkg.adoc_src_dir / "content.adoc").is_file()
+
+    assert pkg.adoc_image_dir == tmp_path / "test" / "1.0.0" / "images"
+    assert pkg.adoc_image_dir.is_dir()
+    assert (pkg.adoc_image_dir / "picture.png").is_file()
+
+    assert pkg.adoc_root_doc == tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc"
+    assert pkg.adoc_root_doc.is_file()
 
 
 async def test_http_package_xml_only(aiohttp_server, tmp_path):
@@ -63,12 +100,13 @@ async def test_http_package_xml_only(aiohttp_server, tmp_path):
     assert len(packages) == 1
     pkg = packages[0]
     assert pkg.name == "test"
-    assert len(pkg.xml_dirs) == 1
-    assert len(pkg.include_dirs) == 0
+    assert pkg.scoped is False
+    assert pkg.reference_dir is not None
+    assert pkg.reference_type == "doxygen"
+    assert pkg.adoc_src_dir is None
 
-    xml_dir = pkg.xml_dirs[0]
-    assert xml_dir.is_dir()
-    assert (xml_dir / "content.xml").is_file()
+    assert pkg.reference_dir.is_dir()
+    assert (pkg.reference_dir / "content.xml").is_file()
 
     assert (tmp_path / "test" / "1.0.0" / "xml").is_dir()
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
@@ -89,12 +127,12 @@ async def test_http_package_include_only(aiohttp_server, tmp_path):
     assert len(packages) == 1
     pkg = packages[0]
     assert pkg.name == "test"
-    assert len(pkg.xml_dirs) == 0
-    assert len(pkg.include_dirs) == 1
+    assert pkg.scoped is False
+    assert pkg.reference_dir is None
+    assert pkg.adoc_src_dir is not None
 
-    include_dir = pkg.include_dirs[0]
-    assert include_dir.is_dir()
-    assert (include_dir / "content.adoc").is_file()
+    assert pkg.adoc_src_dir.is_dir()
+    assert (pkg.adoc_src_dir / "content.adoc").is_file()
 
     assert (tmp_path / "test" / "1.0.0" / "adoc").is_dir()
     assert (tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc").is_file()
@@ -118,19 +156,19 @@ async def test_http_package_xml_and_include(aiohttp_server, tmp_path):
     assert len(packages) == 1
     pkg = packages[0]
     assert pkg.name == "test"
-    assert len(pkg.xml_dirs) == 1
-    assert len(pkg.include_dirs) == 1
+    assert pkg.scoped is False
+    assert pkg.reference_dir is not None
+    assert pkg.reference_type == "doxygen"
+    assert pkg.adoc_src_dir is not None
 
-    xml_dir = pkg.xml_dirs[0]
-    assert xml_dir.is_dir()
-    assert (xml_dir / "content.xml").is_file()
+    assert pkg.reference_dir.is_dir()
+    assert (pkg.reference_dir / "content.xml").is_file()
 
     assert (tmp_path / "test" / "1.0.0" / "xml").is_dir()
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
-    include_dir = pkg.include_dirs[0]
-    assert include_dir.is_dir()
-    assert (include_dir / "content.adoc").is_file()
+    assert pkg.adoc_src_dir.is_dir()
+    assert (pkg.adoc_src_dir / "content.adoc").is_file()
 
     assert (tmp_path / "test" / "1.0.0" / "adoc").is_dir()
     assert (tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc").is_file()
@@ -219,6 +257,44 @@ async def test_http_package_version_and_name_interpolation_in_file_names(aiohttp
     assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
 
 
+async def test_local_package__contents_toml(tmp_path):
+    output_dir = tmp_path / "output"
+    input_dir = tmp_path / "input"
+
+    input_dir.mkdir(parents=True, exist_ok=True)
+    (input_dir / "xml").mkdir()
+    (input_dir / "adoc").mkdir()
+    (input_dir / "images").mkdir()
+    (input_dir / "contents.toml").write_text("""\
+[package]
+name = "package"
+
+[reference]
+type = "doxygen"
+dir = "xml"
+
+[asciidoc]
+src_dir = "adoc"
+image_dir = "images"
+""")
+
+    spec = LocalPackageSpec("test", input_dir)
+    spec.xml_subdir = "xml"
+    spec.include_subdir = "adoc"
+
+    packages = await collect([spec], output_dir)
+    assert len(packages) == 1
+
+    pkg = packages[0]
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+
+    assert pkg.reference_dir == input_dir / "xml"
+    assert pkg.adoc_src_dir == input_dir / "adoc"
+    assert pkg.adoc_image_dir == input_dir / "images"
+
+
 async def test_local_package_xml_and_include(tmp_path):
     output_dir = tmp_path / "output"
     input_dir = tmp_path / "input"
@@ -236,11 +312,13 @@ async def test_local_package_xml_and_include(tmp_path):
 
     pkg = packages[0]
     assert pkg.name == "test"
-    assert len(pkg.xml_dirs) == 1
-    assert len(pkg.include_dirs) == 1
+    assert pkg.scoped is False
+    assert pkg.reference_dir is not None
+    assert pkg.reference_type == "doxygen"
+    assert pkg.adoc_src_dir is not None
 
-    assert (input_dir / "xml") in pkg.xml_dirs
-    assert (input_dir / "adoc") in pkg.include_dirs
+    assert pkg.reference_dir == input_dir / "xml"
+    assert pkg.adoc_src_dir == input_dir / "adoc"
 
 
 async def test_local_package_include_only(tmp_path):
@@ -259,10 +337,11 @@ async def test_local_package_include_only(tmp_path):
 
     pkg = packages[0]
     assert pkg.name == "test"
-    assert len(pkg.xml_dirs) == 0
-    assert len(pkg.include_dirs) == 1
+    assert pkg.scoped is False
+    assert pkg.reference_dir is None
+    assert pkg.adoc_src_dir is not None
 
-    assert (input_dir / "adoc") in pkg.include_dirs
+    assert pkg.adoc_src_dir == input_dir / "adoc"
 
 
 async def test_local_package_xml_only(tmp_path):
@@ -281,10 +360,12 @@ async def test_local_package_xml_only(tmp_path):
 
     pkg = packages[0]
     assert pkg.name == "test"
-    assert len(pkg.xml_dirs) == 1
-    assert len(pkg.include_dirs) == 0
+    assert pkg.scoped is False
+    assert pkg.reference_dir is not None
+    assert pkg.reference_type == "doxygen"
+    assert pkg.adoc_src_dir is None
 
-    assert (input_dir / "xml") in pkg.xml_dirs
+    assert pkg.reference_dir == input_dir / "xml"
 
 
 async def test_local_package_subdirs_not_matched(tmp_path):
@@ -761,3 +842,126 @@ version = "1.0.0"
     assert spec.url_template == "https://example.com/{version}"
     assert spec.file_names == ["{name}-{version}.tar.gz"]
     assert spec.version == "1.0.0"
+
+
+def test_package__from_toml(tmp_path):
+    contents = """\
+[package]
+name = "package"
+
+[reference]
+type = "doxygen"
+dir = "xml"
+
+[asciidoc]
+src_dir = "adoc"
+image_dir = "images"
+root_doc = "index.adoc"
+"""
+
+    pkg = Package("my-package")
+    pkg.load_from_toml(tmp_path, toml.loads(contents))
+
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+    assert pkg.reference_dir == tmp_path / "xml"
+    assert pkg.adoc_src_dir == tmp_path / "adoc"
+    assert pkg.adoc_image_dir == tmp_path / "images"
+    assert pkg.adoc_root_doc == tmp_path / "adoc" / "index.adoc"
+
+
+def test_package__from_toml__no_name(tmp_path):
+    contents = """\
+[package]
+
+[reference]
+type = "doxygen"
+dir = "xml"
+
+[asciidoc]
+src_dir = "adoc"
+image_dir = "images"
+root_doc = "index.adoc"
+"""
+
+    pkg = Package("my-package")
+    pkg.load_from_toml(tmp_path, toml.loads(contents))
+
+    assert pkg.name == "my-package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+    assert pkg.reference_dir == tmp_path / "xml"
+    assert pkg.adoc_src_dir == tmp_path / "adoc"
+    assert pkg.adoc_image_dir == tmp_path / "images"
+    assert pkg.adoc_root_doc == tmp_path / "adoc" / "index.adoc"
+
+
+def test_package__from_toml__no_reference(tmp_path):
+    contents = """\
+[package]
+name = "package"
+
+[asciidoc]
+src_dir = "adoc"
+image_dir = "images"
+root_doc = "index.adoc"
+"""
+
+    pkg = Package("my-package")
+    pkg.load_from_toml(tmp_path, toml.loads(contents))
+
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type is None
+    assert pkg.reference_dir is None
+    assert pkg.adoc_src_dir == tmp_path / "adoc"
+    assert pkg.adoc_image_dir == tmp_path / "images"
+    assert pkg.adoc_root_doc == tmp_path / "adoc" / "index.adoc"
+
+
+def test_package__from_toml__no_asciidoc(tmp_path):
+    contents = """\
+[package]
+name = "package"
+
+[reference]
+type = "doxygen"
+dir = "xml"
+"""
+
+    pkg = Package("my-package")
+    pkg.load_from_toml(tmp_path, toml.loads(contents))
+
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+    assert pkg.reference_dir == tmp_path / "xml"
+    assert pkg.adoc_src_dir is None
+    assert pkg.adoc_image_dir is None
+    assert pkg.adoc_root_doc is None
+
+
+def test_package__from_toml__root_doc_no_src_dir(tmp_path):
+    contents = """\
+[package]
+name = "package"
+
+[reference]
+type = "doxygen"
+dir = "xml"
+
+[asciidoc]
+root_doc = "index.adoc"
+"""
+
+    pkg = Package("my-package")
+    pkg.load_from_toml(tmp_path, toml.loads(contents))
+
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+    assert pkg.reference_dir == tmp_path / "xml"
+    assert pkg.adoc_src_dir is None
+    assert pkg.adoc_image_dir is None
+    assert pkg.adoc_root_doc is None

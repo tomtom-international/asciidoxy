@@ -177,9 +177,10 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         include_dirs: List[Path] = []
         xml_parser = ParserDriver(force_language=args.force_language)
         for pkg in tqdm(packages, desc="Loading API reference", unit="pkg"):
-            include_dirs.extend(pkg.include_dirs)
-            for xml_dir in pkg.xml_dirs:
-                for xml_file in xml_dir.glob("**/*.xml"):
+            if pkg.adoc_src_dir is not None:
+                include_dirs.append(pkg.adoc_src_dir)
+            if pkg.reference_dir is not None:
+                for xml_file in pkg.reference_dir.glob("**/*.xml"):
                     xml_parser.parse(xml_file)
 
         with tqdm(desc="Resolving references ", unit="ref") as progress:
