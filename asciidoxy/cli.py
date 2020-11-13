@@ -77,6 +77,39 @@ def output_extension(backend: str) -> Optional[str]:
         return None
 
 
+class PathArgument:
+    _existing_dir: bool
+    _existing_file: bool
+    _new_dir: bool
+
+    def __init__(self,
+                 existing_dir: bool = False,
+                 existing_file: bool = False,
+                 new_dir: bool = False):
+        self._existing_dir = existing_dir
+        self._existing_file = existing_file
+        self._new_dir = new_dir
+
+    def __call__(self, value: str) -> Optional[Path]:
+        if value is None:
+            return None
+
+        path = Path(value).resolve()
+
+        if self._existing_dir and not path.is_dir():
+            raise argparse.ArgumentTypeError(
+                "{} does not point to an existing directory.".format(value))
+        if self._existing_file and not path.is_file():
+            raise argparse.ArgumentTypeError("{} does not point to an existing file.".format(value))
+        if self._new_dir and path.is_file():
+            raise argparse.ArgumentTypeError("{} points to an existing file.".format(value))
+        if not self._new_dir and not path.parent.exists():
+            raise argparse.ArgumentTypeError(
+                "Directory to store {} in does not exist.".format(value))
+
+        return path
+
+
 def main(argv: Optional[Sequence[str]] = None) -> None:
     print(rf"""
     ___              _ _ ____  {__version__:>16}
@@ -89,7 +122,10 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     parser = argparse.ArgumentParser(description="Generate API documentation using AsciiDoctor",
                                      allow_abbrev=False)
-    parser.add_argument("input_file", metavar="INPUT_FILE", help="Input AsciiDoc file.")
+    parser.add_argument("input_file",
+                        metavar="INPUT_FILE",
+                        type=PathArgument(existing_file=True),
+                        help="Input AsciiDoc file.")
     parser.add_argument("-b",
                         "--backend",
                         metavar="BACKEND",
@@ -99,21 +135,25 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                         "--build-dir",
                         metavar="BUILD_DIR",
                         default="build",
+                        type=PathArgument(new_dir=True),
                         help="Build directory.")
     parser.add_argument("-D",
                         "--destination-dir",
                         metavar="DESTINATION_DIR",
                         default=None,
+                        type=PathArgument(new_dir=True),
                         help="Destination for generate documentation.")
     parser.add_argument("-s",
                         "--spec-file",
                         metavar="SPEC_FILE",
                         default=None,
+                        type=PathArgument(existing_file=True),
                         help="Package specification file.")
     parser.add_argument("-v",
                         "--version-file",
                         metavar="VERSION_FILE",
                         default=None,
+                        type=PathArgument(existing_file=True),
                         help="Version specification file.")
     parser.add_argument("-W",
                         "--warnings-are-errors",
@@ -139,31 +179,24 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     logger = logging.getLogger(__name__)
 
-    build_dir = Path(args.build_dir).resolve()
     if args.destination_dir is not None:
-        destination_dir = Path(args.destination_dir).resolve()
+        destination_dir = args.destination_dir
     else:
-        destination_dir = build_dir / "output"
+        destination_dir = args.build_dir / "output"
     extension = output_extension(args.backend)
     if extension is None:
         logger.error(f"Backend {args.backend} is not supported.")
         sys.exit(1)
 
     if args.spec_file is not None:
-        spec_file = Path(args.spec_file).resolve()
-        if args.version_file:
-            version_file: Optional[Path] = Path(args.version_file).resolve()
-        else:
-            version_file = None
-
         logger.info("Collecting packages  ")
         try:
-            package_specs = specs_from_file(spec_file, version_file)
+            package_specs = specs_from_file(args.spec_file, args.version_file)
         except SpecificationError:
             logger.exception("Failed to load package specifications.")
             sys.exit(1)
 
-        download_dir = build_dir / "download"
+        download_dir = args.build_dir / "download"
         try:
             with tqdm(desc="Collecting packages  ", total=len(package_specs),
                       unit="pkg") as progress:
@@ -188,7 +221,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
         if args.debug:
             logger.info("Writing debug data, sorry for the delay!")
-            with (build_dir / "debug.json").open("w", encoding="utf-8") as f:
+            with (args.build_dir / "debug.json").open("w", encoding="utf-8") as f:
                 json.dump(xml_parser.api_reference.elements, f, default=json_repr, indent=2)
 
         api_reference = xml_parser.api_reference
@@ -197,13 +230,12 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         api_reference = ApiReference()
         include_dirs = []
 
-    in_file = copy_and_switch_to_intermediate_dir(
-        Path(args.input_file).resolve(), include_dirs, build_dir)
+    in_file = copy_and_switch_to_intermediate_dir(args.input_file, include_dirs, args.build_dir)
 
     try:
         with tqdm(desc="Processing asciidoc  ", total=1, unit="file") as progress:
             in_to_out_file_map = process_adoc(in_file,
-                                              build_dir,
+                                              args.build_dir,
                                               api_reference,
                                               warnings_are_errors=args.warnings_are_errors,
                                               multipage=args.multipage,
