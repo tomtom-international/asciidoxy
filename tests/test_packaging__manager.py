@@ -1,0 +1,172 @@
+# Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Tests for managing packages."""
+
+import pytest
+import toml
+
+from pathlib import Path
+from unittest.mock import MagicMock, call
+
+from asciidoxy.packaging.manager import PackageManager
+
+
+@pytest.fixture
+def package_manager(build_dir):
+    return PackageManager(build_dir)
+
+
+def create_package_dir(parent: Path,
+                       name: str,
+                       xml: bool = True,
+                       adoc: bool = True,
+                       images: bool = True,
+                       contents: bool = True) -> Path:
+    pkg_dir = parent / name
+    pkg_dir.mkdir(parents=True)
+
+    if xml:
+        (pkg_dir / "xml").mkdir()
+        (pkg_dir / "xml" / f"{name}.xml").touch()
+
+    if adoc:
+        (pkg_dir / "adoc").mkdir()
+        (pkg_dir / "adoc" / f"{name}.adoc").touch()
+
+    if images:
+        (pkg_dir / "images").mkdir()
+        (pkg_dir / "images" / f"{name}.png").touch()
+
+    if contents:
+        with (pkg_dir / "contents.toml").open("w", encoding="utf-8") as contents_file:
+            print(f"""\
+[package]
+name = "{name}"
+""", file=contents_file)
+
+            if xml:
+                print("""\
+[reference]
+type = "doxygen"
+dir = "xml"
+""", file=contents_file)
+
+            if adoc:
+                print("""\
+[asciidoc]
+src_dir = "adoc"
+""", file=contents_file)
+
+                if images:
+                    print("""\
+image_dir = "images"
+""", file=contents_file)
+
+    return pkg_dir
+
+
+def create_package_spec(parent: Path, *names: str) -> Path:
+    data = {
+        "sources": {
+            "local": {
+                "type": "local",
+                "xml_subdir": "xml",
+                "include_subdir": "adoc"
+            }
+        },
+    }
+
+    data["packages"] = {
+        f"{name}": {
+            "source": "local",
+            "package_dir": str(parent / name)
+        }
+        for name in names
+    }
+
+    spec_file = parent / "spec.toml"
+    with spec_file.open("w", encoding="utf-8") as spec_file_handle:
+        toml.dump(data, spec_file_handle)
+
+    return spec_file
+
+
+def test_collect(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+
+    package_manager.collect(spec_file)
+    assert len(package_manager.packages) == 2
+
+    packages = {pkg.name: pkg for pkg in package_manager.packages}
+    assert "a" in packages
+    assert "b" in packages
+
+    pkg_a = packages["a"]
+    assert pkg_a.reference_dir is not None
+    assert pkg_a.reference_dir.is_dir()
+    assert pkg_a.adoc_src_dir is not None
+    assert pkg_a.adoc_src_dir.is_dir()
+    assert pkg_a.adoc_image_dir is not None
+    assert pkg_a.adoc_image_dir.is_dir()
+
+    pkg_b = packages["b"]
+    assert pkg_b.reference_dir is not None
+    assert pkg_b.reference_dir.is_dir()
+    assert pkg_b.adoc_src_dir is not None
+    assert pkg_b.adoc_src_dir.is_dir()
+    assert pkg_b.adoc_image_dir is not None
+    assert pkg_b.adoc_image_dir.is_dir()
+
+
+def test_load_reference(package_manager, event_loop, tmp_path, build_dir):
+    pkg_a_dir = create_package_dir(tmp_path, "a")
+    pkg_b_dir = create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    parser_mock = MagicMock()
+    package_manager.load_reference(parser_mock)
+    parser_mock.parse.assert_has_calls([call(pkg_a_dir / "xml" / "a.xml"),
+                                        call(pkg_b_dir / "xml" / "b.xml")],
+                                       any_order=True)
+
+
+def test_prepare_work_directory(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "chapter.adoc").touch()
+    (src_dir / "other").mkdir()
+    (src_dir / "other" / "another.adoc").touch()
+
+    work_file = package_manager.prepare_work_directory(in_file)
+    assert work_file.is_file()
+    assert work_file.name == "index.adoc"
+    work_dir = work_file.parent
+
+    assert (work_dir / "index.adoc").is_file()
+    assert (work_dir / "chapter.adoc").is_file()
+    assert (work_dir / "other").is_dir()
+    assert (work_dir / "other" / "another.adoc").is_file()
+
+    assert (work_dir / "a.adoc").is_file()
+    assert (work_dir / "b.adoc").is_file()

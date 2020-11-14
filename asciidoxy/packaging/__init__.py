@@ -13,6 +13,7 @@
 # limitations under the License.
 """Modules for handling documentation packages."""
 
-from .collect import collect, specs_from_file, CollectError, SpecificationError
+from .collect import CollectError, SpecificationError
+from .manager import PackageManager
 
-__all__ = ["collect", "specs_from_file", "CollectError", "SpecificationError"]
+__all__ = ["CollectError", "PackageManager", "SpecificationError"]

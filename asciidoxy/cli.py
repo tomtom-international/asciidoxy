@@ -14,15 +14,13 @@
 """Command line interface."""
 
 import argparse
-import asyncio
 import json
 import logging
-import shutil
 import subprocess
 import sys
 
 from pathlib import Path
-from typing import Optional, Sequence, List
+from typing import Optional, Sequence
 
 from mako.exceptions import RichTraceback
 from tqdm import tqdm
@@ -31,7 +29,7 @@ from .api_reference import ApiReference
 from .doxygenparser import Driver as ParserDriver
 from .generator import process_adoc, AsciiDocError
 from .model import json_repr
-from .packaging import collect, specs_from_file, CollectError, SpecificationError
+from .packaging import CollectError, PackageManager, SpecificationError
 from ._version import __version__
 
 
@@ -49,23 +47,6 @@ def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, mul
     ],
                    shell=True,
                    check=True)
-
-
-def copy_and_switch_to_intermediate_dir(in_file: Path, adoc_dirs: List[Path],
-                                        build_dir: Path) -> Path:
-    intermediate_dir = build_dir / "intermediate"
-
-    if intermediate_dir.exists():
-        shutil.rmtree(intermediate_dir)
-
-    shutil.copytree(str(in_file.parent), str(intermediate_dir))
-
-    for adoc_dir in adoc_dirs:
-        # workaround, in Python 3.8 we can call
-        # `shutil.copytree(adoc_dir, intermediate_dir, dirs_exist_ok=True)`
-        subprocess.run([f"cp -R {adoc_dir}/* {intermediate_dir}"], shell=True, check=True)
-
-    return intermediate_dir / in_file.name
 
 
 def output_extension(backend: str) -> Optional[str]:
@@ -188,35 +169,23 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         logger.error(f"Backend {args.backend} is not supported.")
         sys.exit(1)
 
+    pkg_mgr = PackageManager(args.build_dir)
     if args.spec_file is not None:
-        logger.info("Collecting packages  ")
         try:
-            package_specs = specs_from_file(args.spec_file, args.version_file)
+            with tqdm(desc="Collecting packages     ", unit="pkg") as progress:
+                pkg_mgr.collect(args.spec_file, args.version_file, progress)
         except SpecificationError:
             logger.exception("Failed to load package specifications.")
             sys.exit(1)
-
-        download_dir = args.build_dir / "download"
-        try:
-            with tqdm(desc="Collecting packages  ", total=len(package_specs),
-                      unit="pkg") as progress:
-                packages = asyncio.get_event_loop().run_until_complete(
-                    collect(package_specs, download_dir, progress))
         except CollectError:
             logger.exception("Failed to collect packages.")
             sys.exit(1)
 
-        logger.info("Loading packages")
-        include_dirs: List[Path] = []
         xml_parser = ParserDriver(force_language=args.force_language)
-        for pkg in tqdm(packages, desc="Loading API reference", unit="pkg"):
-            if pkg.adoc_src_dir is not None:
-                include_dirs.append(pkg.adoc_src_dir)
-            if pkg.reference_dir is not None:
-                for xml_file in pkg.reference_dir.glob("**/*.xml"):
-                    xml_parser.parse(xml_file)
+        with tqdm(desc="Loading API reference   ", unit="pkg") as progress:
+            pkg_mgr.load_reference(xml_parser, progress)
 
-        with tqdm(desc="Resolving references ", unit="ref") as progress:
+        with tqdm(desc="Resolving references    ", unit="ref") as progress:
             xml_parser.resolve_references(progress)
 
         if args.debug:
@@ -225,15 +194,14 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                 json.dump(xml_parser.api_reference.elements, f, default=json_repr, indent=2)
 
         api_reference = xml_parser.api_reference
-
     else:
         api_reference = ApiReference()
-        include_dirs = []
 
-    in_file = copy_and_switch_to_intermediate_dir(args.input_file, include_dirs, args.build_dir)
+    with tqdm(desc="Preparing work directory", unit="pkg") as progress:
+        in_file = pkg_mgr.prepare_work_directory(args.input_file, progress)
 
     try:
-        with tqdm(desc="Processing asciidoc  ", total=1, unit="file") as progress:
+        with tqdm(desc="Processing asciidoc     ", total=1, unit="file") as progress:
             in_to_out_file_map = process_adoc(in_file,
                                               args.build_dir,
                                               api_reference,
@@ -254,7 +222,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     in_dir = in_file.parent
     for (in_adoc_file, out_adoc_file) in tqdm(
         [(k, v) for (k, v) in in_to_out_file_map.items() if args.multipage or k == in_file],
-            desc="Running asciidoctor  ",
+            desc="Running asciidoctor     ",
             unit="file"):
         out_file = destination_dir / in_adoc_file.relative_to(in_dir).with_suffix(extension)
         asciidoctor(destination_dir, out_file, out_adoc_file, args.multipage, args.backend,
