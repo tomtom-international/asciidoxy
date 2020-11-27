@@ -36,42 +36,29 @@ def create_package_dir(parent: Path,
     pkg_dir = parent / name
     pkg_dir.mkdir(parents=True)
 
+    data = {"package": {"name": name}}
+
     if xml:
         (pkg_dir / "xml").mkdir()
         (pkg_dir / "xml" / f"{name}.xml").touch()
+
+        data["reference"] = {"type": "doxygen", "dir": "xml"}
 
     if adoc:
         (pkg_dir / "adoc").mkdir()
         (pkg_dir / "adoc" / f"{name}.adoc").touch()
 
-    if images:
-        (pkg_dir / "images").mkdir()
-        (pkg_dir / "images" / f"{name}.png").touch()
+        data["asciidoc"] = {"src_dir": "adoc"}
+
+        if images:
+            (pkg_dir / "images").mkdir()
+            (pkg_dir / "images" / f"{name}.png").touch()
+
+            data["asciidoc"]["image_dir"] = "images"
 
     if contents:
         with (pkg_dir / "contents.toml").open("w", encoding="utf-8") as contents_file:
-            print(f"""\
-[package]
-name = "{name}"
-""", file=contents_file)
-
-            if xml:
-                print("""\
-[reference]
-type = "doxygen"
-dir = "xml"
-""", file=contents_file)
-
-            if adoc:
-                print("""\
-[asciidoc]
-src_dir = "adoc"
-""", file=contents_file)
-
-                if images:
-                    print("""\
-image_dir = "images"
-""", file=contents_file)
+            toml.dump(data, contents_file)
 
     return pkg_dir
 
