@@ -170,3 +170,6 @@ def test_prepare_work_directory(package_manager, event_loop, tmp_path, build_dir
 
     assert (work_dir / "a.adoc").is_file()
     assert (work_dir / "b.adoc").is_file()
+    assert (work_dir / "images").is_dir()
+    assert (work_dir / "images" / "a.png").is_file()
+    assert (work_dir / "images" / "b.png").is_file()

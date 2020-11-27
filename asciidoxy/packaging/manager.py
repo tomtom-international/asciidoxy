@@ -28,11 +28,13 @@ from .collect import Package, collect, specs_from_file
 class PackageManager:
     build_dir: Path
     work_dir: Path
+    image_work_dir: Path
     packages: List[Package]
 
     def __init__(self, build_dir: Path):
         self.build_dir = build_dir
         self.work_dir = build_dir / "intermediate"
+        self.image_work_dir = self.work_dir / "images"
         self.packages = []
 
     def collect(self,
@@ -95,6 +97,7 @@ class PackageManager:
             shutil.rmtree(self.work_dir)
 
         shutil.copytree(in_file.parent, self.work_dir)
+        self.image_work_dir.mkdir(parents=True, exist_ok=True)
         if progress is not None:
             progress.update()
 
@@ -104,6 +107,10 @@ class PackageManager:
                 # In Python 3.8 we can call:
                 # `shutil.copytree(adoc_dir, intermediate_dir, dirs_exist_ok=True)`
                 subprocess.run([f"cp -R {pkg.adoc_src_dir}/* {self.work_dir}"],
+                               shell=True,
+                               check=True)
+            if pkg.adoc_image_dir is not None:
+                subprocess.run([f"cp -R {pkg.adoc_image_dir}/* {self.image_work_dir}"],
                                shell=True,
                                check=True)
             if progress is not None:
