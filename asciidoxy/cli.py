@@ -218,7 +218,6 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                 logger.error(f"File {filename}, line {lineno}:\n\t{line}\n")
         sys.exit(1)
 
-    logger.info("Running asciidoctor")
     in_dir = in_file.parent
     for (in_adoc_file, out_adoc_file) in tqdm(
         [(k, v) for (k, v) in in_to_out_file_map.items() if args.multipage or k == in_file],
@@ -228,6 +227,10 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         asciidoctor(destination_dir, out_file, out_adoc_file, args.multipage, args.backend,
                     extra_args)
         logger.info(f"Generated: {out_file}")
+
+    if args.backend != "pdf":
+        with tqdm(desc="Copying images          ", unit="pkg") as progress:
+            pkg_mgr.make_image_directory(destination_dir, progress)
 
 
 if __name__ == "__main__":

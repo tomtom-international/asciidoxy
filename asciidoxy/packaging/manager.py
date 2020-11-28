@@ -89,7 +89,7 @@ class PackageManager:
         """Create a work directory in which the files to be processed by AsciiDoctor can be created.
 
         Args:
-            in_file: Input file that will be processed.
+            in_file:  Input file that will be processed.
             progress: Optional progress reporting.
 
         Returns:
@@ -119,6 +119,32 @@ class PackageManager:
                 progress.update()
 
         return self.work_dir / in_file.name
+
+    def make_image_directory(self, parent: Path, progress: Optional[tqdm] = None) -> None:
+        """Create an `images` directory in the specified path.
+
+        Useful for output formats that require you to copy the images yourself.
+
+        Args:
+            parent:   Directory under which the images directory needs to be created.
+            progress: Optional progress reporting.
+
+        Raises:
+            FileCollisionError: The same file is present in multiple packages.
+        """
+        # TODO: Images for input file
+
+        if progress is not None:
+            progress.total = len(self.packages)
+            progress.update(0)
+
+        image_dir = parent / "images"
+        image_dir.mkdir(parents=True, exist_ok=True)
+        for pkg in self.packages:
+            if pkg.adoc_image_dir is not None:
+                _copy_dir_contents(pkg.adoc_image_dir, image_dir, pkg)
+            if progress is not None:
+                progress.update()
 
 
 def _copy_dir_contents(src: Path, dst: Path, pkg: Package) -> None:

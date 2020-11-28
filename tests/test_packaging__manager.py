@@ -222,3 +222,17 @@ def test_prepare_work_directory__same_dir_in_multiple_packages(package_manager, 
     assert (work_dir / "other" / "another.adoc").is_file()
     assert (work_dir / "other" / "a_another.adoc").is_file()
     assert (work_dir / "other" / "b_another.adoc").is_file()
+
+
+def test_make_image_directory(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    output_dir = tmp_path / "output"
+    package_manager.make_image_directory(output_dir)
+
+    assert (output_dir / "images").is_dir()
+    assert (output_dir / "images" / "a.png").is_file()
+    assert (output_dir / "images" / "b.png").is_file()
