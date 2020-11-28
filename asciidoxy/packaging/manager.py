@@ -15,14 +15,20 @@
 
 import asyncio
 import shutil
-import subprocess
 
 from pathlib import Path
 from tqdm import tqdm
 from typing import List, Optional
 
 from ..doxygenparser import Driver
-from .collect import Package, collect, specs_from_file
+from .collect import CollectError, Package, collect, specs_from_file
+
+
+class FileCollisionError(CollectError):
+    """Raised when files from different packages collide."""
+    def __str__(self) -> str:
+        return (f"File is present in multiple packages. Detected in package {self.name}:"
+                f"\n{self.message}")
 
 
 class PackageManager:
@@ -88,6 +94,9 @@ class PackageManager:
 
         Returns:
             Location of the input file in the working directory.
+
+        Raises:
+            FileCollisionError: The same file is present in multiple packages.
         """
         if progress is not None:
             progress.total = len(self.packages) + 1
@@ -103,17 +112,35 @@ class PackageManager:
 
         for pkg in self.packages:
             if pkg.adoc_src_dir is not None:
-                # Workaround to support overwriting existing directories.
-                # In Python 3.8 we can call:
-                # `shutil.copytree(adoc_dir, intermediate_dir, dirs_exist_ok=True)`
-                subprocess.run([f"cp -R {pkg.adoc_src_dir}/* {self.work_dir}"],
-                               shell=True,
-                               check=True)
+                _copy_dir_contents(pkg.adoc_src_dir, self.work_dir, pkg)
             if pkg.adoc_image_dir is not None:
-                subprocess.run([f"cp -R {pkg.adoc_image_dir}/* {self.image_work_dir}"],
-                               shell=True,
-                               check=True)
+                _copy_dir_contents(pkg.adoc_image_dir, self.image_work_dir, pkg)
             if progress is not None:
                 progress.update()
 
         return self.work_dir / in_file.name
+
+
+def _copy_dir_contents(src: Path, dst: Path, pkg: Package) -> None:
+    # In Python 3.8 we can use:
+    # `shutil.copytree(src, dst, dirs_exist_ok=True)`
+
+    if dst.is_file():
+        raise FileCollisionError(
+            pkg.name, f"Another package contains file {dst.name}, which is a directory"
+            f" in {pkg.name}.")
+    dst.mkdir(parents=True, exist_ok=True)
+
+    for src_entry in src.iterdir():
+        if src_entry.is_symlink():
+            continue
+
+        dst_entry = dst / src_entry.relative_to(src)
+        if src_entry.is_file():
+            if dst_entry.exists():
+                raise FileCollisionError(
+                    pkg.name, f"File {dst_entry.name} from {pkg.name} already exists in"
+                    "another package.")
+            shutil.copy2(src_entry, dst_entry)
+        elif src_entry.is_dir():
+            _copy_dir_contents(src_entry, dst_entry, pkg)

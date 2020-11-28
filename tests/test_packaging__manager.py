@@ -19,7 +19,7 @@ import toml
 from pathlib import Path
 from unittest.mock import MagicMock, call
 
-from asciidoxy.packaging.manager import PackageManager
+from asciidoxy.packaging.manager import FileCollisionError, PackageManager
 
 
 @pytest.fixture
@@ -126,9 +126,9 @@ def test_load_reference(package_manager, event_loop, tmp_path, build_dir):
 
     parser_mock = MagicMock()
     package_manager.load_reference(parser_mock)
-    parser_mock.parse.assert_has_calls([call(pkg_a_dir / "xml" / "a.xml"),
-                                        call(pkg_b_dir / "xml" / "b.xml")],
-                                       any_order=True)
+    parser_mock.parse.assert_has_calls(
+        [call(pkg_a_dir / "xml" / "a.xml"),
+         call(pkg_b_dir / "xml" / "b.xml")], any_order=True)
 
 
 def test_prepare_work_directory(package_manager, event_loop, tmp_path, build_dir):
@@ -160,3 +160,65 @@ def test_prepare_work_directory(package_manager, event_loop, tmp_path, build_dir
     assert (work_dir / "images").is_dir()
     assert (work_dir / "images" / "a.png").is_file()
     assert (work_dir / "images" / "b.png").is_file()
+
+
+def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "a.adoc").touch()
+
+    with pytest.raises(FileCollisionError):
+        package_manager.prepare_work_directory(in_file)
+
+
+def test_prepare_work_directory__dir_and_file_collision(package_manager, event_loop, tmp_path,
+                                                        build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "a.adoc").mkdir()
+
+    with pytest.raises(FileCollisionError):
+        package_manager.prepare_work_directory(in_file)
+
+
+def test_prepare_work_directory__same_dir_in_multiple_packages(package_manager, event_loop,
+                                                               tmp_path, build_dir):
+    pkg_a_dir = create_package_dir(tmp_path, "a")
+    pkg_b_dir = create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "other").mkdir()
+    (src_dir / "other" / "another.adoc").touch()
+    (pkg_a_dir / "adoc" / "other").mkdir()
+    (pkg_a_dir / "adoc" / "other" / "a_another.adoc").touch()
+    (pkg_b_dir / "adoc" / "other").mkdir()
+    (pkg_b_dir / "adoc" / "other" / "b_another.adoc").touch()
+
+    work_file = package_manager.prepare_work_directory(in_file)
+    assert work_file.is_file()
+    assert work_file.name == "index.adoc"
+    work_dir = work_file.parent
+
+    assert (work_dir / "other").is_dir()
+    assert (work_dir / "other" / "another.adoc").is_file()
+    assert (work_dir / "other" / "a_another.adoc").is_file()
+    assert (work_dir / "other" / "b_another.adoc").is_file()
