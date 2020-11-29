@@ -58,6 +58,7 @@ ADOC_OUT_FILES := $(patsubst %.adoc,%.html,$(addprefix $(DOC_BUILD_DIR)/output/,
 
 $(ADOC_OUT_FILES): $(ADOC_IN_FILES) $(DOC_BUILD_DIR)/asciidoxy $(CURDIR)/asciidoxy.toml $(CURDIR)/copy $(DOXYGEN_BUILD_DIR)/asciidoxy/xml $(EXAMPLE_OUTPUTS)
 	asciidoxy index.adoc \
+		--base-dir . \
 		--build-dir $(DOC_BUILD_DIR)/asciidoxy \
 		--destination-dir $(DOC_BUILD_DIR)/output \
 		--spec-file asciidoxy.toml \

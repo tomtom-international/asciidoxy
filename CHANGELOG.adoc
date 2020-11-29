@@ -28,11 +28,17 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - [AD-15] Allow forcing to embed an included file in multipage mode.
   - [AD-37] Show members for other visibility levels than public. By default only public and
     protected members are shown. Use `api.filter` to change.
+  - [AD-32] New package format with contents metadata file. The contents file specifies whether the
+    package contains AsciiDoc includes or reference, and in what subdirectory. It can now also
+    include images that need to be included to the output.
+  - [AD-32] A directory containing images to include can be specified using `--image-dir`.
 
 === Changed
 
   - Argument `leveloffset` in `api.include` now supports `None` to prevent adding `leveloffset` in
     the generated AsciiDoc.
+  - [AD-32] By default the directory containing the input file is not copied to the intermediate
+    build directory. Use `--base-dir` to enable copying of additional include files.
 
 === Fixed
 

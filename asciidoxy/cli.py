@@ -107,13 +107,26 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                         metavar="INPUT_FILE",
                         type=PathArgument(existing_file=True),
                         help="Input AsciiDoc file.")
+    parser.add_argument("-B",
+                        "--base-dir",
+                        metavar="BASE_DIR",
+                        default=None,
+                        type=PathArgument(existing_dir=True),
+                        help="Base directory containing the document and resources. If no base"
+                        " directory is specified, local include files cannot be found.")
+    parser.add_argument("--image-dir",
+                        metavar="IMAGE_DIR",
+                        default=None,
+                        type=PathArgument(existing_dir=True),
+                        help="Directory containing images to include. If no image directory is"
+                        " specified, only images in the `images` directory next to the input file"
+                        " be included.")
     parser.add_argument("-b",
                         "--backend",
                         metavar="BACKEND",
                         default="html5",
                         help="Set output backend format used by AsciiDoctor.")
-    parser.add_argument("-B",
-                        "--build-dir",
+    parser.add_argument("--build-dir",
                         metavar="BUILD_DIR",
                         default="build",
                         type=PathArgument(new_dir=True),
@@ -197,6 +210,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     else:
         api_reference = ApiReference()
 
+    pkg_mgr.set_input_files(args.input_file, args.base_dir, args.image_dir)
     with tqdm(desc="Preparing work directory", unit="pkg") as progress:
         in_file = pkg_mgr.prepare_work_directory(args.input_file, progress)
 

@@ -74,6 +74,9 @@ clean-test: ## remove test and coverage artifacts
 	rm -rf .mypy_cache
 	find . -name '.asciidoxy.*' -exec rm -rf {} +
 
+clean-docs: ## remove documentation generation artifacts
+	rm -rf build/doc
+
 lint: ## check style with flake8
 	flake8 asciidoxy tests
 

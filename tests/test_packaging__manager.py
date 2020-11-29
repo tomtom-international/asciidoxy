@@ -145,6 +145,7 @@ def test_prepare_work_directory(package_manager, event_loop, tmp_path, build_dir
     (src_dir / "other").mkdir()
     (src_dir / "other" / "another.adoc").touch()
 
+    package_manager.set_input_files(in_file, src_dir)
     work_file = package_manager.prepare_work_directory(in_file)
     assert work_file.is_file()
     assert work_file.name == "index.adoc"
@@ -162,6 +163,114 @@ def test_prepare_work_directory(package_manager, event_loop, tmp_path, build_dir
     assert (work_dir / "images" / "b.png").is_file()
 
 
+def test_prepare_work_directory__no_include_dir(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "chapter.adoc").touch()
+    (src_dir / "other").mkdir()
+    (src_dir / "other" / "another.adoc").touch()
+
+    package_manager.set_input_files(in_file)
+    work_file = package_manager.prepare_work_directory(in_file)
+    assert work_file.is_file()
+    assert work_file.name == "index.adoc"
+    work_dir = work_file.parent
+
+    assert (work_dir / "index.adoc").is_file()
+    assert not (work_dir / "chapter.adoc").is_file()
+    assert not (work_dir / "other").is_dir()
+    assert not (work_dir / "other" / "another.adoc").is_file()
+
+    assert (work_dir / "a.adoc").is_file()
+    assert (work_dir / "b.adoc").is_file()
+    assert (work_dir / "images").is_dir()
+    assert (work_dir / "images" / "a.png").is_file()
+    assert (work_dir / "images" / "b.png").is_file()
+
+
+def test_prepare_work_directory__explicit_images(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "chapter.adoc").touch()
+    (src_dir / "other").mkdir()
+    (src_dir / "other" / "another.adoc").touch()
+
+    image_dir = tmp_path / "images"
+    image_dir.mkdir()
+    (image_dir / "image.png").touch()
+
+    package_manager.set_input_files(in_file, None, image_dir)
+    work_file = package_manager.prepare_work_directory(in_file)
+    assert work_file.is_file()
+    assert work_file.name == "index.adoc"
+    work_dir = work_file.parent
+
+    assert (work_dir / "index.adoc").is_file()
+    assert not (work_dir / "chapter.adoc").is_file()
+    assert not (work_dir / "other").is_dir()
+    assert not (work_dir / "other" / "another.adoc").is_file()
+
+    assert (work_dir / "images").is_dir()
+    assert (work_dir / "images" / "image.png").is_file()
+
+    assert (work_dir / "a.adoc").is_file()
+    assert (work_dir / "b.adoc").is_file()
+    assert (work_dir / "images" / "a.png").is_file()
+    assert (work_dir / "images" / "b.png").is_file()
+
+
+def test_prepare_work_directory__implicit_images(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "chapter.adoc").touch()
+    (src_dir / "other").mkdir()
+    (src_dir / "other" / "another.adoc").touch()
+
+    image_dir = src_dir / "images"
+    image_dir.mkdir()
+    (image_dir / "image.png").touch()
+
+    package_manager.set_input_files(in_file, None, None)
+    work_file = package_manager.prepare_work_directory(in_file)
+    assert work_file.is_file()
+    assert work_file.name == "index.adoc"
+    work_dir = work_file.parent
+
+    assert (work_dir / "index.adoc").is_file()
+    assert not (work_dir / "chapter.adoc").is_file()
+    assert not (work_dir / "other").is_dir()
+    assert not (work_dir / "other" / "another.adoc").is_file()
+
+    assert (work_dir / "images").is_dir()
+    assert (work_dir / "images" / "image.png").is_file()
+
+    assert (work_dir / "a.adoc").is_file()
+    assert (work_dir / "b.adoc").is_file()
+    assert (work_dir / "images" / "a.png").is_file()
+    assert (work_dir / "images" / "b.png").is_file()
+
+
 def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
@@ -174,6 +283,7 @@ def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp
     in_file.touch()
     (src_dir / "a.adoc").touch()
 
+    package_manager.set_input_files(in_file, src_dir)
     with pytest.raises(FileCollisionError):
         package_manager.prepare_work_directory(in_file)
 
@@ -191,6 +301,7 @@ def test_prepare_work_directory__dir_and_file_collision(package_manager, event_l
     in_file.touch()
     (src_dir / "a.adoc").mkdir()
 
+    package_manager.set_input_files(in_file, src_dir)
     with pytest.raises(FileCollisionError):
         package_manager.prepare_work_directory(in_file)
 
@@ -213,6 +324,7 @@ def test_prepare_work_directory__same_dir_in_multiple_packages(package_manager, 
     (pkg_b_dir / "adoc" / "other").mkdir()
     (pkg_b_dir / "adoc" / "other" / "b_another.adoc").touch()
 
+    package_manager.set_input_files(in_file, src_dir)
     work_file = package_manager.prepare_work_directory(in_file)
     assert work_file.is_file()
     assert work_file.name == "index.adoc"
@@ -234,5 +346,31 @@ def test_make_image_directory(package_manager, event_loop, tmp_path, build_dir):
     package_manager.make_image_directory(output_dir)
 
     assert (output_dir / "images").is_dir()
+    assert (output_dir / "images" / "a.png").is_file()
+    assert (output_dir / "images" / "b.png").is_file()
+
+
+def test_make_image_directory__from_input_files(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+
+    image_dir = tmp_path / "images"
+    image_dir.mkdir()
+    (image_dir / "image.png").touch()
+
+    package_manager.set_input_files(in_file, None, image_dir)
+    package_manager.collect(spec_file)
+
+    output_dir = tmp_path / "output"
+    package_manager.make_image_directory(output_dir)
+
+    assert (output_dir / "images").is_dir()
+    assert (output_dir / "images" / "image.png").is_file()
     assert (output_dir / "images" / "a.png").is_file()
     assert (output_dir / "images" / "b.png").is_file()

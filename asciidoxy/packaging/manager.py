@@ -43,6 +43,30 @@ class PackageManager:
         self.image_work_dir = self.work_dir / "images"
         self.packages = []
 
+    def set_input_files(self,
+                        in_file: Path,
+                        include_dir: Optional[Path] = None,
+                        image_dir: Optional[Path] = None) -> None:
+        """Set the input files to collect.
+
+        Args:
+            in_file:     AsciiDoc file used as input.
+            include_dir: Directory containing files to include from AsciiDoc files. `None` to not
+                             include additional files.
+            image_dir:   Directory containing iamges to include from AsciiDoc files. If `None` and
+                            directory named `images` is present next to the `in_file`, that
+                            directory is used for images. Otherwise, no images are copied.
+        """
+        pkg = Package("INPUT")
+        pkg.adoc_src_dir = include_dir
+        pkg.adoc_root_doc = in_file
+
+        if image_dir is not None:
+            pkg.adoc_image_dir = image_dir
+        elif (in_file.parent / "images").is_dir():
+            pkg.adoc_image_dir = in_file.parent / "images"
+        self.packages.append(pkg)
+
     def collect(self,
                 spec_file: Path,
                 version_file: Optional[Path] = None,
@@ -64,8 +88,8 @@ class PackageManager:
             progress.update(0)
 
         download_dir = self.build_dir / "download"
-        self.packages = asyncio.get_event_loop().run_until_complete(
-            collect(specs, download_dir, progress))
+        self.packages.extend(asyncio.get_event_loop().run_until_complete(
+            collect(specs, download_dir, progress)))
 
     def load_reference(self, parser: Driver, progress: Optional[tqdm] = None) -> None:
         """Load API reference from available packages.
@@ -99,20 +123,19 @@ class PackageManager:
             FileCollisionError: The same file is present in multiple packages.
         """
         if progress is not None:
-            progress.total = len(self.packages) + 1
+            progress.total = len(self.packages)
             progress.update(0)
 
         if self.work_dir.exists():
             shutil.rmtree(self.work_dir)
 
-        shutil.copytree(in_file.parent, self.work_dir)
         self.image_work_dir.mkdir(parents=True, exist_ok=True)
-        if progress is not None:
-            progress.update()
 
         for pkg in self.packages:
             if pkg.adoc_src_dir is not None:
                 _copy_dir_contents(pkg.adoc_src_dir, self.work_dir, pkg)
+            elif pkg.adoc_root_doc is not None:
+                shutil.copy2(pkg.adoc_root_doc, self.work_dir)
             if pkg.adoc_image_dir is not None:
                 _copy_dir_contents(pkg.adoc_image_dir, self.image_work_dir, pkg)
             if progress is not None:
@@ -132,8 +155,6 @@ class PackageManager:
         Raises:
             FileCollisionError: The same file is present in multiple packages.
         """
-        # TODO: Images for input file
-
         if progress is not None:
             progress.total = len(self.packages)
             progress.update(0)
