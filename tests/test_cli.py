@@ -129,11 +129,17 @@ def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destin
 
 
 def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
-                     adoc_data, event_loop):
+                     adoc_data, event_loop, tmp_path):
     in_file = adoc_data / "simple_test.input.adoc"
+    image_dir = tmp_path / "images"
+    image_dir.mkdir()
 
     main([
         str(in_file),
+        "--base-dir",
+        str(in_file.parent),
+        "--image-dir",
+        str(image_dir),
         "--spec-file",
         str(spec_file),
         "--version-file",
@@ -188,13 +194,15 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
         "-D",
         str(destination_dir),
         "-B",
-        str(build_dir),
+        str(in_file.parent),
         "-b",
         "html5",
         "-W",
         "--debug",
         "--log",
         "WARNING",
+        "--build-dir",
+        str(build_dir),
     ])
 
     output_file = destination_dir / "simple_test.input.html"
