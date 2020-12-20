@@ -709,28 +709,29 @@ def test_multipage_toc__preprocessing_run(preprocessing_api, input_file, multipa
 @pytest.mark.parametrize("warnings_are_errors", [True, False],
                          ids=["warnings-are-errors", "warnings-are-not-errors"])
 @pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
-def test_process_adoc_single_file(warnings_are_errors, build_dir, test_file_name,
-                                  single_and_multipage, adoc_data, api_reference):
+def test_process_adoc_single_file(warnings_are_errors, fragment_dir, test_file_name,
+                                  single_and_multipage, adoc_data, api_reference, package_manager):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
 
     progress_mock = ProgressMock()
     output_file = process_adoc(input_file,
-                               build_dir,
                                api_reference,
+                               package_manager,
                                warnings_are_errors=warnings_are_errors,
                                progress=progress_mock)[input_file]
     assert output_file.is_file()
 
     content = output_file.read_text()
-    content = content.replace(os.fspath(build_dir), "BUILD_DIR")
+    content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
     assert content == expected_output_file.read_text()
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == 2
 
 
-def test_process_adoc_multi_file(build_dir, single_and_multipage, adoc_data, api_reference):
+def test_process_adoc_multi_file(fragment_dir, single_and_multipage, adoc_data, api_reference,
+                                 package_manager):
     main_doc_file = adoc_data / "multifile_test.input.adoc"
     sub_doc_file = main_doc_file.parent / "sub_directory" / "multifile_subdoc_test.input.adoc"
     sub_doc_in_table_file = main_doc_file.parent / "sub_directory" \
@@ -738,8 +739,8 @@ def test_process_adoc_multi_file(build_dir, single_and_multipage, adoc_data, api
 
     progress_mock = ProgressMock()
     output_files = process_adoc(main_doc_file,
-                                build_dir,
                                 api_reference,
+                                package_manager,
                                 warnings_are_errors=True,
                                 multipage=single_and_multipage,
                                 progress=progress_mock)
@@ -754,7 +755,7 @@ def test_process_adoc_multi_file(build_dir, single_and_multipage, adoc_data, api
         expected_output_file = input_file.with_suffix(
             ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
         content = output_file.read_text()
-        content = content.replace(os.fspath(build_dir), "BUILD_DIR")
+        content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
         content = content.replace(os.fspath(adoc_data), "SRC_DIR")
         assert content == expected_output_file.read_text()
 
@@ -762,14 +763,14 @@ def test_process_adoc_multi_file(build_dir, single_and_multipage, adoc_data, api
     assert progress_mock.total == 2 * len(output_files)
 
 
-def test_process_adoc__embedded_file_not_in_output_map(build_dir, single_and_multipage, adoc_data,
-                                                       api_reference):
+def test_process_adoc__embedded_file_not_in_output_map(single_and_multipage, adoc_data,
+                                                       api_reference, package_manager):
     main_doc_file = adoc_data / "embeddedfile_test.input.adoc"
 
     progress_mock = ProgressMock()
     output_files = process_adoc(main_doc_file,
-                                build_dir,
                                 api_reference,
+                                package_manager,
                                 warnings_are_errors=True,
                                 multipage=single_and_multipage,
                                 progress=progress_mock)
@@ -785,8 +786,8 @@ def test_process_adoc__embedded_file_not_in_output_map(build_dir, single_and_mul
 @pytest.mark.parametrize(
     "test_file_name",
     ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
-def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multipage, adoc_data,
-                                   api_reference):
+def test_process_adoc_file_warning(fragment_dir, test_file_name, single_and_multipage, adoc_data,
+                                   api_reference, package_manager):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
@@ -795,12 +796,14 @@ def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multipa
         if expected_output_file_multipage.is_file():
             expected_output_file = expected_output_file_multipage
 
-    output_file = process_adoc(input_file, build_dir, api_reference,
+    output_file = process_adoc(input_file,
+                               api_reference,
+                               package_manager,
                                multipage=single_and_multipage)[input_file]
     assert output_file.is_file()
 
     content = output_file.read_text()
-    content = content.replace(os.fspath(build_dir), "BUILD_DIR")
+    content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
     assert content == expected_output_file.read_text()
 
 
@@ -809,12 +812,12 @@ def test_process_adoc_file_warning(build_dir, test_file_name, single_and_multipa
                                                    ("dangling_cross_doc_ref", ConsistencyError),
                                                    ("double_insert", ConsistencyError),
                                                    ("dangling_link_in_insert", ConsistencyError)])
-def test_process_adoc_file_warning_as_error(build_dir, test_file_name, error, single_and_multipage,
-                                            adoc_data, api_reference):
+def test_process_adoc_file_warning_as_error(test_file_name, error, single_and_multipage, adoc_data,
+                                            api_reference, package_manager):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 
     with pytest.raises(error):
-        process_adoc(input_file, build_dir, api_reference, warnings_are_errors=True)
+        process_adoc(input_file, api_reference, package_manager, warnings_are_errors=True)
 
 
 def test_require_version__exact_match(preprocessing_api):

@@ -4,7 +4,7 @@ Sub-document document text.
 
 == Sub-document chapter [[sub-document-chapter]]
 
-include::BUILD_DIR/fragments/cpp-classasciidoxy_1_1geometry_1_1_coordinate.adoc[leveloffset=+1]
+include::FRAGMENT_DIR/cpp-classasciidoxy_1_1geometry_1_1_coordinate.adoc[leveloffset=+1]
 
 Reference to main-document:
 <<.asciidoxy.multifile_test.input.adoc#main-document-chapter,Reference to main-document>>

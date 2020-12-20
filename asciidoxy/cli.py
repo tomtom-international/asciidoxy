@@ -217,8 +217,8 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     try:
         with tqdm(desc="Processing asciidoc     ", total=1, unit="file") as progress:
             in_to_out_file_map = process_adoc(in_file,
-                                              args.build_dir,
                                               api_reference,
+                                              pkg_mgr,
                                               warnings_are_errors=args.warnings_are_errors,
                                               multipage=args.multipage,
                                               progress=progress)

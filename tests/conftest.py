@@ -22,6 +22,7 @@ from asciidoxy.doxygenparser import Driver as ParserDriver
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
 from asciidoxy.generator.navigation import DocumentTreeNode
+from asciidoxy.packaging import PackageManager
 
 from .builders import SimpleClassBuilder
 
@@ -93,8 +94,20 @@ def fragment_dir(build_dir):
 
 
 @pytest.fixture
-def input_file(tmp_path):
-    f = tmp_path / "input_file.adoc"
+def package_manager(build_dir):
+    return PackageManager(build_dir)
+
+
+@pytest.fixture
+def work_dir(package_manager):
+    wd = package_manager.work_dir
+    wd.mkdir(parents=True)
+    return wd
+
+
+@pytest.fixture
+def input_file(work_dir):
+    f = work_dir / "input_file.adoc"
     f.touch()
     return f
 
@@ -126,11 +139,11 @@ def api_reference(parser_driver_factory, api_reference_set, forced_language):
 
 
 @pytest.fixture
-def context(input_file, build_dir, fragment_dir, api_reference):
+def context(input_file, fragment_dir, api_reference, package_manager):
     c = Context(base_dir=input_file.parent,
-                build_dir=build_dir,
                 fragment_dir=fragment_dir,
                 reference=api_reference,
+                package_manager=package_manager,
                 current_document=DocumentTreeNode(input_file))
     return c
 
@@ -213,11 +226,11 @@ def single_and_multipage(request, context):
 
 
 @pytest.fixture
-def empty_context(input_file, build_dir, fragment_dir):
+def empty_context(input_file, fragment_dir, package_manager):
     return Context(base_dir=input_file.parent,
-                   build_dir=build_dir,
                    fragment_dir=fragment_dir,
                    reference=ApiReference(),
+                   package_manager=package_manager,
                    current_document=DocumentTreeNode(input_file))
 
 

@@ -32,6 +32,7 @@ from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..doxygenparser import safe_language_tag
 from ..model import ReferableElement
+from ..packaging import PackageManager
 from ..transcoder import TranscoderBase
 from .._version import __version__
 from .context import Context
@@ -58,7 +59,7 @@ class Api(ABC):
     def __init__(self, current_file: Path, context: Context):
         assert current_file.is_file()
         assert context.base_dir.is_dir()
-        assert context.build_dir.is_dir()
+        assert context.package_manager.work_dir.is_dir()
         assert context.fragment_dir.is_dir()
         assert context.reference is not None
 
@@ -674,8 +675,8 @@ class GeneratingApi(Api):
 
 
 def process_adoc(in_file: Path,
-                 build_dir: Path,
                  api_reference: ApiReference,
+                 package_manager: PackageManager,
                  warnings_are_errors: bool = False,
                  multipage: bool = False,
                  progress: Optional[tqdm] = None):
@@ -683,7 +684,6 @@ def process_adoc(in_file: Path,
 
     Args:
         in_file:             AsciiDoc file to process.
-        build_dir:           Directory to store build artifacts in.
         api_reference:       API reference to insert in the documents.
         warnings_are_errors: True to treat every warning as an error.
         multipage:          True to enable multi page output.
@@ -693,13 +693,14 @@ def process_adoc(in_file: Path,
             reference.
     """
 
-    context = Context(base_dir=in_file.parent,
-                      build_dir=build_dir,
-                      fragment_dir=build_dir / "fragments",
-                      reference=api_reference,
-                      current_document=DocumentTreeNode(in_file, None))
+    context = Context(
+        base_dir=in_file.parent,
+        fragment_dir=package_manager.build_dir / "fragments",
+        reference=api_reference,
+        package_manager=package_manager,
+        current_document=DocumentTreeNode(in_file, None))
 
-    context.build_dir.mkdir(parents=True, exist_ok=True)
+    context.package_manager.work_dir.mkdir(parents=True, exist_ok=True)
     context.fragment_dir.mkdir(parents=True, exist_ok=True)
 
     context.warnings_are_errors = warnings_are_errors

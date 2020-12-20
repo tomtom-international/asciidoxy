@@ -23,6 +23,7 @@ from tqdm import tqdm
 
 from ..api_reference import ApiReference
 from ..model import ReferableElement
+from ..packaging import PackageManager
 from .errors import ConsistencyError
 from .filters import InsertionFilter
 from .navigation import DocumentTreeNode, relative_path
@@ -38,7 +39,6 @@ class Context(object):
     Attributes:
         base_dir:           Base directory from which the documentation is generated. Relative
                                 paths are relative to the base directory.
-        build_dir:          Directory for (temporary) build artifacts.
         fragment_dir:       Directory containing generated fragments to be included in the
                                 documentation.
         namespace:          Current namespace to use when looking up references.
@@ -53,7 +53,6 @@ class Context(object):
         current_document:   Node in the Document Tree that is currently being processed.
     """
     base_dir: Path
-    build_dir: Path
     fragment_dir: Path
 
     namespace: Optional[str] = None
@@ -66,6 +65,7 @@ class Context(object):
     embedded: bool = False
 
     reference: ApiReference
+    package_manager: PackageManager
     progress: Optional[tqdm] = None
 
     linked: Set[str]
@@ -74,15 +74,15 @@ class Context(object):
     embedded_file_map: Dict[Tuple[Path, Path], Path]
     current_document: DocumentTreeNode
 
-    def __init__(self, base_dir: Path, build_dir: Path, fragment_dir: Path, reference: ApiReference,
-                 current_document: DocumentTreeNode):
+    def __init__(self, base_dir: Path, fragment_dir: Path, reference: ApiReference,
+                 package_manager: PackageManager, current_document: DocumentTreeNode):
         self.base_dir = base_dir
-        self.build_dir = build_dir
         self.fragment_dir = fragment_dir
 
         self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]})
 
         self.reference = reference
+        self.package_manager = package_manager
 
         self.linked = set()
         self.inserted = {}
@@ -102,9 +102,9 @@ class Context(object):
 
     def sub_context(self) -> "Context":
         sub = Context(base_dir=self.base_dir,
-                      build_dir=self.build_dir,
                       fragment_dir=self.fragment_dir,
                       reference=self.reference,
+                      package_manager=self.package_manager,
                       current_document=self.current_document)
 
         # Copies

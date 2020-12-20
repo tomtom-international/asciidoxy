@@ -34,7 +34,6 @@ def test_create_sub_context(empty_context):
     assert sub is not context
 
     assert sub.base_dir == context.base_dir
-    assert sub.build_dir == context.build_dir
     assert sub.fragment_dir == context.fragment_dir
 
     assert sub.namespace == "ns"

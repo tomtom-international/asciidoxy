@@ -4,7 +4,7 @@ Main document text.
 
 == Main document chapter [[main-document-chapter]]
 
-include::BUILD_DIR/fragments/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9.adoc[leveloffset=+1]
+include::FRAGMENT_DIR/cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9.adoc[leveloffset=+1]
 
 Reference to sub-document:
 <<sub_directory/multifile_subdoc_test.input.adoc#sub-document-chapter,Reference to sub-document>>
