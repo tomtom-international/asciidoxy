@@ -18,7 +18,7 @@ import shutil
 
 from pathlib import Path
 from tqdm import tqdm
-from typing import List, Optional
+from typing import Dict, Optional
 
 from ..doxygenparser import Driver
 from .collect import CollectError, Package, collect, specs_from_file
@@ -31,17 +31,39 @@ class FileCollisionError(CollectError):
                 f"\n{self.message}")
 
 
+class UnknownPackageError(Exception):
+    package_name: str
+
+    def __init__(self, package_name: str):
+        self.package_name = package_name
+
+    def __str(self) -> str:
+        return f"Unknown package name: {self.package_name}."
+
+
+class UnknownFileError(Exception):
+    package_name: str
+    file_name: str
+
+    def __init__(self, package_name: str, file_name: str):
+        self.package_name = package_name
+        self.file_name = file_name
+
+    def __str(self) -> str:
+        return f"File not found in package {self.package_name}: {self.file_name}."
+
+
 class PackageManager:
     build_dir: Path
     work_dir: Path
     image_work_dir: Path
-    packages: List[Package]
+    packages: Dict[str, Package]
 
     def __init__(self, build_dir: Path):
         self.build_dir = build_dir
         self.work_dir = build_dir / "intermediate"
         self.image_work_dir = self.work_dir / "images"
-        self.packages = []
+        self.packages = {}
 
     def set_input_files(self,
                         in_file: Path,
@@ -65,7 +87,7 @@ class PackageManager:
             pkg.adoc_image_dir = image_dir
         elif (in_file.parent / "images").is_dir():
             pkg.adoc_image_dir = in_file.parent / "images"
-        self.packages.append(pkg)
+        self.packages["INPUT"] = pkg
 
     def collect(self,
                 spec_file: Path,
@@ -88,8 +110,9 @@ class PackageManager:
             progress.update(0)
 
         download_dir = self.build_dir / "download"
-        self.packages.extend(asyncio.get_event_loop().run_until_complete(
-            collect(specs, download_dir, progress)))
+        packages = asyncio.get_event_loop().run_until_complete(
+            collect(specs, download_dir, progress))
+        self.packages.update({pkg.name: pkg for pkg in packages})
 
     def load_reference(self, parser: Driver, progress: Optional[tqdm] = None) -> None:
         """Load API reference from available packages.
@@ -102,7 +125,7 @@ class PackageManager:
             progress.total = len(self.packages)
             progress.update(0)
 
-        for pkg in self.packages:
+        for pkg in self.packages.values():
             if pkg.reference_dir is not None:
                 for xml_file in pkg.reference_dir.glob("**/*.xml"):
                     parser.parse(xml_file)
@@ -131,7 +154,7 @@ class PackageManager:
 
         self.image_work_dir.mkdir(parents=True, exist_ok=True)
 
-        for pkg in self.packages:
+        for pkg in self.packages.values():
             if pkg.adoc_src_dir is not None:
                 _copy_dir_contents(pkg.adoc_src_dir, self.work_dir, pkg)
             elif pkg.adoc_root_doc is not None:
@@ -161,11 +184,40 @@ class PackageManager:
 
         image_dir = parent / "images"
         image_dir.mkdir(parents=True, exist_ok=True)
-        for pkg in self.packages:
+        for pkg in self.packages.values():
             if pkg.adoc_image_dir is not None:
                 _copy_dir_contents(pkg.adoc_image_dir, image_dir, pkg)
             if progress is not None:
                 progress.update()
+
+    def file_in_work_directory(self, package_name: str, file_name: str) -> Path:
+        """Get the absolute path to a file in the work directory.
+
+        Args:
+            package_name: Package the file is in.
+            file_name:    Name of the file in the package.
+
+        Returns:
+            Absolute path to the file.
+
+        Raises:
+            UnknownPackageError: There is no package with that name.
+            UnknownFileError:    The package does not contain a file with that name.
+        """
+        pkg = self.packages.get(package_name, None)
+        if pkg is None:
+            raise UnknownPackageError(package_name)
+
+        if pkg.adoc_src_dir is None:
+            raise UnknownFileError(package_name, file_name)
+
+        src_file = pkg.adoc_src_dir / file_name
+        if not src_file.is_file():
+            raise UnknownFileError(package_name, file_name)
+
+        work_file = self.work_dir / file_name
+        assert work_file.is_file()
+        return work_file
 
 
 def _copy_dir_contents(src: Path, dst: Path, pkg: Package) -> None:

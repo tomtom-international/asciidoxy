@@ -19,7 +19,8 @@ import toml
 from pathlib import Path
 from unittest.mock import MagicMock, call
 
-from asciidoxy.packaging.manager import FileCollisionError, PackageManager
+from asciidoxy.packaging.manager import (FileCollisionError, PackageManager, UnknownFileError,
+                                         UnknownPackageError)
 
 
 @pytest.fixture
@@ -97,7 +98,7 @@ def test_collect(package_manager, event_loop, tmp_path, build_dir):
     package_manager.collect(spec_file)
     assert len(package_manager.packages) == 2
 
-    packages = {pkg.name: pkg for pkg in package_manager.packages}
+    packages = package_manager.packages
     assert "a" in packages
     assert "b" in packages
 
@@ -374,3 +375,88 @@ def test_make_image_directory__from_input_files(package_manager, event_loop, tmp
     assert (output_dir / "images" / "image.png").is_file()
     assert (output_dir / "images" / "a.png").is_file()
     assert (output_dir / "images" / "b.png").is_file()
+
+
+def test_file_in_work_directory__present(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    work_file = package_manager.prepare_work_directory(in_file)
+    work_dir = work_file.parent
+
+    assert package_manager.file_in_work_directory("a", "a.adoc") == work_dir / "a.adoc"
+    assert package_manager.file_in_work_directory("b", "b.adoc") == work_dir / "b.adoc"
+
+
+def test_file_in_work_directory__unknown_package(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    package_manager.prepare_work_directory(in_file)
+
+    with pytest.raises(UnknownPackageError):
+        package_manager.file_in_work_directory("c", "a.adoc")
+
+
+def test_file_in_work_directory__unknown_file(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    package_manager.prepare_work_directory(in_file)
+
+    with pytest.raises(UnknownFileError):
+        package_manager.file_in_work_directory("a", "c.adoc")
+
+
+def test_file_in_work_directory__package_must_match(package_manager, event_loop, tmp_path,
+                                                    build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    package_manager.prepare_work_directory(in_file)
+
+    with pytest.raises(UnknownFileError):
+        package_manager.file_in_work_directory("b", "a.adoc")
+    with pytest.raises(UnknownFileError):
+        package_manager.file_in_work_directory("a", "b.adoc")
+
+
+def test_file_in_work_directory__package_without_include_files(package_manager, event_loop,
+                                                               tmp_path, build_dir):
+    create_package_dir(tmp_path, "a", adoc=False)
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    package_manager.prepare_work_directory(in_file)
+
+    with pytest.raises(UnknownFileError):
+        package_manager.file_in_work_directory("a", "a.adoc")

@@ -14,6 +14,9 @@
 """Modules for handling documentation packages."""
 
 from .collect import CollectError, SpecificationError
-from .manager import PackageManager
+from .manager import PackageManager, UnknownFileError, UnknownPackageError
 
-__all__ = ["CollectError", "PackageManager", "SpecificationError"]
+__all__ = [
+    "CollectError", "PackageManager", "SpecificationError", "UnknownFileError",
+    "UnknownPackageError"
+]
