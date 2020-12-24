@@ -213,19 +213,12 @@ class Api(ABC):
         try:
             element = self.find_element(name, kind=kind, lang=lang, allow_overloads=allow_overloads)
         except ReferenceNotFoundError as ref_not_found:
-            if self._context.warnings_are_errors:
-                raise
-            else:
-                logger.warning(str(ref_not_found))
-                return text or name
+            self._warning_or_error(ref_not_found)
+            return text or name
 
         if element.id is None:
-            unlinkable = UnlinkableError(name, lang=lang, kind=kind)
-            if self._context.warnings_are_errors:
-                raise unlinkable
-            else:
-                logger.warning(str(unlinkable))
-                return text or name
+            self._warning_or_error(UnlinkableError(name, lang=lang, kind=kind))
+            return text or name
 
         if text is not None:
             link_text = text
@@ -283,43 +276,9 @@ class Api(ABC):
         if Path(file_name).is_absolute():
             raise InvalidApiCallError("`file_name` must be a relative path.")
 
-        if package_name is None:
-            package_name = self._context.current_package.name
-            absolute_work_file_path = (self._current_file.parent / file_name).resolve()
-            if not absolute_work_file_path.exists():
-                file_not_found_error = IncludeFileNotFoundError(file_name)
-                if self._context.warnings_are_errors:
-                    raise file_not_found_error
-                else:
-                    logger.warning(str(file_not_found_error))
-                return ""
-
-            if not self._context.current_package.scoped:
-                absolute_file_path = absolute_work_file_path
-                package_name = None
-            else:
-                relative_work_file_path = absolute_work_file_path.relative_to(
-                    self._context.package_manager.work_dir)
-                file_name = str(relative_work_file_path)
-
-        if package_name is not None:
-            try:
-                absolute_file_path = self._context.package_manager.file_in_work_directory(
-                    package_name, file_name)
-            except UnknownPackageError:
-                missing_package_error = MissingPackageError(package_name)
-                if self._context.warnings_are_errors:
-                    raise missing_package_error
-                else:
-                    logger.warning(str(missing_package_error))
-                return ""
-            except UnknownFileError:
-                missing_file_error = MissingPackageFileError(package_name, file_name)
-                if self._context.warnings_are_errors:
-                    raise missing_file_error
-                else:
-                    logger.warning(str(missing_file_error))
-                return ""
+        absolute_file_path = self._find_absolute_file_path(file_name, package_name)
+        if absolute_file_path is None:
+            return ""
 
         if file_verification is not None:
             file_verification(absolute_file_path)
@@ -329,6 +288,41 @@ class Api(ABC):
         link_text = link_text if link_text is not None else anchor
         return (f"<<{link_file_path}{link_anchor},"
                 f"{link_text if link_text is not None else anchor}>>")
+
+    def _find_absolute_file_path(self, file_name: str,
+                                 package_name: Optional[str]) -> Optional[Path]:
+        if package_name is not None:
+            return self._file_from_package(file_name, package_name)
+        else:
+            package_name = self._context.current_package.name
+            absolute_work_file_path = (self._current_file.parent / file_name).resolve()
+            if not absolute_work_file_path.exists():
+                self._warning_or_error(IncludeFileNotFoundError(file_name))
+                return None
+
+            if not self._context.current_package.scoped:
+                return absolute_work_file_path
+            else:
+                relative_work_file_path = absolute_work_file_path.relative_to(
+                    self._context.package_manager.work_dir)
+                return self._file_from_package(str(relative_work_file_path), package_name)
+
+    def _file_from_package(self, file_name: str, package_name: str) -> Optional[Path]:
+        try:
+            return self._context.package_manager.file_in_work_directory(package_name, file_name)
+
+        except UnknownPackageError:
+            self._warning_or_error(MissingPackageError(package_name))
+            return None
+        except UnknownFileError:
+            self._warning_or_error(MissingPackageFileError(package_name, file_name))
+            return None
+
+    def _warning_or_error(self, error: Exception):
+        if self._context.warnings_are_errors:
+            raise error
+        else:
+            logger.warning(str(error))
 
     def include(self,
                 file_name: str,
@@ -678,10 +672,7 @@ class GeneratingApi(Api):
                 msg = (f"Invalid cross-reference from document '{self._current_file}' "
                        f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
                        f"is not included anywhere across whole documentation tree.")
-                if self._context.warnings_are_errors:
-                    raise ConsistencyError(msg)
-                else:
-                    logger.warning(msg)
+                self._warning_or_error(ConsistencyError(msg))
 
         return super()._cross_document_ref(file_name,
                                            package_name=package_name,
