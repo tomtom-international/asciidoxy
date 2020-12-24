@@ -59,6 +59,8 @@ class PackageManager:
     image_work_dir: Path
     packages: Dict[str, Package]
 
+    INPUT_FILES: str = "INPUT"
+
     def __init__(self, build_dir: Path):
         self.build_dir = build_dir
         self.work_dir = build_dir / "intermediate"
@@ -79,15 +81,16 @@ class PackageManager:
                             directory named `images` is present next to the `in_file`, that
                             directory is used for images. Otherwise, no images are copied.
         """
-        pkg = Package("INPUT")
+        pkg = Package(self.INPUT_FILES)
         pkg.adoc_src_dir = include_dir
         pkg.adoc_root_doc = in_file
+        pkg.scoped = True
 
         if image_dir is not None:
             pkg.adoc_image_dir = image_dir
         elif (in_file.parent / "images").is_dir():
             pkg.adoc_image_dir = in_file.parent / "images"
-        self.packages["INPUT"] = pkg
+        self.packages[self.INPUT_FILES] = pkg
 
     def collect(self,
                 spec_file: Path,
@@ -218,6 +221,11 @@ class PackageManager:
         work_file = self.work_dir / file_name
         assert work_file.is_file()
         return work_file
+
+    def input_package(self) -> Package:
+        """Get the meta-package representing the input and include files."""
+        assert self.INPUT_FILES in self.packages
+        return self.packages[self.INPUT_FILES]
 
 
 def _copy_dir_contents(src: Path, dst: Path, pkg: Package) -> None:

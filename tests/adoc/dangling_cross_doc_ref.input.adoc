@@ -2,5 +2,5 @@
 
 This is some generic text.
 
-A link: ${api.cross_document_ref("not_existing_doc.adoc", "some-anchor", "Link text")}
+A link: ${api.cross_document_ref("not_existing_doc.adoc", anchor="some-anchor", link_text="Link text")}
 

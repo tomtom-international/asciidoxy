@@ -22,7 +22,7 @@ from asciidoxy.doxygenparser import Driver as ParserDriver
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
 from asciidoxy.generator.navigation import DocumentTreeNode
-from asciidoxy.packaging import PackageManager
+from asciidoxy.packaging import Package, PackageManager
 
 from .builders import SimpleClassBuilder
 
@@ -101,14 +101,15 @@ def package_manager(build_dir):
 @pytest.fixture
 def work_dir(package_manager):
     wd = package_manager.work_dir
-    wd.mkdir(parents=True)
+    wd.mkdir(parents=True, exist_ok=True)
     return wd
 
 
 @pytest.fixture
-def input_file(work_dir):
+def input_file(work_dir, package_manager):
     f = work_dir / "input_file.adoc"
     f.touch()
+    package_manager.set_input_files(f, include_dir=work_dir)
     return f
 
 
@@ -144,7 +145,8 @@ def context(input_file, fragment_dir, api_reference, package_manager):
                 fragment_dir=fragment_dir,
                 reference=api_reference,
                 package_manager=package_manager,
-                current_document=DocumentTreeNode(input_file))
+                current_document=DocumentTreeNode(input_file),
+                current_package=Package(PackageManager.INPUT_FILES))
     return c
 
 
@@ -231,7 +233,8 @@ def empty_context(input_file, fragment_dir, package_manager):
                    fragment_dir=fragment_dir,
                    reference=ApiReference(),
                    package_manager=package_manager,
-                   current_document=DocumentTreeNode(input_file))
+                   current_document=DocumentTreeNode(input_file),
+                   current_package=Package(PackageManager.INPUT_FILES))
 
 
 @pytest.fixture

@@ -23,7 +23,7 @@ from tqdm import tqdm
 
 from ..api_reference import ApiReference
 from ..model import ReferableElement
-from ..packaging import PackageManager
+from ..packaging import Package, PackageManager
 from .errors import ConsistencyError
 from .filters import InsertionFilter
 from .navigation import DocumentTreeNode, relative_path
@@ -51,6 +51,7 @@ class Context(object):
         inserted:           All elements that have been inserted in the documentation.
         in_to_out_file_map: Mapping from input files for AsciiDoctor to the resulting output files.
         current_document:   Node in the Document Tree that is currently being processed.
+        current_package:    Package containing the current files.
     """
     base_dir: Path
     fragment_dir: Path
@@ -73,9 +74,11 @@ class Context(object):
     in_to_out_file_map: Dict[Path, Path]
     embedded_file_map: Dict[Tuple[Path, Path], Path]
     current_document: DocumentTreeNode
+    current_package: Package
 
     def __init__(self, base_dir: Path, fragment_dir: Path, reference: ApiReference,
-                 package_manager: PackageManager, current_document: DocumentTreeNode):
+                 package_manager: PackageManager, current_document: DocumentTreeNode,
+                 current_package: Package):
         self.base_dir = base_dir
         self.fragment_dir = fragment_dir
 
@@ -89,6 +92,7 @@ class Context(object):
         self.in_to_out_file_map = {}
         self.embedded_file_map = {}
         self.current_document = current_document
+        self.current_package = current_package
 
     def insert(self, element: ReferableElement) -> None:
         assert element.id
@@ -105,7 +109,8 @@ class Context(object):
                       fragment_dir=self.fragment_dir,
                       reference=self.reference,
                       package_manager=self.package_manager,
-                      current_document=self.current_document)
+                      current_document=self.current_document,
+                      current_package=self.current_package)
 
         # Copies
         sub.namespace = self.namespace

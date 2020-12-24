@@ -171,3 +171,36 @@ class InvalidApiCallError(AsciiDocError):
 
     def __str__(self) -> str:
         return f"Invalid API call: {self.msg}"
+
+
+class MissingPackageError(AsciiDocError):
+    """The specified package is missing from the package specification.
+
+    Args:
+        package_name: Name of the missing package.
+    """
+    package_name: str
+
+    def __init__(self, package_name: str):
+        self.package_name = package_name
+
+    def __str__(self) -> str:
+        return f"The package `{self.package_name}` is not available."
+
+
+class MissingPackageFileError(AsciiDocError):
+    """The specified file is missing from the package.
+
+    Args:
+        package_name: Name of the missing package.
+        file_name:    Name of the missing file.
+    """
+    package_name: str
+    file_name: str
+
+    def __init__(self, package_name: str, file_name: str):
+        self.package_name = package_name
+        self.file_name = file_name
+
+    def __str__(self) -> str:
+        return f"Package `{self.package_name}` does not contain file `{self.file_name}`."

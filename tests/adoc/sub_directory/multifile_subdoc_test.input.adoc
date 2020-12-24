@@ -7,7 +7,7 @@ Sub-document document text.
 ${api.insert("asciidoxy::geometry::Coordinate")}
 
 Reference to main-document:
-${api.cross_document_ref("../multifile_test.input.adoc", "main-document-chapter",
+${api.cross_document_ref("../multifile_test.input.adoc", anchor="main-document-chapter",
                          link_text="Reference to main-document")}
 
 Link to sub-document API:

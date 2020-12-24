@@ -24,7 +24,7 @@ from mako.template import Template
 from pathlib import Path
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
-from typing import MutableMapping, NamedTuple, Optional
+from typing import Callable, MutableMapping, NamedTuple, Optional
 
 from tqdm import tqdm
 
@@ -32,13 +32,14 @@ from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..doxygenparser import safe_language_tag
 from ..model import ReferableElement
-from ..packaging import PackageManager
+from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
 from ..transcoder import TranscoderBase
 from .._version import __version__
 from .context import Context
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
-                     IncompatibleVersionError, InvalidApiCallError, ReferenceNotFoundError,
-                     TemplateMissingError, UnlinkableError)
+                     IncompatibleVersionError, InvalidApiCallError, MissingPackageError,
+                     MissingPackageFileError, ReferenceNotFoundError, TemplateMissingError,
+                     UnlinkableError)
 from .filters import FilterSpec, InsertionFilter
 from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipage_toc
 
@@ -207,7 +208,7 @@ class Api(ABC):
             AsciiDoc text to include in the document.
         """
         if text is not None and full_name is True:
-            raise ValueError("`text` and `full_name` cannot be used together.")
+            raise InvalidApiCallError("`text` and `full_name` cannot be used together.")
 
         try:
             element = self.find_element(name, kind=kind, lang=lang, allow_overloads=allow_overloads)
@@ -235,7 +236,12 @@ class Api(ABC):
 
         return self.link_to_element(element.id, link_text)
 
-    def cross_document_ref(self, file_name: str, anchor: str, link_text: str = None) -> str:
+    def cross_document_ref(self,
+                           file_name: str,
+                           *,
+                           package_name: Optional[str] = None,
+                           anchor: Optional[str] = None,
+                           link_text: Optional[str] = None) -> str:
         """AsciiDoc cross-document reference.
 
         Since AsciiDoxy in multi-page mode generates intermediate AsciiDoc files and process them
@@ -243,20 +249,85 @@ class Api(ABC):
         (i.e. `<<file_name#anchor,link_tex>>`) doesn't work. You must use this method instead.
 
         Args:
-             file_name: Relative or absolute path to the referred AsciiDoc file. Relative paths
-                            are relative to the document calling the method.
-             anchor:    Anchor to the referred section in the referred AsciiDoc document.
-             link_text: Text of the reference. If None, `anchor` will be used as text of the
-                            reference.
+             file_name:    Name of the file. If `package_name` is specified, it must be relative to
+                              the root of the package. Otherwise, it is relative to the current
+                              document. Absolute paths are not supported.
+             package_name: Name of the package containing the file. If not specified, the file must
+                               come from the same package.
+             anchor:       Anchor to the referred section in the referred AsciiDoc document.
+             link_text:    Text of the reference. If None, `anchor` will be used as text of the
+                               reference.
 
         Returns:
             AsciiDoc cross-document reference.
+
+        Raises:
+            InvalidApiCallError:     Incorrect argument or argument combinations are used.
+            MissingPackageError:     The specified package is not available.
+            MissingPackageFileError: The specified file name is not available in the package.
         """
-        referenced_file_name = Path(file_name)
-        absolute_file_path = (referenced_file_name if referenced_file_name.is_absolute() else
-                              self._current_file.parent / referenced_file_name).resolve()
+        return self._cross_document_ref(file_name,
+                                        package_name=package_name,
+                                        anchor=anchor,
+                                        link_text=link_text)
+
+    def _cross_document_ref(self,
+                            file_name: str,
+                            *,
+                            package_name: Optional[str] = None,
+                            anchor: Optional[str] = None,
+                            link_text: Optional[str] = None,
+                            file_verification: Optional[Callable[[Path], None]] = None) -> str:
+        if anchor is None and link_text is None:
+            raise InvalidApiCallError("At least `anchor` or `link_text` is required,")
+        if Path(file_name).is_absolute():
+            raise InvalidApiCallError("`file_name` must be a relative path.")
+
+        if package_name is None:
+            package_name = self._context.current_package.name
+            absolute_work_file_path = (self._current_file.parent / file_name).resolve()
+            if not absolute_work_file_path.exists():
+                file_not_found_error = IncludeFileNotFoundError(file_name)
+                if self._context.warnings_are_errors:
+                    raise file_not_found_error
+                else:
+                    logger.warning(str(file_not_found_error))
+                return ""
+
+            if not self._context.current_package.scoped:
+                absolute_file_path = absolute_work_file_path
+                package_name = None
+            else:
+                relative_work_file_path = absolute_work_file_path.relative_to(
+                    self._context.package_manager.work_dir)
+                file_name = str(relative_work_file_path)
+
+        if package_name is not None:
+            try:
+                absolute_file_path = self._context.package_manager.file_in_work_directory(
+                    package_name, file_name)
+            except UnknownPackageError:
+                missing_package_error = MissingPackageError(package_name)
+                if self._context.warnings_are_errors:
+                    raise missing_package_error
+                else:
+                    logger.warning(str(missing_package_error))
+                return ""
+            except UnknownFileError:
+                missing_file_error = MissingPackageFileError(package_name, file_name)
+                if self._context.warnings_are_errors:
+                    raise missing_file_error
+                else:
+                    logger.warning(str(missing_file_error))
+                return ""
+
+        if file_verification is not None:
+            file_verification(absolute_file_path)
+
         link_file_path = self._context.link_to_adoc_file(absolute_file_path)
-        return (f"<<{link_file_path}#{anchor},"
+        link_anchor = f"#{anchor}" if anchor is not None else ""
+        link_text = link_text if link_text is not None else anchor
+        return (f"<<{link_file_path}{link_anchor},"
                 f"{link_text if link_text is not None else anchor}>>")
 
     def include(self,
@@ -595,22 +666,28 @@ class GeneratingApi(Api):
             f.write(toc_content)
         return ":docinfo: private"
 
-    def cross_document_ref(self, file_name: str, anchor: str, link_text: str = None) -> str:
-        referenced_file_name = Path(file_name)
+    def cross_document_ref(self,
+                           file_name: str,
+                           *,
+                           package_name: Optional[str] = None,
+                           anchor: Optional[str] = None,
+                           link_text: Optional[str] = None) -> str:
+        def verifier(absolute_file_path: Path) -> None:
+            if absolute_file_path not in (
+                    d.in_file for d in self._context.current_document.all_documents_in_tree()):
+                msg = (f"Invalid cross-reference from document '{self._current_file}' "
+                       f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
+                       f"is not included anywhere across whole documentation tree.")
+                if self._context.warnings_are_errors:
+                    raise ConsistencyError(msg)
+                else:
+                    logger.warning(msg)
 
-        absolute_file_path = (referenced_file_name if referenced_file_name.is_absolute() else
-                              self._current_file.parent / referenced_file_name).resolve()
-        if absolute_file_path not in (
-                d.in_file for d in self._context.current_document.all_documents_in_tree()):
-            msg = (f"Invalid cross-reference from document '{self._current_file}' "
-                   f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
-                   f"is not included anywhere across whole documentation tree.")
-            if self._context.warnings_are_errors:
-                raise ConsistencyError(msg)
-            else:
-                logger.warning(msg)
-
-        return super().cross_document_ref(file_name, anchor, link_text)
+        return super()._cross_document_ref(file_name,
+                                           package_name=package_name,
+                                           anchor=anchor,
+                                           link_text=link_text,
+                                           file_verification=verifier)
 
     def insert_fragment(self,
                         element,
@@ -693,12 +770,12 @@ def process_adoc(in_file: Path,
             reference.
     """
 
-    context = Context(
-        base_dir=in_file.parent,
-        fragment_dir=package_manager.build_dir / "fragments",
-        reference=api_reference,
-        package_manager=package_manager,
-        current_document=DocumentTreeNode(in_file, None))
+    context = Context(base_dir=in_file.parent,
+                      fragment_dir=package_manager.build_dir / "fragments",
+                      reference=api_reference,
+                      package_manager=package_manager,
+                      current_document=DocumentTreeNode(in_file, None),
+                      current_package=package_manager.input_package())
 
     context.package_manager.work_dir.mkdir(parents=True, exist_ok=True)
     context.fragment_dir.mkdir(parents=True, exist_ok=True)

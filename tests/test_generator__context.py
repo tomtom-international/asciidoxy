@@ -52,6 +52,7 @@ def test_create_sub_context(empty_context):
     assert sub.in_to_out_file_map is context.in_to_out_file_map
     assert sub.embedded_file_map is context.embedded_file_map
     assert sub.current_document is context.current_document
+    assert sub.current_package is context.current_package
 
     sub.namespace = "other"
     sub.language = "objc"

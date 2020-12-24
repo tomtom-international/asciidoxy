@@ -13,10 +13,10 @@
 # limitations under the License.
 """Modules for handling documentation packages."""
 
-from .collect import CollectError, SpecificationError
+from .collect import CollectError, Package, SpecificationError
 from .manager import PackageManager, UnknownFileError, UnknownPackageError
 
 __all__ = [
-    "CollectError", "PackageManager", "SpecificationError", "UnknownFileError",
+    "CollectError", "Package", "PackageManager", "SpecificationError", "UnknownFileError",
     "UnknownPackageError"
 ]
