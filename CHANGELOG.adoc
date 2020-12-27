@@ -39,12 +39,21 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     the generated AsciiDoc.
   - [AD-32] By default the directory containing the input file is not copied to the intermediate
     build directory. Use `--base-dir` to enable copying of additional include files.
+  - [AD-32] `api.cross_document_ref` and `api.include` support a new `package_name` keyword to
+    point to files in packages. For new packages with a contents metadata file this keyword is
+    mandatory. If the package specifies a root document, the `filename` is optional now.
+  - [AD-32] For `api.cross_document_ref` the `anchor` and `link_text` arguments are now keyword
+    only.
+  - [AD-32] For `api.include` the `leveloffset`, `link_text`, and `link_prefix` arguments are now
+    keyword only.
+  - [AD-32] Multiple packages supplying the same file is now an error.
 
 === Fixed
 
   - [AD-35] Improve handling of complex closures.
   - Objective C: Support `__autoreleasing` suffix.
   - Including files in parent directories no longer raises an exception.
+  - Files and directories provided on the command-line are validated before use.
 
 
 == 0.6.3 (1 Nov 2020)
