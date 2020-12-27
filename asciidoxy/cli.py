@@ -39,10 +39,11 @@ def error(*args, **kwargs) -> None:
 
 
 def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, multipage: bool,
-                backend: str, extra_args: Sequence[str]) -> None:
+                backend: str, extra_args: Sequence[str], image_dir: Path) -> None:
     subprocess.run([
         f"asciidoctor -D {destination_dir} -o {out_file} -b {backend} "
         f"{'-a multipage ' if multipage else ''}"
+        f"-a imagesdir@={image_dir} "
         f"{processed_file} {' '.join(extra_args)}"
     ],
                    shell=True,
@@ -120,7 +121,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                         type=PathArgument(existing_dir=True),
                         help="Directory containing images to include. If no image directory is"
                         " specified, only images in the `images` directory next to the input file"
-                        " be included.")
+                        " can be included.")
     parser.add_argument("-b",
                         "--backend",
                         metavar="BACKEND",
@@ -239,7 +240,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             unit="file"):
         out_file = destination_dir / in_adoc_file.relative_to(in_dir).with_suffix(extension)
         asciidoctor(destination_dir, out_file, out_adoc_file, args.multipage, args.backend,
-                    extra_args)
+                    extra_args, pkg_mgr.image_work_dir)
         logger.info(f"Generated: {out_file}")
 
     if args.backend != "pdf":
