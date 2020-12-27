@@ -18,5 +18,12 @@ A step by step guide to get you started with AsciiDoxy.
 
 . ${api.cross_document_ref("getting-started/installation.adoc", link_text="Installation")}: Install
   AsciiDoxy and everything required to run it.
+. ${api.cross_document_ref("getting-started/basic-asciidoc-file.adoc", link_text="A basic AsciiDoc file")}:
+  Generating HTML out of a basic AsciiDoc file.
+. Using python in AsciiDoc files.
+. Multipage documents.
+. Separating documentation in packages.
+. Including API reference.
 
 ${api.include("getting-started/installation.adoc", multipage_link=False)}
+${api.include("getting-started/basic-asciidoc-file.adoc", multipage_link=False)}

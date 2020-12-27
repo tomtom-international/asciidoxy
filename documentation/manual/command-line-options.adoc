@@ -11,12 +11,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= Manual
-${api.include("_header.adoc", always_embed=True, leveloffset=None)}
+= Command-line options
+${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
 
-${api.include("manual/requirements.adoc", link_text="Requirements", link_prefix=". ")}
-${api.include("manual/command-line-options.adoc", link_text="Command-line options", link_prefix=". ")}
+To see all command line options, run:
 
-== TODO
+[source,bash]
+----
+asciidoxy --help
+----
 
-${api.include("usage.adoc", link_text="Usage", link_prefix=". ")}
+----
+<%
+import subprocess
+%>
+${subprocess.run("asciidoxy --help", stdout=subprocess.PIPE, shell=True, encoding="utf-8").stdout}
+----

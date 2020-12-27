@@ -17,55 +17,6 @@ ${api.include("_header.adoc", always_embed=True, leveloffset=None)}
 Instructions for how to install and use AsciiDoxy to create your own AsciiDoc API reference
 documentation.
 
-== Installation
-
-The preferred way to install AsciiDoxy is to use pip:
-
-[source,bash]
-----
-pip3 install asciidoxy
-----
-
-Alternatively you can directly install the development version by cloning the source and running:
-
-[source,bash]
-----
-make install
-----
-
-== Invocation
-
-The minimal invocation takes only an input AsciiDoc file. In the AsciiDoc file you can execute any
-python code in Mako format. It creates a single page HTML document.
-
-[source,bash]
-----
-asciidoxy input_file.adoc
-----
-
-AsciiDoxy becomes more powerful if you specify a Package Specification file pointing to external
-resources and API reference documentation. It allows you to generate API reference in AsciiDoc
-files.
-
-[source,bash]
-----
-asciidoxy --spec-file package_spec.toml input_file.adoc
-----
-
-To see all command line options, run:
-
-[source,bash]
-----
-asciidoxy --help
-----
-
-----
-<%
-import subprocess
-%>
-${subprocess.run("asciidoxy --help", stdout=subprocess.PIPE, shell=True, encoding="utf-8").stdout}
-----
-
 == Preparing API reference
 
 AsciiDoxy uses XML output from Doxygen to generate API reference documentation. To include the API
