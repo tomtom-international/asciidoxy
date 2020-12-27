@@ -53,7 +53,7 @@ endef
 
 $(foreach example_dir,$(EXAMPLE_DIRS),$(eval $(call EXAMPLE_template,$(example_dir))))
 
-ADOC_IN_FILES := $(wildcard *.adoc) $(wildcard examples/**/*.adoc)
+ADOC_IN_FILES := $(wildcard *.adoc) $(wildcard **/*.adoc) $(wildcard examples/**/*.adoc)
 ADOC_OUT_FILES := $(patsubst %.adoc,%.html,$(addprefix $(DOC_BUILD_DIR)/output/, $(ADOC_IN_FILES)))
 
 $(ADOC_OUT_FILES): $(ADOC_IN_FILES) $(DOC_BUILD_DIR)/asciidoxy $(CURDIR)/asciidoxy.toml $(CURDIR)/copy $(DOXYGEN_BUILD_DIR)/asciidoxy/xml $(EXAMPLE_OUTPUTS)

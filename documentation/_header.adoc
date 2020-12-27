@@ -30,7 +30,8 @@ ${api.multipage_toc()}
 
 [ ${api.cross_document_ref("index.adoc", link_text="Home")} |
 ${api.cross_document_ref("about.adoc", link_text="What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", link_text="Usage")} |
+${api.cross_document_ref("getting-started.adoc", link_text="Getting started")} |
+${api.cross_document_ref("manual.adoc", link_text="Manual")} |
 ${api.cross_document_ref("examples.adoc", link_text="Examples")} |
 ${api.cross_document_ref("contributing.adoc", link_text="Contributing")} |
 ${api.cross_document_ref("changelog.adoc", link_text="Changelog")} |
