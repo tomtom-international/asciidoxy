@@ -640,7 +640,7 @@ def test_cross_document_ref__document_not_in_tree(test_data_builder, tdb_single_
                                        link_text="bla")
 
 
-def test_include_relative_path(test_data_builder):
+def test_include__relative_path(test_data_builder):
     input_file = test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
 
@@ -655,7 +655,7 @@ def test_include_relative_path(test_data_builder):
         assert file_name.is_absolute()
 
 
-def test_include_relative_path__parent_directory(test_data_builder):
+def test_include__relative_path__parent_directory(test_data_builder):
     input_file = test_data_builder.add_input_file("src/input_file.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
 
@@ -670,7 +670,7 @@ def test_include_relative_path__parent_directory(test_data_builder):
         assert file_name.is_absolute()
 
 
-def test_include_relative_path_multipage(test_data_builder):
+def test_include__relative_path_multipage(test_data_builder):
     test_data_builder.add_input_file("input.adoc")
     include_file = test_data_builder.add_include_file("includes/another_file.adoc")
     test_data_builder.multipage = True
@@ -682,29 +682,72 @@ def test_include_relative_path_multipage(test_data_builder):
             api, GeneratingApi)
 
 
-def test_include_absolute_path(test_data_builder, tdb_single_and_multipage):
-    input_file = test_data_builder.add_input_file("input.adoc")
+def test_include__absolute_path_not_allowed(test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
     include_file = test_data_builder.add_include_file("includes/another_file.adoc")
 
     for api in test_data_builder.apis():
-        result = api.include("includes/another_file.adoc")
+        with pytest.raises(InvalidApiCallError):
+            api.include(str(include_file))
 
-        if tdb_single_and_multipage:
-            assert result == "<<includes/another_file.adoc#,includes/another_file.adoc>>"
-            assert include_file.with_name(".asciidoxy.another_file.adoc").is_file() == isinstance(
-                api, GeneratingApi)
 
+def test_include__from_package(test_data_builder):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_package_file("package-a", "another_file.adoc")
+
+    for api in test_data_builder.apis():
+        result = api.include("another_file.adoc", package_name="package-a")
+        assert result.startswith("include::")
+        assert result.endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / result[9:-16]
+        assert file_name.is_file() == isinstance(api, GeneratingApi)
+        assert file_name.name == ".asciidoxy.another_file.adoc"
+        assert file_name.is_absolute()
+
+
+def test_include__from_wrong_package(test_data_builder, tdb_warnings_are_and_are_not_errors):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_package_file("package-a", "another_file.adoc")
+    test_data_builder.add_package_file("package-b", "the_right_file.adoc")
+
+    for api in test_data_builder.apis():
+        if tdb_warnings_are_and_are_not_errors:
+            with pytest.raises(MissingPackageFileError):
+                api.include("the_right_file.adoc", package_name="package-a")
         else:
-            assert result.startswith("include::")
-            assert result.endswith("[leveloffset=+1]")
-
-            file_name = input_file.parent / result[9:-16]
-            assert file_name.is_file() == isinstance(api, GeneratingApi)
-            assert file_name.name == ".asciidoxy.another_file.adoc"
-            assert file_name.is_absolute()
+            assert api.include("the_right_file.adoc", package_name="package-a") == ""
 
 
-def test_include_with_leveloffset(test_data_builder):
+def test_include__package_does_not_exist(test_data_builder, tdb_warnings_are_and_are_not_errors):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_package_file("package-a", "another_file.adoc")
+
+    for api in test_data_builder.apis():
+        if tdb_warnings_are_and_are_not_errors:
+            with pytest.raises(MissingPackageError):
+                api.include("the_right_file.adoc", package_name="package-b")
+        else:
+            assert api.include("the_right_file.adoc", package_name="package-b") == ""
+
+
+def test_include__direct_access_to_other_package_for_old_style_packages(test_data_builder):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_package_file("package-a", "another_file.adoc")
+    test_data_builder.package_manager.input_package().scoped = False
+
+    for api in test_data_builder.apis():
+        result = api.include("another_file.adoc")
+        assert result.startswith("include::")
+        assert result.endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / result[9:-16]
+        assert file_name.is_file() == isinstance(api, GeneratingApi)
+        assert file_name.name == ".asciidoxy.another_file.adoc"
+        assert file_name.is_absolute()
+
+
+def test_include__with_leveloffset(test_data_builder):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
 
@@ -714,7 +757,7 @@ def test_include_with_leveloffset(test_data_builder):
         assert result.endswith("[leveloffset=-1]")
 
 
-def test_include_without_leveloffset(test_data_builder):
+def test_include__without_leveloffset(test_data_builder):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
 
@@ -724,7 +767,7 @@ def test_include_without_leveloffset(test_data_builder):
         assert result.endswith("[]")
 
 
-def test_include_multipage_with_link_text(test_data_builder):
+def test_include__multipage_with_link_text(test_data_builder):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
     test_data_builder.multipage = True
@@ -734,7 +777,7 @@ def test_include_multipage_with_link_text(test_data_builder):
         assert result == "<<includes/another_file.adoc#,Link>>"
 
 
-def test_include_multipage_with_prefix_text(test_data_builder):
+def test_include__multipage_with_prefix_text(test_data_builder):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
     test_data_builder.multipage = True
@@ -744,7 +787,7 @@ def test_include_multipage_with_prefix_text(test_data_builder):
         assert result == ". <<includes/another_file.adoc#,includes/another_file.adoc>>"
 
 
-def test_include_multipage_without_link(test_data_builder):
+def test_include__multipage_without_link(test_data_builder):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
     test_data_builder.multipage = True
@@ -754,7 +797,7 @@ def test_include_multipage_without_link(test_data_builder):
         assert result == ""
 
 
-def test_include_with_extra_options(test_data_builder):
+def test_include__with_extra_options(test_data_builder):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
 
@@ -764,11 +807,14 @@ def test_include_with_extra_options(test_data_builder):
         assert result.endswith("[lines=1..10,indent=12,leveloffset=+1]")
 
 
-def test_include_error_file_not_found(test_data_builder):
+def test_include__error_file_not_found(test_data_builder, tdb_warnings_are_and_are_not_errors):
     test_data_builder.add_input_file("input.adoc")
     for api in test_data_builder.apis():
-        with pytest.raises(IncludeFileNotFoundError):
-            api.include("non_existing_file.adoc")
+        if tdb_warnings_are_and_are_not_errors:
+            with pytest.raises(IncludeFileNotFoundError):
+                api.include("non_existing_file.adoc")
+        else:
+            assert api.include("non_existing_file.adoc") == ""
 
 
 def test_include__always_embed(test_data_builder, tdb_single_and_multipage):

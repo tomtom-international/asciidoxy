@@ -326,6 +326,8 @@ class Api(ABC):
 
     def include(self,
                 file_name: str,
+                *,
+                package_name: Optional[str] = None,
                 leveloffset: str = "+1",
                 link_text: str = "",
                 link_prefix: str = "",
@@ -339,8 +341,11 @@ class Api(ABC):
         referring to the document.
 
         Args:
-            file_name:         Relative or absolute path to the file to include. Relative paths are
-                                   relative to the document calling include.
+            file_name:         Name of the file. If `package_name` is specified, it must be relative
+                                   to the root of the package. Otherwise, it is relative to the
+                                   current document. Absolute paths are not supported.
+            package_name:      Name of the package containing the file. If not specified, the file
+                                   must come from the same package.
             leveloffset:       Offset of the top header of the inserted text from the top level
                                    header of the including document.
             link_text:         Text of the link which will be inserted when the output format is
@@ -357,14 +362,18 @@ class Api(ABC):
 
         Returns:
             AsciiDoc text to include in the document.
+
+        Raises:
+            InvalidApiCallError:     Incorrect argument or argument combinations are used.
+            MissingPackageError:     The specified package is not available.
+            MissingPackageFileError: The specified file name is not available in the package.
         """
+        if Path(file_name).is_absolute():
+            raise InvalidApiCallError("`file_name` must be a relative path.")
 
-        file_path = Path(file_name)
-        if not file_path.is_absolute():
-            file_path = (self._current_file.parent / file_path).resolve()
-
-        if not file_path.is_file():
-            raise IncludeFileNotFoundError(file_name)
+        file_path = self._find_absolute_file_path(file_name, package_name)
+        if file_path is None:
+            return ""
 
         out_file = self._sub_api(file_path, always_embed).process_adoc()
 
