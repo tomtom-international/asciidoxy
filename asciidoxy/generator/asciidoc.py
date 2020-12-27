@@ -284,7 +284,7 @@ class Api(ABC):
             file_verification(absolute_file_path)
 
         link_file_path = self._context.link_to_adoc_file(absolute_file_path)
-        link_anchor = f"#{anchor}" if anchor is not None else ""
+        link_anchor = f"#{anchor}" if anchor is not None else "#"
         link_text = link_text if link_text is not None else anchor
         return (f"<<{link_file_path}{link_anchor},"
                 f"{link_text if link_text is not None else anchor}>>")

@@ -576,9 +576,9 @@ def test_cross_document_ref__direct_access_to_other_package_for_old_style_packag
     for api in test_data_builder.apis():
         result = api.cross_document_ref("include.adoc", link_text="bla")
         if tdb_single_and_multipage:
-            assert result == "<<include.adoc,bla>>"
+            assert result == "<<include.adoc#,bla>>"
         else:
-            assert result == "<<.asciidoxy.include.adoc,bla>>"
+            assert result == "<<.asciidoxy.include.adoc#,bla>>"
 
 
 def test_cross_document_ref__with_link_text(test_data_builder, tdb_single_and_multipage):
@@ -602,9 +602,9 @@ def test_cross_document_ref__to_other_package(test_data_builder, tdb_single_and_
     for api in test_data_builder.apis():
         result = api.cross_document_ref("include.adoc", package_name="package", link_text="bla")
         if tdb_single_and_multipage:
-            assert result == "<<include.adoc,bla>>"
+            assert result == "<<include.adoc#,bla>>"
         else:
-            assert result == "<<.asciidoxy.include.adoc,bla>>"
+            assert result == "<<.asciidoxy.include.adoc#,bla>>"
 
 
 def test_cross_document_ref__links_to_package_are_relative_to_package_root(
@@ -617,9 +617,9 @@ def test_cross_document_ref__links_to_package_are_relative_to_package_root(
                                         package_name="package",
                                         link_text="bla")
         if tdb_single_and_multipage:
-            assert result == "<<../other_dir/include.adoc,bla>>"
+            assert result == "<<../other_dir/include.adoc#,bla>>"
         else:
-            assert result == "<<../other_dir/.asciidoxy.include.adoc,bla>>"
+            assert result == "<<../other_dir/.asciidoxy.include.adoc#,bla>>"
 
 
 def test_cross_document_ref__document_not_in_tree(test_data_builder, tdb_single_and_multipage):
@@ -632,7 +632,7 @@ def test_cross_document_ref__document_not_in_tree(test_data_builder, tdb_single_
             result = api.cross_document_ref("other_dir/include.adoc",
                                             package_name="package",
                                             link_text="bla")
-            assert result == "<<../other_dir/include.adoc,bla>>"
+            assert result == "<<../other_dir/include.adoc#,bla>>"
         else:
             with pytest.raises(ConsistencyError):
                 api.cross_document_ref("other_dir/include.adoc",
