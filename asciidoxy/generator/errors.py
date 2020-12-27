@@ -196,11 +196,14 @@ class MissingPackageFileError(AsciiDocError):
         file_name:    Name of the missing file.
     """
     package_name: str
-    file_name: str
+    file_name: Optional[str]
 
-    def __init__(self, package_name: str, file_name: str):
+    def __init__(self, package_name: str, file_name: Optional[str]):
         self.package_name = package_name
         self.file_name = file_name
 
     def __str__(self) -> str:
-        return f"Package `{self.package_name}` does not contain file `{self.file_name}`."
+        if self.file_name:
+            return (f"Package `{self.package_name}` does not contain file `{self.file_name}`.")
+        else:
+            return (f"Package `{self.package_name}` does not specify a root document.")

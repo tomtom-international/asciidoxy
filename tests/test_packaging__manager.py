@@ -33,7 +33,8 @@ def create_package_dir(parent: Path,
                        xml: bool = True,
                        adoc: bool = True,
                        images: bool = True,
-                       contents: bool = True) -> Path:
+                       contents: bool = True,
+                       root_doc: bool = False) -> Path:
     pkg_dir = parent / name
     pkg_dir.mkdir(parents=True)
 
@@ -50,6 +51,9 @@ def create_package_dir(parent: Path,
         (pkg_dir / "adoc" / f"{name}.adoc").touch()
 
         data["asciidoc"] = {"src_dir": "adoc"}
+
+        if root_doc:
+            data["asciidoc"]["root_doc"] = f"{name}.adoc"
 
         if images:
             (pkg_dir / "images").mkdir()
@@ -76,7 +80,7 @@ def create_package_spec(parent: Path, *names: str) -> Path:
     }
 
     data["packages"] = {
-        f"{name}": {
+        name: {
             "source": "local",
             "package_dir": str(parent / name)
         }
@@ -392,6 +396,40 @@ def test_file_in_work_directory__present(package_manager, event_loop, tmp_path, 
 
     assert package_manager.file_in_work_directory("a", "a.adoc") == work_dir / "a.adoc"
     assert package_manager.file_in_work_directory("b", "b.adoc") == work_dir / "b.adoc"
+
+
+def test_file_in_work_directory__default_root_doc(package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a", root_doc=True)
+    spec_file = create_package_spec(tmp_path, "a")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    work_file = package_manager.prepare_work_directory(in_file)
+    work_dir = work_file.parent
+
+    assert package_manager.file_in_work_directory("a", None) == work_dir / "a.adoc"
+    assert package_manager.file_in_work_directory("a", "") == work_dir / "a.adoc"
+
+
+def test_file_in_work_directory__no_root_doc_no_filename(package_manager, event_loop, tmp_path,
+                                                         build_dir):
+    create_package_dir(tmp_path, "a", root_doc=False)
+    spec_file = create_package_spec(tmp_path, "a")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    package_manager.prepare_work_directory(in_file)
+
+    with pytest.raises(UnknownFileError):
+        package_manager.file_in_work_directory("a", None)
+    with pytest.raises(UnknownFileError):
+        package_manager.file_in_work_directory("a", "")
 
 
 def test_file_in_work_directory__unknown_package(package_manager, event_loop, tmp_path, build_dir):

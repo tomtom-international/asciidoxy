@@ -230,7 +230,7 @@ class Api(ABC):
         return self.link_to_element(element.id, link_text)
 
     def cross_document_ref(self,
-                           file_name: str,
+                           file_name: Optional[str] = None,
                            *,
                            package_name: Optional[str] = None,
                            anchor: Optional[str] = None,
@@ -265,15 +265,17 @@ class Api(ABC):
                                         link_text=link_text)
 
     def _cross_document_ref(self,
-                            file_name: str,
+                            file_name: Optional[str] = None,
                             *,
                             package_name: Optional[str] = None,
                             anchor: Optional[str] = None,
                             link_text: Optional[str] = None,
                             file_verification: Optional[Callable[[Path], None]] = None) -> str:
-        if anchor is None and link_text is None:
-            raise InvalidApiCallError("At least `anchor` or `link_text` is required,")
-        if Path(file_name).is_absolute():
+        if not file_name and not package_name:
+            raise InvalidApiCallError("At least `file_name` or `package_name` is required.")
+        if not anchor and not link_text:
+            raise InvalidApiCallError("At least `anchor` or `link_text` is required.")
+        if file_name and Path(file_name).is_absolute():
             raise InvalidApiCallError("`file_name` must be a relative path.")
 
         absolute_file_path = self._find_absolute_file_path(file_name, package_name)
@@ -289,11 +291,12 @@ class Api(ABC):
         return (f"<<{link_file_path}{link_anchor},"
                 f"{link_text if link_text is not None else anchor}>>")
 
-    def _find_absolute_file_path(self, file_name: str,
+    def _find_absolute_file_path(self, file_name: Optional[str],
                                  package_name: Optional[str]) -> Optional[Path]:
         if package_name is not None:
             return self._file_from_package(file_name, package_name)
         else:
+            assert file_name is not None
             package_name = self._context.current_package.name
             absolute_work_file_path = (self._current_file.parent / file_name).resolve()
             if not absolute_work_file_path.exists():
@@ -307,7 +310,7 @@ class Api(ABC):
                     self._context.package_manager.work_dir)
                 return self._file_from_package(str(relative_work_file_path), package_name)
 
-    def _file_from_package(self, file_name: str, package_name: str) -> Optional[Path]:
+    def _file_from_package(self, file_name: Optional[str], package_name: str) -> Optional[Path]:
         try:
             return self._context.package_manager.file_in_work_directory(package_name, file_name)
 
@@ -670,7 +673,7 @@ class GeneratingApi(Api):
         return ":docinfo: private"
 
     def cross_document_ref(self,
-                           file_name: str,
+                           file_name: Optional[str] = None,
                            *,
                            package_name: Optional[str] = None,
                            anchor: Optional[str] = None,

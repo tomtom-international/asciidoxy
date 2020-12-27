@@ -19,6 +19,7 @@ import os
 import pytest
 
 from pathlib import Path
+from typing import Optional
 
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi, process_adoc
@@ -72,6 +73,10 @@ class _TestDataBuilder:
         self.add_package(package)
         return self.add_file(package, name, register)
 
+    def add_package_default_file(self, package: str, name: str, register: bool = True):
+        self.add_package(package, name)
+        return self.add_file(package, name, register)
+
     def add_file(self, package: str, name: str, register: bool = True):
         input_file = self.packages_dir / package / name
         input_file.parent.mkdir(parents=True, exist_ok=True)
@@ -86,10 +91,12 @@ class _TestDataBuilder:
 
         return work_file
 
-    def add_package(self, package: str):
+    def add_package(self, package: str, default_file: Optional[str] = None):
         if package not in self.package_manager.packages:
             pkg = Package(package)
             pkg.adoc_src_dir = self.packages_dir / package
+            if default_file:
+                pkg.adoc_root_doc = pkg.adoc_src_dir / default_file
             pkg.scoped = True
             self.package_manager.packages[package] = pkg
 
@@ -485,6 +492,26 @@ def test_cross_document_ref__with_absolute_path(test_data_builder, tdb_single_an
             api.cross_document_ref(target_file, anchor="anchor")
 
 
+def test_cross_document_ref__requires_filename_or_packagename(test_data_builder,
+                                                              tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("includes/other_file.adoc")
+
+    for api in test_data_builder.apis():
+        with pytest.raises(InvalidApiCallError):
+            api.cross_document_ref(anchor="anchor")
+
+
+def test_cross_document_ref__requires_filename_or_packagename_not_empty(
+        test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("includes/other_file.adoc")
+
+    for api in test_data_builder.apis():
+        with pytest.raises(InvalidApiCallError):
+            api.cross_document_ref("", package_name="", anchor="anchor")
+
+
 def test_cross_document_ref__file_not_in_workdirectory(test_data_builder, tdb_single_and_multipage,
                                                        tdb_warnings_are_and_are_not_errors):
     test_data_builder.add_input_file("input.adoc")
@@ -601,6 +628,18 @@ def test_cross_document_ref__to_other_package(test_data_builder, tdb_single_and_
 
     for api in test_data_builder.apis():
         result = api.cross_document_ref("include.adoc", package_name="package", link_text="bla")
+        if tdb_single_and_multipage:
+            assert result == "<<include.adoc#,bla>>"
+        else:
+            assert result == "<<.asciidoxy.include.adoc#,bla>>"
+
+
+def test_cross_document_ref__to_package_default(test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_package_default_file("package", "include.adoc")
+
+    for api in test_data_builder.apis():
+        result = api.cross_document_ref(package_name="package", link_text="bla")
         if tdb_single_and_multipage:
             assert result == "<<include.adoc#,bla>>"
         else:
@@ -857,7 +896,7 @@ def test_include__always_embed__correct_sub_context(test_data_builder, tdb_singl
     test_data_builder.add_input_file("input.adoc")
     include_file = test_data_builder.add_include_file("includes/another_file.adoc")
     include_file.write_text("""
-${{api.cross_document_ref("../input.adoc", anchor="")}}
+${{api.cross_document_ref("../input.adoc", anchor="bla")}}
 """)
 
     for api in test_data_builder.apis():
@@ -872,10 +911,10 @@ ${{api.cross_document_ref("../input.adoc", anchor="")}}
     contents = file_name.read_text()
     if tdb_single_and_multipage:
         # multipage
-        assert "<<input.adoc#,>>" in contents, contents
+        assert "<<input.adoc#bla,bla>>" in contents, contents
     else:
         # singlepage
-        assert "<<.asciidoxy.input.adoc#,>>" in contents, contents
+        assert "<<.asciidoxy.input.adoc#bla,bla>>" in contents, contents
 
 
 def test_multipage_toc__default(generating_api, input_file, multipage):

@@ -43,14 +43,14 @@ class UnknownPackageError(Exception):
 
 class UnknownFileError(Exception):
     package_name: str
-    file_name: str
+    file_name: Optional[str]
 
-    def __init__(self, package_name: str, file_name: str):
+    def __init__(self, package_name: str, file_name: Optional[str]):
         self.package_name = package_name
         self.file_name = file_name
 
     def __str(self) -> str:
-        return f"File not found in package {self.package_name}: {self.file_name}."
+        return f"File not found in package {self.package_name}: {self.file_name or 'default file'}."
 
 
 class PackageManager:
@@ -193,19 +193,21 @@ class PackageManager:
             if progress is not None:
                 progress.update()
 
-    def file_in_work_directory(self, package_name: str, file_name: str) -> Path:
+    def file_in_work_directory(self, package_name: str, file_name: Optional[str]) -> Path:
         """Get the absolute path to a file in the work directory.
 
         Args:
             package_name: Package the file is in.
-            file_name:    Name of the file in the package.
+            file_name:    Name of the file in the package. None or empty to use the default file for
+                              the package.
 
         Returns:
             Absolute path to the file.
 
         Raises:
             UnknownPackageError: There is no package with that name.
-            UnknownFileError:    The package does not contain a file with that name.
+            UnknownFileError:    The package does not contain a file with that name, or does not
+                                     have a default file.
         """
         pkg = self.packages.get(package_name, None)
         if pkg is None:
@@ -214,11 +216,18 @@ class PackageManager:
         if pkg.adoc_src_dir is None:
             raise UnknownFileError(package_name, file_name)
 
-        src_file = pkg.adoc_src_dir / file_name
+        if file_name:
+            src_file = pkg.adoc_src_dir / file_name
+            work_file = self.work_dir / file_name
+        else:
+            if pkg.adoc_root_doc is None:
+                raise UnknownFileError(package_name, file_name)
+            src_file = pkg.adoc_root_doc
+            work_file = self.work_dir / src_file.relative_to(pkg.adoc_src_dir)
+
         if not src_file.is_file():
             raise UnknownFileError(package_name, file_name)
 
-        work_file = self.work_dir / file_name
         assert work_file.is_file()
         return work_file
 
