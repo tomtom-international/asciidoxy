@@ -204,6 +204,11 @@ A package has a specific type and based on the type different key/value pairs ar
 types of packages the following key/value pairs are required:
 
 `type`:: The type of the package.
+
+For old-style packages the following key/value pairs are required. For backwards compatibility they
+can always be specified, even for new-style packages. But in case of new-style packages, they are
+ignored. New-style packages use <<_package_content_files>> to specify the contents.
+
 `xml_subdir`:: Subdirectory in the root of the package in which all Doxygen XML files are stored.
 `include_subdir`:: Subdirectory in the root of the package in which all other include files are
 stored.
@@ -302,6 +307,48 @@ include_subdir = "adoc"
 source = "remote_server"
 version = "12.3.4"
 ----
+
+=== Package content files
+
+Each package should describe its contents in a metadata file called `contents.toml`. This file is
+used by AsciiDoxy to determine how to use the contents of the package.
+
+Package specification files use https://github.com/toml-lang/toml[TOML] format. They can contain the
+following sections:
+
+`package`:: Metadata for the package.
+`reference`:: The API reference information contained in the package.
+`asciidoc`:: AsciiDoc and other files to be included in AsciiDoc generation.
+
+==== Package section
+
+The `package` section contains general metadata for the package. This section is mandatory for all
+packages. It contains the following key/value pairs:
+
+`name`:: Name of the package. This overrides the name specified in the package specification file.
+
+==== Reference section
+
+The `reference` section describes the API reference contained in the package. It is only required if
+the package contains API reference information. Without this section, API reference information is
+ignored. It contains the following key/value pairs:
+
+`type`:: The type of API reference information. Currently only supports `doxygen` for Doxygen XML
+format.
+`dir`:: Subdirectory inside the package containing the API reference information files.
+
+==== Asciidoc section
+
+The `asciidoc` section describes AsciiDoc and other files in the package that can be included in the
+generated documentation. This section is only required if the package contains files to be included.
+It can contain the following key/value pairs:
+
+`src_dir`:: (Required) Subdirectory inside the package containing the AsciiDoc and other include
+files.
+`image_dir`:: (Optional) Subdirectory inside the package containing images to be included in the
+AsciiDoc files. These files are copied to the image directory used for all AsciiDoc files.
+`root_doc`:: (Optional) Document to include by default for the package. Used if not specific file
+in the package is mentioned.
 
 == Writing documentation
 ${api.namespace("asciidoxy.generator.asciidoc")}
@@ -585,6 +632,7 @@ embed other AsciiDoc files in the current file. AsciiDoxy extends this directive
 ----
 ${"""
 ${api.include(<file_name>,
+              [package_name=<package name>,]
               [leveloffset=<offset>,]
               [link_text=<text>,]
               [link_prefix=<prefix>,]
@@ -595,6 +643,7 @@ ${api.include(<file_name>,
 ----
 
 `file_name`:: Relative or absolute path to the file to include.
+`package_name`:: Package containing the file to include. Defaults to the current package.
 `leveloffset`:: Offset for the headers in the included file from the top level of the current file.
 Defaults to +1.
 
@@ -648,13 +697,14 @@ there is `${api.link("Api.cross_document_ref", text="api.cross_document_ref")}`.
 ----
 ${"""
 ${api.cross_document_ref(<file_name>,
-                         anchor=<section-anchor>,
+                         [anchor=<section-anchor>],
                          [link_text=<text>])}
 """}
 ----
 
 `file_name`:: File containing the anchor to link to.
-`anchor`:: Anchor to link to.
+`package_name`:: Package containing the file to link to. Defaults to the current package.
+`anchor`:: Anchor to link to. If not provided, `link_text` is required.
 `link_text`:: Text to use for the link. If not provided, the anchor name is used.
 
 ==== Examples

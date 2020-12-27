@@ -28,12 +28,12 @@ ${api.multipage_toc()}
                                       /____/
 ----
 
-[ ${api.cross_document_ref("index.adoc", "", "Home")} |
-${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", "", "Usage")} |
-${api.cross_document_ref("examples.adoc", "", "Examples")} |
-${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
-${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
+[ ${api.cross_document_ref("index.adoc", link_text="Home")} |
+${api.cross_document_ref("about.adoc", link_text="What is AsciiDoxy?")} |
+${api.cross_document_ref("usage.adoc", link_text="Usage")} |
+${api.cross_document_ref("examples.adoc", link_text="Examples")} |
+${api.cross_document_ref("contributing.adoc", link_text="Contributing")} |
+${api.cross_document_ref("changelog.adoc", link_text="Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = {doctitle}
