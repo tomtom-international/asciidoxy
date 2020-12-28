@@ -16,6 +16,9 @@ ${api.include("_header.adoc", always_embed=True, leveloffset=None)}
 
 ${api.include("manual/requirements.adoc", link_text="Requirements", link_prefix=". ")}
 ${api.include("manual/command-line-options.adoc", link_text="Command-line options", link_prefix=". ")}
+${api.include("manual/packages.adoc", link_text="Packages", link_prefix=". ")}
+${api.include("manual/commands.adoc", link_text="Commands", link_prefix=". ")}
+${api.include("manual/doxygen.adoc", link_text="Doxygen", link_prefix=". ")}
 
 == TODO
 
