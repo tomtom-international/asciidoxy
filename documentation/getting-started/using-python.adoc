@@ -1,0 +1,160 @@
+// Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Using python
+${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
+
+The most powerful feature of AsciiDoxy is that it allows you to use python code to generate (parts
+of) your documentation. The python code can be written directly in the AsciiDoc files. AsciiDoxy
+runs all python code and replaces it with valid AsciiDoc syntax before handing it over to
+AsciiDoctor.
+
+This feature enables most of the other functionality offered by AsciiDoxy. To fully use AsciiDoxy it
+is important to understand how to include python code in you AsciiDoc files.
+
+:sectnums:
+== Basic syntax
+
+AsciiDoxy uses https://www.makotemplates.org/[Make templates] to combine python and AsciiDoc in a
+single file. It supports all syntax supported by Mako.
+
+The construct `${"${}"}` can be used to execute python code and insert the result in its place.
+Everything between `${"${"}` and `}` is evaluated and executed as python code. The result of the
+execution is inserted in the AsciiDoc file in the place of the `${"${}"}` construct.
+
+For example:
+
+[source]
+----
+${"""
+The sum of 3 and 4 is ${3 + 4}.
+"""}
+----
+
+Results in:
+
+====
+The sum of 3 and 4 is ${3 + 4}.
+====
+
+It is also possible to use builtin functions provided by python. For example:
+
+[source]
+----
+${"""
+The sum of 3 and 4 is ${sum([3, 4])}.
+"""}
+----
+
+Also results in:
+
+====
+The sum of 3 and 4 is ${sum([3, 4])}.
+====
+
+
+[TIP]
+====
+For more information, and other options see:
+https://docs.makotemplates.org/en/latest/syntax.html[Mako template syntax].
+====
+
+== Importing extra functionality
+
+It is possible to use all functionality provided by
+https://docs.python.org/3/library/index.html[the python standard library]. Extra python packages
+from https://pypi.org/[the python package index] can be used as well. Like in normal python scripts
+the functionality does need to be imported before it can be used.
+
+To import functionality, add an import statement within a so-called module-level block:
+
+[source]
+----
+${"""
+<%!
+    import math
+%>
+"""}
+----
+
+Then use the imported functionality in any `${"${}"}` construct in the file:
+
+[source]
+----
+${"""
+The factorial of 5 is ${math.factorial(5)}.
+"""}
+----
+
+This results in:
+
+====
+<%!
+    import math
+%>
+The factorial of 5 is ${math.factorial(5)}.
+====
+
+== Custom functions
+
+Module-level blocks can also be used to define custom functions to reuse in your AsciiDoc files.
+Write the functions once in a module-level block, and use it multiple times in a `${"${}"}`
+construct:
+
+[source]
+----
+${"""
+<%!
+    def my_sum(*values):
+        return sum(values)
+%>
+
+The sum of 3 and 4 is ${my_sum(3, 4)}.
+
+The sum of 1, 2, 3 and 4 is ${my_sum(1, 2, 3, 4)}.
+"""}
+----
+
+The result is:
+
+====
+<%!
+    def my_sum(*values):
+        return sum(values)
+%>
+
+The sum of 3 and 4 is ${my_sum(3, 4)}.
+
+The sum of 1, 2, 3 and 4 is ${my_sum(1, 2, 3, 4)}.
+====
+
+[IMPORTANT]
+====
+Module-level blocks are executed once when the AsciiDoc files are loaded, before the content is
+actually rendered. It is recommended to put all imports and user defined functions in module-level
+blocks.
+
+The AsciiDoxy builtin functionality is not available in module-level blocks. If you need to access
+to that functionality, use a block without the `!`:
+
+[source]
+----
+${"""
+<%
+    ...
+%>
+"""}
+----
+
+Regular python blocks are only executed when the surrounding text is rendered.
+====
