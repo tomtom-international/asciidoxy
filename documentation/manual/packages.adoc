@@ -14,6 +14,15 @@
 = Packages
 ${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
 
+== Package format
+
+AsciiDoxy supports 2 physical package formats:
+
+* A directory on the local file system, or a mounted remote filesystem.
+* A tar.gz archive hosted on an HTTP server.
+
+Other archive formats and compressions are not supported at the moment.
+
 == Package specification files
 
 AsciiDoxy needs to know where to find the XML files containing the API reference documentation. It
