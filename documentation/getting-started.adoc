@@ -22,12 +22,18 @@ A step by step guide to get you started with AsciiDoxy.
                            link_text="A basic AsciiDoc file")}:
   Generating HTML out of a basic AsciiDoc file.
 . ${api.cross_document_ref("getting-started/using-python.adoc",
-                           link_text="Using python in AsciiDoc files.")}:
+                           link_text="Using python in AsciiDoc files")}:
   Using python code to generate parts of your documentation.
-. Multipage documents.
+. ${api.cross_document_ref("getting-started/multipage.adoc",
+                           link_text="Multipage documents")}:
+  Splitting the HTML output into multiple pages with convenient navigation.
 . Separating documentation in packages.
 . Including API reference.
+. Multipage tips and tricks:
+ * Nice list of cross references and separate includes without multipage links.
+ * Table of contents
 
 ${api.include("getting-started/installation.adoc", multipage_link=False)}
 ${api.include("getting-started/basic-asciidoc-file.adoc", multipage_link=False)}
 ${api.include("getting-started/using-python.adoc", multipage_link=False)}
+${api.include("getting-started/multipage.adoc", multipage_link=False)}

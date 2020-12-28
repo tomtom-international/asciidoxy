@@ -265,7 +265,7 @@ ${api.link_class("MyNamespace::MyClass", lang="c++")}          # <6>
 <5> Link to class `MyNamespace::MyClass`. Ignore other kinds of elements.
 <6> Link to {cpp} class `MyNamespace::MyClass`. Ignore other kinds of elements and languages.
 
-== Including other AsciiDoc files
+== Including other AsciiDoc files [[api_include]]
 
 AsciiDoc has the https://asciidoctor.org/docs/user-manual/#include-directive[`include` directive] to
 embed other AsciiDoc files in the current file. AsciiDoxy extends this directive with its
@@ -344,7 +344,8 @@ there is `${api.link("Api.cross_document_ref", text="api.cross_document_ref")}`.
 ----
 ${"""
 ${api.cross_document_ref(<file_name>,
-                         [anchor=<section-anchor>],
+                         [package_name=<package name>,]
+                         [anchor=<section-anchor>,]
                          [link_text=<text>])}
 """}
 ----
