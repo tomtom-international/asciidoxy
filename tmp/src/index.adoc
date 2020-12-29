@@ -1,0 +1,6 @@
+= Documentation
+
+This is the entry point of the documentation.
+
+${api.include("reference.adoc")}
+

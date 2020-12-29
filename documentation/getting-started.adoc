@@ -29,7 +29,9 @@ A step by step guide to get you started with AsciiDoxy.
   Splitting the HTML output into multiple pages with convenient navigation.
 . ${api.cross_document_ref("getting-started/packages.adoc", link_text="Packages")}:
   Separating documentation in packages.
-. Including API reference.
+. ${api.cross_document_ref("getting-started/api-reference.adoc",
+                           link_text="Including API reference")}:
+  Add API reference documentation extracted from source code.
 . Multipage tips and tricks:
  * Nice list of cross references and separate includes without multipage links.
  * Table of contents
@@ -44,3 +46,4 @@ ${api.include("getting-started/basic-asciidoc-file.adoc", multipage_link=False)}
 ${api.include("getting-started/using-python.adoc", multipage_link=False)}
 ${api.include("getting-started/multipage.adoc", multipage_link=False)}
 ${api.include("getting-started/packages.adoc", multipage_link=False)}
+${api.include("getting-started/api-reference.adoc", multipage_link=False)}

@@ -15,7 +15,7 @@
 ${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
 ${api.namespace("asciidoxy.generator.asciidoc")}
 
-== Inserting API reference
+== Inserting API reference [[api_insert]]
 
 The original purpose of AsciiDoxy is to insert API reference documentation in AsciiDoc files. Use
 the `${api.link("Api.insert", text="api.insert")}` method to insert API reference documentation at
@@ -173,7 +173,7 @@ ${api.insert(...,
 """}
 ----
 
-== Linking to API reference
+== Linking to API reference [[api_link]]
 
 Use `${api.link("Api.link", text="api.link")}` to insert a link to an API reference element.
 
@@ -437,7 +437,7 @@ ${api.language("java", source=None)}   # <3>
 <2> Insert elements as Swift elements. Transcode from Objective C if the element is not found.
 <3> Disable transcoding, use Java as default language.
 
-== Search namespace
+== Search namespace [[api_namespace]]
 
 By default AsciiDoxy searches for API elements using their fully qualified name. For languages that
 support namespaces, a search namespace can be set to start looking for elements using a relative
@@ -467,7 +467,7 @@ ${api.namespace(None)}                    # <3>
 """}
 ----
 <1> Search in the Java package `org.asciidoxy.parser`.
-<2> Search in the {cpp} namespace `asciidoxy::exmaple`.
+<2> Search in the {cpp} namespace `asciidoxy::example`.
 <3> Only allow fully qualified names from now on.
 
 == Required version
