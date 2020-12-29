@@ -32,6 +32,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     package contains AsciiDoc includes or reference, and in what subdirectory. It can now also
     include images that need to be included to the output.
   - [AD-32] A directory containing images to include can be specified using `--image-dir`.
+  - [AD-11] The usage documentation has been separated into a getting started guide and reference
+    documentation.
 
 === Changed
 
