@@ -750,7 +750,7 @@ def test_include__relative_path_multipage(test_data_builder):
 
     for api in test_data_builder.apis():
         result = api.include("includes/another_file.adoc")
-        assert result == "<<includes/another_file.adoc#,includes/another_file.adoc>>"
+        assert result == "<<includes/another_file.adoc#,another_file>>"
         assert include_file.with_name(".asciidoxy.another_file.adoc").is_file() == isinstance(
             api, GeneratingApi)
 
@@ -850,6 +850,27 @@ def test_include__multipage_with_link_text(test_data_builder):
         assert result == "<<includes/another_file.adoc#,Link>>"
 
 
+def test_include__multipage_with_document_title(test_data_builder):
+    test_data_builder.add_input_file("input.adoc")
+    include_file = test_data_builder.add_include_file("includes/another_file.adoc")
+    include_file.write_text("= Another file's title\n\n")
+    test_data_builder.multipage = True
+
+    for api in test_data_builder.apis():
+        result = api.include("includes/another_file.adoc")
+        assert result == "<<includes/another_file.adoc#,Another file's title>>"
+
+
+def test_include__multipage_with_document_stem(test_data_builder):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("includes/another_file.adoc")
+    test_data_builder.multipage = True
+
+    for api in test_data_builder.apis():
+        result = api.include("includes/another_file.adoc")
+        assert result == "<<includes/another_file.adoc#,another_file>>"
+
+
 def test_include__multipage_with_prefix_text(test_data_builder):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/another_file.adoc")
@@ -857,7 +878,7 @@ def test_include__multipage_with_prefix_text(test_data_builder):
 
     for api in test_data_builder.apis():
         result = api.include("includes/another_file.adoc", link_prefix=". ")
-        assert result == ". <<includes/another_file.adoc#,includes/another_file.adoc>>"
+        assert result == ". <<includes/another_file.adoc#,another_file>>"
 
 
 def test_include__multipage_without_link(test_data_builder):

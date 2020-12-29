@@ -114,17 +114,18 @@ this:
 
 This is the entry point of the documentation.
 
-<<multipage.adoc#,reference.adoc>>
+<<multipage.adoc#,Reference>>
 ====
 
-The link called `reference.adoc` will take you to a file containing only the contents of
+The link called `Reference` will take you to a file containing only the contents of
 `reference.adoc`. Both pages will also have a navigation bar at the bottom. With the navigation bar
 you can easily jump between pages.
 
 == Improving what the link looks like
 
-By default, AsciiDoxy uses the name of the included file for the link text. A nicer text can be
-provided using the `link_text` argument:
+By default, AsciiDoxy uses the first title detected in the included file for the link text. If it
+fails to detect a title the stem of the file name is used. An alternative text can be provided
+using the `link_text` argument:
 
 [source]
 ----

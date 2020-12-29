@@ -302,7 +302,8 @@ In multi-page mode, the preprocessed file is not embedded. Instead, a separate o
 generated, and a link to that file is inserted. The format of the link is controlled with additional
 arguments:
 
-`link_text`:: Text for the link to insert in multi-page mode.
+`link_text`:: Text for the link to insert in multi-page mode. By default the title of the included
+document is used, or if no title is detected the file name stem.
 `link_prefix`:: Text to insert before the link in multi-page mode. Use this to create for example a
 numbered list of links.
 `multipage_link`:: By default a link is inserted in multi-page mode. Set this to False to omit

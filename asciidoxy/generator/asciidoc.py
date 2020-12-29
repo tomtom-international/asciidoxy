@@ -323,7 +323,8 @@ class Api(ABC):
             leveloffset:       Offset of the top header of the inserted text from the top level
                                    header of the including document.
             link_text:         Text of the link which will be inserted when the output format is
-                                   multi-paged.
+                                   multi-paged. By default the document title (if found) or file
+                                   name stem is used.
             link_prefix:       Optional text which will be inserted before the link when the output
                                    format is multi-paged. It can be used for example to compose a
                                    list of linked subdocuments by setting it to ". ".
@@ -354,8 +355,15 @@ class Api(ABC):
         if self._context.multipage and not always_embed:
             if multipage_link:
                 referenced_file = relative_path(self._current_file, file_path)
-                return (f"{link_prefix}"
-                        f"<<{referenced_file}#,{link_text if link_text else referenced_file}>>")
+
+                if not link_text:
+                    document = next(
+                        (d for d in self._context.current_document.all_documents_in_tree()
+                         if d.in_file == file_path), None)
+                    assert document is not None
+                    link_text = document.title
+
+                return (f"{link_prefix}" f"<<{referenced_file}#,{link_text}>>")
             else:
                 return ""
 
