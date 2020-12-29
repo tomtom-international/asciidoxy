@@ -124,7 +124,7 @@ docs: doxygen ## generate documentation
 define DOXYGEN_template
 doxygen-$(1):
 	CONAN_USER_HOME=$(BUILD_DIR) CONAN_DEFAULT_PROFILE_PATH="" DOXYGEN_VERSION=$(1) \
-									conan install doxygen/conanfile.py --install-folder=build/doxygen-$(1)
+									conan install doxygen/conanfile.py --install-folder=build/doxygen-$(1) --build missing
 endef
 $(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call DOXYGEN_template,$(version))))
 
