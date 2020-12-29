@@ -19,7 +19,3 @@ ${api.include("manual/command-line-options.adoc", link_text="Command-line option
 ${api.include("manual/packages.adoc", link_text="Packages", link_prefix=". ")}
 ${api.include("manual/commands.adoc", link_text="Commands", link_prefix=". ")}
 ${api.include("manual/doxygen.adoc", link_text="Doxygen", link_prefix=". ")}
-
-== TODO
-
-${api.include("usage.adoc", link_text="Usage", link_prefix=". ")}
