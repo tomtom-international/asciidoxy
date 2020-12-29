@@ -24,7 +24,7 @@ from mako.template import Template
 from pathlib import Path
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
-from typing import Callable, MutableMapping, NamedTuple, Optional
+from typing import MutableMapping, NamedTuple, Optional
 
 from tqdm import tqdm
 
@@ -229,6 +229,7 @@ class Api(ABC):
 
         return self.link_to_element(element.id, link_text)
 
+    @abstractmethod
     def cross_document_ref(self,
                            file_name: Optional[str] = None,
                            *,
@@ -248,8 +249,8 @@ class Api(ABC):
              package_name: Name of the package containing the file. If not specified, the file must
                                come from the same package.
              anchor:       Anchor to the referred section in the referred AsciiDoc document.
-             link_text:    Text of the reference. If None, `anchor` will be used as text of the
-                               reference.
+             link_text:    Text for the link to insert. If not provided, either the anchor, the
+                               title of the document or the name of the file is used.
 
         Returns:
             AsciiDoc cross-document reference.
@@ -259,37 +260,7 @@ class Api(ABC):
             MissingPackageError:     The specified package is not available.
             MissingPackageFileError: The specified file name is not available in the package.
         """
-        return self._cross_document_ref(file_name,
-                                        package_name=package_name,
-                                        anchor=anchor,
-                                        link_text=link_text)
-
-    def _cross_document_ref(self,
-                            file_name: Optional[str] = None,
-                            *,
-                            package_name: Optional[str] = None,
-                            anchor: Optional[str] = None,
-                            link_text: Optional[str] = None,
-                            file_verification: Optional[Callable[[Path], None]] = None) -> str:
-        if not file_name and not package_name:
-            raise InvalidApiCallError("At least `file_name` or `package_name` is required.")
-        if not anchor and not link_text:
-            raise InvalidApiCallError("At least `anchor` or `link_text` is required.")
-        if file_name and Path(file_name).is_absolute():
-            raise InvalidApiCallError("`file_name` must be a relative path.")
-
-        absolute_file_path = self._find_absolute_file_path(file_name, package_name)
-        if absolute_file_path is None:
-            return ""
-
-        if file_verification is not None:
-            file_verification(absolute_file_path)
-
-        link_file_path = self._context.link_to_adoc_file(absolute_file_path)
-        link_anchor = f"#{anchor}" if anchor is not None else "#"
-        link_text = link_text if link_text is not None else anchor
-        return (f"<<{link_file_path}{link_anchor},"
-                f"{link_text if link_text is not None else anchor}>>")
+        ...
 
     def _find_absolute_file_path(self, file_name: Optional[str],
                                  package_name: Optional[str]) -> Optional[Path]:
@@ -661,6 +632,21 @@ class PreprocessingApi(Api):
 
         return out_file
 
+    def cross_document_ref(self,
+                           file_name: Optional[str] = None,
+                           *,
+                           package_name: Optional[str] = None,
+                           anchor: Optional[str] = None,
+                           link_text: Optional[str] = None) -> str:
+        if not file_name and not package_name:
+            raise InvalidApiCallError("At least `file_name` or `package_name` is required.")
+        if file_name and Path(file_name).is_absolute():
+            raise InvalidApiCallError("`file_name` must be a relative path.")
+
+        # Only check the existance of the file in the correct package
+        self._find_absolute_file_path(file_name, package_name)
+        return ""
+
 
 class GeneratingApi(Api):
     def multipage_toc(self, side: str = "left") -> str:
@@ -678,19 +664,33 @@ class GeneratingApi(Api):
                            package_name: Optional[str] = None,
                            anchor: Optional[str] = None,
                            link_text: Optional[str] = None) -> str:
-        def verifier(absolute_file_path: Path) -> None:
-            if absolute_file_path not in (
-                    d.in_file for d in self._context.current_document.all_documents_in_tree()):
-                msg = (f"Invalid cross-reference from document '{self._current_file}' "
-                       f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
-                       f"is not included anywhere across whole documentation tree.")
-                self._warning_or_error(ConsistencyError(msg))
 
-        return super()._cross_document_ref(file_name,
-                                           package_name=package_name,
-                                           anchor=anchor,
-                                           link_text=link_text,
-                                           file_verification=verifier)
+        if not file_name and not package_name:
+            raise InvalidApiCallError("At least `file_name` or `package_name` is required.")
+        if file_name and Path(file_name).is_absolute():
+            raise InvalidApiCallError("`file_name` must be a relative path.")
+
+        absolute_file_path = self._find_absolute_file_path(file_name, package_name)
+        if absolute_file_path is None:
+            return ""
+
+        document = next((d for d in self._context.current_document.all_documents_in_tree()
+                         if d.in_file == absolute_file_path), None)
+        if document is None:
+            msg = (f"Invalid cross-reference from document '{self._current_file}' "
+                   f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
+                   f"is not included anywhere across the whole documentation tree.")
+            self._warning_or_error(ConsistencyError(msg))
+            return ""
+
+        if not anchor and not link_text:
+            link_text = document.title
+        elif not link_text:
+            link_text = anchor
+
+        link_file_path = self._context.link_to_adoc_file(absolute_file_path)
+        link_anchor = anchor if anchor is not None else ""
+        return (f"<<{link_file_path}#{link_anchor},{link_text}>>")
 
     def insert_fragment(self,
                         element,

@@ -352,21 +352,30 @@ ${api.cross_document_ref(<file_name>,
 
 `file_name`:: File containing the anchor to link to.
 `package_name`:: Package containing the file to link to. Defaults to the current package.
-`anchor`:: Anchor to link to. If not provided, `link_text` is required.
-`link_text`:: Text to use for the link. If not provided, the anchor name is used.
+`anchor`:: Anchor to link to.
+`link_text`:: Text to use for the link.
+
+If `link_text` is not provided, AsciiDoxy tries to select the most appropriate text for the link. It
+will use the first available of:
+
+. The value of `anchor` if provided.
+. The first title found in the linked document.
+. The stem of the file name being linked.
 
 === Examples
 
 [source,python]
 ----
 ${"""
-${api.cross_document_ref("component/component_a.adoc", anchor="section-1")}  # <1>
-${api.cross_document_ref("component/component_a.adoc", anchor="section 1",   # <2>
+${api.cross_document_ref("component/component_a.adoc")}                      # <1>
+${api.cross_document_ref("component/component_a.adoc", anchor="section-1")}  # <2>
+${api.cross_document_ref("component/component_a.adoc", anchor="section 1",   # <3>
                          link_text="Component A - Section 1")}
 """}
 ----
-<1> Insert a link with text "section-1".
-<2> Insert a link with text "Component A - Section 1".
+<2> Insert a link where the text comes from the title of the linked document.
+<2> Insert a link with text "section-1".
+<3> Insert a link with text "Component A - Section 1".
 
 == Setting default programming language
 

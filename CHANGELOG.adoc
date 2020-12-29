@@ -49,6 +49,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - [AD-32] For `api.include` the `leveloffset`, `link_text`, and `link_prefix` arguments are now
     keyword only.
   - [AD-32] Multiple packages supplying the same file is now an error.
+  - [AD-54] If no `anchor` or `link_text` is given, the title of the document is used for the link
+    created by `api.cross_document_ref`. If the title cannot be read, the file name stem is used.
 
 === Fixed
 

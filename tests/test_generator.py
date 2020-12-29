@@ -477,10 +477,11 @@ def test_cross_document_ref(test_data_builder, tdb_single_and_multipage):
 
     for api in test_data_builder.apis():
         result = api.cross_document_ref("includes/other_file.adoc", anchor="anchor")
-        if tdb_single_and_multipage:
-            assert result == "<<includes/other_file.adoc#anchor,anchor>>"
-        else:
-            assert result == "<<includes/.asciidoxy.other_file.adoc#anchor,anchor>>"
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<includes/other_file.adoc#anchor,anchor>>"
+            else:
+                assert result == "<<includes/.asciidoxy.other_file.adoc#anchor,anchor>>"
 
 
 def test_cross_document_ref__with_absolute_path(test_data_builder, tdb_single_and_multipage):
@@ -602,10 +603,11 @@ def test_cross_document_ref__direct_access_to_other_package_for_old_style_packag
 
     for api in test_data_builder.apis():
         result = api.cross_document_ref("include.adoc", link_text="bla")
-        if tdb_single_and_multipage:
-            assert result == "<<include.adoc#,bla>>"
-        else:
-            assert result == "<<.asciidoxy.include.adoc#,bla>>"
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<include.adoc#,bla>>"
+            else:
+                assert result == "<<.asciidoxy.include.adoc#,bla>>"
 
 
 def test_cross_document_ref__with_link_text(test_data_builder, tdb_single_and_multipage):
@@ -616,10 +618,38 @@ def test_cross_document_ref__with_link_text(test_data_builder, tdb_single_and_mu
         result = api.cross_document_ref("includes/other_file.adoc",
                                         anchor="anchor",
                                         link_text="Link")
-        if tdb_single_and_multipage:
-            assert result == "<<includes/other_file.adoc#anchor,Link>>"
-        else:
-            assert result == "<<includes/.asciidoxy.other_file.adoc#anchor,Link>>"
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<includes/other_file.adoc#anchor,Link>>"
+            else:
+                assert result == "<<includes/.asciidoxy.other_file.adoc#anchor,Link>>"
+
+
+def test_cross_document_ref__link_text_document_title(test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+    include_file = test_data_builder.add_include_file("includes/other_file.adoc")
+    include_file.write_text("= Other file\n\n")
+
+    for api in test_data_builder.apis():
+        result = api.cross_document_ref("includes/other_file.adoc")
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<includes/other_file.adoc#,Other file>>"
+            else:
+                assert result == "<<includes/.asciidoxy.other_file.adoc#,Other file>>"
+
+
+def test_cross_document_ref__link_text_document_name(test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("includes/other_file.adoc")
+
+    for api in test_data_builder.apis():
+        result = api.cross_document_ref("includes/other_file.adoc")
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<includes/other_file.adoc#,other_file>>"
+            else:
+                assert result == "<<includes/.asciidoxy.other_file.adoc#,other_file>>"
 
 
 def test_cross_document_ref__to_other_package(test_data_builder, tdb_single_and_multipage):
@@ -628,10 +658,11 @@ def test_cross_document_ref__to_other_package(test_data_builder, tdb_single_and_
 
     for api in test_data_builder.apis():
         result = api.cross_document_ref("include.adoc", package_name="package", link_text="bla")
-        if tdb_single_and_multipage:
-            assert result == "<<include.adoc#,bla>>"
-        else:
-            assert result == "<<.asciidoxy.include.adoc#,bla>>"
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<include.adoc#,bla>>"
+            else:
+                assert result == "<<.asciidoxy.include.adoc#,bla>>"
 
 
 def test_cross_document_ref__to_package_default(test_data_builder, tdb_single_and_multipage):
@@ -640,10 +671,11 @@ def test_cross_document_ref__to_package_default(test_data_builder, tdb_single_an
 
     for api in test_data_builder.apis():
         result = api.cross_document_ref(package_name="package", link_text="bla")
-        if tdb_single_and_multipage:
-            assert result == "<<include.adoc#,bla>>"
-        else:
-            assert result == "<<.asciidoxy.include.adoc#,bla>>"
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<include.adoc#,bla>>"
+            else:
+                assert result == "<<.asciidoxy.include.adoc#,bla>>"
 
 
 def test_cross_document_ref__links_to_package_are_relative_to_package_root(
@@ -655,10 +687,11 @@ def test_cross_document_ref__links_to_package_are_relative_to_package_root(
         result = api.cross_document_ref("other_dir/include.adoc",
                                         package_name="package",
                                         link_text="bla")
-        if tdb_single_and_multipage:
-            assert result == "<<../other_dir/include.adoc#,bla>>"
-        else:
-            assert result == "<<../other_dir/.asciidoxy.include.adoc#,bla>>"
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<../other_dir/include.adoc#,bla>>"
+            else:
+                assert result == "<<../other_dir/.asciidoxy.include.adoc#,bla>>"
 
 
 def test_cross_document_ref__document_not_in_tree(test_data_builder, tdb_single_and_multipage):
@@ -671,7 +704,8 @@ def test_cross_document_ref__document_not_in_tree(test_data_builder, tdb_single_
             result = api.cross_document_ref("other_dir/include.adoc",
                                             package_name="package",
                                             link_text="bla")
-            assert result == "<<../other_dir/include.adoc#,bla>>"
+            if isinstance(api, GeneratingApi):
+                assert result == "<<../other_dir/include.adoc#,bla>>"
         else:
             with pytest.raises(ConsistencyError):
                 api.cross_document_ref("other_dir/include.adoc",
