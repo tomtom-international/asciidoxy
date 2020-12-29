@@ -201,3 +201,11 @@ For more options, see the documentation for
 ${api.cross_document_ref("../reference/commands.adoc", anchor="cross_referencing",
                          link_text="api.cross_document_ref")}.
 ====
+
+== More to come...
+
+The AsciiDoxy documentation is still being written. Expect more documentation about:
+
+ * Hiding multipage links
+ * Showing a multipage table of contents
+ * ...
