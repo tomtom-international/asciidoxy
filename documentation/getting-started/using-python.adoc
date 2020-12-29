@@ -47,7 +47,7 @@ Results in:
 The sum of 3 and 4 is ${3 + 4}.
 ====
 
-It is also possible to use builtin functions provided by python. For example:
+It is also possible to use built-in functions provided by python. For example:
 
 [source]
 ----
@@ -144,7 +144,7 @@ Module-level blocks are executed once when the AsciiDoc files are loaded, before
 actually rendered. It is recommended to put all imports and user defined functions in module-level
 blocks.
 
-The AsciiDoxy builtin functionality is not available in module-level blocks. If you need to access
+The AsciiDoxy built-in functionality is not available in module-level blocks. If you need to access
 to that functionality, use a block without the `!`:
 
 [source]

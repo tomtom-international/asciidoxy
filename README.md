@@ -23,21 +23,21 @@
 
 AsciiDoxy generates API documentation from [Doxygen](https://doxygen.nl) XML output to AsciiDoc.
 [AsciiDoctor](https://asciidoctor.org) is then used to create HTML or PDF documentation that can be
-published on-line.
+published online.
 
 Supported languages:
 - C++
 - Java
-- Objective C
+- Objective-C
 - Python (using [doxypypy](https://github.com/Feneric/doxypypy))
-- Swift (transcoded from Objective C only)
+- Swift (transcoded from Objective-C only)
 - Kotlin (transcoded from Java only)
 
 Features:
 
 - API documentation generation.
 - Collecting API reference information from remote and local sources.
-- Single and multi page HTML output.
+- Single and multipage HTML output.
 - Single page PDF output.
 - Transcoding: showing how to use elements written in one language in another compatible language.
 

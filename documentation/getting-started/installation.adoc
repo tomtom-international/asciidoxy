@@ -58,7 +58,7 @@ https://asciidoctor.org/docs/user-manual/#installing-the-asciidoctor-ruby-gem[As
 
 == AsciiDoxy
 
-Finally install AsciiDoxy using `pip`:
+Finally, install AsciiDoxy using `pip`:
 
 [source,bash]
 ----

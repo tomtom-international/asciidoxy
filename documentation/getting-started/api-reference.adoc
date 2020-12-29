@@ -23,12 +23,12 @@ beautiful AsciiDoc documentation.
 == Extracting API reference information
 
 To extract API reference information from your source code, you need to install
-https://www.doxygen.nl/index.html[doxygen] first. Doxygen will do the hard work of parsing all
+https://www.doxygen.nl/index.html[Doxygen] first. Doxygen will do the hard work of parsing all
 source code for documentation comments and extracting them to XML format. See
-https://www.doxygen.nl/manual/index.html[the doxygen manual] for details about setting up doxygen
+https://www.doxygen.nl/manual/index.html[the Doxygen manual] for details about setting up Doxygen
 for your project.
 
-AsciiDoxy requires the XML output from doxygen. Your doxygen configuration file should at least
+AsciiDoxy requires the XML output from Doxygen. Your Doxygen configuration file should at least
 enable this XML output:
 
 .Doxyfile
@@ -37,7 +37,7 @@ enable this XML output:
 GENERATE_XML           = YES
 ----
 
-The following doxygen configuration will only generate the XML output and store it in a location we
+The following Doxygen configuration will only generate the XML output and store it in a location we
 will later turn into an AsciiDoxy package:
 
 .Doxyfile
@@ -55,10 +55,10 @@ GENERATE_XML           = YES                        # <4>
 
 [TIP]
 ====
-The shown doxygen configuration will work correctly for most C and {Cpp} source code. For other
+The shown Doxygen configuration will work correctly for most C and {Cpp} source code. For other
 languages, see the examples in
 ${api.cross_document_ref("../reference/doxygen.adoc",
-                         link_text="the doxygen section of the reference documentation")}.
+                         link_text="the Doxygen section of the reference documentation")}.
 ====
 
 == Creating a package
@@ -78,7 +78,7 @@ type = "doxygen"  # <2>
 dir = "xml"       # <3>
 ----
 <1> This package contains API reference information.
-<2> The type of API reference is doxygen output. This is currently the only supported format.
+<2> The type of API reference is Doxygen output. This is currently the only supported format.
 <3> The `xml` subdirectory in the package contains the API reference information.
 
 [TIP]
@@ -150,9 +150,9 @@ Some text about the Java interface.
 
 ${api.insert("com.asciidoxy.MyClass")}
 
-== Objective C interface
+== Objective-C interface
 
-And some text about Objective C version.
+And some text about Objective-C version.
 
 ${api.insert("NSMyClass")}
 """}
@@ -166,7 +166,7 @@ ${api.cross_document_ref("../reference/commands.adoc", anchor="api_insert", link
 
 == Adjusting the level of the section headers
 
-The inserted API reference has its own section headers. By default these headers use a level offset
+The inserted API reference has its own section headers. By default, these headers use a level offset
 of +1 from the document in which they are inserted. If this does not match your layout, you can
 override the default level offset with the `leveloffset` argument:
 
@@ -185,9 +185,9 @@ Some text about the Java interface.
 
 ${api.insert("com.asciidoxy.MyClass", leveloffset="+2")}  // <2>
 
-=== Objective C interface
+=== Objective-C interface
 
-And some text about Objective C version.
+And some text about Objective-C version.
 
 ${api.insert("NSMyClass", leveloffset="+3")}              // <3>
 """}

@@ -225,7 +225,7 @@ AsciiDoctor manual]. Do make sure you do not change the value of `:imagesdir:`.
 The AsciiDoxy documentation is still being written. Expect more documentation about:
 
  * Creating and using remote packages
- * Simpler pacakge specification using package sources
+ * Simpler package specification using package sources
  * URL string replacements for remote package sources
  * Using a separate version file
  * ...

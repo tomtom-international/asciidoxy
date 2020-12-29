@@ -32,7 +32,7 @@ AsciiDoxy directives.
 
 == Copies files to an intermediate directory
 
-The input file and all files from the same directory and sub directories will be copied to an
+The input file and all files from the same directory and subdirectories will be copied to an
 intermediate directory. After this all `adoc` directories from the downloaded archives will also be
 copied inside the intermediate directory preserving their directory structure.
 

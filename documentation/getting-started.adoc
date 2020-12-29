@@ -14,7 +14,7 @@
 = Getting started
 ${api.include("_header.adoc", always_embed=True, leveloffset=None)}
 
-A step by step guide to get you started with AsciiDoxy.
+A step-by-step guide to get you started with AsciiDoxy.
 
 . ${api.cross_document_ref("getting-started/installation.adoc", link_text="Installation")}: Install
   AsciiDoxy and everything required to run it.

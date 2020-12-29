@@ -22,7 +22,7 @@ files. However, it does not provide structured navigation between the files, and
 required to generate a single PDF version of the same documentation.
 
 AsciiDoxy removes these limitations by introducing multipage mode. You can generate single HTML or
-PDF files in single page mode, and generate multiple HTML documetns in multipage mode. All from the
+PDF files in single page mode, and generate multiple HTML documents in multipage mode. All from the
 same AsciiDoc source files.
 
 :sectnums:
@@ -123,7 +123,7 @@ you can easily jump between pages.
 
 == Improving what the link looks like
 
-By default AsciiDoxy uses the name of the included file for the link text. A nicer text can be
+By default, AsciiDoxy uses the name of the included file for the link text. A nicer text can be
 provided using the `link_text` argument:
 
 [source]
@@ -159,13 +159,13 @@ For more options, see the documentation for
 ${api.cross_document_ref("../reference/commands.adoc", anchor="api_include", link_text="api.include")}.
 ====
 
-== Cross references between pages
+== Cross-references between pages
 
-In multipage mode, the usual AsciiDoc cross references between different files no longer work as
+In multipage mode, the usual AsciiDoc cross-references between different files no longer work as
 expected. AsciiDoctor relies on having all references in the same output file. When the target of
-the cross reference is in a different output file, the cross reference needs to be adapted.
+the cross-reference is in a different output file, the cross-reference needs to be adapted.
 
-AsciiDoxy can generate the correct cross references for both singlepage and multipage mode. Instead
+AsciiDoxy can generate the correct cross-references for both singlepage and multipage mode. Instead
 of `<<...>>` or `xref:...[]`, you need to use `${"${api.cross_document_ref(...)}"}`.
 
 In the document structure from <<structure,section 1>> we can add the following to

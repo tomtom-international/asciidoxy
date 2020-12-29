@@ -18,7 +18,7 @@ ${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
 
 AsciiDoxy supports 2 physical package formats:
 
-* A directory on the local file system, or a mounted remote filesystem.
+* A directory on the local file system, or a mounted remote file system.
 * A tar.gz archive hosted on an HTTP server.
 
 Other archive formats and compressions are not supported at the moment.
@@ -143,7 +143,7 @@ only once.
 A source section can contain every key/value pair that is allowed for a package. Packages can
 specify the source they are based on by using the `source` key/value pair.
 
-When a source is used, the key/value pairs of the source and the pacakge are merged. Values for keys
+When a source is used, the key/value pairs of the source and the package are merged. Values for keys
 that are present in both the package and the source will be taken from the package. So the package
 values override source values.
 
@@ -191,7 +191,7 @@ The `reference` section describes the API reference contained in the package. It
 the package contains API reference information. Without this section, API reference information is
 ignored. It contains the following key/value pairs:
 
-`type`:: The type of API reference information. Currently only supports `doxygen` for Doxygen XML
+`type`:: The type of API reference information. Currently, only supports `doxygen` for Doxygen XML
 format.
 `dir`:: Subdirectory inside the package containing the API reference information files.
 
