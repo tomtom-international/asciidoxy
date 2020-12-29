@@ -37,8 +37,8 @@ the most basic package format: a local directory.
 [TIP]
 ====
 For an overview of supported package formats, see
-${api.cross_document_ref("../manual/packages.adoc", anchor="_package_format",
-                         link_text="the packages section in the manual")}.
+${api.cross_document_ref("../reference/packages.adoc", anchor="_package_format",
+                         link_text="the packages section in the reference documentation")}.
 ====
 
 . Create a new directory for the package named `my-package`.
@@ -68,8 +68,8 @@ package.
 [TIP]
 ====
 More details and syntax for the package content file can be found in
-${api.cross_document_ref("../manual/packages.adoc", anchor="_package_content_files",
-                         link_text="the packages section in the manual")}.
+${api.cross_document_ref("../reference/packages.adoc", anchor="_package_content_files",
+                         link_text="the packages section in the reference documentation")}.
 ====
 
 [NOTE]
@@ -112,8 +112,8 @@ asciidoxy --spec-file packages.spec INPUT_FILE
 [TIP]
 ====
 More details and syntax for the package specification file can be found in
-${api.cross_document_ref("../manual/packages.adoc", anchor="_package_specification_files",
-                         link_text="the packages section in the manual")}.
+${api.cross_document_ref("../reference/packages.adoc", anchor="_package_specification_files",
+                         link_text="the packages section in the reference documentation")}.
 ====
 
 == Using the contents of the package

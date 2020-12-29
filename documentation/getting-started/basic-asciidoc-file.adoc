@@ -97,5 +97,5 @@ NOTE: If you do not explicitly specify a destination directory, the output will 
 the temporary build files.
 
 All available command-line options can be found in
-${api.cross_document_ref("../manual/command-line-options.adoc",
-                         link_text="the manual page about command-line options")}.
+${api.cross_document_ref("../reference/command-line-options.adoc",
+                         link_text="the reference documentation for command-line options")}.

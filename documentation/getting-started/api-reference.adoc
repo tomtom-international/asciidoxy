@@ -57,8 +57,8 @@ GENERATE_XML           = YES                        # <4>
 ====
 The shown doxygen configuration will work correctly for most C and {Cpp} source code. For other
 languages, see the examples in
-${api.cross_document_ref("../manual/doxygen.adoc",
-                         link_text="the doxygen section of the manual")}.
+${api.cross_document_ref("../reference/doxygen.adoc",
+                         link_text="the doxygen section of the reference documentation")}.
 ====
 
 == Creating a package
@@ -85,7 +85,8 @@ dir = "xml"       # <3>
 ====
 More information about packages can be found in the
 ${api.cross_document_ref("packages.adoc", link_text="packages getting started guide")} and in the
-${api.cross_document_ref("../manual/packages.adoc", link_text="packages section of the manual")}.
+${api.cross_document_ref("../reference/packages.adoc",
+                         link_text="packages section of the reference documentation")}.
 ====
 
 == Collecting the reference package
@@ -160,7 +161,7 @@ ${api.insert("NSMyClass")}
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../manual/commands.adoc", anchor="api_insert", link_text="api.insert")}.
+${api.cross_document_ref("../reference/commands.adoc", anchor="api_insert", link_text="api.insert")}.
 ====
 
 == Adjusting the level of the section headers
@@ -253,7 +254,7 @@ setting is restored after the end of the included file.
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../manual/commands.adoc", anchor="api_namespace", link_text="api.namespace")}.
+${api.cross_document_ref("../reference/commands.adoc", anchor="api_namespace", link_text="api.namespace")}.
 ====
 
 == Linking to API reference elements
@@ -317,7 +318,7 @@ Use the <<api-reference.adoc#,parser base>> to create new parsers.
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../manual/commands.adoc", anchor="api_link", link_text="api.link")}.
+${api.cross_document_ref("../reference/commands.adoc", anchor="api_link", link_text="api.link")}.
 ====
 
 == Warnings

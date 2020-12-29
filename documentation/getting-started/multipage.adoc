@@ -156,7 +156,7 @@ ${api.include("reference.adoc", link_text="Reference documentation", link_prefix
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../manual/commands.adoc", anchor="api_include", link_text="api.include")}.
+${api.cross_document_ref("../reference/commands.adoc", anchor="api_include", link_text="api.include")}.
 ====
 
 == Cross references between pages
@@ -198,6 +198,6 @@ ${api.cross_document_ref("multipage.adoc", anchor="_reference", link_text="Refer
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../manual/commands.adoc", anchor="cross_referencing",
+${api.cross_document_ref("../reference/commands.adoc", anchor="cross_referencing",
                          link_text="api.cross_document_ref")}.
 ====

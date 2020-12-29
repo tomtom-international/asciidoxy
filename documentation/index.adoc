@@ -62,7 +62,7 @@ https://github.com/audreyr/cookiecutter-pypackage[audreyr/cookiecutter-pypackage
 
 ${api.include("about.adoc", multipage_link=False)}
 ${api.include("getting-started.adoc", multipage_link=False)}
-${api.include("manual.adoc", multipage_link=False)}
+${api.include("reference.adoc", multipage_link=False)}
 ${api.include("examples.adoc", multipage_link=False)}
 ${api.include("contributing.adoc", multipage_link=False)}
 ${api.include("changelog.adoc", multipage_link=False)}
