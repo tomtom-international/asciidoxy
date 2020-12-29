@@ -9,7 +9,8 @@
 
 [ [Home](https://asciidoxy.org) |
 [What is AsciiDoxy?](https://asciidoxy.org/about.html) |
-[Usage](https://asciidoxy.org/usage.html) |
+[Getting started](https://asciidoxy.org/getting-started.html) |
+[Reference documentation](https://asciidoxy.org/reference.html) |
 [Examples](https://asciidoxy.org/examples.html) |
 [Contributing](https://asciidoxy.org/contributing.html) |
 [Changelog](CHANGELOG.adoc) |
@@ -21,12 +22,16 @@
 [![PyPI](https://img.shields.io/pypi/v/asciidoxy)](https://pypi.org/project/asciidoxy)
 
 AsciiDoxy generates API documentation from [Doxygen](https://doxygen.nl) XML output to AsciiDoc.
+[AsciiDoctor](https://asciidoctor.org) is then used to create HTML or PDF documentation that can be
+published on-line.
 
 Supported languages:
 - C++
 - Java
 - Objective C
 - Python (using [doxypypy](https://github.com/Feneric/doxypypy))
+- Swift (transcoded from Objective C only)
+- Kotlin (transcoded from Java only)
 
 Features:
 
@@ -34,6 +39,7 @@ Features:
 - Collecting API reference information from remote and local sources.
 - Single and multi page HTML output.
 - Single page PDF output.
+- Transcoding: showing how to use elements written in one language in another compatible language.
 
 
 ## Credits
