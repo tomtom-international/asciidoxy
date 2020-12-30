@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Optional
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi, process_adoc
+from asciidoxy.generator.asciidoc import ApiProxy, GeneratingApi, PreprocessingApi, process_adoc
 from asciidoxy.generator.context import Context
 from asciidoxy.generator.navigation import DocumentTreeNode
 from asciidoxy.generator.errors import (AmbiguousReferenceError, ConsistencyError,
@@ -186,7 +186,7 @@ def test_insert_class(generating_api):
 
 
 def test_insert_class_explicit_kind(generating_api):
-    result = generating_api.insert_class("asciidoxy::geometry::Coordinate")
+    result = generating_api.insert("asciidoxy::geometry::Coordinate", kind="class")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
@@ -200,7 +200,7 @@ def test_insert_class_explicit_language(generating_api):
 
 
 def test_insert_class_explicit_all(generating_api):
-    result = generating_api.insert_class("asciidoxy::geometry::Coordinate", lang="cpp")
+    result = generating_api.insert("asciidoxy::geometry::Coordinate", lang="cpp", kind="class")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
@@ -220,7 +220,7 @@ def test_insert_class_with_extra_options(generating_api):
 
 
 def test_insert_cpp_enum(generating_api):
-    result = generating_api.insert_enum("asciidoxy::traffic::TrafficEvent::Severity")
+    result = generating_api.insert("asciidoxy::traffic::TrafficEvent::Severity", kind="enum")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "enum asciidoxy::traffic::TrafficEvent::Severity")
@@ -269,12 +269,12 @@ def test_insert_with_default_language(generating_api):
 def test_insert_with_default_language_other_languages_are_ignored(generating_api):
     generating_api.language("objc")
     with pytest.raises(ReferenceNotFoundError):
-        generating_api.insert_class("Logger")
+        generating_api.insert("Logger")
 
 
 def test_insert_with_default_language_can_be_overridden(generating_api):
     generating_api.language("java")
-    result = generating_api.insert_class("asciidoxy::geometry::Coordinate", lang="cpp")
+    result = generating_api.insert("asciidoxy::geometry::Coordinate", lang="cpp")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
@@ -282,7 +282,7 @@ def test_insert_with_default_language_can_be_overridden(generating_api):
 
 def test_insert__transcode__explicit(generating_api):
     generating_api.language("kotlin", source="java")
-    result = generating_api.insert_class("com.asciidoxy.geometry.Coordinate", lang="kotlin")
+    result = generating_api.insert("com.asciidoxy.geometry.Coordinate", lang="kotlin")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
@@ -291,7 +291,7 @@ def test_insert__transcode__explicit(generating_api):
 
 def test_insert__transcode__implicit(generating_api):
     generating_api.language("kotlin", source="java")
-    result = generating_api.insert_class("com.asciidoxy.geometry.Coordinate")
+    result = generating_api.insert("com.asciidoxy.geometry.Coordinate")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
@@ -301,7 +301,7 @@ def test_insert__transcode__implicit(generating_api):
 def test_insert__transcode__reset(generating_api):
     generating_api.language("kotlin", source="java")
     generating_api.language(None)
-    result = generating_api.insert_class("com.asciidoxy.geometry.Coordinate")
+    result = generating_api.insert("com.asciidoxy.geometry.Coordinate")
     assert result.startswith("include::")
     assert result.endswith("[leveloffset=+1]")
     _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
@@ -358,7 +358,7 @@ def test_insert_error_when_kind_not_supported(generating_api):
 
 def test_insert_error_when_ambiguous(generating_api):
     with pytest.raises(AmbiguousReferenceError) as exception:
-        generating_api.insert_function("asciidoxy::traffic::TrafficEvent::TrafficEvent")
+        generating_api.insert("asciidoxy::traffic::TrafficEvent::TrafficEvent")
     assert len(exception.value.candidates) == 2
     exception_message = str(exception.value)
     assert ("Multiple matches for asciidoxy::traffic::TrafficEvent::TrafficEvent"
@@ -412,12 +412,12 @@ def test_link_function(generating_api):
 
 
 def test_link_class_explicit(generating_api):
-    result = generating_api.link_class("asciidoxy::geometry::Coordinate")
+    result = generating_api.link("asciidoxy::geometry::Coordinate", kind="class")
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
 
 
 def test_link_function_explicit(generating_api):
-    result = generating_api.link_function("asciidoxy::geometry::Coordinate::IsValid")
+    result = generating_api.link("asciidoxy::geometry::Coordinate::IsValid", kind="function")
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
                       "1a8d7e0eac29549fa4666093e36914deac[IsValid]")
 
@@ -1216,3 +1216,144 @@ def test_context_link_to_element_element_not_inserted(context, single_and_multip
     assert element_id not in context.inserted
     assert generating_api.link_to_element(element_id,
                                           link_text) == f"xref:{element_id}[{link_text}]"
+
+
+def test_api_proxy__filter(generating_api):
+    api = ApiProxy(generating_api)
+    api.filter(members="-SharedData")
+    result = api.insert("asciidoxy::traffic::TrafficEvent")
+    _check_inserted_file_does_not_contain(result, "SharedData")
+    _check_inserted_file_contains(result, "Update")
+    _check_inserted_file_contains(result, "CalculateDelay")
+
+
+def test_api_proxy__insert(generating_api):
+    api = ApiProxy(generating_api)
+    result = api.insert("asciidoxy::geometry::Coordinate")
+    assert result.startswith("include::")
+    assert result.endswith("[leveloffset=+1]")
+    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+
+
+def test_api_proxy__insert_class(generating_api):
+    api = ApiProxy(generating_api)
+    result = api.insert_class("asciidoxy::geometry::Coordinate")
+    assert result.startswith("include::")
+    assert result.endswith("[leveloffset=+1]")
+    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+
+
+def test_api_proxy__link(generating_api):
+    api = ApiProxy(generating_api)
+    result = api.link("asciidoxy::geometry::Coordinate")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
+
+
+def test_api_proxy__link_class(generating_api):
+    api = ApiProxy(generating_api)
+    result = api.link_class("asciidoxy::geometry::Coordinate")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
+
+
+def test_api_proxy__cross_document_ref(test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("includes/other_file.adoc")
+
+    for api in test_data_builder.apis():
+        proxy = ApiProxy(api)
+        result = proxy.cross_document_ref("includes/other_file.adoc", anchor="anchor")
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<includes/other_file.adoc#anchor,anchor>>"
+            else:
+                assert result == "<<includes/.asciidoxy.other_file.adoc#anchor,anchor>>"
+
+
+def test_api_proxy__cross_document_ref__old_syntax(test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("includes/other_file.adoc")
+
+    for api in test_data_builder.apis():
+        proxy = ApiProxy(api)
+        result = proxy.cross_document_ref("includes/other_file.adoc", "anchor")
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                assert result == "<<includes/other_file.adoc#anchor,anchor>>"
+            else:
+                assert result == "<<includes/.asciidoxy.other_file.adoc#anchor,anchor>>"
+
+
+def test_api_proxy__include(test_data_builder):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("includes/another_file.adoc")
+
+    for api in test_data_builder.apis():
+        proxy = ApiProxy(api)
+        result = proxy.include("includes/another_file.adoc")
+        lines = result.splitlines()
+        assert len(lines) == 2
+
+        assert lines[0] == "[[top-includes-another_file-top]]"
+
+        assert lines[1].startswith("include::")
+        assert lines[1].endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / lines[1][9:-16]
+        assert file_name.is_file() == isinstance(api, GeneratingApi)
+        assert file_name.name == ".asciidoxy.another_file.adoc"
+        assert file_name.is_absolute()
+
+
+def test_api_proxy__include__old_syntax(test_data_builder):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("includes/another_file.adoc")
+
+    for api in test_data_builder.apis():
+        proxy = ApiProxy(api)
+        result = proxy.include("includes/another_file.adoc", "+2")
+        lines = result.splitlines()
+        assert len(lines) == 2
+
+        assert lines[0] == "[[top-includes-another_file-top]]"
+
+        assert lines[1].startswith("include::")
+        assert lines[1].endswith("[leveloffset=+2]")
+
+        file_name = input_file.parent / lines[1][9:-16]
+        assert file_name.is_file() == isinstance(api, GeneratingApi)
+        assert file_name.name == ".asciidoxy.another_file.adoc"
+        assert file_name.is_absolute()
+
+
+def test_api_proxy__language(generating_api):
+    with pytest.raises(AmbiguousReferenceError) as exception:
+        generating_api.insert("Logger")
+    assert len(exception.value.candidates) == 2
+
+    api = ApiProxy(generating_api)
+    api.language("java")
+    result = generating_api.insert("Logger")
+    assert result.startswith("include::")
+    assert result.endswith("[leveloffset=+1]")
+    _check_inserted_file_contains(result, "class Logger")
+
+
+def test_api_proxy__namespace(generating_api):
+    api = ApiProxy(generating_api)
+    api.namespace("asciidoxy::geometry::")
+    result = api.insert("Coordinate", lang="cpp")
+    assert result.startswith("include::")
+    assert result.endswith("[leveloffset=+1]")
+    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+
+
+def test_api_proxy__require_version(preprocessing_api):
+    ApiProxy(preprocessing_api).require_version(f"=={__version__}")
+
+
+def test_api_proxy__multipage_toc(generating_api, input_file, multipage):
+    result = generating_api.multipage_toc()
+    assert result == ":docinfo: private"
+
+    toc_file = input_file.parent / f".asciidoxy.{input_file.stem}-docinfo-footer.html"
+    assert toc_file.is_file()

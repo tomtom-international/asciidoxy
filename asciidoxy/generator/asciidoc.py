@@ -45,6 +45,18 @@ from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipa
 
 logger = logging.getLogger(__name__)
 
+SUPPORTED_COMMANDS = [
+    "cross_document_ref",
+    "filter",
+    "include",
+    "insert",
+    "language",
+    "link",
+    "multipage_toc",
+    "namespace",
+    "require_version",
+]
+
 
 class Api(ABC):
     """Methods to insert and link to API reference documentation from AsciiDoc files."""
@@ -67,14 +79,6 @@ class Api(ABC):
         self._current_file = current_file
 
         self._context = context
-
-    def __getattr__(self, name: str):
-        if name.startswith("insert_"):
-            return functools.partial(self.insert, kind=name[7:])
-        elif name.startswith("link_"):
-            return functools.partial(self.link, kind=name[5:])
-        else:
-            raise AttributeError(name)
 
     def filter(self,
                *,
@@ -600,13 +604,7 @@ class Api(ABC):
         return "top-" + "-".join(relative_to_base.with_suffix("").parts) + "-top"
 
     def _commands(self):
-        return {
-            name: getattr(self, name)
-            for name in [
-                "cross_document_ref", "filter", "include", "insert", "language", "link",
-                "multipage_toc", "namespace", "require_version"
-            ]
-        }
+        return {name: getattr(self, name) for name in SUPPORTED_COMMANDS}
 
 
 class PreprocessingApi(Api):
@@ -649,7 +647,7 @@ class PreprocessingApi(Api):
             self._context.progress.update(0)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
-        template.render(api=self, _api=self, **self._commands())
+        template.render(api=ApiProxy(self), _api=self, **self._commands())
 
         if self._context.progress is not None:
             self._context.progress.update()
@@ -768,7 +766,7 @@ class GeneratingApi(Api):
         out_file = self._context.register_adoc_file(self._current_file)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
-        rendered_doc = template.render(api=self, _api=self, **self._commands())
+        rendered_doc = template.render(api=ApiProxy(self), _api=self, **self._commands())
 
         with out_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
@@ -781,6 +779,46 @@ class GeneratingApi(Api):
             self._context.progress.update()
 
         return out_file
+
+
+class ApiProxy:
+    """Proxy for exposing legacy `api.` commands."""
+    _api: Api
+
+    def __init__(self, api: Api):
+        self._api = api
+
+    def __getattr__(self, name: str):
+        if name in SUPPORTED_COMMANDS:
+            return getattr(self._api, name)
+        elif name.startswith("insert_"):
+            return functools.partial(self._api.insert, kind=name[7:])
+        elif name.startswith("link_"):
+            return functools.partial(self._api.link, kind=name[5:])
+        else:
+            raise AttributeError(name)
+
+    def cross_document_ref(self,
+                           file_name: Optional[str] = None,
+                           anchor: Optional[str] = None,
+                           link_text: Optional[str] = None) -> str:
+        return self._api.cross_document_ref(file_name, anchor=anchor, link_text=link_text)
+
+    def include(self,
+                file_name: str,
+                leveloffset: str = "+1",
+                link_text: str = "",
+                link_prefix: str = "",
+                multipage_link: bool = True,
+                always_embed: bool = False,
+                **asciidoc_options) -> str:
+        return self._api.include(file_name,
+                                 leveloffset=leveloffset,
+                                 link_text=link_text,
+                                 link_prefix=link_prefix,
+                                 multipage_link=multipage_link,
+                                 always_embed=always_embed,
+                                 **asciidoc_options)
 
 
 def process_adoc(in_file: Path,

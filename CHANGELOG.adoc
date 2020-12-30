@@ -27,7 +27,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Kotlin: [AD-27] Generating Kotlin documentation based on Java source code.
   - [AD-15] Allow forcing to embed an included file in multipage mode.
   - [AD-37] Show members for other visibility levels than public. By default only public and
-    protected members are shown. Use `api.filter` to change.
+    protected members are shown. Use `filter` to change.
   - [AD-32] New package format with contents metadata file. The contents file specifies whether the
     package contains AsciiDoc includes or reference, and in what subdirectory. It can now also
     include images that need to be included to the output.
@@ -41,18 +41,18 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     the generated AsciiDoc.
   - [AD-32] By default the directory containing the input file is not copied to the intermediate
     build directory. Use `--base-dir` to enable copying of additional include files.
-  - [AD-32] `api.cross_document_ref` and `api.include` support a new `package_name` keyword to
+  - [AD-32] `cross_document_ref` and `include` support a new `package_name` keyword to
     point to files in packages. For new packages with a contents metadata file this keyword is
     mandatory. If the package specifies a root document, the `filename` is optional now.
-  - [AD-32] For `api.cross_document_ref` the `anchor` and `link_text` arguments are now keyword
-    only.
-  - [AD-32] For `api.include` the `leveloffset`, `link_text`, and `link_prefix` arguments are now
-    keyword only.
+  - [AD-32] For `cross_document_ref` the `anchor` and `link_text` arguments are now keyword
+    only. For backwards compatibility `api.cross_document_ref` is still supports the old syntax.
+  - [AD-32] For `include` the `leveloffset`, `link_text`, and `link_prefix` arguments are now
+    keyword only. For bacwards compatibility `api.include` still supports the old syntax.
   - [AD-32] Multiple packages supplying the same file is now an error.
   - [AD-54] If no `anchor` or `link_text` is given, the title of the document is used for the link
-    created by `api.cross_document_ref`. If the title cannot be read, the file name stem is used.
+    created by `cross_document_ref`. If the title cannot be read, the file name stem is used.
   - [AD-54] If no `link_text` is given, the title of the document is used for the link created by
-    `api.include` in multipage mode. If the title cannot be read, the file name stem is used.
+    `include` in multipage mode. If the title cannot be read, the file name stem is used.
   - [AD-42] The `api.` prefix for commands is no longer needed. It will be deprecated in a future
     version. The `api.link_<kind>` and `api.insert_<kind>` commands are also deprecated and not
     available without the `api.` prefix.
