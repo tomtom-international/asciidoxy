@@ -371,7 +371,10 @@ class Api(ABC):
             asciidoc_options["leveloffset"] = leveloffset
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
-        return f"include::{out_file}[{attributes}]"
+        if always_embed:
+            return f"include::{out_file}[{attributes}]"
+        else:
+            return f"[[{self._file_top_anchor(file_path)}]]\ninclude::{out_file}[{attributes}]"
 
     def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
@@ -592,6 +595,10 @@ class Api(ABC):
                                                              api_context=self._context,
                                                              api=self)
 
+    def _file_top_anchor(self, file_name: Path) -> str:
+        relative_to_base = file_name.relative_to(self._context.base_dir)
+        return "top-" + "-".join(relative_to_base.with_suffix("").parts) + "-top"
+
 
 class PreprocessingApi(Api):
     def _sub_api(self, file_path: Path, embedded: bool = False) -> "Api":
@@ -696,9 +703,14 @@ class GeneratingApi(Api):
         elif not link_text:
             link_text = anchor
 
+        if not anchor:
+            if not self._context.multipage:
+                anchor = self._file_top_anchor(absolute_file_path)
+            else:
+                anchor = ""
+
         link_file_path = self._context.link_to_adoc_file(absolute_file_path)
-        link_anchor = anchor if anchor is not None else ""
-        return (f"<<{link_file_path}#{link_anchor},{link_text}>>")
+        return (f"<<{link_file_path}#{anchor},{link_text}>>")
 
     def insert_fragment(self,
                         element,

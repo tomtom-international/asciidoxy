@@ -607,7 +607,7 @@ def test_cross_document_ref__direct_access_to_other_package_for_old_style_packag
             if tdb_single_and_multipage:
                 assert result == "<<include.adoc#,bla>>"
             else:
-                assert result == "<<.asciidoxy.include.adoc#,bla>>"
+                assert result == "<<.asciidoxy.include.adoc#top-include-top,bla>>"
 
 
 def test_cross_document_ref__with_link_text(test_data_builder, tdb_single_and_multipage):
@@ -636,7 +636,8 @@ def test_cross_document_ref__link_text_document_title(test_data_builder, tdb_sin
             if tdb_single_and_multipage:
                 assert result == "<<includes/other_file.adoc#,Other file>>"
             else:
-                assert result == "<<includes/.asciidoxy.other_file.adoc#,Other file>>"
+                assert result == ("<<includes/.asciidoxy.other_file.adoc"
+                                  "#top-includes-other_file-top,Other file>>")
 
 
 def test_cross_document_ref__link_text_document_name(test_data_builder, tdb_single_and_multipage):
@@ -649,7 +650,8 @@ def test_cross_document_ref__link_text_document_name(test_data_builder, tdb_sing
             if tdb_single_and_multipage:
                 assert result == "<<includes/other_file.adoc#,other_file>>"
             else:
-                assert result == "<<includes/.asciidoxy.other_file.adoc#,other_file>>"
+                assert result == ("<<includes/.asciidoxy.other_file.adoc"
+                                  "#top-includes-other_file-top,other_file>>")
 
 
 def test_cross_document_ref__to_other_package(test_data_builder, tdb_single_and_multipage):
@@ -662,7 +664,7 @@ def test_cross_document_ref__to_other_package(test_data_builder, tdb_single_and_
             if tdb_single_and_multipage:
                 assert result == "<<include.adoc#,bla>>"
             else:
-                assert result == "<<.asciidoxy.include.adoc#,bla>>"
+                assert result == "<<.asciidoxy.include.adoc#top-include-top,bla>>"
 
 
 def test_cross_document_ref__to_package_default(test_data_builder, tdb_single_and_multipage):
@@ -675,7 +677,7 @@ def test_cross_document_ref__to_package_default(test_data_builder, tdb_single_an
             if tdb_single_and_multipage:
                 assert result == "<<include.adoc#,bla>>"
             else:
-                assert result == "<<.asciidoxy.include.adoc#,bla>>"
+                assert result == "<<.asciidoxy.include.adoc#top-include-top,bla>>"
 
 
 def test_cross_document_ref__links_to_package_are_relative_to_package_root(
@@ -691,7 +693,8 @@ def test_cross_document_ref__links_to_package_are_relative_to_package_root(
             if tdb_single_and_multipage:
                 assert result == "<<../other_dir/include.adoc#,bla>>"
             else:
-                assert result == "<<../other_dir/.asciidoxy.include.adoc#,bla>>"
+                assert result == ("<<../other_dir/.asciidoxy.include.adoc#"
+                                  "top-other_dir-include-top,bla>>")
 
 
 def test_cross_document_ref__document_not_in_tree(test_data_builder, tdb_single_and_multipage):
@@ -719,10 +722,15 @@ def test_include__relative_path(test_data_builder):
 
     for api in test_data_builder.apis():
         result = api.include("includes/another_file.adoc")
-        assert result.startswith("include::")
-        assert result.endswith("[leveloffset=+1]")
+        lines = result.splitlines()
+        assert len(lines) == 2
 
-        file_name = input_file.parent / result[9:-16]
+        assert lines[0] == "[[top-includes-another_file-top]]"
+
+        assert lines[1].startswith("include::")
+        assert lines[1].endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / lines[1][9:-16]
         assert file_name.is_file() == isinstance(api, GeneratingApi)
         assert file_name.name == ".asciidoxy.another_file.adoc"
         assert file_name.is_absolute()
@@ -734,10 +742,15 @@ def test_include__relative_path__parent_directory(test_data_builder):
 
     for api in test_data_builder.apis():
         result = api.include("../includes/another_file.adoc")
-        assert result.startswith("include::")
-        assert result.endswith("[leveloffset=+1]")
+        lines = result.splitlines()
+        assert len(lines) == 2
 
-        file_name = input_file.parent / result[9:-16]
+        assert lines[0] == "[[top-includes-another_file-top]]"
+
+        assert lines[1].startswith("include::")
+        assert lines[1].endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / lines[1][9:-16]
         assert file_name.is_file() == isinstance(api, GeneratingApi)
         assert file_name.name == ".asciidoxy.another_file.adoc"
         assert file_name.is_absolute()
@@ -770,10 +783,15 @@ def test_include__from_package(test_data_builder):
 
     for api in test_data_builder.apis():
         result = api.include("another_file.adoc", package_name="package-a")
-        assert result.startswith("include::")
-        assert result.endswith("[leveloffset=+1]")
+        lines = result.splitlines()
+        assert len(lines) == 2
 
-        file_name = input_file.parent / result[9:-16]
+        assert lines[0] == "[[top-another_file-top]]"
+
+        assert lines[1].startswith("include::")
+        assert lines[1].endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / lines[1][9:-16]
         assert file_name.is_file() == isinstance(api, GeneratingApi)
         assert file_name.name == ".asciidoxy.another_file.adoc"
         assert file_name.is_absolute()
@@ -811,10 +829,15 @@ def test_include__direct_access_to_other_package_for_old_style_packages(test_dat
 
     for api in test_data_builder.apis():
         result = api.include("another_file.adoc")
-        assert result.startswith("include::")
-        assert result.endswith("[leveloffset=+1]")
+        lines = result.splitlines()
+        assert len(lines) == 2
 
-        file_name = input_file.parent / result[9:-16]
+        assert lines[0] == "[[top-another_file-top]]"
+
+        assert lines[1].startswith("include::")
+        assert lines[1].endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / lines[1][9:-16]
         assert file_name.is_file() == isinstance(api, GeneratingApi)
         assert file_name.name == ".asciidoxy.another_file.adoc"
         assert file_name.is_absolute()
@@ -826,7 +849,6 @@ def test_include__with_leveloffset(test_data_builder):
 
     for api in test_data_builder.apis():
         result = api.include("includes/another_file.adoc", leveloffset="-1")
-        assert result.startswith("include::")
         assert result.endswith("[leveloffset=-1]")
 
 
@@ -836,7 +858,6 @@ def test_include__without_leveloffset(test_data_builder):
 
     for api in test_data_builder.apis():
         result = api.include("includes/another_file.adoc", leveloffset=None)
-        assert result.startswith("include::")
         assert result.endswith("[]")
 
 
@@ -897,7 +918,6 @@ def test_include__with_extra_options(test_data_builder):
 
     for api in test_data_builder.apis():
         result = api.include("includes/another_file.adoc", lines="1..10", indent=12)
-        assert result.startswith("include::")
         assert result.endswith("[lines=1..10,indent=12,leveloffset=+1]")
 
 

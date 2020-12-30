@@ -60,6 +60,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Objective C: Support `__autoreleasing` suffix.
   - Including files in parent directories no longer raises an exception.
   - Files and directories provided on the command-line are validated before use.
+  - [AD-55] Insert anchors at the top of includes in singlepage mode to make cross document
+    references without anchors work.
 
 
 == 0.6.3 (1 Nov 2020)
