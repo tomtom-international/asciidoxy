@@ -5,5 +5,5 @@ Sub-document document text.
 == Sub-document in table [[sub-document-in-table]]
 
 Reference to main-document:
-${api.cross_document_ref("../multifile_test.input.adoc", anchor="main-document-chapter",
-                         link_text="Reference to main-document")}
+${cross_document_ref("../multifile_test.input.adoc", anchor="main-document-chapter",
+                     link_text="Reference to main-document")}

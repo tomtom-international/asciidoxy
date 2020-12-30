@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = C++
-${api.include("../../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../../_header.adoc", always_embed=True, leveloffset=None)}
 
 This is an example demonstrating documentation for a {Cpp} project. The used source code files come
 from the https://github.com/SFML/SFML[SFML] project.
@@ -30,12 +30,12 @@ include::Doxyfile[]
 [source,python]
 ----
 ${"""
-${api.insert("sf::UdpSocket")}
-${api.insert("sf::Packet")}
-${api.insert("sf::IpAddress")}
+${insert("sf::UdpSocket")}
+${insert("sf::Packet")}
+${insert("sf::IpAddress")}
 """}
 ----
 
-${api.insert("sf::UdpSocket")}
-${api.insert("sf::Packet")}
-${api.insert("sf::IpAddress")}
+${insert("sf::UdpSocket")}
+${insert("sf::Packet")}
+${insert("sf::IpAddress")}

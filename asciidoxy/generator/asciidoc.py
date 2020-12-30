@@ -599,6 +599,15 @@ class Api(ABC):
         relative_to_base = file_name.relative_to(self._context.base_dir)
         return "top-" + "-".join(relative_to_base.with_suffix("").parts) + "-top"
 
+    def _commands(self):
+        return {
+            name: getattr(self, name)
+            for name in [
+                "cross_document_ref", "filter", "include", "insert", "language", "link",
+                "multipage_toc", "namespace", "require_version"
+            ]
+        }
+
 
 class PreprocessingApi(Api):
     def _sub_api(self, file_path: Path, embedded: bool = False) -> "Api":
@@ -640,7 +649,7 @@ class PreprocessingApi(Api):
             self._context.progress.update(0)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
-        template.render(api=self)
+        template.render(api=self, _api=self, **self._commands())
 
         if self._context.progress is not None:
             self._context.progress.update()
@@ -759,7 +768,7 @@ class GeneratingApi(Api):
         out_file = self._context.register_adoc_file(self._current_file)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
-        rendered_doc = template.render(api=self)
+        rendered_doc = template.render(api=self, _api=self, **self._commands())
 
         with out_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)

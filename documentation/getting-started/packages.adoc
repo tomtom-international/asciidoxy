@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Packages
-${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
 
 AsciiDoxy has been created to generate developer documentation for large projects. In large projects
 different components may be developed by separate teams in separate source control repositories.
@@ -37,8 +37,8 @@ the most basic package format: a local directory.
 [TIP]
 ====
 For an overview of supported package formats, see
-${api.cross_document_ref("../reference/packages.adoc", anchor="_package_format",
-                         link_text="the packages section in the reference documentation")}.
+${cross_document_ref("../reference/packages.adoc", anchor="_package_format",
+                     link_text="the packages section in the reference documentation")}.
 ====
 
 . Create a new directory for the package named `my-package`.
@@ -68,8 +68,8 @@ package.
 [TIP]
 ====
 More details and syntax for the package content file can be found in
-${api.cross_document_ref("../reference/packages.adoc", anchor="_package_content_files",
-                         link_text="the packages section in the reference documentation")}.
+${cross_document_ref("../reference/packages.adoc", anchor="_package_content_files",
+                     link_text="the packages section in the reference documentation")}.
 ====
 
 [NOTE]
@@ -112,31 +112,31 @@ asciidoxy --spec-file packages.spec INPUT_FILE
 [TIP]
 ====
 More details and syntax for the package specification file can be found in
-${api.cross_document_ref("../reference/packages.adoc", anchor="_package_specification_files",
-                         link_text="the packages section in the reference documentation")}.
+${cross_document_ref("../reference/packages.adoc", anchor="_package_specification_files",
+                     link_text="the packages section in the reference documentation")}.
 ====
 
 == Using the contents of the package
 
 AsciiDoc files contained in a package can be included in the main documentation (and in other
-packages) using `api.include`. Specify the name of the file to include, relative to the `src_dir`
+packages) using `include`. Specify the name of the file to include, relative to the `src_dir`
 specified in the package content file. Add the `package_name` argument to indicate the file is
 contained in a package. The `package_name` must match the name in the package content file:
 
 [source]
 ----
 ${"""
-${api.include("reference.adoc", package_name="my-package")}
+${include("reference.adoc", package_name="my-package")}
 """}
 ----
 
-The `api.cross_document_ref` command also supports the `package_name` argument. To create a link to
+The `cross_document_ref` command also supports the `package_name` argument. To create a link to
 a file in the package use:
 
 [source]
 ----
 ${"""
-${api.cross_document_ref("reference.adoc", package_name="my-package")}
+${cross_document_ref("reference.adoc", package_name="my-package")}
 """}
 ----
 
@@ -184,8 +184,8 @@ the command:
 [source]
 ----
 ${"""
-${api.include(package_name="my-package")}
-${api.cross_document_ref(package_name="my-package")}
+${include(package_name="my-package")}
+${cross_document_ref(package_name="my-package")}
 """}
 ----
 

@@ -17,7 +17,7 @@
 :source-highlighter: highlightjs
 :toc: right
 :toc-title: On this page
-${api.multipage_toc()}
+${multipage_toc()}
 
 ----
     ___              _ _ ____
@@ -28,13 +28,13 @@ ${api.multipage_toc()}
                                       /____/
 ----
 
-[ ${api.cross_document_ref("index.adoc", link_text="Home")} |
-${api.cross_document_ref("about.adoc", link_text="What is AsciiDoxy?")} |
-${api.cross_document_ref("getting-started.adoc", link_text="Getting started")} |
-${api.cross_document_ref("reference.adoc", link_text="Reference documentation")} |
-${api.cross_document_ref("examples.adoc", link_text="Examples")} |
-${api.cross_document_ref("contributing.adoc", link_text="Contributing")} |
-${api.cross_document_ref("changelog.adoc", link_text="Changelog")} |
+[ ${cross_document_ref("index.adoc", link_text="Home")} |
+${cross_document_ref("about.adoc", link_text="What is AsciiDoxy?")} |
+${cross_document_ref("getting-started.adoc", link_text="Getting started")} |
+${cross_document_ref("reference.adoc", link_text="Reference documentation")} |
+${cross_document_ref("examples.adoc", link_text="Examples")} |
+${cross_document_ref("contributing.adoc", link_text="Contributing")} |
+${cross_document_ref("changelog.adoc", link_text="Changelog")} |
 https://github.com/tomtom-international/asciidoxy[GitHub] ]
 
 = {doctitle}

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = AsciiDoxy
-${api.include("_header.adoc", always_embed=True, leveloffset=None)}
+${include("_header.adoc", always_embed=True, leveloffset=None)}
 
 image:https://img.shields.io/badge/License-Apache%202.0-green.svg[License, link=LICENSE]
 image:https://img.shields.io/pypi/dm/asciidoxy[pip downloads, link=https://pypi.org/project/asciidoxy]
@@ -60,9 +60,9 @@ the internal version of AsciiDoxy. Many thanks to:
 The python package was created with https://github.com/audreyr/cookiecutter[Cookiecutter] and the
 https://github.com/audreyr/cookiecutter-pypackage[audreyr/cookiecutter-pypackage] project template.
 
-${api.include("about.adoc", multipage_link=False)}
-${api.include("getting-started.adoc", multipage_link=False)}
-${api.include("reference.adoc", multipage_link=False)}
-${api.include("examples.adoc", multipage_link=False)}
-${api.include("contributing.adoc", multipage_link=False)}
-${api.include("changelog.adoc", multipage_link=False)}
+${include("about.adoc", multipage_link=False)}
+${include("getting-started.adoc", multipage_link=False)}
+${include("reference.adoc", multipage_link=False)}
+${include("examples.adoc", multipage_link=False)}
+${include("contributing.adoc", multipage_link=False)}
+${include("changelog.adoc", multipage_link=False)}

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Packages
-${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
 
 == Package format
 

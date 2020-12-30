@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Including API reference
-${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
 
 The name AsciiDoxy is a combination of AsciiDoc and Doxygen. It started as a project to generate
 AsciiDoc documentation for APIs documented with Doxygen comments. Doxygen is still the main tool
@@ -57,8 +57,8 @@ GENERATE_XML           = YES                        # <4>
 ====
 The shown Doxygen configuration will work correctly for most C and {Cpp} source code. For other
 languages, see the examples in
-${api.cross_document_ref("../reference/doxygen.adoc",
-                         link_text="the Doxygen section of the reference documentation")}.
+${cross_document_ref("../reference/doxygen.adoc",
+                     link_text="the Doxygen section of the reference documentation")}.
 ====
 
 == Creating a package
@@ -84,9 +84,9 @@ dir = "xml"       # <3>
 [TIP]
 ====
 More information about packages can be found in the
-${api.cross_document_ref("packages.adoc", link_text="packages getting started guide")} and in the
-${api.cross_document_ref("../reference/packages.adoc",
-                         link_text="packages section of the reference documentation")}.
+${cross_document_ref("packages.adoc", link_text="packages getting started guide")} and in the
+${cross_document_ref("../reference/packages.adoc",
+                     link_text="packages section of the reference documentation")}.
 ====
 
 == Collecting the reference package
@@ -120,16 +120,16 @@ from the source code in a random order in the documentation, it puts you in cont
 is added where. This allows you to write the documentation in a natural flow that is easier to
 digest.
 
-To insert API reference use the `api.insert` command. This command requires at least the fully
+To insert API reference use the `insert` command. This command requires at least the fully
 qualified name of the element to insert. That means that for languages that support namespaces, you
 need to include the full namespace in the element name. For example:
 
 [source,python]
 ----
 ${"""
-${api.insert("MyNamespace::MyClass")}
-${api.insert("com.asciidoxy.MyClass")}
-${api.insert("NSMyClass")}
+${insert("MyNamespace::MyClass")}
+${insert("com.asciidoxy.MyClass")}
+${insert("NSMyClass")}
 """}
 ----
 
@@ -142,26 +142,26 @@ ${"""
 
 This is the interface for {cpp}.
 
-${api.insert("MyNamespace::MyClass")}
+${insert("MyNamespace::MyClass")}
 
 == Java interface
 
 Some text about the Java interface.
 
-${api.insert("com.asciidoxy.MyClass")}
+${insert("com.asciidoxy.MyClass")}
 
 == Objective-C interface
 
 And some text about Objective-C version.
 
-${api.insert("NSMyClass")}
+${insert("NSMyClass")}
 """}
 ----
 
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../reference/commands.adoc", anchor="api_insert", link_text="api.insert")}.
+${cross_document_ref("../reference/commands.adoc", anchor="api_insert", link_text="insert")}.
 ====
 
 == Adjusting the level of the section headers
@@ -177,19 +177,19 @@ ${"""
 
 This is the interface for {cpp}.
 
-${api.insert("MyNamespace::MyClass")}                     // <1>
+${insert("MyNamespace::MyClass")}                     // <1>
 
 == Java interface
 
 Some text about the Java interface.
 
-${api.insert("com.asciidoxy.MyClass", leveloffset="+2")}  // <2>
+${insert("com.asciidoxy.MyClass", leveloffset="+2")}  // <2>
 
 === Objective-C interface
 
 And some text about Objective-C version.
 
-${api.insert("NSMyClass", leveloffset="+3")}              // <3>
+${insert("NSMyClass", leveloffset="+3")}              // <3>
 """}
 ----
 <1> The previous header is level 1, so the default offset of +1 is fine.
@@ -205,8 +205,8 @@ namespace to search in:
 [source,python]
 ----
 ${"""
-${api.namespace("AsciiDoxy::Parser")}
-${api.namespace("com.asciidoxy.parser")}
+${namespace("AsciiDoxy::Parser")}
+${namespace("com.asciidoxy.parser")}
 """}
 ----
 
@@ -217,8 +217,8 @@ element will be used. For example in the following case:
 [source,python]
 ----
 ${"""
-${api.namespace("AsciiDoxy::Parser")}
-${api.insert("ParserBase")}
+${namespace("AsciiDoxy::Parser")}
+${insert("ParserBase")}
 """}
 ----
 
@@ -228,15 +228,15 @@ AsciiDoxy will search for the following elements:
 . `AsciiDoxy::ParserBase`
 . `::ParserBase`
 
-The first match, the one closest to the default namespace, will be used for `api.insert`.
+The first match, the one closest to the default namespace, will be used for `insert`.
 
 Relative namespaces are also supported:
 
 [source,python]
 ----
 ${"""
-${api.namespace("AsciiDoxy::Parser")}
-${api.insert("Cpp::CppParser")}
+${namespace("AsciiDoxy::Parser")}
+${insert("Cpp::CppParser")}
 """}
 ----
 
@@ -246,28 +246,28 @@ Here AsciiDoxy will search for:
 . `AsciiDoxy::Cpp::CppParser`
 . `::Cpp::CppParser`
 
-When setting a default namespace using `api.namespace` it will remain active for the rest of the
-file or until `api.namespace` is used again. It will even apply to files included using
-`api.include`. Don't worry about usage if `api.namespace` in these included files: the previous
+When setting a default namespace using `namespace` it will remain active for the rest of the
+file or until `namespace` is used again. It will even apply to files included using
+`include`. Don't worry about usage if `namespace` in these included files: the previous
 setting is restored after the end of the included file.
 
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../reference/commands.adoc", anchor="api_namespace", link_text="api.namespace")}.
+${cross_document_ref("../reference/commands.adoc", anchor="api_namespace", link_text="namespace")}.
 ====
 
 == Linking to API reference elements
 
 After inserting API reference elements, they can be linked to from the additional text. This can be
 in the same AsciiDoc file, or in a separate file. Even linking from another package is supported.
-To link to an API reference element use the `api.link` command with the fully qualified name of the
+To link to an API reference element use the `link` command with the fully qualified name of the
 element.
 
 [source,python]
 ----
 ${"""
-Use the ${api.insert("AsciiDoxy::Parser::ParserBase")} to create new parsers.
+Use the ${insert("AsciiDoxy::Parser::ParserBase")} to create new parsers.
 """}
 ----
 
@@ -277,14 +277,14 @@ This will insert a link using the short name of the element:
 Use the <<api-reference.adoc#,ParserBase>> to create new parsers.
 ====
 
-The `api.namespace` command also applies to `api.link`. You do not need to repeat the namespace:
+The `namespace` command also applies to `link`. You do not need to repeat the namespace:
 
 [source,python]
 ----
 ${"""
-${api.namespace("AsciiDoxy::Parser")}
+${namespace("AsciiDoxy::Parser")}
 
-Use the ${api.link("ParserBase")} to create new parsers.
+Use the ${link("ParserBase")} to create new parsers.
 """}
 ----
 
@@ -294,7 +294,7 @@ To use the fully qualified name of the element for the link text, set the `full_
 [source,python]
 ----
 ${"""
-Use the ${api.insert("AsciiDoxy::Parser::ParserBase", full_name=True)} to create new parsers.
+Use the ${insert("AsciiDoxy::Parser::ParserBase", full_name=True)} to create new parsers.
 """}
 ----
 
@@ -307,7 +307,7 @@ An alternative link text can be set uring the `text` argument:
 [source,python]
 ----
 ${"""
-Use the ${api.insert("AsciiDoxy::Parser::ParserBase", text="parser base")} to create new parsers.
+Use the ${insert("AsciiDoxy::Parser::ParserBase", text="parser base")} to create new parsers.
 """}
 ----
 
@@ -318,7 +318,7 @@ Use the <<api-reference.adoc#,parser base>> to create new parsers.
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../reference/commands.adoc", anchor="api_link", link_text="api.link")}.
+${cross_document_ref("../reference/commands.adoc", anchor="api_link", link_text="link")}.
 ====
 
 == Warnings
@@ -336,12 +336,12 @@ want to use. A list of candidates will be shown as part of the warning. See the 
 command used for options to select a specific candidate.
 
 `ConsistencyError`: "The following elements are linked to, but not included in the documentation"::
-This happens when using `api.link` for an element that was not added using `api.insert`. Make sure
+This happens when using `link` for an element that was not added using `insert`. Make sure
 you add all the API reference you need. If the element is inserted in another AsciiDoc file, there
 may be a missing include for that file.
 +
-This may also be caused transitively by `api.insert`. If the element depends on another element,
-e.g. in a method argument type, AsciiDoxy inserts an `api.link` for that element. The warning will
+This may also be caused transitively by `insert`. If the element depends on another element,
+e.g. in a method argument type, AsciiDoxy inserts an `link` for that element. The warning will
 inform you that you need to make sure you include all dependencies as well.
 
 [TIP]

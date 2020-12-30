@@ -4,11 +4,11 @@ Sub-document document text.
 
 == Sub-document chapter [[sub-document-chapter]]
 
-${api.insert("asciidoxy::geometry::Coordinate")}
+${insert("asciidoxy::geometry::Coordinate")}
 
 Reference to main-document:
-${api.cross_document_ref("../multifile_test.input.adoc", anchor="main-document-chapter",
-                         link_text="Reference to main-document")}
+${cross_document_ref("../multifile_test.input.adoc", anchor="main-document-chapter",
+                     link_text="Reference to main-document")}
 
 Link to sub-document API:
-${api.link_enum("asciidoxy::traffic::TrafficEvent::Severity")}
+${link("asciidoxy::traffic::TrafficEvent::Severity", kind="enum")}

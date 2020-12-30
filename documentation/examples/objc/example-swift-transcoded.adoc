@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Swift transcoded from Objective C
-${api.include("../../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../../_header.adoc", always_embed=True, leveloffset=None)}
 
 This is an example demonstrating documentation for an Objective C project transcoded to Swift. The
 used source code files come from the https://github.com/AFNetworking/AFNetworking[AFNetworking]
@@ -31,16 +31,16 @@ include::Doxyfile[]
 [source,python]
 ----
 ${"""
-${api.language("swift", source="objc")}
-${api.insert("AFHTTPSessionManager")}
-${api.insert("AFHTTPRequestSerializer")}
-${api.insert("AFURLRequestSerialization")}
-${api.insert("AFMultipartFormData")}
+${language("swift", source="objc")}
+${insert("AFHTTPSessionManager")}
+${insert("AFHTTPRequestSerializer")}
+${insert("AFURLRequestSerialization")}
+${insert("AFMultipartFormData")}
 """}
 ----
 
-${api.language("swift", source="objc")}
-${api.insert("AFHTTPSessionManager")}
-${api.insert("AFHTTPRequestSerializer")}
-${api.insert("AFURLRequestSerialization")}
-${api.insert("AFMultipartFormData")}
+${language("swift", source="objc")}
+${insert("AFHTTPSessionManager")}
+${insert("AFHTTPRequestSerializer")}
+${insert("AFURLRequestSerialization")}
+${insert("AFMultipartFormData")}

@@ -4,6 +4,6 @@ Main document text.
 
 == Main document chapter [[main-document-chapter]]
 
-${api.include("sub_directory/embeddedfile_subdoc_test.input.adoc", always_embed=True)}
+${include("sub_directory/embeddedfile_subdoc_test.input.adoc", always_embed=True)}
 
-${api.insert("asciidoxy::traffic::TrafficEvent::Severity")}
+${insert("asciidoxy::traffic::TrafficEvent::Severity")}

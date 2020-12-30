@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = A basic AsciiDoc file
-${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
 
 In essence AsciiDoxy is a preprocessor for AsciiDoc files. It looks for special directives in these
 files and replaces them with valid AsciiDoc. Then it runs AsciiDoctor to generate HTML or PDF from
@@ -97,5 +97,5 @@ NOTE: If you do not explicitly specify a destination directory, the output will 
 the temporary build files.
 
 All available command-line options can be found in
-${api.cross_document_ref("../reference/command-line-options.adoc",
-                         link_text="the reference documentation for command-line options")}.
+${cross_document_ref("../reference/command-line-options.adoc",
+                     link_text="the reference documentation for command-line options")}.

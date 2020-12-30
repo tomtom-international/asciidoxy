@@ -12,35 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Commands
-${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
-${api.namespace("asciidoxy.generator.asciidoc")}
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+${namespace("asciidoxy.generator.asciidoc")}
 
 == Inserting API reference [[api_insert]]
 
 The original purpose of AsciiDoxy is to insert API reference documentation in AsciiDoc files. Use
-the `${api.link("Api.insert", text="api.insert")}` method to insert API reference documentation at
+the `${link("Api.insert", text="insert")}` method to insert API reference documentation at
 the current location.
 
 [source,python]
 ----
 ${"""
-${api.insert(<name>,
-             [kind=<kind>,]
-             [lang=<language>,]
-             [leveloffset]),
-             [...]}
-${api.insert_<kind>(<name>,                   # <1>
-                    [lang=<language>,]
-                    [leveloffset=<offset>]),
-                    [...]}
+${insert(<name>,
+         [kind=<kind>,]
+         [lang=<language>,]
+         [leveloffset]),
+         [...]}
 """}
 ----
-<1> Alternative way to specify the `kind` of element to insert.
 
 The `insert` method takes the following arguments:
 
-`name`:: Name of the element to insert. This can be the fully qualified name, or if a <<_namespace>>
-is set, a relative name.
+`name`:: Name of the element to insert. This can be the fully qualified name, or if a
+<<api_namespace,namespace>> is set, a relative name.
 `lang`:: Optional. Name of the programming language.
 `kind`:: Optional. Kind of element to insert.
 `leveloffset`:: Optional. Offset for the headers in the reference from the top level of the current
@@ -60,12 +55,10 @@ https://asciidoctor.org/docs/user-manual/#include-directive[the AsciiDoctor manu
 [source,python]
 ----
 ${"""
-${api.insert("MyNamespace::MyClass")}                                    # <1>
-${api.insert("com.tomtom.Class", leveloffset="+2")}                      # <2>
-${api.insert("com.tomtom.Class", kind="class")}                          # <3>
-${api.insert("MyNamespace::FreeFunction", lang="c++")}                   # <4>
-${api.insert_class("MyNamespace::MyClass")}                              # <5>
-${api.insert_function("MyNamespace::FreeFunction", lang="c++")}          # <6>
+${insert("MyNamespace::MyClass")}                                    # <1>
+${insert("com.tomtom.Class", leveloffset="+2")}                      # <2>
+${insert("com.tomtom.Class", kind="class")}                          # <3>
+${insert("MyNamespace::FreeFunction", lang="c++")}                   # <4>
 """}
 ----
 <1> Insert API reference for the element named `MyNamespace::MyClass`.
@@ -75,23 +68,21 @@ ${api.insert_function("MyNamespace::FreeFunction", lang="c++")}          # <6>
     ignored.
 <4> Insert API reference for the {cpp} element named `MyNamespace::FreeFunction`. Other languages are
     ignored.
-<5> Insert API reference for the class named `MyNamespace::MyClass`. Alternative syntax.
-<6> Insert API reference for the {cpp} function named `MyNamespace::FreeFunction`. Alternative syntax.
 
 === Filtering what is inserted
 
-By default `${api.link("Api.insert", text="api.insert")}` inserts all contents of the API element.
+By default `${link("Api.insert", text="insert")}` inserts all contents of the API element.
 You can control which members, inner classes, enum values, and exceptions get inserted for each
-call to `api.insert`.
+call to `insert`.
 
 [source,python]
 ----
 ${"""
-${api.insert(...,
-             [members=<filter_spec>,]
-             [inner_classes=<filter_spec>,]
-             [enum_values=<filter_spec>,]
-             [exceptions=<filter_spec>])}
+${insert(...,
+         [members=<filter_spec>,]
+         [inner_classes=<filter_spec>,]
+         [enum_values=<filter_spec>,]
+         [exceptions=<filter_spec>])}
 """}
 ----
 
@@ -119,20 +110,20 @@ name of the property, and the value is a string or list of strings with the filt
 
 == Global filters
 
-A global filter can be set that applies to every `api.insert` after it is set using
-`${api.link("Api.filter", text="api.filter")}`.
+A global filter can be set that applies to every `insert` after it is set using
+`${link("Api.filter", text="filter")}`.
 
 [source,python]
 ----
 ${"""
-${api.filter([members=<filter_spec>,]
-             [inner_classes=<filter_spec>,]
-             [enum_values=<filter_spec>,]
-             [exceptions=<filter_spec>])}
+${filter([members=<filter_spec>,]
+         [inner_classes=<filter_spec>,]
+         [enum_values=<filter_spec>,]
+         [exceptions=<filter_spec>])}
 """}
 ----
 
-The global filter applies to every call to `api.insert` in the same file, after it is set. It also
+The global filter applies to every call to `insert` in the same file, after it is set. It also
 applies to any file included after it is set.
 
 Filters can be overridden in included files. At the end of the file, the original filter is
@@ -140,60 +131,54 @@ restored.
 
 === Combining filter specifications
 
-When an `api.insert` call contains additional filter specifications, these specifications are added
+When an `insert` call contains additional filter specifications, these specifications are added
 to the end of the global filter specifications:
 
 [source,python]
 ----
 ${"""
-${api.filter(members=["add", "update"])}
-${api.insert("name", members=["remove"])}
+${filter(members=["add", "update"])}
+${insert("name", members=["remove"])}
 
 # Is equal to
-${api.insert("name", members=["add", "update", "remove"])}
+${insert("name", members=["add", "update", "remove"])}
 """}
 ----
 
-Filters added in `api.insert` are always added to the end. If there is no corresponding global
+Filters added in `insert` are always added to the end. If there is no corresponding global
 filter specification, it is treated as a new filter, and `NONE` or `ALL` is prepended if needed.
 
 
-The global filter can be overridden for some calls to `api.insert`. Then only the explicit filter
+The global filter can be overridden for some calls to `insert`. Then only the explicit filter
 specifications on that call are used:
 
 [source,python]
 ----
 ${"""
-${api.insert(...,
-             ignore_global_filter=True,
-             [members=<filter_spec>,]
-             [inner_classes=<filter_spec>,]
-             [enum_values=<filter_spec>,]
-             [exceptions=<filter_spec>])}
+${insert(...,
+         ignore_global_filter=True,
+         [members=<filter_spec>,]
+         [inner_classes=<filter_spec>,]
+         [enum_values=<filter_spec>,]
+         [exceptions=<filter_spec>])}
 """}
 ----
 
 == Linking to API reference [[api_link]]
 
-Use `${api.link("Api.link", text="api.link")}` to insert a link to an API reference element.
+Use `${link("Api.link", text="link")}` to insert a link to an API reference element.
 
 [source,python]
 ----
 ${"""
-${api.link(<name>,
-           [kind=<kind>,]
-           [lang=<language>,]
-           [text=<alt_text>,]
-           [full_name=<True/False>,]
-           [allow_overloads=<True/False>])}
-${api.link_<kind>(<name>,                     # <1>
-                  [lang=<language>,]
-                  [text=<alt_text>,]
-                  [full_name=<True/False>,]
-                  [allow_overloads=<True/False>])}
+${link(<name>,
+       [kind=<kind>,]
+       [lang=<language>,]
+       [text=<alt_text>,]
+       [full_name=<True/False>,]
+       [allow_overloads=<True/False>])}
 """}
 ----
-<1> Alternative way to specify the `kind` of element to link to.
 
 By default the short name of the element is used as the text of the link.
 
@@ -222,7 +207,7 @@ The list of parameter types should be specified in parentheses after the functio
 [source,python]
 ----
 ${"""
-${api.link("MyFunction(int, std::string)")}
+${link("MyFunction(int, std::string)")}
 """}
 ----
 
@@ -231,7 +216,7 @@ Empty parentheses indicate the function should accept no parameters:
 [source,python]
 ----
 ${"""
-${api.link("MyFunction()")}
+${link("MyFunction()")}
 """}
 ----
 
@@ -241,7 +226,7 @@ will not be able to pick one:
 [source,python]
 ----
 ${"""
-${api.link("MyFunction")}
+${link("MyFunction")}
 """}
 ----
 
@@ -250,12 +235,12 @@ ${api.link("MyFunction")}
 [source,python]
 ----
 ${"""
-${api.link("MyNamespace::MyClass")}                            # <1>
-${api.link("MyNamespace::MyClass", lang="c++")}                # <2>
-${api.link("com.tomtom.Class.Method", full_name=True)}         # <3>
-${api.link("MyNamespace::FreeFunction", text="FreeFunction")}  # <4>
-${api.link_class("MyNamespace::MyClass")}                      # <5>
-${api.link_class("MyNamespace::MyClass", lang="c++")}          # <6>
+${link("MyNamespace::MyClass")}                            # <1>
+${link("MyNamespace::MyClass", lang="c++")}                # <2>
+${link("com.tomtom.Class.Method", full_name=True)}         # <3>
+${link("MyNamespace::FreeFunction", text="FreeFunction")}  # <4>
+${link("MyNamespace::MyClass", kind="class")}              # <5>
+${link("MyNamespace::MyClass", kind="class", lang="c++")}  # <6>
 """}
 ----
 <1> Link to any element called `MyNamespace::MyClass`.
@@ -269,7 +254,7 @@ ${api.link_class("MyNamespace::MyClass", lang="c++")}          # <6>
 
 AsciiDoc has the https://asciidoctor.org/docs/user-manual/#include-directive[`include` directive] to
 embed other AsciiDoc files in the current file. AsciiDoxy extends this directive with its
-`${api.link("Api.include", text="api.include")}` method for 2 reasons:
+`${link("Api.include", text="include")}` method for 2 reasons:
 
 . Perform preprocessing on the included AsciiDoc files. When using the normal `include` directive,
   AsciiDoxy will not preprocess the included file.
@@ -278,14 +263,14 @@ embed other AsciiDoc files in the current file. AsciiDoxy extends this directive
 [source,python]
 ----
 ${"""
-${api.include(<file_name>,
-              [package_name=<package name>,]
-              [leveloffset=<offset>,]
-              [link_text=<text>,]
-              [link_prefix=<prefix>,]
-              [multipage_link=<bool>,]
-              [always_embed=<bool>,]
-              [...])}
+${include(<file_name>,
+          [package_name=<package name>,]
+          [leveloffset=<offset>,]
+          [link_text=<text>,]
+          [link_prefix=<prefix>,]
+          [multipage_link=<bool>,]
+          [always_embed=<bool>,]
+          [...])}
 """}
 ----
 
@@ -321,10 +306,10 @@ https://asciidoctor.org/docs/user-manual/#include-directive[the AsciiDoctor manu
 [source,python]
 ----
 ${"""
-${api.include("component/reference.adoc")}                                           # <1>
-${api.include("/mount/data/reference.adoc", leveloffset="+3")}                       # <2>
-${api.include("component/reference.adoc", link_text="Reference", link_prefix=". ")}  # <3>
-${api.include("/component/reference.adoc", multipage_link=False)}                   # <4>
+${include("component/reference.adoc")}                                           # <1>
+${include("/mount/data/reference.adoc", leveloffset="+3")}                       # <2>
+${include("component/reference.adoc", link_text="Reference", link_prefix=". ")}  # <3>
+${include("/component/reference.adoc", multipage_link=False)}                    # <4>
 """}
 ----
 <1> Include and process `component/reference.adoc` relative to this file.
@@ -339,15 +324,15 @@ ${api.include("/component/reference.adoc", multipage_link=False)}               
 
 In multi-page mode, normal https://asciidoctor.org/docs/user-manual/#xref[cross references] to
 anchors in included files do not work. A link to the appropariate file needs to be created. For this
-there is `${api.link("Api.cross_document_ref", text="api.cross_document_ref")}`.
+there is `${link("Api.cross_document_ref", text="cross_document_ref")}`.
 
 [source,python]
 ----
 ${"""
-${api.cross_document_ref(<file_name>,
-                         [package_name=<package name>,]
-                         [anchor=<section-anchor>,]
-                         [link_text=<text>])}
+${cross_document_ref(<file_name>,
+                     [package_name=<package name>,]
+                     [anchor=<section-anchor>,]
+                     [link_text=<text>])}
 """}
 ----
 
@@ -368,10 +353,10 @@ will use the first available of:
 [source,python]
 ----
 ${"""
-${api.cross_document_ref("component/component_a.adoc")}                      # <1>
-${api.cross_document_ref("component/component_a.adoc", anchor="section-1")}  # <2>
-${api.cross_document_ref("component/component_a.adoc", anchor="section 1",   # <3>
-                         link_text="Component A - Section 1")}
+${cross_document_ref("component/component_a.adoc")}                      # <1>
+${cross_document_ref("component/component_a.adoc", anchor="section-1")}  # <2>
+${cross_document_ref("component/component_a.adoc", anchor="section 1",   # <3>
+                     link_text="Component A - Section 1")}
 """}
 ----
 <2> Insert a link where the text comes from the title of the linked document.
@@ -381,12 +366,12 @@ ${api.cross_document_ref("component/component_a.adoc", anchor="section 1",   # <
 == Setting default programming language
 
 When all documentation in a file is for the same programming language, you can set the default
-language to use for every command using `${api.link("Api.language", text="api.language")}`.
+language to use for every command using `${link("Api.language", text="language")}`.
 
 [source,python]
 ----
 ${"""
-${api.language(<language>)}
+${language(<language>)}
 """}
 ----
 
@@ -400,10 +385,10 @@ applies to all files included afterwards, but resets and the end of the current 
 [source,python]
 ----
 ${"""
-${api.language("cpp")}  # <1>
-${api.language("c++")}  # <2>
-${api.language("java")} # <3>
-${api.language(None)}   # <4>
+${language("cpp")}  # <1>
+${language("c++")}  # <2>
+${language("java")} # <3>
+${language(None)}   # <4>
 """}
 ----
 <1> Set the default language to {cpp}.
@@ -421,7 +406,7 @@ one language in the other language. It is called "transcoding".
 [source,python]
 ----
 ${"""
-${api.language(<language>, source=<source_language>)}
+${language(<language>, source=<source_language>)}
 """}
 ----
 
@@ -438,9 +423,9 @@ resets and the end of the current file.
 [source,python]
 ----
 ${"""
-${api.language("kotlin", source="java")} # <1>
-${api.language("swift", source="objc")} # <2>
-${api.language("java", source=None)}   # <3>
+${language("kotlin", source="java")}  # <1>
+${language("swift", source="objc")}   # <2>
+${language("java", source=None)}      # <3>
 """}
 ----
 <1> Insert elements as Kotlin elements. Transcode from Java if the element is not found.
@@ -451,12 +436,12 @@ ${api.language("java", source=None)}   # <3>
 
 By default AsciiDoxy searches for API elements using their fully qualified name. For languages that
 support namespaces, a search namespace can be set to start looking for elements using a relative
-name. The `${api.link("Api.namespace", text="api.namespace")}` sets the search namespace.
+name. The `${link("Api.namespace", text="namespace")}` sets the search namespace.
 
 [source,python]
 ----
 ${"""
-${api.namespace(<namespace>)}
+${namespace(<namespace>)}
 """}
 ----
 
@@ -471,9 +456,9 @@ namespace if nothing is found earlier.
 [source,python]
 ----
 ${"""
-${api.namespace("org.asciidoxy.parser")}  # <1>
-${api.namespace("asciidoxy::example")}    # <2>
-${api.namespace(None)}                    # <3>
+${namespace("org.asciidoxy.parser")}  # <1>
+${namespace("asciidoxy::example")}    # <2>
+${namespace(None)}                    # <3>
 """}
 ----
 <1> Search in the Java package `org.asciidoxy.parser`.
@@ -489,7 +474,7 @@ compatible version of AsciiDoxy, you can specify a required version or version r
 [source,python]
 ----
 ${"""
-${api.require_version(<specifier>)}
+${require_version(<specifier>)}
 """}
 ----
 
@@ -503,10 +488,10 @@ standard for specifying python package versions installed with pip.
 [source,python]
 ----
 ${"""
-${api.require_version("==0.5.3")}       # <1>
-${api.require_version("~=0.5.3")}       # <2>
-${api.require_version(">=0.5.3")}       # <3>
-${api.require_version(">=0.5.3,<0.7")}  # <4>
+${require_version("==0.5.3")}       # <1>
+${require_version("~=0.5.3")}       # <2>
+${require_version(">=0.5.3")}       # <3>
+${require_version(">=0.5.3,<0.7")}  # <4>
 """}
 ----
 <1> Require version 0.5.3. Allow no other versions.
@@ -524,7 +509,7 @@ table of contents listing each separate page.
 [source,python]
 ----
 ${"""
-${api.multipage_toc([side=<left/right>])}
+${multipage_toc([side=<left/right>])}
 """}
 ----
 
@@ -550,9 +535,9 @@ document header contains at least:
 [source,python]
 ----
 ${"""
-${api.multipage_toc()}              # <1>
-${api.multipage_toc(side="left")}   # <2>
-${api.multipage_toc(side="right")}  # <3>
+${multipage_toc()}              # <1>
+${multipage_toc(side="left")}   # <2>
+${multipage_toc(side="right")}  # <3>
 """}
 ----
 <1> Insert a multi-page ToC on the left side of the document (default).
@@ -561,6 +546,6 @@ ${api.multipage_toc(side="right")}  # <3>
 
 == Reference
 
-${api.insert("Api", members=["insert$", "filter", "link", "cross_document_ref", "include",
+${insert("Api", members=["insert$", "filter", "link", "cross_document_ref", "include",
 "language", "namespace"], inner_classes="NONE", leveloffset="+2")}
 

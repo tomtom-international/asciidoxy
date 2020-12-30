@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Installation
-${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
 
 To get started with AsciiDoxy you need to install at least python and AsciiDoctor. The required
-versions are specified in the ${api.cross_document_ref("../reference/requirements.adoc",
+versions are specified in the ${cross_document_ref("../reference/requirements.adoc",
 link_text="reference documentation")}.
 
 :sectnums:
@@ -25,7 +25,7 @@ To install python see the https://www.python.org/[python website] and/or the doc
 operating system.
 
 Most Linux distributions install python by default. Make sure the installed version matches the
-${api.cross_document_ref("../reference/requirements.adoc", link_text="requirements")}.
+${cross_document_ref("../reference/requirements.adoc", link_text="requirements")}.
 
 On macOS python is also already installed, but this may be a version that is too old for AsciiDoxy.
 You can use https://brew.sh[HomeBrew] to install a newer version of python.

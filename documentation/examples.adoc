@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Examples
-${api.include("_header.adoc", always_embed=True, leveloffset=None)}
+${include("_header.adoc", always_embed=True, leveloffset=None)}
 
 These are some examples of AsciiDoxy in action. They demonstrate documentation for source code used
 to test AsciiDoxy. The first example is the website you are looking at. It is completely generated
 using AsciiDoxy.
 
-${api.include("examples/cpp/example-cpp.adoc", link_text="{Cpp}", link_prefix=". ")}
-${api.include("examples/java/example-java.adoc", link_text="Java", link_prefix=". ")}
-${api.include("examples/java/example-kotlin-transcoded.adoc", link_text="Kotlin transcoded from Java", link_prefix=". ")}
-${api.include("examples/objc/example-objc.adoc", link_text="Objective C", link_prefix=". ")}
-${api.include("examples/objc/example-swift-transcoded.adoc", link_text="Swift transcoded from Objective C", link_prefix=". ")}
-${api.include("examples/python/example-python.adoc", link_text="Python", link_prefix=". ")}
+${include("examples/cpp/example-cpp.adoc", link_text="{Cpp}", link_prefix=". ")}
+${include("examples/java/example-java.adoc", link_text="Java", link_prefix=". ")}
+${include("examples/java/example-kotlin-transcoded.adoc", link_text="Kotlin transcoded from Java", link_prefix=". ")}
+${include("examples/objc/example-objc.adoc", link_text="Objective C", link_prefix=". ")}
+${include("examples/objc/example-swift-transcoded.adoc", link_text="Swift transcoded from Objective C", link_prefix=". ")}
+${include("examples/python/example-python.adoc", link_text="Python", link_prefix=". ")}
 

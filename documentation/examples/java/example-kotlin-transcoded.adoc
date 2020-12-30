@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Kotlin transcoded from Java
-${api.include("../../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../../_header.adoc", always_embed=True, leveloffset=None)}
 
 This is an example demonstrating documentation for a Java project transcoded to Kotlin. The used
 source code files come from the https://gitbox.apache.org/repos/asf?p=commons-io.git[Apache Commons
@@ -31,13 +31,13 @@ include::Doxyfile[]
 [source,python]
 ----
 ${"""
-${api.language("kotlin", source="java")}
-${api.insert("org.apache.commons.io.FileCleaningTracker")}
-${api.insert("org.apache.commons.io.FileDeleteStrategy")}
+${language("kotlin", source="java")}
+${insert("org.apache.commons.io.FileCleaningTracker")}
+${insert("org.apache.commons.io.FileDeleteStrategy")}
 """}
 ----
 
-${api.language("kotlin", source="java")}
-${api.insert("org.apache.commons.io.FileCleaningTracker")}
-${api.insert("org.apache.commons.io.FileDeleteStrategy")}
+${language("kotlin", source="java")}
+${insert("org.apache.commons.io.FileCleaningTracker")}
+${insert("org.apache.commons.io.FileDeleteStrategy")}
 

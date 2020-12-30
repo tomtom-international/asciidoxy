@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Java
-${api.include("../../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../../_header.adoc", always_embed=True, leveloffset=None)}
 
 This is an example demonstrating documentation for a Java project. The used source code files come
 from the https://gitbox.apache.org/repos/asf?p=commons-io.git[Apache Commons IO] project.
@@ -30,15 +30,15 @@ include::Doxyfile[]
 [source,python]
 ----
 ${"""
-${api.language("java")}  <1>
-${api.insert("org.apache.commons.io.FileCleaningTracker")}
-${api.insert("org.apache.commons.io.FileDeleteStrategy")}
+${language("java")}  <1>
+${insert("org.apache.commons.io.FileCleaningTracker")}
+${insert("org.apache.commons.io.FileDeleteStrategy")}
 """}
 ----
 <1> Explicitly setting the language is required for this document, because we are transcoding the
 same classes to Kotlin. Without setting the language, AsciiDoxy does not know whether it needs to
 insert the Java or Kotlin version.
 
-${api.language("java")}
-${api.insert("org.apache.commons.io.FileCleaningTracker")}
-${api.insert("org.apache.commons.io.FileDeleteStrategy")}
+${language("java")}
+${insert("org.apache.commons.io.FileCleaningTracker")}
+${insert("org.apache.commons.io.FileDeleteStrategy")}

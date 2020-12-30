@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = What is AsciiDoxy?
-${api.include("_header.adoc", always_embed=True, leveloffset=None)}
+${include("_header.adoc", always_embed=True, leveloffset=None)}
 
 In essence AsciiDoxy is a preprocessor for AsciiDoc files. It looks for specific tags in these files
 and replaces them with valid AsciiDoc syntax. The information it inserts into the AsciiDoc files
@@ -23,7 +23,7 @@ comes from Doxygen XML output.
 
 Doxygen XML files are collected from remote HTTP servers, from the local file system, or a
 combination of both. What files are collected is specified in a package specification file and
-optionally a version file. See ${api.cross_document_ref("reference/packages.adoc",
+optionally a version file. See ${cross_document_ref("reference/packages.adoc",
 anchor="_package_specification_files", link_text="Package specification")} for details.
 
 The packages can also contain other files that can be included in the documentation. These can be
@@ -52,7 +52,7 @@ Mako.  For more details on the syntax, see the
 https://docs.makotemplates.org/en/latest/syntax.html[Mako syntax documentation].
 
 The code executed by Mako inserts additional AsciiDoc into the file. Methods are provided to use
-the information from the Doxygen XML files. See ${api.cross_document_ref("reference/commands.adoc",
+the information from the Doxygen XML files. See ${cross_document_ref("reference/commands.adoc",
 link_text="the reference documentation")} for more details.
 
 Consistency checking is performed to make sure links to, and between, API reference documentation

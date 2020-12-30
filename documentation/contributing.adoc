@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Contributing
-${api.include("_header.adoc", always_embed=True, leveloffset=None)}
+${include("_header.adoc", always_embed=True, leveloffset=None)}
 
 You can contribute to AsciiDoxy by reporting issues, updating the documentation, fixing issues, or
 developing new features.

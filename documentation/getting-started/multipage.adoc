@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Multipage documents
-${api.include("../_header.adoc", always_embed=True, leveloffset=None)}
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
 
 The HTML output from AsciiDoctor is limited to a single HTML page. You can separate your document
 into multiple AsciiDoc files and use `include::` to combine them, but this will result in a single
@@ -69,7 +69,7 @@ Then add the following content to `src/index.adoc`:
 
 This is the entry point of the documentation.
 
-${"""${api.include("reference.adoc")}"""}
+${"""${include("reference.adoc")}"""}
 ----
 
 The last line is AsciiDoxy's version of `include::`. Similar to the normal `include::` this tells
@@ -130,7 +130,7 @@ using the `link_text` argument:
 [source]
 ----
 ${"""
-${api.include("reference.adoc", link_text="Reference documentation")}
+${include("reference.adoc", link_text="Reference documentation")}
 """}
 ----
 
@@ -146,7 +146,7 @@ will only be inserted in multipage mode. In singlepage mode the contents of the 
 [source]
 ----
 ${"""
-${api.include("reference.adoc", link_text="Reference documentation", link_prefix=". ")}
+${include("reference.adoc", link_text="Reference documentation", link_prefix=". ")}
 """}
 ----
 
@@ -157,7 +157,7 @@ ${api.include("reference.adoc", link_text="Reference documentation", link_prefix
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../reference/commands.adoc", anchor="api_include", link_text="api.include")}.
+${cross_document_ref("../reference/commands.adoc", anchor="api_include", link_text="include")}.
 ====
 
 == Cross-references between pages
@@ -167,7 +167,7 @@ expected. AsciiDoctor relies on having all references in the same output file. W
 the cross-reference is in a different output file, the cross-reference needs to be adapted.
 
 AsciiDoxy can generate the correct cross-references for both singlepage and multipage mode. Instead
-of `<<...>>` or `xref:...[]`, you need to use `${"${api.cross_document_ref(...)}"}`.
+of `<<...>>` or `xref:...[]`, you need to use `${"${cross_document_ref(...)}"}`.
 
 In the document structure from <<structure,section 1>> we can add the following to
 `src/reference.adoc` to refer to the main document:
@@ -175,12 +175,12 @@ In the document structure from <<structure,section 1>> we can add the following 
 [source]
 ----
 ${"""
-${api.cross_document_ref("index.adoc")}
+${cross_document_ref("index.adoc")}
 """}
 ----
 
 ====
-${api.cross_document_ref("multipage.adoc", link_text="Documentation")}
+${cross_document_ref("multipage.adoc", link_text="Documentation")}
 ====
 
 AsciiDoxy takes the first title found in the document. If it cannot parse the file, it will use the
@@ -192,12 +192,12 @@ argument:
 [source]
 ----
 ${"""
-${api.cross_document_ref("index.adoc", link_text="Back home")}
+${cross_document_ref("index.adoc", link_text="Back home")}
 """}
 ----
 
 ====
-${api.cross_document_ref("multipage.adoc", link_text="Back home")}
+${cross_document_ref("multipage.adoc", link_text="Back home")}
 ====
 
 Optionally, you can provide an anchor to link to. For example in `src/index.adoc`:
@@ -205,19 +205,19 @@ Optionally, you can provide an anchor to link to. For example in `src/index.adoc
 [source]
 ----
 ${"""
-${api.cross_document_ref("reference.adoc", anchor="_reference", link_text="Reference")}
+${cross_document_ref("reference.adoc", anchor="_reference", link_text="Reference")}
 """}
 ----
 
 ====
-${api.cross_document_ref("multipage.adoc", anchor="_reference", link_text="Reference")}
+${cross_document_ref("multipage.adoc", anchor="_reference", link_text="Reference")}
 ====
 
 [TIP]
 ====
 For more options, see the documentation for
-${api.cross_document_ref("../reference/commands.adoc", anchor="cross_referencing",
-                         link_text="api.cross_document_ref")}.
+${cross_document_ref("../reference/commands.adoc", anchor="cross_referencing",
+                     link_text="cross_document_ref")}.
 ====
 
 == More to come...

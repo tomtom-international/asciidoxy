@@ -2,8 +2,8 @@
 
 This is some generic text.
 
-A link: ${api.link("asciidoxy::geometry::Coordinate::Altitude")}
+A link: ${link("asciidoxy::geometry::Coordinate::Altitude")}
 
 The class reference:
 
-${api.insert("asciidoxy::geometry::Coordinate")}
+${insert("asciidoxy::geometry::Coordinate")}

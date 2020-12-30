@@ -971,7 +971,7 @@ def test_include__always_embed__correct_sub_context(test_data_builder, tdb_singl
     test_data_builder.add_input_file("input.adoc")
     include_file = test_data_builder.add_include_file("includes/another_file.adoc")
     include_file.write_text("""
-${{api.cross_document_ref("../input.adoc", anchor="bla")}}
+${cross_document_ref("../input.adoc", anchor="bla")}}
 """)
 
     for api in test_data_builder.apis():
