@@ -597,7 +597,8 @@ class Api(ABC):
         return self._template(element.language, kind).render(element=element,
                                                              insert_filter=insert_filter,
                                                              api_context=self._context,
-                                                             api=self)
+                                                             api=self,
+                                                             **self._commands())
 
     def _file_top_anchor(self, file_name: Path) -> str:
         relative_to_base = file_name.relative_to(self._context.base_dir)
@@ -647,7 +648,7 @@ class PreprocessingApi(Api):
             self._context.progress.update(0)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
-        template.render(api=ApiProxy(self), _api=self, **self._commands())
+        template.render(api=ApiProxy(self), **self._commands())
 
         if self._context.progress is not None:
             self._context.progress.update()
@@ -766,7 +767,7 @@ class GeneratingApi(Api):
         out_file = self._context.register_adoc_file(self._current_file)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
-        rendered_doc = template.render(api=ApiProxy(self), _api=self, **self._commands())
+        rendered_doc = template.render(api=ApiProxy(self), **self._commands())
 
         with out_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
