@@ -37,7 +37,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 === Changed
 
-  - Argument `leveloffset` in `api.include` now supports `None` to prevent adding `leveloffset` in
+  - Argument `leveloffset` in `include` now supports `None` to prevent adding `leveloffset` in
     the generated AsciiDoc.
   - [AD-32] By default the directory containing the input file is not copied to the intermediate
     build directory. Use `--base-dir` to enable copying of additional include files.
