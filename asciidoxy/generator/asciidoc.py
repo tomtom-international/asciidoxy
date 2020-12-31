@@ -354,7 +354,7 @@ class Api(ABC):
         if file_path is None:
             return ""
 
-        out_file = self._sub_api(file_path, always_embed).process_adoc()
+        out_file = self._sub_api(file_path, package_name, always_embed).process_adoc()
 
         if self._context.multipage and not always_embed:
             if multipage_link:
@@ -572,8 +572,17 @@ class Api(ABC):
                 raise TemplateMissingError(lang, kind)
         return template
 
-    def _sub_api(self, file_path: Path, embedded: bool = False) -> "Api":
+    def _sub_api(self,
+                 file_path: Path,
+                 package_name: Optional[str],
+                 embedded: bool = False) -> "Api":
         sub_context = self._context.sub_context()
+
+        if package_name and self._context.current_package.name != package_name:
+            package = self._context.package_manager.packages.get(package_name, None)
+            assert package is not None
+            sub_context.current_package = package
+
         if embedded:
             sub_context.embedded = True
         else:
@@ -609,8 +618,17 @@ class Api(ABC):
 
 
 class PreprocessingApi(Api):
-    def _sub_api(self, file_path: Path, embedded: bool = False) -> "Api":
+    def _sub_api(self,
+                 file_path: Path,
+                 package_name: Optional[str],
+                 embedded: bool = False) -> "Api":
         sub_context = self._context.sub_context()
+
+        if package_name and self._context.current_package.name != package_name:
+            package = self._context.package_manager.packages.get(package_name, None)
+            assert package is not None
+            sub_context.current_package = package
+
         if embedded:
             sub_context.embedded = True
         else:

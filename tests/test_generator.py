@@ -797,6 +797,33 @@ def test_include__from_package(test_data_builder):
         assert file_name.is_absolute()
 
 
+def test_include__inside_package(test_data_builder):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    include_file = test_data_builder.add_package_file("package-a", "another_file.adoc", register=False)
+    test_data_builder.add_package_file("package-a", "yet_another_file.adoc", register=False)
+
+    include_file.write_text("""\
+= Another file
+
+${include("yet_another_file.adoc")}
+""")
+
+    for api in test_data_builder.apis():
+        result = api.include("another_file.adoc", package_name="package-a")
+        lines = result.splitlines()
+        assert len(lines) == 2
+
+        assert lines[0] == "[[top-another_file-top]]"
+
+        assert lines[1].startswith("include::")
+        assert lines[1].endswith("[leveloffset=+1]")
+
+        file_name = input_file.parent / lines[1][9:-16]
+        assert file_name.is_file() == isinstance(api, GeneratingApi)
+        assert file_name.name == ".asciidoxy.another_file.adoc"
+        assert file_name.is_absolute()
+
+
 def test_include__from_wrong_package(test_data_builder, tdb_warnings_are_and_are_not_errors):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_package_file("package-a", "another_file.adoc")
