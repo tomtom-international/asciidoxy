@@ -882,7 +882,10 @@ def process_adoc(in_file: Path,
 def _check_links(context: Context):
     dangling = context.linked - context.inserted.keys()
     if dangling:
-        dangling_elements = {context.reference.find(target_id=element_id) for element_id in dangling}
+        dangling_elements = {
+            context.reference.find(target_id=element_id)
+            for element_id in dangling
+        }
         names = {f"{e.language}: {e.full_name}" for e in dangling_elements if e is not None}
         msg = ("The following elements are linked to, but not included in the documentation:\n\t" +
                "\n\t".join(names))

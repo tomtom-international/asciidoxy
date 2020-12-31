@@ -799,7 +799,9 @@ def test_include__from_package(test_data_builder):
 
 def test_include__inside_package(test_data_builder):
     input_file = test_data_builder.add_input_file("input.adoc")
-    include_file = test_data_builder.add_package_file("package-a", "another_file.adoc", register=False)
+    include_file = test_data_builder.add_package_file("package-a",
+                                                      "another_file.adoc",
+                                                      register=False)
     test_data_builder.add_package_file("package-a", "yet_another_file.adoc", register=False)
 
     include_file.write_text("""\
