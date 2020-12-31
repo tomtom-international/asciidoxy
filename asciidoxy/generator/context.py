@@ -82,7 +82,8 @@ class Context(object):
         self.base_dir = base_dir
         self.fragment_dir = fragment_dir
 
-        self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]})
+        self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]},
+                                             inner_classes={"prot": ["+public", "+protected"]})
 
         self.reference = reference
         self.package_manager = package_manager
