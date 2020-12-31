@@ -23,20 +23,20 @@ include_subdir = "adoc"
 
 [packages.asciidoxy]
 source = "local"
-package_dir = "../build/doc/doxygen"
+package_dir = "../build/doc/doxygen/asciidoxy"
 
 [packages.cppexamples]
 source = "local"
-package_dir = "../tests/xml/1.8.20/cpp/default"
+package_dir = "../build/doc/doxygen/examples/cpp"
 
 [packages.javaexamples]
 source = "local"
-package_dir = "../tests/xml/1.8.20/java/default"
+package_dir = "../build/doc/doxygen/examples/java"
 
 [packages.objcexamples]
 source = "local"
-package_dir = "../tests/xml/1.8.20/objc/default"
+package_dir = "../build/doc/doxygen/examples/objc"
 
 [packages.pythonexamples]
 source = "local"
-package_dir = "../tests/xml/1.8.20/python/default"
+package_dir = "../build/doc/doxygen/examples/python"

@@ -1,0 +1,551 @@
+// Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Commands
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+${namespace("asciidoxy.generator.asciidoc")}
+
+== Inserting API reference [[api_insert]]
+
+The original purpose of AsciiDoxy is to insert API reference documentation in AsciiDoc files. Use
+the `${link("Api.insert", text="insert")}` method to insert API reference documentation at
+the current location.
+
+[source,python]
+----
+${"""
+${insert(<name>,
+         [kind=<kind>,]
+         [lang=<language>,]
+         [leveloffset]),
+         [...]}
+"""}
+----
+
+The `insert` method takes the following arguments:
+
+`name`:: Name of the element to insert. This can be the fully qualified name, or if a
+<<api_namespace,namespace>> is set, a relative name.
+`lang`:: Optional. Name of the programming language.
+`kind`:: Optional. Kind of element to insert.
+`leveloffset`:: Optional. Offset for the headers in the reference from the top level of the current
+file. Defaults to +1. Provide `None` to not set the offset.
+
+Trying to insert an unknown element will result in an error.
+
+When not specifying the language and kind, AsciiDoxy will try to find the element by name, and
+deduce the kind and language. If there are multiple matching elements, an error is raised.
+
+You can add additional options. These options are added as attributes to the inserted include
+directive for the API reference fragment. For available attributes see
+https://asciidoctor.org/docs/user-manual/#include-directive[the AsciiDoctor manual].
+
+=== Examples
+
+[source,python]
+----
+${"""
+${insert("MyNamespace::MyClass")}                                    # <1>
+${insert("com.tomtom.Class", leveloffset="+2")}                      # <2>
+${insert("com.tomtom.Class", kind="class")}                          # <3>
+${insert("MyNamespace::FreeFunction", lang="c++")}                   # <4>
+"""}
+----
+<1> Insert API reference for the element named `MyNamespace::MyClass`.
+<2> Insert API reference for the element named `com.tomtom.Class` using an alternative level offset
+    for the headers in the API reference.
+<3> Insert API reference for the class named `com.tomtom.Class`. Elements of other types are
+    ignored.
+<4> Insert API reference for the {cpp} element named `MyNamespace::FreeFunction`. Other languages are
+    ignored.
+
+=== Filtering what is inserted
+
+By default `${link("Api.insert", text="insert")}` inserts all contents of the API element.
+You can control which members, inner classes, enum values, and exceptions get inserted for each
+call to `insert`.
+
+[source,python]
+----
+${"""
+${insert(...,
+         [members=<filter_spec>,]
+         [inner_classes=<filter_spec>,]
+         [enum_values=<filter_spec>,]
+         [exceptions=<filter_spec>])}
+"""}
+----
+
+A filter specification is either a single string, a list of strings, or a dictionary.
+
+A single string is the same as a list of strings with just one item.
+
+A list of strings defines a set of regular expressions to be applied to the name. They are
+applied in the order they are specified. If the element is still included after all filters
+have been applied, it is inserted.
+
+Each string can have the following value:
+`NONE`:: Exclude all elements.
+`ALL`:: Include all elements.
+`<regular expression>` or `+<regular expression`:: Include elements that match the regular
+expression.
+`-<regular expression>`:: Exclude elements that match the regular expression.
+
+If the first string is an include regular expression, an implicit `NONE` is prepended, if
+the first string is an exclude regular expression, an implicit `ALL` is prepended.
+
+Some filters support filtering on other properties than the name. By default they only
+filter on the name. To filter the other properties use a dictionary, where the key is the
+name of the property, and the value is a string or list of strings with the filter.
+
+== Global filters
+
+A global filter can be set that applies to every `insert` after it is set using
+`${link("Api.filter", text="filter")}`.
+
+[source,python]
+----
+${"""
+${filter([members=<filter_spec>,]
+         [inner_classes=<filter_spec>,]
+         [enum_values=<filter_spec>,]
+         [exceptions=<filter_spec>])}
+"""}
+----
+
+The global filter applies to every call to `insert` in the same file, after it is set. It also
+applies to any file included after it is set.
+
+Filters can be overridden in included files. At the end of the file, the original filter is
+restored.
+
+=== Combining filter specifications
+
+When an `insert` call contains additional filter specifications, these specifications are added
+to the end of the global filter specifications:
+
+[source,python]
+----
+${"""
+${filter(members=["add", "update"])}
+${insert("name", members=["remove"])}
+
+# Is equal to
+${insert("name", members=["add", "update", "remove"])}
+"""}
+----
+
+Filters added in `insert` are always added to the end. If there is no corresponding global
+filter specification, it is treated as a new filter, and `NONE` or `ALL` is prepended if needed.
+
+
+The global filter can be overridden for some calls to `insert`. Then only the explicit filter
+specifications on that call are used:
+
+[source,python]
+----
+${"""
+${insert(...,
+         ignore_global_filter=True,
+         [members=<filter_spec>,]
+         [inner_classes=<filter_spec>,]
+         [enum_values=<filter_spec>,]
+         [exceptions=<filter_spec>])}
+"""}
+----
+
+== Linking to API reference [[api_link]]
+
+Use `${link("Api.link", text="link")}` to insert a link to an API reference element.
+
+[source,python]
+----
+${"""
+${link(<name>,
+       [kind=<kind>,]
+       [lang=<language>,]
+       [text=<alt_text>,]
+       [full_name=<True/False>,]
+       [allow_overloads=<True/False>])}
+"""}
+----
+
+By default the short name of the element is used as the text of the link.
+
+`name`:: Fully qualified name of the element to insert.
+`lang`:: Name of the programming language.
+`kind`:: Kind of element to insert.
+`text`:: Alternative text to use for the link.
+`full_name`:: Use the fully qualified name of the referenced element.
+`allow_overloads`:: True to link to the first match in an overload set.
+
+A warning is shown if the element is unknown, or is not inserted in the same document using the
+`insert` method. There is a command-line option to throw an error instead.
+
+When not specifying the language and kind, AsciiDoxy will try to find the element by name, and
+deduce the kind and language. If there are multiple matching elements, an error is raised.
+
+=== Function or method overloads
+
+In languages that support overloading functions, methods or other callables, the name alone is not
+sufficient to select the correct element to link to or to insert. By default AsciiDoxy will create
+a link to the first member of the overload. In case you need to link to a specific overload the
+exact list of types of the parameters can be provided to select the right element.
+
+The list of parameter types should be specified in parentheses after the function name:
+
+[source,python]
+----
+${"""
+${link("MyFunction(int, std::string)")}
+"""}
+----
+
+Empty parentheses indicate the function should accept no parameters:
+
+[source,python]
+----
+${"""
+${link("MyFunction()")}
+"""}
+----
+
+If no parentheses are given, the parameters are ignored. If there are multiple overloads, AsciiDoxy
+will not be able to pick one:
+
+[source,python]
+----
+${"""
+${link("MyFunction")}
+"""}
+----
+
+=== Examples
+
+[source,python]
+----
+${"""
+${link("MyNamespace::MyClass")}                            # <1>
+${link("MyNamespace::MyClass", lang="c++")}                # <2>
+${link("com.tomtom.Class.Method", full_name=True)}         # <3>
+${link("MyNamespace::FreeFunction", text="FreeFunction")}  # <4>
+${link("MyNamespace::MyClass", kind="class")}              # <5>
+${link("MyNamespace::MyClass", kind="class", lang="c++")}  # <6>
+"""}
+----
+<1> Link to any element called `MyNamespace::MyClass`.
+<2> Link to any {cpp} element called `MyNamespace::MyClass`. Other languages are ignored.
+<3> Link to `com.tomtom.Class.Method` and use the fully qualified name for the link text.
+<4> Link to `MyNamespace::FreeFunction` and use "FreeFunction" for the link text.
+<5> Link to class `MyNamespace::MyClass`. Ignore other kinds of elements.
+<6> Link to {cpp} class `MyNamespace::MyClass`. Ignore other kinds of elements and languages.
+
+== Including other AsciiDoc files [[api_include]]
+
+AsciiDoc has the https://asciidoctor.org/docs/user-manual/#include-directive[`include` directive] to
+embed other AsciiDoc files in the current file. AsciiDoxy extends this directive with its
+`${link("Api.include", text="include")}` method for 2 reasons:
+
+. Perform preprocessing on the included AsciiDoc files. When using the normal `include` directive,
+  AsciiDoxy will not preprocess the included file.
+. Extend the include functionality, for example with multi-page support.
+
+[source,python]
+----
+${"""
+${include(<file_name>,
+          [package_name=<package name>,]
+          [leveloffset=<offset>,]
+          [link_text=<text>,]
+          [link_prefix=<prefix>,]
+          [multipage_link=<bool>,]
+          [always_embed=<bool>,]
+          [...])}
+"""}
+----
+
+`file_name`:: Relative or absolute path to the file to include.
+`package_name`:: Package containing the file to include. Defaults to the current package.
+`leveloffset`:: Offset for the headers in the included file from the top level of the current file.
+Defaults to +1.
+
+In single-page mode, the default, the file to include is preprocessed by AsciiDoxy. Then a normal
+`include` directive is inserted pointing to the preprocessed file. This embeds the file in the same
+output document.
+
+In multi-page mode, the preprocessed file is not embedded. Instead, a separate output file is
+generated, and a link to that file is inserted. The format of the link is controlled with additional
+arguments:
+
+`link_text`:: Text for the link to insert in multi-page mode. By default the title of the included
+document is used, or if no title is detected the file name stem.
+`link_prefix`:: Text to insert before the link in multi-page mode. Use this to create for example a
+numbered list of links.
+`multipage_link`:: By default a link is inserted in multi-page mode. Set this to False to omit
+inserting the link. The included file is still processed. Use <<cross_referencing>> to insert a
+link elsewhere in the document.
+`always_embed`:: Always embed the included file in the current document, even if multipage mode is
+enabled.
+
+You can add additional options. These options are added as attributes to the inserted include
+directive for the API reference fragment. For available attributes see
+https://asciidoctor.org/docs/user-manual/#include-directive[the AsciiDoctor manual].
+
+=== Examples
+
+[source,python]
+----
+${"""
+${include("component/reference.adoc")}                                           # <1>
+${include("/mount/data/reference.adoc", leveloffset="+3")}                       # <2>
+${include("component/reference.adoc", link_text="Reference", link_prefix=". ")}  # <3>
+${include("/component/reference.adoc", multipage_link=False)}                    # <4>
+"""}
+----
+<1> Include and process `component/reference.adoc` relative to this file.
+<2> Include and process `/mount/data/reference.adoc` as an absolute path to the file. Increase the
+    level of the headers by 3.
+<3> In multi-page mode use the link text "Reference" and prefix with a dot to create a numbered
+    list. In single-page mode the document is embedded.
+<4> In multi-page mode process the file, but do not create a link to it. In single page mode the
+    document is embedded.
+
+== Cross-referencing sections in other AsciiDoc files[[cross_referencing,cross referencing]]
+
+In multi-page mode, normal https://asciidoctor.org/docs/user-manual/#xref[cross references] to
+anchors in included files do not work. A link to the appropariate file needs to be created. For this
+there is `${link("Api.cross_document_ref", text="cross_document_ref")}`.
+
+[source,python]
+----
+${"""
+${cross_document_ref(<file_name>,
+                     [package_name=<package name>,]
+                     [anchor=<section-anchor>,]
+                     [link_text=<text>])}
+"""}
+----
+
+`file_name`:: File containing the anchor to link to.
+`package_name`:: Package containing the file to link to. Defaults to the current package.
+`anchor`:: Anchor to link to.
+`link_text`:: Text to use for the link.
+
+If `link_text` is not provided, AsciiDoxy tries to select the most appropriate text for the link. It
+will use the first available of:
+
+. The value of `anchor` if provided.
+. The first title found in the linked document.
+. The stem of the file name being linked.
+
+=== Examples
+
+[source,python]
+----
+${"""
+${cross_document_ref("component/component_a.adoc")}                      # <1>
+${cross_document_ref("component/component_a.adoc", anchor="section-1")}  # <2>
+${cross_document_ref("component/component_a.adoc", anchor="section 1",   # <3>
+                     link_text="Component A - Section 1")}
+"""}
+----
+<1> Insert a link where the text comes from the title of the linked document.
+<2> Insert a link with text "section-1".
+<3> Insert a link with text "Component A - Section 1".
+
+== Setting default programming language
+
+When all documentation in a file is for the same programming language, you can set the default
+language to use for every command using `${link("Api.language", text="language")}`.
+
+[source,python]
+----
+${"""
+${language(<language>)}
+"""}
+----
+
+Other languages will be ignored, unless overridden with a `lang` argument. This setting also
+applies to all files included afterwards, but resets and the end of the current file.
+
+`language`:: Language to use as default, or `None` to reset.
+
+=== Examples
+
+[source,python]
+----
+${"""
+${language("cpp")}  # <1>
+${language("c++")}  # <2>
+${language("java")} # <3>
+${language(None)}   # <4>
+"""}
+----
+<1> Set the default language to {cpp}.
+<2> Set the default language to {cpp}. Alternative language name.
+<3> Set the default language to Java.
+<4> Remove the default language.
+
+== Transcoding
+
+In some ecosystems multiple languages can be used together. Elements written in one language can
+directly be used in the other language. The compiler or interpreter makes sure calls are translated
+appropriately. AsciiDoxy supports generating documentation that shows how to use elements written in
+one language in the other language. It is called "transcoding".
+
+[source,python]
+----
+${"""
+${language(<language>, source=<source_language>)}
+"""}
+----
+
+Other languages will be ignored, unless overridden with a `lang` argument. Using the extra `lang`
+argument also disables transcoding. This setting also applies to all files included afterwards, but
+resets and the end of the current file.
+
+`language`:: Language to use for all following insert and link directives.
+`source`:: Language to transcode elements from if the element cannot be found for `language`.
+`None` to disable transcoding.
+
+=== Examples
+
+[source,python]
+----
+${"""
+${language("kotlin", source="java")}  # <1>
+${language("swift", source="objc")}   # <2>
+${language("java", source=None)}      # <3>
+"""}
+----
+<1> Insert elements as Kotlin elements. Transcode from Java if the element is not found.
+<2> Insert elements as Swift elements. Transcode from Objective C if the element is not found.
+<3> Disable transcoding, use Java as default language.
+
+== Search namespace [[api_namespace]]
+
+By default AsciiDoxy searches for API elements using their fully qualified name. For languages that
+support namespaces, a search namespace can be set to start looking for elements using a relative
+name. The `${link("Api.namespace", text="namespace")}` sets the search namespace.
+
+[source,python]
+----
+${"""
+${namespace(<namespace>)}
+"""}
+----
+
+`namespace`:: Namespace to start the search from, or `None` to reset.
+
+AsciiDoxy tries to search the same way the program language would. It searches the selected
+namespace, but also every namespace above it, until it finds a match. This includes the root
+namespace if nothing is found earlier.
+
+=== Examples
+
+[source,python]
+----
+${"""
+${namespace("org.asciidoxy.parser")}  # <1>
+${namespace("asciidoxy::example")}    # <2>
+${namespace(None)}                    # <3>
+"""}
+----
+<1> Search in the Java package `org.asciidoxy.parser`.
+<2> Search in the {cpp} namespace `asciidoxy::example`.
+<3> Only allow fully qualified names from now on.
+
+== Required version
+
+Your documentation may require features of a specific version of AsciiDoxy. It may also use features
+that are changed in a future version. To make sure your documentation is always generated with a
+compatible version of AsciiDoxy, you can specify a required version or version range.
+
+[source,python]
+----
+${"""
+${require_version(<specifier>)}
+"""}
+----
+
+`specifier`:: One or more comma-separated version specifiers matching the PEP 440 standard.
+
+The version specifiers follow https://www.python.org/dev/peps/pep-0440/[PEP 440], which is the same
+standard for specifying python package versions installed with pip.
+
+=== Examples
+
+[source,python]
+----
+${"""
+${require_version("==0.5.3")}       # <1>
+${require_version("~=0.5.3")}       # <2>
+${require_version(">=0.5.3")}       # <3>
+${require_version(">=0.5.3,<0.7")}  # <4>
+"""}
+----
+<1> Require version 0.5.3. Allow no other versions.
+<2> Require version 0.5.3 and any newer version that is compatible. In this case patch increments
+are allowed, but minor and major increments are not.
+<3> Require version 0.5.3 and any newer version, including versions with breaking changes.
+<4> Require version 0.5.3 and above, but below version 0.7.
+
+== Multi-page table of contents
+
+In multi-page mode the table of contents generated by AsciiDoctor only contains the sections for
+each specific page. The contents of other pages in the tree are not visible. You can add an extra
+table of contents listing each separate page.
+
+[source,python]
+----
+${"""
+${multipage_toc([side=<left/right>])}
+"""}
+----
+
+`side`:: Side of the page to put the table of contents, similar to the AsciiDoc option. Defaults to
+the left side.
+
+In the table of contents, only the first document title encountered in each AsciiDoc file is used.
+For documents having multiple titles, like the book type, the other titles are ignored.
+
+It can be combined with the normal AsciiDoctor table of contents. If both tables are configured to
+appear on the same side, they will hide eachother, so make sure you choose different sides.
+
+The command should be included in the document header. If that is not possible, make sure the
+document header contains at least:
+
+[source]
+----
+:docinfo: private
+----
+
+=== Examples
+
+[source,python]
+----
+${"""
+${multipage_toc()}              # <1>
+${multipage_toc(side="left")}   # <2>
+${multipage_toc(side="right")}  # <3>
+"""}
+----
+<1> Insert a multi-page ToC on the left side of the document (default).
+<2> Same as above, but with explicit side.
+<3> Insert a multi-page ToC on the right side of the document.
+
+== Reference
+
+${insert("Api", members=["insert$", "filter", "link", "cross_document_ref", "include",
+"language", "namespace"], inner_classes="NONE", leveloffset="+2")}
+

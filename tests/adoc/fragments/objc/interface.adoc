@@ -16,8 +16,7 @@ A coordinate has a latitude, longitude, and an altitude.
 
 [cols='h,5a']
 |===
-
-|*Properties*
+|*Public Properties*
 |
 `xref:objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94[latitude]`::
 The latitude in degrees.
@@ -26,7 +25,7 @@ The longitude in degrees.
 `xref:objc-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2[altitude]`::
 The altitude in meters.
 
-|*Methods*
+|*Public Methods*
 |
 `xref:objc-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321[- isValid]`::
 Check if the coordinate is valid.
@@ -37,7 +36,6 @@ Default constructor.
 
 
 == Members
-
 [[objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]
 
 [source,objectivec,subs="-specialchars,macros+"]

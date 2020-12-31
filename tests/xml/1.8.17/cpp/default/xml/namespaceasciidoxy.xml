@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="namespaceasciidoxy" kind="namespace" language="C++">
+    <compoundname>asciidoxy</compoundname>
+    <innerclass refid="classasciidoxy_1_1_convertor" prot="public">asciidoxy::Convertor</innerclass>
+    <innernamespace refid="namespaceasciidoxy_1_1geometry">asciidoxy::geometry</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1relative__namespace">asciidoxy::relative_namespace</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1system">asciidoxy::system</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1traffic">asciidoxy::traffic</innernamespace>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="overloads_8hpp_1afbbb1c0274b5a0d90b2d1d39f1269027" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string asciidoxy::to_string</definition>
+        <argsstring>(int number)</argsstring>
+        <name>to_string</name>
+        <param>
+          <type>int</type>
+          <declname>number</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Convert a number to string. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="overloads.hpp" line="24" column="13" declfile="overloads.hpp" declline="24" declcolumn="13"/>
+      </memberdef>
+      <memberdef kind="function" id="overloads_8hpp_1a8eebbc44a7bed882754da89a49139680" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string asciidoxy::to_string</definition>
+        <argsstring>(float number)</argsstring>
+        <name>to_string</name>
+        <param>
+          <type>float</type>
+          <declname>number</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Convert a number to string. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="overloads.hpp" line="29" column="13" declfile="overloads.hpp" declline="29" declcolumn="13"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="coordinate.hpp" line="20" column="19"/>
+  </compounddef>
+</doxygen>

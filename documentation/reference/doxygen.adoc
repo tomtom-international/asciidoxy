@@ -1,0 +1,86 @@
+// Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Doxygen
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+
+For extracting documentation from source code, AsciiDoxy relies on Doxygen. You are expected to run
+Doxygen on your source code, and then provide the path to the generated XML files to AsciiDoxy. It
+is recommended to set at least the following non-default settings in your Doxyfile when generating
+the XML.
+
+== {cpp}
+
+----
+GENERATE_XML           = YES
+----
+
+== Java
+
+----
+GENERATE_XML           = YES
+JAVADOC_AUTOBRIEF      = YES
+OPTIMIZE_OUTPUT_JAVA   = YES
+----
+
+Doxygen does not support all kinds of annotations. For example the annotations of return types are
+removed. To trick Doxygen into passing annotations to AsciiDoxy, you need to transform them into a
+name that does not contain `@`. AsciiDoxy supports changing type prefixes like
+`+++__AT__Annotation__+++` back into `@Annotation`. For example to pass through all annotations
+with information about nullability, add the following to the Doxygen file:
+
+----
+FILTER_PATTERNS        = *.java="sed -E 's/@(Nullable|NonNull|CheckForNull|PossiblyNull)([[:space:]]+[[:alnum:]_])/__AT__\1__\2/g'"
+----
+
+== Objective C
+
+----
+GENERATE_XML           = YES
+EXTENSION_MAPPING      = h=objective-c
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+PREDEFINED             = NS_ASSUME_NONNULL_BEGIN= NS_UNAVAILABLE= NS_DESIGNATED_INITIALIZER=
+----
+
+== Python
+
+To fully support python docstrings formats like the Google Python Style Guide it is recommended to
+use https://github.com/Feneric/doxypypy[doxypypy] as a filter for Doxygen.
+
+----
+GENERATE_XML           = YES
+FILTER_PATTERNS        = *.py="./py_filter.sh"
+----
+
+The contents of py_filter.sh should be:
+
+[source,bash]
+----
+#!/bin/bash
+doxypypy -a -c $1 | sed 's/#        /# /'
+----
+
+The `sed` command is a workaround for https://github.com/Feneric/doxypypy/issues/19[a bug in
+doxypypy].
+
+Alternatively you can disable MarkDown support and run doxypypy directly:
+
+----
+GENERATE_XML           = YES
+FILTER_PATTERNS        = *.py="doxypypy -a -c"
+MARKDOWN_SUPPORT       = NO
+----
+
+Support for type hints in Doxygen is still limited: https://github.com/doxygen/doxygen/issues/7320.
+

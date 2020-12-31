@@ -16,10 +16,10 @@ from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
 %>
 <%
-helper = PythonTemplateHelper(api_context)
+helper = PythonTemplateHelper(api)
 %>
 = [[${element.id},${element.name}]]
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,python,subs="-specialchars,macros+"]
 ----

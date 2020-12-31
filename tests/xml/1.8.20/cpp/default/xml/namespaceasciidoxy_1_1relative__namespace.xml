@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="namespaceasciidoxy_1_1relative__namespace" kind="namespace" language="C++">
+    <compoundname>asciidoxy::relative_namespace</compoundname>
+    <innerclass refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes" prot="public">asciidoxy::relative_namespace::InterfaceWithDetailClasses</innerclass>
+    <innernamespace refid="namespaceasciidoxy_1_1relative__namespace_1_1detail">asciidoxy::relative_namespace::detail</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="relative_namespace.hpp" line="23" column="1"/>
+  </compounddef>
+</doxygen>

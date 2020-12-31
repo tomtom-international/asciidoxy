@@ -156,3 +156,54 @@ class IncompatibleVersionError(AsciiDocError):
     def __str__(self) -> str:
         return (f"Input file requires version {self.required_version} of AsciiDoxy. "
                 f"Current version {__version__} is not compatible.")
+
+
+class InvalidApiCallError(AsciiDocError):
+    """The API call is invalid in the current context, or the arguments given are invalid.
+
+    Args:
+        msg: Message explaining what is wrong with the call.
+    """
+    msg: str
+
+    def __init__(self, msg: str):
+        self.msg = msg
+
+    def __str__(self) -> str:
+        return f"Invalid API call: {self.msg}"
+
+
+class MissingPackageError(AsciiDocError):
+    """The specified package is missing from the package specification.
+
+    Args:
+        package_name: Name of the missing package.
+    """
+    package_name: str
+
+    def __init__(self, package_name: str):
+        self.package_name = package_name
+
+    def __str__(self) -> str:
+        return f"The package `{self.package_name}` is not available."
+
+
+class MissingPackageFileError(AsciiDocError):
+    """The specified file is missing from the package.
+
+    Args:
+        package_name: Name of the missing package.
+        file_name:    Name of the missing file.
+    """
+    package_name: str
+    file_name: Optional[str]
+
+    def __init__(self, package_name: str, file_name: Optional[str]):
+        self.package_name = package_name
+        self.file_name = file_name
+
+    def __str__(self) -> str:
+        if self.file_name:
+            return (f"Package `{self.package_name}` does not contain file `{self.file_name}`.")
+        else:
+            return (f"Package `{self.package_name}` does not specify a root document.")

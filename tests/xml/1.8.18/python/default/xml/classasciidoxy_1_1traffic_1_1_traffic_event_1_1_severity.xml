@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kind="class" language="Python" prot="public">
+    <compoundname>asciidoxy::traffic::TrafficEvent::Severity</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">Enum</basecompoundref>
+      <sectiondef kind="public-static-attrib">
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a968ab64546e92ecef1cd973413c0287a" prot="public" static="yes" mutable="no">
+        <type>int</type>
+        <definition>int asciidoxy.traffic.TrafficEvent.Severity::Low</definition>
+        <argsstring></argsstring>
+        <name>Low</name>
+        <initializer>=  1</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="27" column="1" bodyfile="asciidoxy/traffic.py" bodystart="27" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a93d3da27d0cf28919dabd7e4584d255f" prot="public" static="yes" mutable="no">
+        <type>int</type>
+        <definition>int asciidoxy.traffic.TrafficEvent.Severity::Medium</definition>
+        <argsstring></argsstring>
+        <name>Medium</name>
+        <initializer>=  2</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="29" column="1" bodyfile="asciidoxy/traffic.py" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a3300e6189865a57ef9150197006fbb98" prot="public" static="yes" mutable="no">
+        <type>int</type>
+        <definition>int asciidoxy.traffic.TrafficEvent.Severity::High</definition>
+        <argsstring></argsstring>
+        <name>High</name>
+        <initializer>=  3</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="31" column="1" bodyfile="asciidoxy/traffic.py" bodystart="31" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a5485b250438093322f6417a578830b3a" prot="public" static="yes" mutable="no">
+        <type>int</type>
+        <definition>int asciidoxy.traffic.TrafficEvent.Severity::Unknown</definition>
+        <argsstring></argsstring>
+        <name>Unknown</name>
+        <initializer>=  4</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/traffic.py" line="36" column="1" bodyfile="asciidoxy/traffic.py" bodystart="36" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para><ref refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kindref="compound">Severity</ref> scale for traffic events. </para>
+    </briefdescription>
+    <detaileddescription>
+<para><verbatim>   The more severe the traffic event, the more likely it is to have a large delay.
+</verbatim> </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>asciidoxy.traffic.TrafficEvent.Severity</label>
+        <link refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>Enum</label>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>asciidoxy.traffic.TrafficEvent.Severity</label>
+        <link refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>Enum</label>
+      </node>
+    </collaborationgraph>
+    <location file="asciidoxy/traffic.py" line="26" column="1" bodyfile="asciidoxy/traffic.py" bodystart="26" bodyend="38"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a3300e6189865a57ef9150197006fbb98" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::Severity</scope><name>High</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a968ab64546e92ecef1cd973413c0287a" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::Severity</scope><name>Low</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a93d3da27d0cf28919dabd7e4584d255f" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::Severity</scope><name>Medium</name></member>
+      <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a5485b250438093322f6417a578830b3a" prot="public" virt="non-virtual"><scope>asciidoxy::traffic::TrafficEvent::Severity</scope><name>Unknown</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

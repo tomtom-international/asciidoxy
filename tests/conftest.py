@@ -19,8 +19,12 @@ from pathlib import Path
 
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.doxygenparser import Driver as ParserDriver
-from asciidoxy.generator.asciidoc import Api, Context, DocumentTreeNode
-from asciidoxy.model import Compound, Member, ReturnValue, InnerTypeReference
+from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
+from asciidoxy.generator.context import Context
+from asciidoxy.generator.navigation import DocumentTreeNode
+from asciidoxy.packaging import Package, PackageManager
+
+from .builders import SimpleClassBuilder
 
 _xml_dir = Path(__file__).parent / "xml"
 
@@ -90,9 +94,22 @@ def fragment_dir(build_dir):
 
 
 @pytest.fixture
-def input_file(tmp_path):
-    f = tmp_path / "input_file.adoc"
+def package_manager(build_dir):
+    return PackageManager(build_dir)
+
+
+@pytest.fixture
+def work_dir(package_manager):
+    wd = package_manager.work_dir
+    wd.mkdir(parents=True, exist_ok=True)
+    return wd
+
+
+@pytest.fixture
+def input_file(work_dir, package_manager):
+    f = work_dir / "input_file.adoc"
     f.touch()
+    package_manager.set_input_files(f, include_dir=work_dir)
     return f
 
 
@@ -123,107 +140,67 @@ def api_reference(parser_driver_factory, api_reference_set, forced_language):
 
 
 @pytest.fixture
-def context(input_file, build_dir, fragment_dir, api_reference):
+def context(input_file, fragment_dir, api_reference, package_manager):
     c = Context(base_dir=input_file.parent,
-                build_dir=build_dir,
                 fragment_dir=fragment_dir,
                 reference=api_reference,
-                current_document=DocumentTreeNode(input_file))
-    c.preprocessing_run = False
+                package_manager=package_manager,
+                current_document=DocumentTreeNode(input_file),
+                current_package=Package(PackageManager.INPUT_FILES))
     return c
 
 
 @pytest.fixture
-def api(input_file, context):
-    return Api(input_file, context)
+def preprocessing_api(input_file, context):
+    return PreprocessingApi(input_file, context)
+
+
+@pytest.fixture
+def generating_api(input_file, context):
+    return GeneratingApi(input_file, context)
 
 
 @pytest.fixture
 def cpp_class():
-    compound = Compound("cpp")
-    compound.name = "MyClass"
-
-    def generate_member(kind: str, prot: str) -> Member:
-        member = Member("cpp")
-        member.kind = kind
-        member.name = f"{prot.capitalize()}{kind.capitalize()}"
-        member.prot = prot
-        return member
-
-    def generate_member_function(prot: str,
-                                 name: str,
-                                 has_return_value: bool = True,
-                                 is_static: bool = False,
-                                 is_deleted: bool = False,
-                                 is_default: bool = False) -> Member:
-        member = Member("cpp")
-        member.kind = "function"
-        member.name = name
-        member.prot = prot
-        if has_return_value:
-            member.returns = ReturnValue()
-        if is_static:
-            member.static = True
-        if is_deleted:
-            member.deleted = True
-        if is_default:
-            member.default = True
-        return member
-
-    def generate_inner_class_reference(prot: str, name: str):
-        nested_class = Compound("cpp")
-        nested_class.name = name
-        inner_class_reference = InnerTypeReference(language="cpp")
-        inner_class_reference.name = nested_class.name
-        inner_class_reference.referred_object = nested_class
-        inner_class_reference.prot = prot
-        return inner_class_reference
+    builder = SimpleClassBuilder("cpp")
+    builder.name("MyClass")
 
     # fill class with typical members
     for visibility in ("public", "protected", "private"):
         for member_type in ("variable", "enum", "class", "typedef", "struct", "trash"):
-            compound.members.append(generate_member(kind=member_type, prot=visibility))
+            builder.simple_member(kind=member_type, prot=visibility)
 
         # constructor
-        compound.members.append(
-            generate_member_function(prot=visibility, name="MyClass", has_return_value=False))
+        builder.member_function(prot=visibility, name="MyClass", has_return_value=False)
         # default constructor
-        compound.members.append(
-            generate_member_function(prot=visibility,
-                                     name="MyClass",
-                                     has_return_value=False,
-                                     is_default=True))
+        builder.member_function(prot=visibility,
+                                name="MyClass",
+                                has_return_value=False,
+                                default=True)
         # deleted constructor
-        compound.members.append(
-            generate_member_function(prot=visibility,
-                                     name="MyClass",
-                                     has_return_value=False,
-                                     is_deleted=True))
+        builder.member_function(prot=visibility,
+                                name="MyClass",
+                                has_return_value=False,
+                                deleted=True)
         # destructor
-        compound.members.append(
-            generate_member_function(prot=visibility, name="~MyClass", has_return_value=False))
+        builder.member_function(prot=visibility, name="~MyClass", has_return_value=False)
 
         # operator
-        compound.members.append(generate_member_function(prot=visibility, name="operator++"))
+        builder.member_function(prot=visibility, name="operator++")
         # default operator
-        compound.members.append(
-            generate_member_function(prot=visibility, name="operator=", is_default=True))
+        builder.member_function(prot=visibility, name="operator=", default=True)
         # deleted operator
-        compound.members.append(
-            generate_member_function(prot=visibility, name="operator=", is_deleted=True))
+        builder.member_function(prot=visibility, name="operator=", deleted=True)
         # method
-        compound.members.append(
-            generate_member_function(prot=visibility, name=f"{visibility.capitalize()}Method"))
+        builder.member_function(prot=visibility, name=f"{visibility.capitalize()}Method")
         # static method
-        compound.members.append(
-            generate_member_function(prot=visibility,
-                                     name=visibility.capitalize() + "StaticMethod",
-                                     is_static=True))
+        builder.member_function(prot=visibility,
+                                name=visibility.capitalize() + "StaticMethod",
+                                static=True)
         # nested type
-        compound.inner_classes.append(
-            generate_inner_class_reference(visibility, name=f"{visibility.capitalize()}Type"))
+        builder.inner_class(prot=visibility, name=f"{visibility.capitalize()}Type")
 
-    return compound
+    return builder.compound
 
 
 @pytest.fixture
@@ -251,9 +228,20 @@ def single_and_multipage(request, context):
 
 
 @pytest.fixture
-def empty_context(input_file, build_dir, fragment_dir):
+def empty_context(input_file, fragment_dir, package_manager):
     return Context(base_dir=input_file.parent,
-                   build_dir=build_dir,
                    fragment_dir=fragment_dir,
                    reference=ApiReference(),
-                   current_document=DocumentTreeNode(input_file))
+                   package_manager=package_manager,
+                   current_document=DocumentTreeNode(input_file),
+                   current_package=Package(PackageManager.INPUT_FILES))
+
+
+@pytest.fixture
+def empty_preprocessing_api(input_file, empty_context):
+    return PreprocessingApi(input_file, empty_context)
+
+
+@pytest.fixture
+def empty_generating_api(input_file, empty_context):
+    return GeneratingApi(input_file, empty_context)

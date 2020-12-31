@@ -14,13 +14,12 @@ A coordinate has a latitude, longitude, and an altitude.
 
 [cols='h,5a']
 |===
-
-|*Constructors*
+|*Public Constructors*
 |
 `xref:java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1ab88068a456629b5519234b68de8c375f[Coordinate()]`::
 Default constructor.
 
-|*Methods*
+|*Public Methods*
 |
 `xref:java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1a1430fa173dddd5b12f049044f86e4244[double Latitude()]`::
 Latitude.
@@ -104,6 +103,10 @@ The altitude in meters.
 
 |===
 '''
+
+
+
+
 
 
 

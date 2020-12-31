@@ -18,11 +18,11 @@ from asciidoxy.templates.helpers import has
 from asciidoxy.templates.python.helpers import PythonTemplateHelper
 %>
 <%
-helper = PythonTemplateHelper(api_context, element, insert_filter)
+helper = PythonTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,python,subs="-specialchars,macros+"]
 ----
@@ -37,49 +37,49 @@ ${element.description}
 |===
 
 ###################################################################################################
-% if has(helper.public_complex_enclosed_types()):
+% if has(helper.complex_enclosed_types(prot="public")):
 |*Enclosed types*
 |
-% for enclosed in helper.public_complex_enclosed_types():
+% for enclosed in helper.complex_enclosed_types(prot="public"):
 `xref:${enclosed.id}[+++${enclosed.name}+++]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_constructors()):
+% if has(helper.constructors(prot="public")):
 |*Constructors*
 |
-% for constructor in helper.public_constructors():
+% for constructor in helper.constructors(prot="public"):
 `xref:${constructor.id}[+++${constructor.name}+++]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_variables()):
+% if has(helper.variables(prot="public")):
 |*Variables*
 |
-% for variable in helper.public_variables():
+% for variable in helper.variables(prot="public"):
 `xref:${variable.id}[+++${variable.name}+++]`::
 ${variable.brief}
 % endfor
 % endif
 ###################################################################################################
-% if has(helper.public_static_methods()):
+% if has(helper.static_methods(prot="public")):
 |*Static methods*
 |
-% for method in helper.public_static_methods():
+% for method in helper.static_methods(prot="public"):
 `xref:${method.id}[+++${method.name}+++]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_methods()):
+% if has(helper.methods(prot="public")):
 |*Methods*
 |
-% for method in helper.public_methods():
+% for method in helper.methods(prot="public"):
 `xref:${method.id}[+++${method.name}+++]`::
 ${method.brief}
 % endfor
@@ -90,14 +90,14 @@ ${method.brief}
 == Members
 
 ################################################################################### Constructors ##
-% for constructor in helper.public_constructors():
+% for constructor in helper.constructors(prot="public"):
 ${api.insert_fragment(constructor, insert_filter)}
 '''
 % endfor
 ###################################################################################### Variables ##
-% for variable in helper.public_variables():
+% for variable in helper.variables(prot="public"):
 [[${variable.id},${variable.name}]]
-${api_context.insert(variable)}
+${api.inserted(variable)}
 
 [source,python,subs="-specialchars,macros+"]
 ----
@@ -115,19 +115,19 @@ ${variable.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in helper.public_static_methods():
+% for method in helper.static_methods(prot="public"):
 ${api.insert_fragment(method, insert_filter)}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.public_methods():
+% for method in helper.methods(prot="public"):
 ${api.insert_fragment(method, insert_filter)}
 '''
 % endfor
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in helper.public_complex_enclosed_types():
+% for enclosed in helper.complex_enclosed_types(prot="public"):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 

@@ -19,11 +19,11 @@ from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 from itertools import chain
 %>
 <%
-helper = CppTemplateHelper(api_context, element, insert_filter)
+helper = CppTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
@@ -40,104 +40,108 @@ ${element.description}
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
-
+% for prot in ("public", "protected", "private"):
 ###################################################################################################
-% if (has_any(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types())):
-|*Enclosed types*
+% if (has_any(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot))):
+|*${prot.capitalize()} Enclosed Types*
 |
-% for enclosed in chain(helper.public_simple_enclosed_types(), helper.public_complex_enclosed_types()):
+% for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_constructors()):
-|*Constructors*
+% if has(helper.constructors(prot=prot)):
+|*${prot.capitalize()} Constructors*
 |
-% for constructor in helper.public_constructors():
+% for constructor in helper.constructors(prot=prot):
 `xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
 ${constructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_destructors()):
-|*Destructors*
+% if has(helper.destructors(prot=prot)):
+|*${prot.capitalize()} Destructors*
 |
-% for destructor in helper.public_destructors():
+% for destructor in helper.destructors(prot=prot):
 `xref:${destructor.id}[${destructor.name}()]`::
 ${destructor.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_operators()):
-|*Operators*
+% if has(helper.operators(prot=prot)):
+|*${prot.capitalize()} Operators*
 |
-% for operator in helper.public_operators():
+% for operator in helper.operators(prot=prot):
 `xref:${operator.id}[${operator.name}${helper.type_list(operator.params)}]`::
 ${operator.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_variables()):
-|*Variables*
+% if has(helper.variables(prot=prot)):
+|*${prot.capitalize()} Variables*
 |
-% for variable in helper.public_variables():
+% for variable in helper.variables(prot=prot):
 `xref:${variable.id}[${variable.name}]`::
 ${variable.brief}
 % endfor
 % endif
 ###################################################################################################
-% if has(helper.public_static_methods()):
-|*Static methods*
+% if has(helper.static_methods(prot=prot)):
+|*${prot.capitalize()} Static Methods*
 |
-% for method in helper.public_static_methods():
+% for method in helper.static_methods(prot=prot):
 `xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_methods()):
-|*Methods*
+% if has(helper.methods(prot=prot)):
+|*${prot.capitalize()} Methods*
 |
-% for method in helper.public_methods():
+% for method in helper.methods(prot=prot):
 `xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${" const" if method.const else ""}]`::
 ${method.brief}
 % endfor
 
 % endif
+% endfor
 |===
 
 ##################################################################### Enclosed enums and typedefs ##
-% for enclosed in helper.public_simple_enclosed_types():
+% for prot in ("public", "protected", "private"):
+% for enclosed in helper.simple_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
+% endfor
 % endfor
 
 == Members
 
+% for prot in ("public", "protected", "private"):
 ################################################################################### Constructors ##
-% for constructor in helper.public_constructors():
+% for constructor in helper.constructors(prot=prot):
 ${api.insert_fragment(constructor, insert_filter, kind_override="method")}
 '''
 % endfor
 #################################################################################### Destructors ##
-% for destructor in helper.public_destructors():
+% for destructor in helper.destructors(prot=prot):
 ${api.insert_fragment(destructor, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Operators ##
-% for operator in helper.public_operators():
+% for operator in helper.operators(prot=prot):
 ${api.insert_fragment(operator, insert_filter, kind_override="method")}
 '''
 % endfor
 ###################################################################################### Variables ##
-% for variable in helper.public_variables():
+% for variable in helper.variables(prot=prot):
 [[${variable.id},${variable.name}]]
-${api_context.insert(variable)}
+${api.inserted(variable)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
@@ -151,18 +155,21 @@ ${variable.description}
 '''
 % endfor
 ################################################################################# Static methods ##
-% for method in helper.public_static_methods():
+% for method in helper.static_methods(prot=prot):
 ${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.public_methods():
+% for method in helper.methods(prot=prot):
 ${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
+% endfor
 % endfor
 
 ############################################################################# Inner/Nested types ##
 
-% for enclosed in helper.public_complex_enclosed_types():
+% for prot in ("public", "protected", "private"):
+% for enclosed in helper.complex_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
+% endfor
 % endfor

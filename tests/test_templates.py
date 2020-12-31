@@ -55,9 +55,9 @@ def _read_fragment(include_statement: str) -> str:
     ("asciidoxy.default_values.Point.increment", "python",
      "fragments/python/function_default_value.adoc"),
 ])
-def test_fragment(api, adoc_data, fragment_dir, element_name, language, expected_result,
+def test_fragment(generating_api, adoc_data, fragment_dir, element_name, language, expected_result,
                   update_expected_results):
-    result = api.insert(element_name, lang=language)
+    result = generating_api.insert(element_name, lang=language)
     content = _read_fragment(result)
     content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
 
@@ -69,7 +69,10 @@ def test_fragment(api, adoc_data, fragment_dir, element_name, language, expected
 
 filtered_testdata = [
     ("asciidoxy::geometry::Coordinate", "cpp", {
-        "members": "-Altitude"
+        "members": {
+            "name": "-Altitude",
+            "prot": "ALL"
+        }
     }, "fragments/cpp/class_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent::Severity", "cpp", {
         "enum_values": ["+Medium", "+High"]
@@ -81,6 +84,9 @@ filtered_testdata = [
         "members": "-delay"
     }, "fragments/cpp/struct_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent", "cpp", {
+        "members": {
+            "prot": "ALL"
+        },
         "inner_classes": ["+Severity", "-TrafficEventData"]
     }, "fragments/cpp/nested_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", {
@@ -121,10 +127,10 @@ filtered_testdata = [
 
 
 @pytest.mark.parametrize("element_name,language,filter_spec,expected_result", filtered_testdata)
-def test_global_filter(api, adoc_data, fragment_dir, element_name, language, filter_spec,
+def test_global_filter(generating_api, adoc_data, fragment_dir, element_name, language, filter_spec,
                        expected_result, update_expected_results):
-    api.filter(**filter_spec)
-    result = api.insert(element_name, lang=language)
+    generating_api.filter(**filter_spec)
+    result = generating_api.insert(element_name, lang=language)
     content = _read_fragment(result)
     content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
 
@@ -135,9 +141,37 @@ def test_global_filter(api, adoc_data, fragment_dir, element_name, language, fil
 
 
 @pytest.mark.parametrize("element_name,language,filter_spec,expected_result", filtered_testdata)
-def test_local_filter(api, adoc_data, fragment_dir, element_name, language, filter_spec,
+def test_local_filter(generating_api, adoc_data, fragment_dir, element_name, language, filter_spec,
                       expected_result, update_expected_results):
-    result = api.insert(element_name, lang=language, **filter_spec)
+    result = generating_api.insert(element_name, lang=language, **filter_spec)
+    content = _read_fragment(result)
+    content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
+
+    if update_expected_results:
+        (adoc_data / expected_result).write_text(content, encoding="UTF-8")
+
+    assert content == (adoc_data / expected_result).read_text(encoding="UTF-8")
+
+
+@pytest.mark.parametrize("element_name,source,target,expected_result", [
+    ("ADTrafficEvent", "objc", "swift", "fragments/swift/transcoded_protocol.adoc"),
+    ("TrafficEventData.ADSeverity", "objc", "swift", "fragments/swift/transcoded_enum.adoc"),
+    ("ADCoordinate", "objc", "swift", "fragments/swift/transcoded_interface.adoc"),
+    ("OnTrafficEventCallback", "objc", "swift", "fragments/swift/transcoded_block.adoc"),
+    ("TpegCauseCode", "objc", "swift", "fragments/swift/transcoded_typedef.adoc"),
+    ("com.asciidoxy.geometry.Coordinate", "java", "kotlin",
+     "fragments/kotlin/transcoded_class.adoc"),
+    ("com.asciidoxy.traffic.TrafficEvent.Severity", "java", "kotlin",
+     "fragments/kotlin/transcoded_enum.adoc"),
+    ("com.asciidoxy.system.Service", "java", "kotlin",
+     "fragments/kotlin/transcoded_interface.adoc"),
+    ("com.asciidoxy.traffic.TrafficEvent", "java", "kotlin",
+     "fragments/kotlin/transcoded_nested.adoc"),
+])
+def test_transcoded_fragment(generating_api, adoc_data, fragment_dir, element_name, source, target,
+                             expected_result, update_expected_results):
+    generating_api.language(target, source=source)
+    result = generating_api.insert(element_name)
     content = _read_fragment(result)
     content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
 

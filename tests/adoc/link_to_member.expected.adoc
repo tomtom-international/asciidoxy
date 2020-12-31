@@ -6,5 +6,5 @@ A link: xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fec
 
 The class reference:
 
-include::BUILD_DIR/fragments/cpp-classasciidoxy_1_1geometry_1_1_coordinate.adoc[leveloffset=+1]
+include::FRAGMENT_DIR/cpp-classasciidoxy_1_1geometry_1_1_coordinate.adoc[leveloffset=+1]
 

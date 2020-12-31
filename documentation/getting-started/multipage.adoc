@@ -1,0 +1,229 @@
+// Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Multipage documents
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+
+The HTML output from AsciiDoctor is limited to a single HTML page. You can separate your document
+into multiple AsciiDoc files and use `include::` to combine them, but this will result in a single
+large HTML file. Alternatively, you can create multiple AsciiDoc files and run AsciiDoctor
+separately on each file. This does create multiple HTML files, and you can even link between these
+files. However, it does not provide structured navigation between the files, and manual work is
+required to generate a single PDF version of the same documentation.
+
+AsciiDoxy removes these limitations by introducing multipage mode. You can generate single HTML or
+PDF files in single page mode, and generate multiple HTML documents in multipage mode. All from the
+same AsciiDoc source files.
+
+:sectnums:
+== Structuring your multipage document [[structure]]
+
+AsciiDoxy copies the input files to a temporary location where it can modify them. This is required
+to process the included python code. To be able to include, and refer to, other files, you need to
+tell AsciiDoxy where these files are. AsciiDoxy will then copy these files to the temporary location
+as well.
+
+Let's start by creating a directory with 2 AsciiDoc files:
+
+. Create a directory called `src`. This will be the directory used by AsciiDoxy to find all files.
+. In the `src` directory create a file called `index.adoc`. This will be the entry point for the
+  generated documentation.
+. In the `src` directory create another file called `reference.adoc`. This will be the second page
+  of the documentation.
+
+Run AsciiDoxy on these files:
+
+[source,bash]
+----
+asciidoxy --base-dir src src/index.adoc
+----
+
+The result will be a single, mostly empty file: `build/output/index.html`.
+
+== Including another file
+
+Let's first add some content to `src/reference.adoc`:
+
+[source]
+----
+= Reference
+
+This is the reference file.
+----
+
+Then add the following content to `src/index.adoc`:
+
+[source]
+----
+= Documentation
+
+This is the entry point of the documentation.
+
+${"""${include("reference.adoc")}"""}
+----
+
+The last line is AsciiDoxy's version of `include::`. Similar to the normal `include::` this tells
+AsciiDoxy that you want to include the contents of another file here in the document. However, in a
+moment you will see that this version can do much more.
+
+Run AsciiDoxy again:
+
+[source,bash]
+----
+asciidoxy --base-dir src src/index.adoc
+----
+
+The result will look something like this:
+
+====
+[discrete]
+= Documentation
+
+This is the entry point of the documentation.
+
+[discrete]
+== Reference
+
+This is the reference file.
+====
+
+This is still the same result as using AsciiDoctor with `include::`! However, the result will be
+different when using AsciiDoxy in multipage mode:
+
+[source,bash]
+----
+asciidoxy --base-dir src --multipage src/index.adoc
+----
+
+There will now be 2 files: `src/index.html` and `src/reference.html`. The first one will look like
+this:
+
+====
+[discrete]
+= Documentation
+
+This is the entry point of the documentation.
+
+<<multipage.adoc#,Reference>>
+====
+
+The link called `Reference` will take you to a file containing only the contents of
+`reference.adoc`. Both pages will also have a navigation bar at the bottom. With the navigation bar
+you can easily jump between pages.
+
+== Improving what the link looks like
+
+By default, AsciiDoxy uses the first title detected in the included file for the link text. If it
+fails to detect a title the stem of the file name is used. An alternative text can be provided
+using the `link_text` argument:
+
+[source]
+----
+${"""
+${include("reference.adoc", link_text="Reference documentation")}
+"""}
+----
+
+The result is:
+
+====
+<<multipage.adoc#,Reference documentation>>
+====
+
+A link prefix can be used to insert text before the link, e.g. to create a list of links. This text
+will only be inserted in multipage mode. In singlepage mode the contents of the file are inserted.
+
+[source]
+----
+${"""
+${include("reference.adoc", link_text="Reference documentation", link_prefix=". ")}
+"""}
+----
+
+====
+. <<multipage.adoc#,Reference documentation>>
+====
+
+[TIP]
+====
+For more options, see the documentation for
+${cross_document_ref("../reference/commands.adoc", anchor="api_include", link_text="include")}.
+====
+
+== Cross-references between pages
+
+In multipage mode, the usual AsciiDoc cross-references between different files no longer work as
+expected. AsciiDoctor relies on having all references in the same output file. When the target of
+the cross-reference is in a different output file, the cross-reference needs to be adapted.
+
+AsciiDoxy can generate the correct cross-references for both singlepage and multipage mode. Instead
+of `<<...>>` or `xref:...[]`, you need to use `${"${cross_document_ref(...)}"}`.
+
+In the document structure from <<structure,section 1>> we can add the following to
+`src/reference.adoc` to refer to the main document:
+
+[source]
+----
+${"""
+${cross_document_ref("index.adoc")}
+"""}
+----
+
+====
+${cross_document_ref("multipage.adoc", link_text="Documentation")}
+====
+
+AsciiDoxy takes the first title found in the document. If it cannot parse the file, it will use the
+stem of the file name: `index` in this case.
+
+If the default link text is not what you want, you can override the text using the `link_text`
+argument:
+
+[source]
+----
+${"""
+${cross_document_ref("index.adoc", link_text="Back home")}
+"""}
+----
+
+====
+${cross_document_ref("multipage.adoc", link_text="Back home")}
+====
+
+Optionally, you can provide an anchor to link to. For example in `src/index.adoc`:
+
+[source]
+----
+${"""
+${cross_document_ref("reference.adoc", anchor="_reference", link_text="Reference")}
+"""}
+----
+
+====
+${cross_document_ref("multipage.adoc", anchor="_reference", link_text="Reference")}
+====
+
+[TIP]
+====
+For more options, see the documentation for
+${cross_document_ref("../reference/commands.adoc", anchor="cross_referencing",
+                     link_text="cross_document_ref")}.
+====
+
+== More to come...
+
+The AsciiDoxy documentation is still being written. Expect more documentation about:
+
+ * Hiding multipage links
+ * Showing a multipage table of contents
+ * ...

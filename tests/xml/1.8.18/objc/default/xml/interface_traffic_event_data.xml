@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="interface_traffic_event_data" kind="class" language="Objective-C" prot="public">
+    <compoundname>TrafficEventData</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">NSObject</basecompoundref>
+    <includes refid="_a_d_traffic_event_8h" local="no">ADTrafficEvent.h</includes>
+      <sectiondef kind="protected-type">
+      <memberdef kind="enum" id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273" prot="protected" static="no" strong="no">
+        <type></type>
+        <name>ADSeverity</name>
+        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414" prot="protected">
+          <name>Low</name>
+          <initializer>= 1</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>Low severity. </para>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7" prot="protected">
+          <name>Medium</name>
+          <initializer>= 2</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>Medium severity. </para>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d" prot="protected">
+          <name>High</name>
+          <initializer>= 3</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>High severity.</para>
+<para>Better stay away here. </para>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff" prot="protected">
+          <name>Unknown</name>
+          <initializer>= 4</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+<para>Severity unknown. </para>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Severity scale for traffic events.</para>
+<para>The more severe the traffic event, the more likely it is to have a large delay. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADTrafficEvent.h" line="36" column="1" bodyfile="ADTrafficEvent.h" bodystart="36" bodyend="58"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="interface_traffic_event_data_1a8353496d09d78db82e9e62f8c2808d34" prot="protected" static="no" mutable="no">
+        <type>TpegCauseCode</type>
+        <definition>TpegCauseCode TrafficEventData::cause</definition>
+        <argsstring></argsstring>
+        <name>cause</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>TPEG cause code. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADTrafficEvent.h" line="63" column="15" bodyfile="ADTrafficEvent.h" bodystart="63" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="interface_traffic_event_data_1ab4a315c870a75cc68f5bba648b9b8be0" prot="protected" static="no" mutable="no">
+        <type>NSInteger</type>
+        <definition>NSInteger TrafficEventData::delay</definition>
+        <argsstring></argsstring>
+        <name>delay</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Delay caused by the traffic event in seconds. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADTrafficEvent.h" line="68" column="11" bodyfile="ADTrafficEvent.h" bodystart="68" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="interface_traffic_event_data_1a3136b600b8d16811c66914ff3afa48ca" prot="protected" static="no" mutable="no">
+        <type>Severity</type>
+        <definition>Severity TrafficEventData::severity</definition>
+        <argsstring></argsstring>
+        <name>severity</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Severity of the event. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="ADTrafficEvent.h" line="73" column="10" bodyfile="ADTrafficEvent.h" bodystart="73" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Details about a traffic event.</para>
+<para>Use the cause and delay to properly inform your users. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>TrafficEventData</label>
+        <link refid="interface_traffic_event_data"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>NSObject</label>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>TrafficEventData</label>
+        <link refid="interface_traffic_event_data"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>NSObject</label>
+      </node>
+    </collaborationgraph>
+    <location file="ADTrafficEvent.h" line="29" column="12" bodyfile="ADTrafficEvent.h" bodystart="30" bodyend="-1"/>
+    <listofallmembers>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>ADSeverity</name></member>
+      <member refid="interface_traffic_event_data_1a8353496d09d78db82e9e62f8c2808d34" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>cause</name></member>
+      <member refid="interface_traffic_event_data_1ab4a315c870a75cc68f5bba648b9b8be0" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>delay</name></member>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>High</name></member>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>Low</name></member>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>Medium</name></member>
+      <member refid="interface_traffic_event_data_1a3136b600b8d16811c66914ff3afa48ca" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>severity</name></member>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>Unknown</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

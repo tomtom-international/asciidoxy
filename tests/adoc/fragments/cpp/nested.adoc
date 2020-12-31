@@ -16,22 +16,21 @@ Information about a traffic event.
 
 [cols='h,5a']
 |===
-
-|*Enclosed types*
+|*Public Enclosed Types*
 |
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[Severity]`::
 Severity scale for traffic events.
 `xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[TrafficEventData]`::
 Details about a traffic event.
 
-|*Constructors*
+|*Public Constructors*
 |
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41[TrafficEvent()]`::
 Default constructor.
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc[TrafficEvent(TrafficEventData)]`::
 Construct a traffic event from data.
 
-|*Methods*
+|*Public Methods*
 |
 `xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28[const TrafficEventData & Data() const]`::
 Get the traffic event details.

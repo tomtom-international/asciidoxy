@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classasciidoxy_1_1geometry_1_1_convertor" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::geometry::Convertor</compoundname>
+    <includes refid="same__in__multiple__namespaces_8hpp" local="no">same_in_multiple_namespaces.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1geometry_1_1_convertor" kindref="compound">Convertor</ref> in namespace asciidoxy::geometry. </para>
+    </detaileddescription>
+    <location file="same_in_multiple_namespaces.hpp" line="30" column="16" bodyfile="same_in_multiple_namespaces.hpp" bodystart="30" bodyend="31"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

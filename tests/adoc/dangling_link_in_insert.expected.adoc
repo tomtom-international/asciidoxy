@@ -2,5 +2,5 @@
 
 The class reference:
 
-include::BUILD_DIR/fragments/cpp-classasciidoxy_1_1positioning_1_1_positioning.adoc[leveloffset=+1]
+include::FRAGMENT_DIR/cpp-classasciidoxy_1_1positioning_1_1_positioning.adoc[leveloffset=+1]
 

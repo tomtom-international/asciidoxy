@@ -1,0 +1,359 @@
+// Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Including API reference
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+
+The name AsciiDoxy is a combination of AsciiDoc and Doxygen. It started as a project to generate
+AsciiDoc documentation for APIs documented with Doxygen comments. Doxygen is still the main tool
+used to extract documentation from source code. AsciiDoxy uses the output from Doxygen to generate
+beautiful AsciiDoc documentation.
+
+:sectnums:
+== Extracting API reference information
+
+To extract API reference information from your source code, you need to install
+https://www.doxygen.nl/index.html[Doxygen] first. Doxygen will do the hard work of parsing all
+source code for documentation comments and extracting them to XML format. See
+https://www.doxygen.nl/manual/index.html[the Doxygen manual] for details about setting up Doxygen
+for your project.
+
+AsciiDoxy requires the XML output from Doxygen. Your Doxygen configuration file should at least
+enable this XML output:
+
+.Doxyfile
+[source]
+----
+GENERATE_XML           = YES
+----
+
+The following Doxygen configuration will only generate the XML output and store it in a location we
+will later turn into an AsciiDoxy package:
+
+.Doxyfile
+[source]
+----
+OUTPUT_DIRECTORY       = /home/me/asciidoc/package  # <1>
+GENERATE_HTML          = NO                         # <2>
+GENERATE_LATEX         = NO                         # <3>
+GENERATE_XML           = YES                        # <4>
+----
+<1> Store the output in our package directory. Doxygen will create an `xml` subdirectory in it.
+<2> Do not generate the default HTML output. It is not needed for AsciiDoxy.
+<3> Do not generate the default LaTex output. It is not needed for AsciiDoxy.
+<4> Generate XML output. This is what AsciiDoxy will use.
+
+[TIP]
+====
+The shown Doxygen configuration will work correctly for most C and {Cpp} source code. For other
+languages, see the examples in
+${cross_document_ref("../reference/doxygen.adoc",
+                     link_text="the Doxygen section of the reference documentation")}.
+====
+
+== Creating a package
+
+Before AsciiDoxy can read the API reference information, it needs to be packaged. For a package in
+a local directory, it is sufficient to add a package content file in the root of the package
+directory:
+
+.contents.toml
+[source]
+----
+[package]
+name = "my-package"
+
+[reference]       # <1>
+type = "doxygen"  # <2>
+dir = "xml"       # <3>
+----
+<1> This package contains API reference information.
+<2> The type of API reference is Doxygen output. This is currently the only supported format.
+<3> The `xml` subdirectory in the package contains the API reference information.
+
+[TIP]
+====
+More information about packages can be found in the
+${cross_document_ref("packages.adoc", link_text="packages getting started guide")} and in the
+${cross_document_ref("../reference/packages.adoc",
+                     link_text="packages section of the reference documentation")}.
+====
+
+== Collecting the reference package
+
+To include the API reference package created in the previous section, AsciiDoxy needs to be told to
+load it. Create a package specification file with the following content:
+
+.packages.toml
+[source]
+----
+[packages]
+
+[packages.my-package]
+type = "local"
+package_dir = "/home/me/asciidoc/package"
+----
+
+When loading the package specification file, AsciiDoxy will detect that the package contains
+Doxygen XML output, and make it available for use in AsciiDoc files:
+
+[source]
+----
+asciidoxy --spec-file packages.spec INPUT_FILE
+----
+
+== Including API reference in AsciiDoc files
+
+The way AsciiDoxy adds API reference information to AsciiDoc files is inspired by
+https://www.sphinx-doc.org[Sphinx for python]. Instead of automatically putting all documentation
+from the source code in a random order in the documentation, it puts you in control of exactly what
+is added where. This allows you to write the documentation in a natural flow that is easier to
+digest.
+
+To insert API reference use the `insert` command. This command requires at least the fully
+qualified name of the element to insert. That means that for languages that support namespaces, you
+need to include the full namespace in the element name. For example:
+
+[source,python]
+----
+${"""
+${insert("MyNamespace::MyClass")}
+${insert("com.asciidoxy.MyClass")}
+${insert("NSMyClass")}
+"""}
+----
+
+The API reference can be mixed with normal AsciiDoc content to create a narrative:
+
+[source,python]
+----
+${"""
+== {Cpp} interface
+
+This is the interface for {cpp}.
+
+${insert("MyNamespace::MyClass")}
+
+== Java interface
+
+Some text about the Java interface.
+
+${insert("com.asciidoxy.MyClass")}
+
+== Objective-C interface
+
+And some text about Objective-C version.
+
+${insert("NSMyClass")}
+"""}
+----
+
+[TIP]
+====
+For more options, see the documentation for
+${cross_document_ref("../reference/commands.adoc", anchor="api_insert", link_text="insert")}.
+====
+
+== Adjusting the level of the section headers
+
+The inserted API reference has its own section headers. By default, these headers use a level offset
+of +1 from the document in which they are inserted. If this does not match your layout, you can
+override the default level offset with the `leveloffset` argument:
+
+[source,python]
+----
+${"""
+= {Cpp} interface
+
+This is the interface for {cpp}.
+
+${insert("MyNamespace::MyClass")}                     // <1>
+
+== Java interface
+
+Some text about the Java interface.
+
+${insert("com.asciidoxy.MyClass", leveloffset="+2")}  // <2>
+
+=== Objective-C interface
+
+And some text about Objective-C version.
+
+${insert("NSMyClass", leveloffset="+3")}              // <3>
+"""}
+----
+<1> The previous header is level 1, so the default offset of +1 is fine.
+<2> Match the level 2 header by specifing an offset of +2.
+<3> Match the level 3 header by specifying an offset of +3.
+
+== Using a default namespace
+
+In languages supporting namespaces most of the interfaces for one component will be in the same
+namespace. To avoid having to repeat the namespace for every element, you can set a default
+namespace to search in:
+
+[source,python]
+----
+${"""
+${namespace("AsciiDoxy::Parser")}
+${namespace("com.asciidoxy.parser")}
+"""}
+----
+
+In a command referring to an API reference element, AsciiDoxy will search the default namespace
+first. After that it will search each namespace above the default namespace. The first matching
+element will be used. For example in the following case:
+
+[source,python]
+----
+${"""
+${namespace("AsciiDoxy::Parser")}
+${insert("ParserBase")}
+"""}
+----
+
+AsciiDoxy will search for the following elements:
+
+. `AsciiDoxy::Parser::ParserBase`
+. `AsciiDoxy::ParserBase`
+. `::ParserBase`
+
+The first match, the one closest to the default namespace, will be used for `insert`.
+
+Relative namespaces are also supported:
+
+[source,python]
+----
+${"""
+${namespace("AsciiDoxy::Parser")}
+${insert("Cpp::CppParser")}
+"""}
+----
+
+Here AsciiDoxy will search for:
+
+. `AsciiDoxy::Parser::Cpp::CppParser`
+. `AsciiDoxy::Cpp::CppParser`
+. `::Cpp::CppParser`
+
+When setting a default namespace using `namespace` it will remain active for the rest of the
+file or until `namespace` is used again. It will even apply to files included using
+`include`. Don't worry about usage if `namespace` in these included files: the previous
+setting is restored after the end of the included file.
+
+[TIP]
+====
+For more options, see the documentation for
+${cross_document_ref("../reference/commands.adoc", anchor="api_namespace", link_text="namespace")}.
+====
+
+== Linking to API reference elements
+
+After inserting API reference elements, they can be linked to from the additional text. This can be
+in the same AsciiDoc file, or in a separate file. Even linking from another package is supported.
+To link to an API reference element use the `link` command with the fully qualified name of the
+element.
+
+[source,python]
+----
+${"""
+Use the ${insert("AsciiDoxy::Parser::ParserBase")} to create new parsers.
+"""}
+----
+
+This will insert a link using the short name of the element:
+
+====
+Use the <<api-reference.adoc#,ParserBase>> to create new parsers.
+====
+
+The `namespace` command also applies to `link`. You do not need to repeat the namespace:
+
+[source,python]
+----
+${"""
+${namespace("AsciiDoxy::Parser")}
+
+Use the ${link("ParserBase")} to create new parsers.
+"""}
+----
+
+To use the fully qualified name of the element for the link text, set the `full_name` argument to
+`True`:
+
+[source,python]
+----
+${"""
+Use the ${insert("AsciiDoxy::Parser::ParserBase", full_name=True)} to create new parsers.
+"""}
+----
+
+====
+Use the <<api-reference.adoc#,AsciiDoxy::Parser::ParserBase>> to create new parsers.
+====
+
+An alternative link text can be set uring the `text` argument:
+
+[source,python]
+----
+${"""
+Use the ${insert("AsciiDoxy::Parser::ParserBase", text="parser base")} to create new parsers.
+"""}
+----
+
+====
+Use the <<api-reference.adoc#,parser base>> to create new parsers.
+====
+
+[TIP]
+====
+For more options, see the documentation for
+${cross_document_ref("../reference/commands.adoc", anchor="api_link", link_text="link")}.
+====
+
+== Warnings
+
+AsciiDoxy will issue warnings if there are issues with the inserted API reference. Some common
+warnings are:
+
+`ReferenceNotFoundError`: "Cannot find any NAME for any"::
+The API reference information does not contain any language element with the name `NAME`. Did you
+write the correct name, and used the correct namespace?
+
+`AmbiguousReferenceError`: "Multiple matches for NAME. Please provide more details."::
+Multiple elements have been found that match the given name. AsciiDoxy does not know which one you
+want to use. A list of candidates will be shown as part of the warning. See the reference for the
+command used for options to select a specific candidate.
+
+`ConsistencyError`: "The following elements are linked to, but not included in the documentation"::
+This happens when using `link` for an element that was not added using `insert`. Make sure
+you add all the API reference you need. If the element is inserted in another AsciiDoc file, there
+may be a missing include for that file.
++
+This may also be caused transitively by `insert`. If the element depends on another element,
+e.g. in a method argument type, AsciiDoxy inserts an `link` for that element. The warning will
+inform you that you need to make sure you include all dependencies as well.
+
+[TIP]
+====
+You can change these warnings into critical errors by using the command-line option
+`--warnings-are-errors`. This is useful to generate errors in CI builds.
+====
+
+== More to come...
+
+The AsciiDoxy documentation is still being written. Expect more documentation about:
+
+* Filtering what is inserted.
+* Transcoding related languages.
+* ...

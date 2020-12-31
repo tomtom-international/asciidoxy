@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.18">
+  <compound refid="classasciidoxy_1_1geometry_1_1_coordinate" kind="class"><name>asciidoxy::geometry::Coordinate</name>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8" kind="variable"><name>latitude</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a0eb652e91c894dc2e49d9fbf3f224aa5" kind="variable"><name>longitude</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ad238c9c268dc5518859400dc9c857fe3" kind="variable"><name>altitude</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f" kind="function"><name>__init__</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891" kind="function"><name>is_valid</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe" kind="function"><name>from_string</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa" kind="function"><name>from_string_safe</name></member>
+    <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d" kind="function"><name>combine</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1default__values_1_1_point" kind="class"><name>asciidoxy::default_values::Point</name>
+    <member refid="classasciidoxy_1_1default__values_1_1_point_1ae2454dfa3e6bcf10d9c36975f310b781" kind="function"><name>__init__</name></member>
+    <member refid="classasciidoxy_1_1default__values_1_1_point_1a7afa9cd9fcbec61efa64cb0f3108c17b" kind="function"><name>increment</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity" kind="class"><name>asciidoxy::traffic::TrafficEvent::Severity</name>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a968ab64546e92ecef1cd973413c0287a" kind="variable"><name>Low</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a93d3da27d0cf28919dabd7e4584d255f" kind="variable"><name>Medium</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a3300e6189865a57ef9150197006fbb98" kind="variable"><name>High</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a5485b250438093322f6417a578830b3a" kind="variable"><name>Unknown</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1traffic_1_1_traffic_event" kind="class"><name>asciidoxy::traffic::TrafficEvent</name>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a32be293fd10a77aa74964459d3738726" kind="variable"><name>_data</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ad7ebc90048fc465f046cf37cf2300d9e" kind="function"><name>__init__</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e" kind="function"><name>update</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1aa2a565164d3af2f5655c7ef819ff4545" kind="function"><name>calculate_delay</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1ab0296d5ce7ec9725a3a90440b4f960b3" kind="function"><name>refresh_data</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data" kind="class"><name>asciidoxy::traffic::TrafficEvent::TrafficEventData</name>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a7a93792cb0d89c430b35d085f36e804e" kind="variable"><name>cause</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1ad2dcca5c153fdd8bd97d8424bb13c003" kind="variable"><name>delay</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a9601be1f4871fbf57154f5a061e0f784" kind="variable"><name>severity</name></member>
+    <member refid="classasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1ae909c5f0bb40589e4977cd48accf3d6d" kind="function"><name>__init__</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy" kind="namespace"><name>asciidoxy</name>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1default__values" kind="namespace"><name>asciidoxy::default_values</name>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
+  </compound>
+  <compound refid="____init_____8py" kind="file"><name>__init__.py</name>
+  </compound>
+  <compound refid="default__values_8py" kind="file"><name>default_values.py</name>
+  </compound>
+  <compound refid="geometry_8py" kind="file"><name>geometry.py</name>
+  </compound>
+  <compound refid="traffic_8py" kind="file"><name>traffic.py</name>
+  </compound>
+  <compound refid="dir_3b16d38c15c00c78b4ed52f839ddcd7a" kind="dir"><name>asciidoxy</name>
+  </compound>
+</doxygenindex>

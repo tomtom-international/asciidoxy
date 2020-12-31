@@ -12,27 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = AsciiDoxy
-:notitle:
-:toc: right
-:toc-title: On this page
-${api.multipage_toc()}
-
-----
-    ___              _ _ ____
-   /   |  __________(_|_) __ \____  _  ____  __
-  / /| | / ___/ ___/ / / / / / __ \| |/_/ / / /
- / ___ |(__  ) /__/ / / /_/ / /_/ />  </ /_/ /
-/_/  |_/____/\___/_/_/_____/\____/_/|_|\__, /
-                                      /____/
-----
-
-[ ${api.cross_document_ref("index.adoc", "", "Home")} |
-${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", "", "Usage")} |
-${api.cross_document_ref("examples.adoc", "", "Examples")} |
-${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
-${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
-https://github.com/tomtom-international/asciidoxy[GitHub] ]
+${include("_header.adoc", always_embed=True, leveloffset=None)}
 
 image:https://img.shields.io/badge/License-Apache%202.0-green.svg[License, link=LICENSE]
 image:https://img.shields.io/pypi/dm/asciidoxy[pip downloads, link=https://pypi.org/project/asciidoxy]
@@ -41,21 +21,24 @@ image:https://img.shields.io/pypi/v/asciidoxy[PyPI, link=https://pypi.org/projec
 
 AsciiDoxy generates API documentation from https://doxygen.nl[Doxygen] XML output to AsciiDoc.
 https://asciidoctor.org[AsciiDoctor] is then used to create HTML or PDF documentation that can be
-published on-line.
+published online.
 
 Supported languages:
 
 - C++
 - Java
-- Objective C
+- Objective-C
 - Python (using https://github.com/Feneric/doxypypy[doxypypy])
+- Swift (transcoded from Objective-C only)
+- Kotlin (transcoded from Java only)
 
 Features:
 
 - API documentation generation.
 - Collecting API reference information from remote and local sources.
-- Single and multi page HTML output.
+- Single and multipage HTML output.
 - Single page PDF output.
+- Transcoding: showing how to use elements written in one language in another compatible language.
 
 
 == Credits
@@ -77,8 +60,9 @@ the internal version of AsciiDoxy. Many thanks to:
 The python package was created with https://github.com/audreyr/cookiecutter[Cookiecutter] and the
 https://github.com/audreyr/cookiecutter-pypackage[audreyr/cookiecutter-pypackage] project template.
 
-${api.include("about.adoc", multipage_link=False)}
-${api.include("usage.adoc", multipage_link=False)}
-${api.include("examples.adoc", multipage_link=False)}
-${api.include("contributing.adoc", multipage_link=False)}
-${api.include("changelog.adoc", multipage_link=False)}
+${include("about.adoc", multipage_link=False)}
+${include("getting-started.adoc", multipage_link=False)}
+${include("reference.adoc", multipage_link=False)}
+${include("examples.adoc", multipage_link=False)}
+${include("contributing.adoc", multipage_link=False)}
+${include("changelog.adoc", multipage_link=False)}

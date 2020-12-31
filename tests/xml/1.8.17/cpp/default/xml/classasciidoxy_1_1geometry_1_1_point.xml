@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classasciidoxy_1_1geometry_1_1_point" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::geometry::Point</compoundname>
+    <includes refid="default__values_8hpp" local="no">default_values.hpp</includes>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_point_1aabf939f4746751aeb2f1e9e3553eecb4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>asciidoxy::geometry::Point::Point</definition>
+        <argsstring>(int x=0, int y=1)</argsstring>
+        <name>Point</name>
+        <param>
+          <type>int</type>
+          <declname>x</declname>
+          <defval>0</defval>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>y</declname>
+          <defval>1</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Construct a new point.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The X coordinate of the point. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The Y coordinate of the point. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="default_values.hpp" line="31" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classasciidoxy_1_1geometry_1_1_point" kindref="compound">Point</ref></type>
+        <definition>Point asciidoxy::geometry::Point::increment</definition>
+        <argsstring>(int x=2, int y=3) const</argsstring>
+        <name>increment</name>
+        <param>
+          <type>int</type>
+          <declname>x</declname>
+          <defval>2</defval>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>y</declname>
+          <defval>3</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a new point that is an increment of this point.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>x</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value to increment the X coordinate with. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value to increment the Y coordinate with. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A new incremented <ref refid="classasciidoxy_1_1geometry_1_1_point" kindref="compound">Point</ref>. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="default_values.hpp" line="40" column="9"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Class to hold information about a simple point. </para>
+    </detaileddescription>
+    <location file="default_values.hpp" line="23" column="12" bodyfile="default_values.hpp" bodystart="23" bodyend="41"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Point</scope><name>increment</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_point_1aabf939f4746751aeb2f1e9e3553eecb4" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Point</scope><name>Point</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

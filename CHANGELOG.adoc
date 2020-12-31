@@ -12,12 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-= Changelog
-
 All notable changes to this project will be documented in this file.
 
 The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
+
+
+== 0.7.0 (31 Dec 2020)
+
+=== Added
+
+  - Infrastructure for transcoding documentation from one to another language.
+  - Swift: [AD-28] Generating Swift documentation based on Objective C source code.
+  - Kotlin: [AD-27] Generating Kotlin documentation based on Java source code.
+  - [AD-15] Allow forcing to embed an included file in multipage mode.
+  - [AD-37] Show members for other visibility levels than public. By default only public and
+    protected members are shown. Use `filter` to change.
+  - [AD-32] New package format with contents metadata file. The contents file specifies whether the
+    package contains AsciiDoc includes or reference, and in what subdirectory. It can now also
+    include images that need to be included to the output.
+  - [AD-32] A directory containing images to include can be specified using `--image-dir`.
+  - [AD-11] The usage documentation has been separated into a getting started guide and reference
+    documentation.
+
+=== Changed
+
+  - Argument `leveloffset` in `include` now supports `None` to prevent adding `leveloffset` in
+    the generated AsciiDoc.
+  - [AD-32] By default the directory containing the input file is not copied to the intermediate
+    build directory. Use `--base-dir` to enable copying of additional include files.
+  - [AD-32] `cross_document_ref` and `include` support a new `package_name` keyword to
+    point to files in packages. For new packages with a contents metadata file this keyword is
+    mandatory. If the package specifies a root document, the `filename` is optional now.
+  - [AD-32] For `cross_document_ref` the `anchor` and `link_text` arguments are now keyword
+    only. For backwards compatibility `api.cross_document_ref` is still supports the old syntax.
+  - [AD-32] For `include` the `leveloffset`, `link_text`, and `link_prefix` arguments are now
+    keyword only. For bacwards compatibility `api.include` still supports the old syntax.
+  - [AD-32] Multiple packages supplying the same file is now an error.
+  - [AD-54] If no `anchor` or `link_text` is given, the title of the document is used for the link
+    created by `cross_document_ref`. If the title cannot be read, the file name stem is used.
+  - [AD-54] If no `link_text` is given, the title of the document is used for the link created by
+    `include` in multipage mode. If the title cannot be read, the file name stem is used.
+  - [AD-42] The `api.` prefix for commands is no longer needed. It will be deprecated in a future
+    version. The `api.link_<kind>` and `api.insert_<kind>` commands are also deprecated and not
+    available without the `api.` prefix.
+
+=== Fixed
+
+  - [AD-35] Improve handling of complex closures.
+  - Objective C: Support `__autoreleasing` suffix.
+  - Including files in parent directories no longer raises an exception.
+  - Files and directories provided on the command-line are validated before use.
+  - [AD-55] Insert anchors at the top of includes in singlepage mode to make cross document
+    references without anchors work.
 
 
 == 0.6.3 (1 Nov 2020)

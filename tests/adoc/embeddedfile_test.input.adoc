@@ -1,0 +1,9 @@
+= Test document
+
+Main document text.
+
+== Main document chapter [[main-document-chapter]]
+
+${include("sub_directory/embeddedfile_subdoc_test.input.adoc", always_embed=True)}
+
+${insert("asciidoxy::traffic::TrafficEvent::Severity")}

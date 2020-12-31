@@ -17,6 +17,7 @@ import functools
 import logging
 import os
 
+from abc import ABC, abstractmethod
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
@@ -31,18 +32,33 @@ from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..doxygenparser import safe_language_tag
 from ..model import ReferableElement
+from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
+from ..transcoder import TranscoderBase
 from .._version import __version__
 from .context import Context
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
-                     IncompatibleVersionError, ReferenceNotFoundError, TemplateMissingError,
+                     IncompatibleVersionError, InvalidApiCallError, MissingPackageError,
+                     MissingPackageFileError, ReferenceNotFoundError, TemplateMissingError,
                      UnlinkableError)
 from .filters import FilterSpec, InsertionFilter
 from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipage_toc
 
 logger = logging.getLogger(__name__)
 
+SUPPORTED_COMMANDS = [
+    "cross_document_ref",
+    "filter",
+    "include",
+    "insert",
+    "language",
+    "link",
+    "multipage_toc",
+    "namespace",
+    "require_version",
+]
 
-class Api(object):
+
+class Api(ABC):
     """Methods to insert and link to API reference documentation from AsciiDoc files."""
     class TemplateKey(NamedTuple):
         lang: str
@@ -56,63 +72,13 @@ class Api(object):
     def __init__(self, current_file: Path, context: Context):
         assert current_file.is_file()
         assert context.base_dir.is_dir()
-        assert context.build_dir.is_dir()
+        assert context.package_manager.work_dir.is_dir()
         assert context.fragment_dir.is_dir()
         assert context.reference is not None
 
         self._current_file = current_file
 
         self._context = context
-
-    def __getattr__(self, name: str):
-        if name.startswith("insert_"):
-            return functools.partial(self.insert, kind=name[7:])
-        elif name.startswith("link_"):
-            return functools.partial(self.link, kind=name[5:])
-        else:
-            raise AttributeError(name)
-
-    def find_element(self,
-                     name: str,
-                     *,
-                     kind: Optional[str] = None,
-                     lang: Optional[str] = None,
-                     allow_overloads: bool = False) -> ReferableElement:
-        """Find a reference to API documentation.
-
-        Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
-        disambiguate.
-
-        Args:
-            name:            Name of the object to insert.
-            kind:            Kind of object to generate reference documentation for.
-            lang:            Programming language of the object.
-            allow_overloads: True to return the first match of an overload set.
-
-        Returns:
-            An API documentation reference.
-
-        Raises:
-             AmbiguousReferenceError: There are multiple elements matching the criteria.
-             ReferenceNotFoundError: There are no elements matching the criteria.
-        """
-        if lang is not None:
-            lang = safe_language_tag(lang)
-        else:
-            lang = self._context.language
-
-        try:
-            element = self._context.reference.find(name=name,
-                                                   namespace=self._context.namespace,
-                                                   kind=kind,
-                                                   lang=lang,
-                                                   allow_overloads=allow_overloads)
-        except AmbiguousLookupError as ex:
-            raise AmbiguousReferenceError(name, ex.candidates)
-
-        if element is None:
-            raise ReferenceNotFoundError(name, lang=lang, kind=kind)
-        return element
 
     def filter(self,
                *,
@@ -246,24 +212,17 @@ class Api(object):
             AsciiDoc text to include in the document.
         """
         if text is not None and full_name is True:
-            raise ValueError("`text` and `full_name` cannot be used together.")
+            raise InvalidApiCallError("`text` and `full_name` cannot be used together.")
 
         try:
             element = self.find_element(name, kind=kind, lang=lang, allow_overloads=allow_overloads)
         except ReferenceNotFoundError as ref_not_found:
-            if self._context.warnings_are_errors:
-                raise
-            else:
-                logger.warning(str(ref_not_found))
-                return text or name
+            self._warning_or_error(ref_not_found)
+            return text or name
 
         if element.id is None:
-            unlinkable = UnlinkableError(name, lang=lang, kind=kind)
-            if self._context.warnings_are_errors:
-                raise unlinkable
-            else:
-                logger.warning(str(unlinkable))
-                return text or name
+            self._warning_or_error(UnlinkableError(name, lang=lang, kind=kind))
+            return text or name
 
         if text is not None:
             link_text = text
@@ -272,9 +231,15 @@ class Api(object):
         else:
             link_text = element.name
 
-        return self._context.link_to_element(element.id, link_text, element)
+        return self.link_to_element(element.id, link_text)
 
-    def cross_document_ref(self, file_name: str, anchor: str, link_text: str = None) -> str:
+    @abstractmethod
+    def cross_document_ref(self,
+                           file_name: Optional[str] = None,
+                           *,
+                           package_name: Optional[str] = None,
+                           anchor: Optional[str] = None,
+                           link_text: Optional[str] = None) -> str:
         """AsciiDoc cross-document reference.
 
         Since AsciiDoxy in multi-page mode generates intermediate AsciiDoc files and process them
@@ -282,156 +247,170 @@ class Api(object):
         (i.e. `<<file_name#anchor,link_tex>>`) doesn't work. You must use this method instead.
 
         Args:
-             file_name: Relative or absolute path to the referred AsciiDoc file. Relative paths
-                            are relative to the document calling the method.
-             anchor:    Anchor to the referred section in the referred AsciiDoc document.
-             link_text: Text of the reference. If None, `anchor` will be used as text of the
-                            reference.
+             file_name:    Name of the file. If `package_name` is specified, it must be relative to
+                              the root of the package. Otherwise, it is relative to the current
+                              document. Absolute paths are not supported.
+             package_name: Name of the package containing the file. If not specified, the file must
+                               come from the same package.
+             anchor:       Anchor to the referred section in the referred AsciiDoc document.
+             link_text:    Text for the link to insert. If not provided, either the anchor, the
+                               title of the document or the name of the file is used.
 
         Returns:
             AsciiDoc cross-document reference.
+
+        Raises:
+            InvalidApiCallError:     Incorrect argument or argument combinations are used.
+            MissingPackageError:     The specified package is not available.
+            MissingPackageFileError: The specified file name is not available in the package.
         """
-        referenced_file_name = Path(file_name)
+        ...
 
-        if not self._context.preprocessing_run:
-            absolute_file_path = (referenced_file_name if referenced_file_name.is_absolute() else
-                                  self._current_file.parent / referenced_file_name).resolve()
-            if absolute_file_path not in (
-                    d.in_file for d in self._context.current_document.all_documents_in_tree()):
-                msg = (f"Invalid cross-reference from document '{self._current_file}' "
-                       f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
-                       f"is not included anywhere across whole documentation tree.")
-                if self._context.warnings_are_errors:
-                    raise ConsistencyError(msg)
-                else:
-                    logger.warning(msg)
-
-        if not self._context.multipage:
-            file_path = Path(file_name)
-            if not file_path.is_absolute():
-                file_path = (self._current_file.parent / file_path).resolve().relative_to(
-                    self._context.base_dir)
-            referenced_file_name = _out_file_name(file_path)
-        return (f"<<{referenced_file_name}#{anchor},"
-                f"{link_text if link_text is not None else anchor}>>")
-
-    def insert_fragment(self,
-                        element,
-                        insert_filter: InsertionFilter,
-                        leveloffset: str = "+1",
-                        kind_override: Optional[str] = None,
-                        **asciidoc_options) -> str:
-        """Generate and insert a documentation fragment.
-
-        Args:
-            element:          Python representation of the element to insert.
-            insertion_filter: Filter for members to insert.
-            leveloffset:      Offset of the top header of the inserted text from the top level
-                                  header of the including document.
-            kind_override:    Override the kind of template to use. None to use the kind of
-                                  `element`.
-            asciidoc_options: Any additional option is added as an attribute to the include
-                                  directive in single page mode.
-
-        Returns:
-            AsciiDoc text to include in the document.
-        """
-
-        assert element.id
-        fragment_file = self._context.fragment_dir / f"{element.id}.adoc"
-
-        if kind_override is None:
-            kind = element.kind
+    def _find_absolute_file_path(self, file_name: Optional[str],
+                                 package_name: Optional[str]) -> Optional[Path]:
+        if package_name is not None:
+            return self._file_from_package(file_name, package_name)
         else:
-            kind = kind_override
+            assert file_name is not None
+            package_name = self._context.current_package.name
+            absolute_work_file_path = (self._current_file.parent / file_name).resolve()
+            if not absolute_work_file_path.exists():
+                self._warning_or_error(IncludeFileNotFoundError(file_name))
+                return None
 
-        rendered_doc = self._template(element.language, kind).render(element=element,
-                                                                     insert_filter=insert_filter,
-                                                                     api_context=self._context,
-                                                                     api=self)
+            if not self._context.current_package.scoped:
+                return absolute_work_file_path
+            else:
+                relative_work_file_path = absolute_work_file_path.relative_to(
+                    self._context.package_manager.work_dir)
+                return self._file_from_package(str(relative_work_file_path), package_name)
 
-        if not self._context.preprocessing_run:
-            with fragment_file.open("w", encoding="utf-8") as f:
-                print(rendered_doc, file=f)
+    def _file_from_package(self, file_name: Optional[str], package_name: str) -> Optional[Path]:
+        try:
+            return self._context.package_manager.file_in_work_directory(package_name, file_name)
 
-        asciidoc_options["leveloffset"] = leveloffset
-        attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
-        return f"include::{fragment_file}[{attributes}]"
+        except UnknownPackageError:
+            self._warning_or_error(MissingPackageError(package_name))
+            return None
+        except UnknownFileError:
+            self._warning_or_error(MissingPackageFileError(package_name, file_name))
+            return None
+
+    def _warning_or_error(self, error: Exception):
+        if self._context.warnings_are_errors:
+            raise error
+        else:
+            logger.warning(str(error))
 
     def include(self,
                 file_name: str,
+                *,
+                package_name: Optional[str] = None,
                 leveloffset: str = "+1",
                 link_text: str = "",
                 link_prefix: str = "",
                 multipage_link: bool = True,
+                always_embed: bool = False,
                 **asciidoc_options) -> str:
         """Include another AsciiDoc file, and process it to insert API references.
 
-        If the output format is multi-paged, the method will cause generation of separate output
-        document for the included AsciiDoc document and optional insertion of link referring to the
-        document.
+        If the output format is multi-paged, the method will by default cause generation of
+        separate output document for the included AsciiDoc document and optional insertion of link
+        referring to the document.
 
         Args:
-            file_name:         Relative or absolute path to the file to include. Relative paths are
-                                   relative to the document calling include.
+            file_name:         Name of the file. If `package_name` is specified, it must be relative
+                                   to the root of the package. Otherwise, it is relative to the
+                                   current document. Absolute paths are not supported.
+            package_name:      Name of the package containing the file. If not specified, the file
+                                   must come from the same package.
             leveloffset:       Offset of the top header of the inserted text from the top level
                                    header of the including document.
             link_text:         Text of the link which will be inserted when the output format is
-                                   multi-paged.
+                                   multi-paged. By default the document title (if found) or file
+                                   name stem is used.
             link_prefix:       Optional text which will be inserted before the link when the output
                                    format is multi-paged. It can be used for example to compose a
                                    list of linked subdocuments by setting it to ". ".
-            multipage_link:    True to include a link in a multi-page document (default). Otherwise
+            multipage_link:    True to include a link in a multipage document (default). Otherwise
                                    the separate document is generated but not linked from here.
+            always_embed:      True to always embed the contents in the current document, even in
+                                   multipage mode.
             asciidoc_options:  Any additional option is added as an attribute to the include
                                    directive in single page mode.
 
         Returns:
             AsciiDoc text to include in the document.
+
+        Raises:
+            InvalidApiCallError:     Incorrect argument or argument combinations are used.
+            MissingPackageError:     The specified package is not available.
+            MissingPackageFileError: The specified file name is not available in the package.
         """
+        if Path(file_name).is_absolute():
+            raise InvalidApiCallError("`file_name` must be a relative path.")
 
-        file_path = Path(file_name)
-        if not file_path.is_absolute():
-            file_path = (self._current_file.parent / file_path).resolve()
+        file_path = self._find_absolute_file_path(file_name, package_name)
+        if file_path is None:
+            return ""
 
-        if not file_path.is_file():
-            raise IncludeFileNotFoundError(file_name)
+        out_file = self._sub_api(file_path, package_name, always_embed).process_adoc()
 
-        sub_context = self._context.sub_context()
-        if self._context.preprocessing_run:
-            sub_context.current_document = DocumentTreeNode(file_path,
-                                                            self._context.current_document)
-            self._context.current_document.children.append(sub_context.current_document)
-        else:
-            sub_context.current_document = self._context.current_document.find_child(file_path)
-            assert sub_context.current_document is not None
-
-        out_file = _process_adoc(file_path, sub_context)
-        if self._context.multipage:
+        if self._context.multipage and not always_embed:
             if multipage_link:
                 referenced_file = relative_path(self._current_file, file_path)
-                return (f"{link_prefix}"
-                        f"<<{referenced_file}#,{link_text if link_text else referenced_file}>>")
+
+                if not link_text:
+                    document = next(
+                        (d for d in self._context.current_document.all_documents_in_tree()
+                         if d.in_file == file_path), None)
+                    assert document is not None
+                    link_text = document.title
+
+                return (f"{link_prefix}" f"<<{referenced_file}#,{link_text}>>")
             else:
                 return ""
 
-        asciidoc_options["leveloffset"] = leveloffset
+        if leveloffset:
+            asciidoc_options["leveloffset"] = leveloffset
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
-        rel_path = out_file.relative_to(self._current_file.parent)
-        return f"include::{rel_path}[{attributes}]"
+        if always_embed:
+            return f"include::{out_file}[{attributes}]"
+        else:
+            return f"[[{self._file_top_anchor(file_path)}]]\ninclude::{out_file}[{attributes}]"
 
-    def language(self, lang: Optional[str]) -> str:
+    def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
 
         Elements will then only be inserted for that language, and other languages are ignored. The
         language can still be overridden with the `lang` keyword. Files included after this command
         will also be affected.
 
+        Optionally, a different language can be used as the `source` of the API reference. If an
+        element is inserted that does not exist in the target `lang`, it is automatically
+        transcoded from the `source` language. This feature is only available for a limited set of
+        languages.
+
         Params:
-            lang The new default language, or None to reset.
+            lang:   The new default language, or None to reset.
+            source: Language to transcode from if an element is not available in the
+                        selected language. Only available for limited combinations.
+
+        Raises:
+            InvalidApiCallError: The `source` language needs to be different from `lang`, and `lang`
+                                     is required when `source` is specified.
         """
-        self._context.language = safe_language_tag(lang)
+        lang = safe_language_tag(lang)
+        source = safe_language_tag(source)
+
+        if source and not lang:
+            raise InvalidApiCallError("When specifying `source`, `lang` cannot be empty.")
+        if source and source == lang:
+            raise InvalidApiCallError("`source` and `lang` cannot be the same.")
+
+        self._context.language = lang if lang else None
+        self._context.source_language = source if source else None
 
         # Prevent output of None
         return ""
@@ -481,13 +460,103 @@ class Api(object):
         Args:
             side: Show the multipage TOC at the `left` or `right` side.
         """
-        if not self._context.multipage or self._context.preprocessing_run:
-            return ""
+        return ""
 
-        toc_content = multipage_toc(self._context.current_document, side)
-        with _docinfo_footer_file_name(self._current_file).open(mode="w", encoding="utf-8") as f:
-            f.write(toc_content)
-        return ":docinfo: private"
+    # Internal, non-API methods
+
+    def find_element(self,
+                     name: str,
+                     *,
+                     kind: Optional[str] = None,
+                     lang: Optional[str] = None,
+                     allow_overloads: bool = False) -> ReferableElement:
+        """Find a reference to API documentation.
+
+        Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
+        disambiguate.
+
+        Args:
+            name:            Name of the object to insert.
+            kind:            Kind of object to generate reference documentation for.
+            lang:            Programming language of the object.
+            allow_overloads: True to return the first match of an overload set.
+
+        Returns:
+            An API documentation reference.
+
+        Raises:
+             AmbiguousReferenceError: There are multiple elements matching the criteria.
+             ReferenceNotFoundError: There are no elements matching the criteria.
+        """
+        if lang is not None:
+            lang = safe_language_tag(lang)
+        else:
+            lang = self._context.language
+
+        try:
+            element = self._context.reference.find(name=name,
+                                                   namespace=self._context.namespace,
+                                                   kind=kind,
+                                                   lang=lang,
+                                                   allow_overloads=allow_overloads)
+        except AmbiguousLookupError as ex:
+            raise AmbiguousReferenceError(name, ex.candidates)
+
+        if element is None:
+            if (lang and lang == self._context.language and self._context.source_language):
+                source_element = self.find_element(name,
+                                                   kind=kind,
+                                                   lang=self._context.source_language,
+                                                   allow_overloads=allow_overloads)
+                if source_element is not None:
+                    return TranscoderBase.transcode(source_element, lang, self._context.reference)
+
+            raise ReferenceNotFoundError(name, lang=lang, kind=kind)
+        return element
+
+    @abstractmethod
+    def insert_fragment(self,
+                        element,
+                        insert_filter: InsertionFilter,
+                        leveloffset: str = "+1",
+                        kind_override: Optional[str] = None,
+                        **asciidoc_options) -> str:
+        """Generate and insert a documentation fragment.
+
+        Args:
+            element:          Python representation of the element to insert.
+            insertion_filter: Filter for members to insert.
+            leveloffset:      Offset of the top header of the inserted text from the top level
+                                  header of the including document.
+            kind_override:    Override the kind of template to use. None to use the kind of
+                                  `element`.
+            asciidoc_options: Any additional option is added as an attribute to the include
+                                  directive in single page mode.
+
+        Returns:
+            AsciiDoc text to include in the document.
+        """
+        ...
+
+    def inserted(self, element: ReferableElement) -> str:
+        """Register that an element has been inserted."""
+        return ""
+
+    @abstractmethod
+    def link_to_element(self, element_id: str, link_text: str) -> str:
+        """Insert a link to a specific element."""
+        ...
+
+    @abstractmethod
+    def process_adoc(self) -> Path:
+        """Process the AsciiDoc file.
+
+        Returns
+            Name of the processed output file.
+        """
+        ...
+
+    # "Protected" methods
 
     def _template(self, lang: str, kind: str) -> Template:
         key = Api.TemplateKey(lang, kind)
@@ -503,10 +572,277 @@ class Api(object):
                 raise TemplateMissingError(lang, kind)
         return template
 
+    def _sub_api(self,
+                 file_path: Path,
+                 package_name: Optional[str],
+                 embedded: bool = False) -> "Api":
+        sub_context = self._context.sub_context()
+
+        if package_name and self._context.current_package.name != package_name:
+            package = self._context.package_manager.packages.get(package_name, None)
+            assert package is not None
+            sub_context.current_package = package
+
+        if embedded:
+            sub_context.embedded = True
+        else:
+            sub_context.current_document = self._context.current_document.find_child(file_path)
+            assert sub_context.current_document is not None
+
+        return self.__class__(file_path, sub_context)
+
+    def _render(self,
+                element,
+                insert_filter: InsertionFilter,
+                kind_override: Optional[str] = None) -> str:
+        assert element.id
+        assert element.language
+
+        if kind_override is None:
+            kind = element.kind
+        else:
+            kind = kind_override
+
+        return self._template(element.language, kind).render(element=element,
+                                                             insert_filter=insert_filter,
+                                                             api_context=self._context,
+                                                             api=self,
+                                                             **self._commands())
+
+    def _file_top_anchor(self, file_name: Path) -> str:
+        relative_to_base = file_name.relative_to(self._context.base_dir)
+        return "top-" + "-".join(relative_to_base.with_suffix("").parts) + "-top"
+
+    def _commands(self):
+        return {name: getattr(self, name) for name in SUPPORTED_COMMANDS}
+
+
+class PreprocessingApi(Api):
+    def _sub_api(self,
+                 file_path: Path,
+                 package_name: Optional[str],
+                 embedded: bool = False) -> "Api":
+        sub_context = self._context.sub_context()
+
+        if package_name and self._context.current_package.name != package_name:
+            package = self._context.package_manager.packages.get(package_name, None)
+            assert package is not None
+            sub_context.current_package = package
+
+        if embedded:
+            sub_context.embedded = True
+        else:
+            sub_context.current_document = DocumentTreeNode(file_path,
+                                                            self._context.current_document)
+            self._context.current_document.children.append(sub_context.current_document)
+
+        return self.__class__(file_path, sub_context)
+
+    def insert_fragment(self,
+                        element,
+                        insert_filter: InsertionFilter,
+                        leveloffset: str = "+1",
+                        kind_override: Optional[str] = None,
+                        **asciidoc_options) -> str:
+        self._render(element, insert_filter, kind_override)
+        return ""
+
+    def inserted(self, element: ReferableElement) -> str:
+        self._context.insert(element)
+        return ""
+
+    def link_to_element(self, element_id: str, link_text: str) -> str:
+        self._context.link_to_element(element_id)
+        return ""
+
+    def process_adoc(self):
+        logger.info(f"Preprocessing {self._current_file}")
+
+        out_file = self._context.register_adoc_file(self._current_file)
+
+        if self._context.progress is not None:
+            self._context.progress.total = 2 * (len(self._context.in_to_out_file_map) +
+                                                len(self._context.embedded_file_map))
+            self._context.progress.update(0)
+
+        template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
+        template.render(api=ApiProxy(self), **self._commands())
+
+        if self._context.progress is not None:
+            self._context.progress.update()
+
+        return out_file
+
+    def cross_document_ref(self,
+                           file_name: Optional[str] = None,
+                           *,
+                           package_name: Optional[str] = None,
+                           anchor: Optional[str] = None,
+                           link_text: Optional[str] = None) -> str:
+        if not file_name and not package_name:
+            raise InvalidApiCallError("At least `file_name` or `package_name` is required.")
+        if file_name and Path(file_name).is_absolute():
+            raise InvalidApiCallError("`file_name` must be a relative path.")
+
+        # Only check the existance of the file in the correct package
+        self._find_absolute_file_path(file_name, package_name)
+        return ""
+
+
+class GeneratingApi(Api):
+    def multipage_toc(self, side: str = "left") -> str:
+        if not self._context.multipage:
+            return ""
+
+        toc_content = multipage_toc(self._context.current_document, side)
+        with self._context.docinfo_footer_file().open(mode="w", encoding="utf-8") as f:
+            f.write(toc_content)
+        return ":docinfo: private"
+
+    def cross_document_ref(self,
+                           file_name: Optional[str] = None,
+                           *,
+                           package_name: Optional[str] = None,
+                           anchor: Optional[str] = None,
+                           link_text: Optional[str] = None) -> str:
+
+        if not file_name and not package_name:
+            raise InvalidApiCallError("At least `file_name` or `package_name` is required.")
+        if file_name and Path(file_name).is_absolute():
+            raise InvalidApiCallError("`file_name` must be a relative path.")
+
+        absolute_file_path = self._find_absolute_file_path(file_name, package_name)
+        if absolute_file_path is None:
+            return ""
+
+        document = next((d for d in self._context.current_document.all_documents_in_tree()
+                         if d.in_file == absolute_file_path), None)
+        if document is None:
+            msg = (f"Invalid cross-reference from document '{self._current_file}' "
+                   f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
+                   f"is not included anywhere across the whole documentation tree.")
+            self._warning_or_error(ConsistencyError(msg))
+            return ""
+
+        if not anchor and not link_text:
+            link_text = document.title
+        elif not link_text:
+            link_text = anchor
+
+        if not anchor:
+            if not self._context.multipage:
+                anchor = self._file_top_anchor(absolute_file_path)
+            else:
+                anchor = ""
+
+        link_file_path = self._context.link_to_adoc_file(absolute_file_path)
+        return (f"<<{link_file_path}#{anchor},{link_text}>>")
+
+    def insert_fragment(self,
+                        element,
+                        insert_filter: InsertionFilter,
+                        leveloffset: str = "+1",
+                        kind_override: Optional[str] = None,
+                        **asciidoc_options) -> str:
+        """Generate and insert a documentation fragment.
+
+        Args:
+            element:          Python representation of the element to insert.
+            insertion_filter: Filter for members to insert.
+            leveloffset:      Offset of the top header of the inserted text from the top level
+                                  header of the including document.
+            kind_override:    Override the kind of template to use. None to use the kind of
+                                  `element`.
+            asciidoc_options: Any additional option is added as an attribute to the include
+                                  directive in single page mode.
+
+        Returns:
+            AsciiDoc text to include in the document.
+        """
+        rendered_doc = self._render(element, insert_filter, kind_override)
+
+        fragment_file = self._context.fragment_dir / f"{element.id}.adoc"
+        with fragment_file.open("w", encoding="utf-8") as f:
+            print(rendered_doc, file=f)
+
+        asciidoc_options["leveloffset"] = leveloffset
+        attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
+        return f"include::{fragment_file}[{attributes}]"
+
+    def link_to_element(self, element_id: str, link_text: str) -> str:
+        containing_file = self._context.file_with_element(element_id)
+        if containing_file is not None:
+            file_part = f"{relative_path(self._context.current_document.in_file, containing_file)}#"
+        else:
+            file_part = ""
+
+        return f"xref:{file_part}{element_id}[{link_text}]"
+
+    def process_adoc(self):
+        logger.info(f"Processing {self._current_file}")
+        self._context.linked = []
+
+        out_file = self._context.register_adoc_file(self._current_file)
+
+        template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
+        rendered_doc = template.render(api=ApiProxy(self), **self._commands())
+
+        with out_file.open("w", encoding="utf-8") as f:
+            print(rendered_doc, file=f)
+            if self._context.multipage and not self._context.embedded:
+                nav_bar = navigation_bar(self._context.current_document)
+                if nav_bar:
+                    print(nav_bar, file=f)
+
+        if self._context.progress is not None:
+            self._context.progress.update()
+
+        return out_file
+
+
+class ApiProxy:
+    """Proxy for exposing legacy `api.` commands."""
+    _api: Api
+
+    def __init__(self, api: Api):
+        self._api = api
+
+    def __getattr__(self, name: str):
+        if name in SUPPORTED_COMMANDS:
+            return getattr(self._api, name)
+        elif name.startswith("insert_"):
+            return functools.partial(self._api.insert, kind=name[7:])
+        elif name.startswith("link_"):
+            return functools.partial(self._api.link, kind=name[5:])
+        else:
+            raise AttributeError(name)
+
+    def cross_document_ref(self,
+                           file_name: Optional[str] = None,
+                           anchor: Optional[str] = None,
+                           link_text: Optional[str] = None) -> str:
+        return self._api.cross_document_ref(file_name, anchor=anchor, link_text=link_text)
+
+    def include(self,
+                file_name: str,
+                leveloffset: str = "+1",
+                link_text: str = "",
+                link_prefix: str = "",
+                multipage_link: bool = True,
+                always_embed: bool = False,
+                **asciidoc_options) -> str:
+        return self._api.include(file_name,
+                                 leveloffset=leveloffset,
+                                 link_text=link_text,
+                                 link_prefix=link_prefix,
+                                 multipage_link=multipage_link,
+                                 always_embed=always_embed,
+                                 **asciidoc_options)
+
 
 def process_adoc(in_file: Path,
-                 build_dir: Path,
                  api_reference: ApiReference,
+                 package_manager: PackageManager,
                  warnings_are_errors: bool = False,
                  multipage: bool = False,
                  progress: Optional[tqdm] = None):
@@ -514,7 +850,6 @@ def process_adoc(in_file: Path,
 
     Args:
         in_file:             AsciiDoc file to process.
-        build_dir:           Directory to store build artifacts in.
         api_reference:       API reference to insert in the documents.
         warnings_are_errors: True to treat every warning as an error.
         multipage:          True to enable multi page output.
@@ -525,71 +860,36 @@ def process_adoc(in_file: Path,
     """
 
     context = Context(base_dir=in_file.parent,
-                      build_dir=build_dir,
-                      fragment_dir=build_dir / "fragments",
+                      fragment_dir=package_manager.build_dir / "fragments",
                       reference=api_reference,
-                      current_document=DocumentTreeNode(in_file, None))
+                      package_manager=package_manager,
+                      current_document=DocumentTreeNode(in_file, None),
+                      current_package=package_manager.input_package())
 
-    context.build_dir.mkdir(parents=True, exist_ok=True)
+    context.package_manager.work_dir.mkdir(parents=True, exist_ok=True)
     context.fragment_dir.mkdir(parents=True, exist_ok=True)
 
     context.warnings_are_errors = warnings_are_errors
     context.multipage = multipage
     context.progress = progress
 
-    _process_adoc(in_file, context)
-    context.linked = []
-    context.preprocessing_run = False
-    context.in_to_out_file_map[in_file] = _process_adoc(in_file, context)
+    PreprocessingApi(in_file, context).process_adoc()
     _check_links(context)
+    GeneratingApi(in_file, context).process_adoc()
     return context.in_to_out_file_map
 
 
-def _process_adoc(in_file: Path, context: Context):
-    logger.info(f"Processing {in_file}")
-    api = Api(in_file, context)
-    out_file = _out_file_name(in_file)
-
-    template = Template(filename=os.fspath(in_file), input_encoding="utf-8")
-    if context.preprocessing_run:
-        context.in_to_out_file_map[in_file] = out_file
-
-        if context.progress is not None:
-            context.progress.total = 2 * len(context.in_to_out_file_map)
-            context.progress.update(0)
-
-    rendered_doc = template.render(api=api)
-
-    if not context.preprocessing_run:
-        with out_file.open("w", encoding="utf-8") as f:
-            print(rendered_doc, file=f)
-            if context.multipage:
-                nav_bar = navigation_bar(context.current_document)
-                if nav_bar:
-                    print(nav_bar, file=f)
-
-    if context.progress is not None:
-        context.progress.update()
-
-    return out_file
-
-
 def _check_links(context: Context):
-    linked = {e.id for e in context.linked}
-    dangling = linked - context.inserted.keys()
+    dangling = context.linked - context.inserted.keys()
     if dangling:
-        names = {f"{e.language}: {e.full_name}" for e in context.linked if e.id in dangling}
+        dangling_elements = {
+            context.reference.find(target_id=element_id)
+            for element_id in dangling
+        }
+        names = {f"{e.language}: {e.full_name}" for e in dangling_elements if e is not None}
         msg = ("The following elements are linked to, but not included in the documentation:\n\t" +
                "\n\t".join(names))
         if context.warnings_are_errors:
             raise ConsistencyError(msg)
         else:
             logger.warning(msg)
-
-
-def _out_file_name(in_file: Path) -> Path:
-    return in_file.parent / f".asciidoxy.{in_file.name}"
-
-
-def _docinfo_footer_file_name(in_file: Path) -> Path:
-    return in_file.parent / f".asciidoxy.{in_file.stem}-docinfo-footer.html"

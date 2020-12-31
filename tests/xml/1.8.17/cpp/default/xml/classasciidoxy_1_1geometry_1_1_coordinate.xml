@@ -1,0 +1,295 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classasciidoxy_1_1geometry_1_1_coordinate" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::geometry::Coordinate</compoundname>
+    <includes refid="coordinate_8hpp" local="no">coordinate.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classasciidoxy_1_1geometry_1_1_coordinate_1a52b32f5ac1d5690a56645ba6cc45ed3d" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double asciidoxy::geometry::Coordinate::latitude_</definition>
+        <argsstring></argsstring>
+        <name>latitude_</name>
+        <initializer>{0.0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="108" column="10" bodyfile="coordinate.hpp" bodystart="108" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1geometry_1_1_coordinate_1aa1f1fa30bae57977d397929654496270" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double asciidoxy::geometry::Coordinate::longitude_</definition>
+        <argsstring></argsstring>
+        <name>longitude_</name>
+        <initializer>{0.0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="109" column="10" bodyfile="coordinate.hpp" bodystart="109" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1geometry_1_1_coordinate_1ac5f3b7b213473d7fedbdc7ccda7816f6" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double asciidoxy::geometry::Coordinate::altitude_</definition>
+        <argsstring></argsstring>
+        <name>altitude_</name>
+        <initializer>{0.0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="110" column="10" bodyfile="coordinate.hpp" bodystart="110" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>asciidoxy::geometry::Coordinate::Coordinate</definition>
+        <argsstring>()</argsstring>
+        <name>Coordinate</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Default constructor. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="38" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>asciidoxy::geometry::Coordinate::~Coordinate</definition>
+        <argsstring>()</argsstring>
+        <name>~Coordinate</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Destructor. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="43" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classasciidoxy_1_1geometry_1_1_coordinate" kindref="compound">Coordinate</ref></type>
+        <definition>Coordinate asciidoxy::geometry::Coordinate::operator+</definition>
+        <argsstring>(const Coordinate &amp;other) const</argsstring>
+        <name>operator+</name>
+        <param>
+          <type>const <ref refid="classasciidoxy_1_1geometry_1_1_coordinate" kindref="compound">Coordinate</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Coordinates can be added. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="48" column="14"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double asciidoxy::geometry::Coordinate::Latitude</definition>
+        <argsstring>() const</argsstring>
+        <name>Latitude</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Latitude.</para>
+<para><simplesect kind="return"><para>The latitude in degrees. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="55" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double asciidoxy::geometry::Coordinate::Longitude</definition>
+        <argsstring>() const</argsstring>
+        <name>Longitude</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Longitude.</para>
+<para><simplesect kind="return"><para>The longitude in degrees. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="62" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double asciidoxy::geometry::Coordinate::Altitude</definition>
+        <argsstring>() const</argsstring>
+        <name>Altitude</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Altitude.</para>
+<para><simplesect kind="return"><para>The altitude in meters. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="69" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool asciidoxy::geometry::Coordinate::IsValid</definition>
+        <argsstring>() const</argsstring>
+        <name>IsValid</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Check if the coordinate is valid.</para>
+<para>A coordinate is valid if its values are within WGS84 bounds.</para>
+<para><simplesect kind="return"><para>True if valid, false if not. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="78" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::geometry::Coordinate::Update</definition>
+        <argsstring>(const Coordinate &amp;coordinate)</argsstring>
+        <name>Update</name>
+        <param>
+          <type>const <ref refid="classasciidoxy_1_1geometry_1_1_coordinate" kindref="compound">Coordinate</ref> &amp;</type>
+          <declname>coordinate</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Update from another coordinate. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="83" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::geometry::Coordinate::Update</definition>
+        <argsstring>(std::tuple&lt; double, double, double &gt; coordinate)</argsstring>
+        <name>Update</name>
+        <param>
+          <type>std::tuple&lt; double, double, double &gt;</type>
+          <declname>coordinate</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Update from a tuple of latitude, longitude and altitue. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="88" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::geometry::Coordinate::Update</definition>
+        <argsstring>(std::tuple&lt; double, double &gt; coordinate)</argsstring>
+        <name>Update</name>
+        <param>
+          <type>std::tuple&lt; double, double &gt;</type>
+          <declname>coordinate</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Update from a tuple of only latitude and longitude. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="93" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::geometry::Coordinate::Update</definition>
+        <argsstring>(double latitude, double longitude)</argsstring>
+        <name>Update</name>
+        <param>
+          <type>double</type>
+          <declname>latitude</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>longitude</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Update latitude and longitude.</para>
+<para>Altitude remains unchanged. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="100" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::geometry::Coordinate::Update</definition>
+        <argsstring>(double latitude, double longitude, double altitude)</argsstring>
+        <name>Update</name>
+        <param>
+          <type>double</type>
+          <declname>latitude</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>longitude</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>altitude</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Update from separate values. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="coordinate.hpp" line="105" column="8"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Class to hold information about a coordinate.</para>
+<para>A coordinate has a latitude, longitude, and an altitude. </para>
+    </detaileddescription>
+    <location file="coordinate.hpp" line="33" column="17" bodyfile="coordinate.hpp" bodystart="33" bodyend="111"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Altitude</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ac5f3b7b213473d7fedbdc7ccda7816f6" prot="private" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>altitude_</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Coordinate</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>IsValid</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Latitude</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a52b32f5ac1d5690a56645ba6cc45ed3d" prot="private" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>latitude_</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Longitude</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1aa1f1fa30bae57977d397929654496270" prot="private" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>longitude_</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>operator+</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Update</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Update</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Update</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Update</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Update</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>~Coordinate</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

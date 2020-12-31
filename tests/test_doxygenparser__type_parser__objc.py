@@ -43,7 +43,8 @@ def objc_type_prefix(request):
     return request.param
 
 
-@pytest.fixture(params=["", " *", " **", " * *", " * _Nonnull", " * _Nullable"])
+@pytest.fixture(
+    params=["", " *", " **", " * *", " * _Nonnull", " * _Nullable", "*_Nonnull*__autoreleasing"])
 def objc_type_suffix(request):
     return request.param
 

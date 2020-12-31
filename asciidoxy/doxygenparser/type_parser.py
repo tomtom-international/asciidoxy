@@ -257,16 +257,21 @@ class TypeParser:
         tokens[:0] = cls.remove_trailing_whitespace(names)
 
         nested_types: Optional[List[TypeRef]] = []
-        arg_types: Optional[List[Parameter]] = []
         try:
             nested_types, tokens = cls.nested_types(tokens, driver, parent)
-            arg_types, tokens = cls.arg_types(tokens, driver, parent)
         except TypeParseError as e:
             logger.warning(f"Failed to parse nested types: {e}")
             return fallback()
 
         suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
-        cls.remove_trailing_whitespace(suffixes)
+        tokens[:0] = cls.remove_trailing_whitespace(suffixes)
+
+        arg_types: Optional[List[Parameter]] = []
+        try:
+            arg_types, tokens = cls.arg_types(tokens, driver, parent)
+        except TypeParseError as e:
+            logger.warning(f"Failed to parse args: {e}")
+            return fallback()
 
         if not names:
             logger.warning(f"No name found in `{'`,`'.join(t.text for t in original_tokens)}`")
@@ -278,13 +283,26 @@ class TypeParser:
             suffixes.extend(tokens)
 
         type_ref = TypeRef(cls.TRAITS.TAG)
-        type_ref.name = cls.TRAITS.cleanup_name("".join(n.text for n in names))
-        type_ref.prefix = "".join(p.text for p in prefixes)
-        type_ref.suffix = "".join(s.text for s in suffixes)
-        type_ref.nested = nested_types
+
+        if arg_types is not None:
+            type_ref.returns = TypeRef(cls.TRAITS.TAG)
+            type_ref.returns.name = cls.TRAITS.cleanup_name("".join(n.text for n in names))
+            type_ref.returns.prefix = "".join(p.text for p in prefixes)
+            type_ref.returns.suffix = "".join(s.text for s in suffixes)
+            type_ref.returns.nested = nested_types
+            type_ref.returns.id = cls.TRAITS.unique_id(names[0].refid)
+            type_ref.returns.kind = names[0].kind
+            type_ref.kind = "closure"
+
+        else:
+            type_ref.name = cls.TRAITS.cleanup_name("".join(n.text for n in names))
+            type_ref.prefix = "".join(p.text for p in prefixes)
+            type_ref.suffix = "".join(s.text for s in suffixes)
+            type_ref.nested = nested_types
+            type_ref.id = cls.TRAITS.unique_id(names[0].refid)
+            type_ref.kind = names[0].kind
+
         type_ref.args = arg_types
-        type_ref.id = cls.TRAITS.unique_id(names[0].refid)
-        type_ref.kind = names[0].kind
 
         if isinstance(parent, Compound):
             type_ref.namespace = parent.full_name
@@ -294,6 +312,10 @@ class TypeParser:
         if (driver is not None and type_ref.name and not type_ref.id
                 and not cls.TRAITS.is_language_standard_type(type_ref.name)):
             driver.unresolved_ref(type_ref)
+        if (driver is not None and type_ref.returns is not None and type_ref.returns.name
+                and not type_ref.returns.id
+                and not cls.TRAITS.is_language_standard_type(type_ref.returns.name)):
+            driver.unresolved_ref(type_ref.returns)
 
         return type_ref
 

@@ -16,12 +16,12 @@
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 %>
 = [[${element.id},${element.full_name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${ObjcTemplateHelper(api_context).block_definition(element)}
+${ObjcTemplateHelper(api).block_definition(element)}
 ----
 ${element.brief}
 

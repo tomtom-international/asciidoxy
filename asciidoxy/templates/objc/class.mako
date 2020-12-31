@@ -18,11 +18,11 @@ from asciidoxy.templates.helpers import has
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 %>
 <%
-helper = ObjcTemplateHelper(api_context, element, insert_filter)
+helper = ObjcTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
 = [[${element.id},${element.name}]]${element.name}
-${api_context.insert(element)}
+${api.inserted(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
@@ -39,60 +39,61 @@ ${element.description}
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
-
+% for prot in ("public", "protected", "private"):
 ###################################################################################################
-% if has(helper.public_simple_enclosed_types()):
-|*Enclosed types*
+% if has(helper.simple_enclosed_types(prot=prot)):
+|*${prot.capitalize()} Enclosed Types*
 |
-% for enclosed in helper.public_simple_enclosed_types():
+% for enclosed in helper.simple_enclosed_types(prot=prot):
 `xref:${enclosed.id}[${enclosed.name}]`::
 ${enclosed.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_properties()):
-|*Properties*
+% if has(helper.properties(prot=prot)):
+|*${prot.capitalize()} Properties*
 |
-% for prop in helper.public_properties():
+% for prop in helper.properties(prot=prot):
 `xref:${prop.id}[${prop.name}]`::
 ${prop.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_class_methods()):
-|*Class methods*
+% if has(helper.class_methods(prot=prot)):
+|*${prot.capitalize()} Class Methods*
 |
-% for method in helper.public_class_methods():
+% for method in helper.class_methods(prot=prot):
 `xref:${method.id}[+ ${method.name}]`::
 ${method.brief}
 % endfor
 
 % endif
 ###################################################################################################
-% if has(helper.public_methods()):
-|*Methods*
+% if has(helper.methods(prot=prot)):
+|*${prot.capitalize()} Methods*
 |
-% for method in helper.public_methods():
+% for method in helper.methods(prot=prot):
 `xref:${method.id}[- ${method.name}]`::
 ${method.brief}
 % endfor
 
 % endif
+% endfor
 |===
 
 ############################################################################ Simple inner types ##
-% for enclosed in helper.public_simple_enclosed_types():
+% for enclosed in helper.simple_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 
 == Members
-
+% for prot in ("public", "protected", "private"):
 ##################################################################################### Properties ##
-% for prop in helper.public_properties():
+% for prop in helper.properties(prot=prot):
 [[${prop.id},${prop.name}]]
-${api_context.insert(prop)}
+${api.inserted(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
 @property() ${helper.print_ref(prop.returns.type)} ${prop.name}
@@ -105,9 +106,9 @@ ${prop.description}
 '''
 % endfor
 ################################################################################## Class methods ##
-% for method in helper.public_class_methods():
+% for method in helper.class_methods(prot=prot):
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)};
@@ -151,9 +152,9 @@ ${exception.description}
 '''
 % endfor
 ######################################################################################## Methods ##
-% for method in helper.public_methods():
+% for method in helper.methods(prot=prot):
 [[${method.id},${method.name}]]
-${api_context.insert(method)}
+${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
 ${helper.method_signature(method)};
@@ -195,4 +196,5 @@ ${exception.description}
 % endif
 
 '''
+% endfor
 % endfor

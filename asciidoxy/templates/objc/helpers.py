@@ -66,7 +66,7 @@ class ObjcTemplateHelper(TemplateHelper):
         return (f"typedef {self.print_ref(block.returns.type, skip_args=True)}(^{block_name})"
                 f" {self.argument_list(block.returns.type.args)}")
 
-    def public_simple_enclosed_types(self) -> Iterator[Member]:
+    def simple_enclosed_types(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
@@ -74,5 +74,4 @@ class ObjcTemplateHelper(TemplateHelper):
         return (m for m in self.insert_filter.members(self.element)
                 if m.kind in ["enum", "class", "protocol"])
 
-    def public_class_methods(self) -> Iterator[Member]:
-        return self.public_static_methods()
+    class_methods = TemplateHelper.static_methods

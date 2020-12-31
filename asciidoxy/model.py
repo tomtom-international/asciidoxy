@@ -84,6 +84,7 @@ class TypeRef(TypeRefBase):
         nested:    List of nested types. None if no arguments, an empty list if zero arguments.
         args:      Arguments for function like types. None if no arguments, an empty list if zero
                        arguments.
+        returns:   Return type in case of closure types.
     """
 
     # doxygen based fields
@@ -93,6 +94,7 @@ class TypeRef(TypeRefBase):
     suffix: Optional[str] = None
     nested: Optional[List["TypeRef"]] = None
     args: Optional[List["Parameter"]] = None
+    returns: Optional["TypeRef"] = None
 
     def __init__(self, language: str, name: str = ""):
         super().__init__(language, name)
@@ -123,6 +125,7 @@ class Parameter:
         name:          Name used for the parameter.
         description:   Explanation of the parameter.
         default_value: Default value for the parameter.
+        prefix:        Prefix for the parameter declaration.
     """
 
     # doxygen based fields
@@ -130,6 +133,7 @@ class Parameter:
     name: str = ""
     description: str = ""
     default_value: Optional[str] = None
+    prefix: Optional[str] = None
 
 
 class ReturnValue:

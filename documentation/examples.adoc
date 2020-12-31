@@ -12,129 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Examples
-:notitle:
-:icons: font
-:doctype: book
-:source-highlighter: highlightjs
-:toc: right
-:toc-title: On this page
-${api.multipage_toc()}
-
-----
-    ___              _ _ ____
-   /   |  __________(_|_) __ \____  _  ____  __
-  / /| | / ___/ ___/ / / / / / __ \| |/_/ / / /
- / ___ |(__  ) /__/ / / /_/ / /_/ />  </ /_/ /
-/_/  |_/____/\___/_/_/_____/\____/_/|_|\__, /
-                                      /____/
-----
-
-[ ${api.cross_document_ref("index.adoc", "", "Home")} |
-${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", "", "Usage")} |
-${api.cross_document_ref("examples.adoc", "", "Examples")} |
-${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
-${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
-https://github.com/tomtom-international/asciidoxy[GitHub] ]
-
-= {doctitle}
+${include("_header.adoc", always_embed=True, leveloffset=None)}
 
 These are some examples of AsciiDoxy in action. They demonstrate documentation for source code used
 to test AsciiDoxy. The first example is the website you are looking at. It is completely generated
 using AsciiDoxy.
 
-== C++ class
+${include("examples/cpp/example-cpp.adoc", link_text="{Cpp}", link_prefix=". ")}
+${include("examples/java/example-java.adoc", link_text="Java", link_prefix=". ")}
+${include("examples/java/example-kotlin-transcoded.adoc", link_text="Kotlin transcoded from Java", link_prefix=". ")}
+${include("examples/objc/example-objc.adoc", link_text="Objective C", link_prefix=". ")}
+${include("examples/objc/example-swift-transcoded.adoc", link_text="Swift transcoded from Objective C", link_prefix=". ")}
+${include("examples/python/example-python.adoc", link_text="Python", link_prefix=". ")}
 
-Insert a basic C++ class:
-
-[source,python]
-----
-${"""
-${api.insert("asciidoxy::geometry::Coordinate", leveloffset="+3")}
-"""}
-----
-
-.Source code
-[%collapsible]
-====
-[source,cpp]
-----
-include::./source_code/cpp/default/coordinate.hpp[]
-----
-====
-
-=== Output
-
-${api.insert("asciidoxy::geometry::Coordinate", leveloffset="+3")}
-
-== Java class
-
-Insert a basic Java class:
-
-[source,python]
-----
-${"""
-${api.insert("com.asciidoxy.geometry.Coordinate", leveloffset="+3")}
-"""}
-----
-
-.Source code
-[%collapsible]
-====
-[source,java]
-----
-include::./source_code/java/default/Coordinate.java[]
-----
-====
-
-=== Output
-
-${api.insert("com.asciidoxy.geometry.Coordinate", leveloffset="+3")}
-
-== Objective C interface
-
-Insert a basic Objective C interface:
-
-[source,python]
-----
-${"""
-${api.insert("ADCoordinate", leveloffset="+3")}
-"""}
-----
-
-.Source code
-[%collapsible]
-====
-[source,objectivec]
-----
-include::./source_code/objc/default/ADCoordinate.h[]
-----
-====
-
-=== Output
-
-${api.insert("ADCoordinate", leveloffset="+3")}
-
-== Python class
-
-Insert a python class:
-
-[source,python]
-----
-${"""
-${api.insert("asciidoxy.geometry.Coordinate", leveloffset="+3")}
-"""}
-----
-
-.Source code
-[%collapsible]
-====
-[source,python]
-----
-include::./source_code/python/default/asciidoxy/geometry.py[]
-----
-====
-
-=== Output
-
-${api.insert("asciidoxy.geometry.Coordinate", leveloffset="+3")}

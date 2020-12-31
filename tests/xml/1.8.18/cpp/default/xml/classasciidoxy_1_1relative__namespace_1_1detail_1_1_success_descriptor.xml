@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1relative__namespace_1_1detail_1_1_success_descriptor" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::relative_namespace::detail::SuccessDescriptor</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="relative_namespace.hpp" line="30" column="1" bodyfile="relative_namespace.hpp" bodystart="30" bodyend="31"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

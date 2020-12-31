@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1geometry_1_1_coordinate" kind="class" language="Python" prot="public">
+    <compoundname>asciidoxy::geometry::Coordinate</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>asciidoxy.geometry.Coordinate::latitude</definition>
+        <argsstring></argsstring>
+        <name>latitude</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Latitude in degrees. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/geometry.py" line="39" column="1" bodyfile="asciidoxy/geometry.py" bodystart="39" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1geometry_1_1_coordinate_1a0eb652e91c894dc2e49d9fbf3f224aa5" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>asciidoxy.geometry.Coordinate::longitude</definition>
+        <argsstring></argsstring>
+        <name>longitude</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Longitude in degrees. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/geometry.py" line="40" column="1" bodyfile="asciidoxy/geometry.py" bodystart="40" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classasciidoxy_1_1geometry_1_1_coordinate_1ad238c9c268dc5518859400dc9c857fe3" prot="public" static="no" mutable="no">
+        <type></type>
+        <definition>asciidoxy.geometry.Coordinate::altitude</definition>
+        <argsstring></argsstring>
+        <name>altitude</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Altitude in meters. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/geometry.py" line="41" column="1" bodyfile="asciidoxy/geometry.py" bodystart="41" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>def</type>
+        <definition>def asciidoxy.geometry.Coordinate.__init__</definition>
+        <argsstring>(self)</argsstring>
+        <name>__init__</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/geometry.py" line="38" column="1" bodyfile="asciidoxy/geometry.py" bodystart="38" bodyend="42"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition> bool asciidoxy.geometry.Coordinate.is_valid</definition>
+        <argsstring>(self)</argsstring>
+        <name>is_valid</name>
+        <param>
+          <type>self</type>
+          <defname>self</defname>
+        </param>
+        <briefdescription>
+<para>Check if the coordinate is valid. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><verbatim>   A coordinate is valid if its values are within WGS84 bounds.
+</verbatim></para>
+<para><simplesect kind="return"><para>True if valid, False if not. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/geometry.py" line="50" column="1" bodyfile="asciidoxy/geometry.py" bodystart="50" bodyend="52"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>&quot;Coordinate&quot;</type>
+        <definition> &quot;Coordinate&quot; asciidoxy.geometry.Coordinate.from_string</definition>
+        <argsstring>(cls, str value)</argsstring>
+        <name>from_string</name>
+        <param>
+          <type>cls</type>
+          <defname>cls</defname>
+        </param>
+        <param>
+          <type>str</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+<para>Create a coordinate from its string representation. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/geometry.py" line="55" column="1" bodyfile="asciidoxy/geometry.py" bodystart="55" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Optional[&quot;Coordinate&quot;]</type>
+        <definition> Optional[&quot;Coordinate&quot;] asciidoxy.geometry.Coordinate.from_string_safe</definition>
+        <argsstring>(cls, Optional[str] value)</argsstring>
+        <name>from_string_safe</name>
+        <param>
+          <type>cls</type>
+          <defname>cls</defname>
+        </param>
+        <param>
+          <type>Optional</type>
+          <declname>value</declname>
+          <array>[str]</array>
+        </param>
+        <briefdescription>
+<para>Create a coordinate from its string representation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><verbatim>   Accepts None as input.
+</verbatim> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/geometry.py" line="68" column="1" bodyfile="asciidoxy/geometry.py" bodystart="68" bodyend="70"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>&quot;Coordinate&quot;</type>
+        <definition> &quot;Coordinate&quot; asciidoxy.geometry.Coordinate.combine</definition>
+        <argsstring>(&quot;Coordinate&quot; left, &quot;Coordinate&quot; right)</argsstring>
+        <name>combine</name>
+        <param>
+          <type>&quot;Coordinate&quot;</type>
+          <declname>left</declname>
+        </param>
+        <param>
+          <type>&quot;Coordinate&quot;</type>
+          <declname>right</declname>
+        </param>
+        <briefdescription>
+<para>Combine two coordinates. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="asciidoxy/geometry.py" line="60" column="1" bodyfile="asciidoxy/geometry.py" bodystart="60" bodyend="62"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Class to hold information about a coordinate. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>A coordinate has a latitude, longitude, and an altitude. </para>
+    </detaileddescription>
+    <location file="asciidoxy/geometry.py" line="24" column="1" bodyfile="asciidoxy/geometry.py" bodystart="24" bodyend="70"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>__init__</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ad238c9c268dc5518859400dc9c857fe3" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>altitude</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>combine</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>from_string</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>from_string_safe</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>is_valid</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>latitude</name></member>
+      <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a0eb652e91c894dc2e49d9fbf3f224aa5" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>longitude</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

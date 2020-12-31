@@ -1,0 +1,68 @@
+// Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Installation
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+
+To get started with AsciiDoxy you need to install at least python and AsciiDoctor. The required
+versions are specified in the ${cross_document_ref("../reference/requirements.adoc",
+link_text="reference documentation")}.
+
+:sectnums:
+== Python
+
+To install python see the https://www.python.org/[python website] and/or the documentation of your
+operating system.
+
+Most Linux distributions install python by default. Make sure the installed version matches the
+${cross_document_ref("../reference/requirements.adoc", link_text="requirements")}.
+
+On macOS python is also already installed, but this may be a version that is too old for AsciiDoxy.
+You can use https://brew.sh[HomeBrew] to install a newer version of python.
+
+== AsciiDoctor
+
+AsciiDoctor runs on ruby. First install ruby for your operating system. See the
+https://www.ruby-lang.org/en/[ruby documentation] for instructions.
+
+Then use `gem` to install AsciiDoctor:
+
+[source,bash]
+----
+gem install asciidoctor
+----
+
+To generate PDF files, you also need the PDF extension for AsciiDoctor:
+
+[source,bash]
+----
+gem install asciidoctor-pdf
+----
+
+[NOTE]
+====
+Some Linux distributions support directly installing AsciiDoctor using its package manager. See the
+documentation for your operating system, or
+https://asciidoctor.org/docs/user-manual/#installing-the-asciidoctor-ruby-gem[AsciiDoctor].
+====
+
+== AsciiDoxy
+
+Finally, install AsciiDoxy using `pip`:
+
+[source,bash]
+----
+pip3 install --update asciidoxy
+----
+
+Now you are ready to go.

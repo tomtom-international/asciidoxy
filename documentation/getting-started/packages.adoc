@@ -1,0 +1,231 @@
+// Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Packages
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+
+AsciiDoxy has been created to generate developer documentation for large projects. In large projects
+different components may be developed by separate teams in separate source control repositories.
+Integration into the final product happens at a different moment than the actual development of new
+features. Writing the documentation for each component as part of development, helps to have up to
+date documentation. Storing that documentation with the exact component version it belongs to
+prevents mismatches between what is documented and what has been integrated into the final product.
+
+The concept of packages is used to distribute and collect documentation for different components.
+Packages contain partial documentation in AsciiDoc format, including supporting files like images
+and code snippets. AsciiDoxy collects packages from local directories or remote (HTTP) servers and
+combines them in a single documentation.
+
+:sectnums:
+== Creating a package
+
+A package is either a directory or an archive containing one or more subdirectories with shared
+content. In the root of the package there is a package content file describing what each
+subdirectory contains and what AsciiDoxy should do with it. In this guide we are going to create
+the most basic package format: a local directory.
+
+[TIP]
+====
+For an overview of supported package formats, see
+${cross_document_ref("../reference/packages.adoc", anchor="_package_format",
+                     link_text="the packages section in the reference documentation")}.
+====
+
+. Create a new directory for the package named `my-package`.
+. Create a subdirectory inside the new directory called `src`. This will be the directory in which
+  we are going to add AsciiDoc files to share.
+. Add an AsciiDoc file called `reference.adoc` in `my-package/src`. Add some basic headers and text.
+. Add a TOML called `contents.toml` in the root of `my-package`. This is the package content file.
+  The name of the file is mandatory, and it must be in the root of the package.
+
+In `contents.toml` the contents of the package need to be described. Enter the following content:
+
+.contents.toml
+[source]
+----
+[package]            # <1>
+name = "my-package"  # <2>
+
+[asciidoc]           # <3>
+src_dir = "src"      # <4>
+----
+<1> The `package` section is mandatory for all packages. It contains metadata for the entire
+package.
+<2> The `name` is also mandatory. It is used to refer to the package when using it.
+<3> This package will contain AsciiDoc files.
+<4> The AsciiDoc files are in a subdirectory called `src` in the package.
+
+[TIP]
+====
+More details and syntax for the package content file can be found in
+${cross_document_ref("../reference/packages.adoc", anchor="_package_content_files",
+                     link_text="the packages section in the reference documentation")}.
+====
+
+[NOTE]
+====
+There is also a legacy package format that does not contain a package content file. The legacy
+format is deprecated and will be removed in a future version of AsciiDoxy.
+====
+
+== Collecting the package
+
+To use the contents of a package in the main documentation, AsciiDoxy needs to collect it. Packages
+to collect are described in a package specification file. This file describes for every package
+where it needs to be collected from.
+
+To use the local package from the previous section, the package specification file needs to look
+like this:
+
+.packages.toml
+[source]
+----
+[packages]                                 # <1>
+
+[packages.my-package]                      # <2>
+type = "local"                             # <3>
+package_dir = "/home/me/asciidoc/package"  # <4>
+----
+<1> The `packages` section contains all packages to collect.
+<2> Each package needs to be defined in a subsection of `packages` with a unique name.
+<3> This is a package in a local directory.
+<4> The location on your local file system containing the package. This should point to the root
+    of the package, the directory directly containing `contents.toml`.
+
+The package specification file is provided to AsciiDoxy using the command-line option `--spec-file`:
+
+[source]
+----
+asciidoxy --spec-file packages.spec INPUT_FILE
+----
+
+[TIP]
+====
+More details and syntax for the package specification file can be found in
+${cross_document_ref("../reference/packages.adoc", anchor="_package_specification_files",
+                     link_text="the packages section in the reference documentation")}.
+====
+
+== Using the contents of the package
+
+AsciiDoc files contained in a package can be included in the main documentation (and in other
+packages) using `include`. Specify the name of the file to include, relative to the `src_dir`
+specified in the package content file. Add the `package_name` argument to indicate the file is
+contained in a package. The `package_name` must match the name in the package content file:
+
+[source]
+----
+${"""
+${include("reference.adoc", package_name="my-package")}
+"""}
+----
+
+The `cross_document_ref` command also supports the `package_name` argument. To create a link to
+a file in the package use:
+
+[source]
+----
+${"""
+${cross_document_ref("reference.adoc", package_name="my-package")}
+"""}
+----
+
+The package name must match the package containing the file. No file will be included, or no link
+will be created, if:
+
+* the file does not exist in the specified package.
+* the package name does not match the package content file.
+* the package is not present in the package specification file.
+
+A warning is printed when this happens. You can change the warnings into fatal errors using
+command-line option `--warnings-are-errors`.
+
+The same file cannot be present in multiple packages. A fatal error will occur when AsciiDoxy
+encounters duplicate files during collection. Having the same file name in different subdirectories
+is allowed. The same subdirectory in multiple packages is also allowed, but the contents of the
+subdirectories cannot have duplicates.
+
+If no `package_name` is given, AsciiDoxy looks for the file in the same packages as the file
+containing the command. It is not required to repeat the `package_name` when referring to files in
+the same package. The input file and the contents of the include directory given on the command
+line, are considered part of a special package called `INPUT`.
+
+== Setting a package root document
+
+Packages can specify a root document that is considered an entry point to the package. The root
+document is specified in the package content file as `root_doc`:
+
+.contents.toml
+[source]
+----
+[package]
+name = "my-package"
+
+[asciidoc]
+src_dir = "src"
+root_doc = "reference.adoc"
+----
+
+The root document must be specified relative to the `src_dir`.
+
+In other packages, or the main document, the root document is used by omitting the file name from
+the command:
+
+[source]
+----
+${"""
+${include(package_name="my-package")}
+${cross_document_ref(package_name="my-package")}
+"""}
+----
+
+If the package does not specify a root document, a warning (or error) is given.
+
+== Using images
+
+Image files require special handling. AsciiDoctor expects all image files in the location specified
+in `:imagesdir:`. In some output formats the images are embedded, while in other output formats the
+images need to be copied manually to the output directory. AsciiDoxy takes care of setting
+`:imagesdir:`, copying the images from the packages, and copying the images to the output directory
+if needed by the output format.
+
+To include images in a package:
+
+. Create a new subdirectory inside the package, e.g. `images`.
+. Add the name of the new subdirectory in the package content file.
+
+.contents.toml
+[source]
+----
+[package]
+name = "my-package"
+
+[asciidoc]
+src_dir = "src"
+image_dir = "images"
+----
+
+The image directory should not be a subdirectory of `src_dir`.
+
+Now you can insert images as described in https://asciidoctor.org/docs/user-manual/#images[the
+AsciiDoctor manual]. Do make sure you do not change the value of `:imagesdir:`.
+
+== More to come...
+
+The AsciiDoxy documentation is still being written. Expect more documentation about:
+
+ * Creating and using remote packages
+ * Simpler package specification using package sources
+ * URL string replacements for remote package sources
+ * Using a separate version file
+ * ...

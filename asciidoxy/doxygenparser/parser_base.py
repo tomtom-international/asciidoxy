@@ -98,18 +98,13 @@ class ParserBase(ABC):
             return None
 
         try:
-            type_ref = self.TYPE_PARSER.parse_xml(type_element,
-                                                  array_element,
-                                                  driver=self._driver,
-                                                  parent=parent)
+            return self.TYPE_PARSER.parse_xml(type_element,
+                                              array_element,
+                                              driver=self._driver,
+                                              parent=parent)
         except TypeParseError:
             logger.exception(
                 f"Failed to parse type {ET.tostring(type_element, encoding='unicode')}.")
-            return None
-
-        if type_ref is not None and type_ref.name:
-            return type_ref
-        else:
             return None
 
     def parse_exceptions(self, memberdef_element: ET.Element, parent: Member) -> List[ThrowsClause]:

@@ -15,13 +15,13 @@
 
 from typing import Iterator, Optional, Sequence
 
-from asciidoxy.generator import Context
+from asciidoxy.generator.asciidoc import Api
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Member, Parameter, TypeRef
 
 
 class TemplateHelper:
-    context: Context
+    api: Api
     element: Optional[Compound]
     insert_filter: Optional[InsertionFilter]
 
@@ -29,12 +29,16 @@ class TemplateHelper:
     NESTED_END: str = "&gt;"
     ARGS_START: str = "("
     ARGS_END: str = ")"
+    ARGS_BEFORE_TYPE = False
+    ARGS_TO_TYPE = ""
+    PARAM_NAME_FIRST = False
+    PARAM_NAME_SEP = " "
 
     def __init__(self,
-                 context: Context,
+                 api: Api,
                  element: Optional[Compound] = None,
                  insert_filter: Optional[InsertionFilter] = None):
-        self.context = context
+        self.api = api
         self.element = element
         self.insert_filter = insert_filter
 
@@ -46,10 +50,20 @@ class TemplateHelper:
         if ref is None:
             return ""
 
-        if ref.nested is not None:
-            if len(ref.nested) > 0:
+        outer_prefix = ""
+        outer_suffix = ""
+        inner_ref = ref
+        if ref.returns is not None:
+            inner_ref = ref.returns
+
+            if ref.prefix or ref.suffix:
+                outer_prefix = f"{ref.prefix or ''}("
+                outer_suffix = f"){ref.suffix or ''}"
+
+        if inner_ref.nested is not None:
+            if len(inner_ref.nested) > 0:
                 nested_parts = (self.print_ref(r, link=link, skip_args=skip_args)
-                                for r in ref.nested)
+                                for r in inner_ref.nested)
                 nested = (f"{self.NESTED_START}{', '.join(nested_parts)}{self.NESTED_END}")
             else:
                 nested = f"{self.NESTED_START}{self.NESTED_END}"
@@ -62,22 +76,43 @@ class TemplateHelper:
                 args = f"{self.ARGS_START}{', '.join(arg_parts)}{self.ARGS_END}"
             else:
                 args = f"{self.ARGS_START}{self.ARGS_END}"
-        else:
-            args = ""
 
-        if link and ref.id:
-            return (f"{ref.prefix or ''}"
-                    f"{self.context.link_to_element(ref.id, ref.name)}{nested}{args}"
-                    f"{ref.suffix or ''}").strip()
+            if self.ARGS_BEFORE_TYPE:
+                args_before = f"{args}{self.ARGS_TO_TYPE}"
+                args_after = ""
+            else:
+                args_before = ""
+                args_after = f"{self.ARGS_TO_TYPE}{args}"
         else:
-            return f"{ref.prefix or ''}{ref.name}{nested}{args}{ref.suffix or ''}".strip()
+            args_before = args_after = ""
+
+        if link and inner_ref.id:
+            return (f"{outer_prefix}{args_before}{inner_ref.prefix or ''}"
+                    f"{self.api.link_to_element(inner_ref.id, inner_ref.name)}{nested}"
+                    f"{inner_ref.suffix or ''}{args_after}{outer_suffix}").strip()
+        else:
+            return (f"{outer_prefix}{args_before}{inner_ref.prefix or ''}{inner_ref.name}{nested}"
+                    f"{inner_ref.suffix or ''}{args_after}{outer_suffix}".strip())
 
     def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
         if default_value and param.default_value:
             defval = f" = {param.default_value}"
         else:
             defval = ""
-        return f"{self.print_ref(param.type, link=link)} {param.name}{defval}".strip()
+        prefix = param.prefix or ""
+
+        param_type = self.print_ref(param.type, link=link)
+        if not param_type:
+            type_and_name = param.name
+        else:
+            if not param.name:
+                type_and_name = self.print_ref(param.type, link=link)
+            elif self.PARAM_NAME_FIRST:
+                type_and_name = f"{param.name}{self.PARAM_NAME_SEP}{param_type}"
+            else:
+                type_and_name = f"{param_type}{self.PARAM_NAME_SEP}{param.name}"
+
+        return f"{prefix}{type_and_name}{defval}".strip()
 
     def argument_list(self, params: Sequence[Parameter], *, link: bool = True) -> str:
         return f"({', '.join(self.parameter(p, link=link) for p in params)})"
@@ -127,55 +162,55 @@ class TemplateHelper:
     def _method_join(*parts: str) -> str:
         return " ".join(part for part in parts if part)
 
-    def public_static_methods(self) -> Iterator[Member]:
+    def static_methods(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.returns and m.prot == "public" and m.static))
+                if (m.kind == "function" and m.returns and m.prot == prot and m.static))
 
-    def public_methods(self) -> Iterator[Member]:
+    def methods(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.returns and m.prot == "public" and not m.static))
+                if (m.kind == "function" and m.returns and m.prot == prot and not m.static))
 
-    def public_constructors(self) -> Iterator[Member]:
+    def constructors(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         constructor_name = self.element.name
         return (m for m in self.insert_filter.members(self.element)
-                if m.kind == "function" and m.name == constructor_name and m.prot == "public")
+                if m.kind == "function" and m.name == constructor_name and m.prot == prot)
 
-    def public_simple_enclosed_types(self) -> Iterator[Member]:
+    def simple_enclosed_types(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.prot in ("public", "protected") and m.kind in ("enum", "typedef"))
+                if m.prot == prot and m.kind in ("enum", "typedef"))
 
-    def public_complex_enclosed_types(self) -> Iterator[Compound]:
+    def complex_enclosed_types(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m.referred_object for m in self.insert_filter.inner_classes(self.element)
-                if m.referred_object is not None and m.prot in ("public", "protected"))
+                if m.referred_object is not None and m.prot == prot)
 
-    def public_variables(self) -> Iterator[Member]:
+    def variables(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.kind == "variable" and m.prot == "public")
+                if m.kind == "variable" and m.prot == prot)
 
-    def public_properties(self) -> Iterator[Member]:
+    def properties(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.kind == "property" and m.prot == "public")
+                if m.kind == "property" and m.prot == prot)
 
 
 def has(elements):

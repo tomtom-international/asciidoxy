@@ -1,0 +1,49 @@
+
+= [[swift-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273,TrafficEventData.ADSeverity]]ADSeverity
+
+
+[source,swift,subs="-specialchars,macros+"]
+----
+#import &lt;ADTrafficEvent.h&gt;
+
+enum TrafficEventData.ADSeverity
+----
+
+Severity scale for traffic events.
+
+The more severe the traffic event, the more likely it is to have a large delay.
+
+[cols='h,5a']
+|===
+
+
+| [[swift-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414,Low]]Low
+|
+Low severity.
+
+
+
+
+| [[swift-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7,Medium]]Medium
+|
+Medium severity.
+
+
+
+
+| [[swift-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d,High]]High
+|
+High severity.
+
+Better stay away here.
+
+
+| [[swift-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff,Unknown]]Unknown
+|
+Severity unknown.
+
+
+
+|===
+
+

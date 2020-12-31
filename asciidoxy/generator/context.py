@@ -14,14 +14,16 @@
 """Context of the document being generated."""
 
 import logging
+import uuid
 
 from pathlib import Path
-from typing import Dict, List, MutableMapping, Optional
+from typing import Dict, MutableMapping, Optional, Set, Tuple
 
 from tqdm import tqdm
 
 from ..api_reference import ApiReference
 from ..model import ReferableElement
+from ..packaging import Package, PackageManager
 from .errors import ConsistencyError
 from .filters import InsertionFilter
 from .navigation import DocumentTreeNode, relative_path
@@ -37,13 +39,11 @@ class Context(object):
     Attributes:
         base_dir:           Base directory from which the documentation is generated. Relative
                                 paths are relative to the base directory.
-        build_dir:          Directory for (temporary) build artifacts.
         fragment_dir:       Directory containing generated fragments to be included in the
                                 documentation.
         namespace:          Current namespace to use when looking up references.
         language:           Default language to use when looking up references.
         insert_filter:      Filter used to select members of elements to insert.
-        preprocessing_run:  True when preprocessing. During preprocessing no files are generated.
         warnings_are_errors:True to treat every warning as an error.
         multipage:          True when multi page output is enabled.
         reference:          API reference information.
@@ -51,92 +51,172 @@ class Context(object):
         inserted:           All elements that have been inserted in the documentation.
         in_to_out_file_map: Mapping from input files for AsciiDoctor to the resulting output files.
         current_document:   Node in the Document Tree that is currently being processed.
+        current_package:    Package containing the current files.
     """
     base_dir: Path
-    build_dir: Path
     fragment_dir: Path
 
     namespace: Optional[str] = None
     language: Optional[str] = None
+    source_language: Optional[str] = None
     insert_filter: InsertionFilter
 
-    preprocessing_run: bool = True
     warnings_are_errors: bool = False
     multipage: bool = False
+    embedded: bool = False
 
     reference: ApiReference
+    package_manager: PackageManager
     progress: Optional[tqdm] = None
 
-    linked: List[ReferableElement]
+    linked: Set[str]
     inserted: MutableMapping[str, Path]
     in_to_out_file_map: Dict[Path, Path]
+    embedded_file_map: Dict[Tuple[Path, Path], Path]
     current_document: DocumentTreeNode
+    current_package: Package
 
-    def __init__(self, base_dir: Path, build_dir: Path, fragment_dir: Path, reference: ApiReference,
-                 current_document: DocumentTreeNode):
+    def __init__(self, base_dir: Path, fragment_dir: Path, reference: ApiReference,
+                 package_manager: PackageManager, current_document: DocumentTreeNode,
+                 current_package: Package):
         self.base_dir = base_dir
-        self.build_dir = build_dir
         self.fragment_dir = fragment_dir
 
-        self.insert_filter = InsertionFilter()
+        self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]},
+                                             inner_classes={"prot": ["+public", "+protected"]})
 
         self.reference = reference
+        self.package_manager = package_manager
 
-        self.linked = []
+        self.linked = set()
         self.inserted = {}
         self.in_to_out_file_map = {}
+        self.embedded_file_map = {}
         self.current_document = current_document
+        self.current_package = current_package
 
-    def insert(self, element) -> str:
-        if self.preprocessing_run:
-            if element.id in self.inserted:
-                msg = f"Duplicate insertion of {element.name}"
-                if self.warnings_are_errors:
-                    raise ConsistencyError(msg)
-                else:
-                    logger.warning(msg)
-            self.inserted[element.id] = self.current_document.in_file
-
-        return ""  # Prevent output in templates
+    def insert(self, element: ReferableElement) -> None:
+        assert element.id
+        if element.id in self.inserted:
+            msg = f"Duplicate insertion of {element.name}"
+            if self.warnings_are_errors:
+                raise ConsistencyError(msg)
+            else:
+                logger.warning(msg)
+        self.inserted[element.id] = self.current_document.in_file
 
     def sub_context(self) -> "Context":
         sub = Context(base_dir=self.base_dir,
-                      build_dir=self.build_dir,
                       fragment_dir=self.fragment_dir,
                       reference=self.reference,
-                      current_document=self.current_document)
+                      package_manager=self.package_manager,
+                      current_document=self.current_document,
+                      current_package=self.current_package)
 
         # Copies
         sub.namespace = self.namespace
         sub.language = self.language
-        sub.preprocessing_run = self.preprocessing_run
+        sub.source_language = self.source_language
         sub.warnings_are_errors = self.warnings_are_errors
         sub.multipage = self.multipage
+        sub.embedded = self.embedded
 
         # References
         sub.linked = self.linked
         sub.inserted = self.inserted
         sub.in_to_out_file_map = self.in_to_out_file_map
+        sub.embedded_file_map = self.embedded_file_map
         sub.insert_filter = self.insert_filter
         sub.progress = self.progress
 
         return sub
 
-    def link_to_element(self,
-                        element_id: str,
-                        link_text: str,
-                        element: Optional[ReferableElement] = None) -> str:
-        def file_part():
-            if not self.multipage or element_id not in self.inserted:
-                return ""
-            containing_file = self.inserted[element_id]
-            assert containing_file is not None
-            if self.current_document.in_file != containing_file:
-                return f"{relative_path(self.current_document.in_file, containing_file)}#"
+    def file_with_element(self, element_id: str) -> Optional[Path]:
+        if not self.multipage or element_id not in self.inserted:
+            return None
 
-        if element is None:
-            element = self.reference.find(target_id=element_id)
-        if element is not None:
-            self.linked.append(element)
+        containing_file = self.inserted[element_id]
+        assert containing_file is not None
+        if self.current_document.in_file != containing_file:
+            return containing_file
+        else:
+            return None
 
-        return f"xref:{file_part() or ''}{element_id}[{link_text}]"
+    def link_to_element(self, element_id: str) -> None:
+        self.linked.add(element_id)
+
+    def register_adoc_file(self, in_file: Path) -> Path:
+        assert in_file.is_absolute()
+        if self.embedded:
+            out_file = self.embedded_file_map.get((in_file, self.current_document.in_file), None)
+        else:
+            out_file = self.in_to_out_file_map.get(in_file, None)
+
+        if out_file is None:
+            if self.embedded:
+                out_file = _embedded_out_file_name(in_file)
+                self.embedded_file_map[(in_file, self.current_document.in_file)] = out_file
+            else:
+                out_file = _out_file_name(in_file)
+                self.in_to_out_file_map[in_file] = out_file
+
+        return out_file
+
+    def link_to_adoc_file(self, file_name: Path):
+        """Determine the correct path to link to a file.
+
+        The exact path differs for single and multipage mode and whether a file is embedded or not.
+        AsciiDoctor processes links in included files as if they are originating from the top level
+        file.
+        """
+        assert file_name.is_absolute()
+
+        if self.multipage:
+            embedded_file = self.embedded_file_map.get((file_name, self.current_document.in_file))
+            if embedded_file is not None:
+                # File is embedded in the current document, link to generated embedded file
+                return relative_path(self.current_document.in_file, embedded_file)
+            else:
+                # File is not embedded, link to original file name
+                return relative_path(self.current_document.in_file, file_name)
+
+        else:
+            # In singlepage mode all links need to be relative to the root file
+            embedded_file = self.embedded_file_map.get((file_name, self.current_document.in_file))
+            if embedded_file is not None:
+                # File is embedded in the current document, link to generated embedded file
+                return relative_path(self.current_document.root().in_file, embedded_file)
+
+            out_file = self.in_to_out_file_map.get(file_name, None)
+            if out_file is not None:
+                # File has been processed, and as we are in single page mode, it is embedded as
+                # well
+                return relative_path(self.current_document.root().in_file, out_file)
+
+            else:
+                # File is not processed, create relative link from current top level document
+                return relative_path(self.current_document.root().in_file, file_name)
+
+    def docinfo_footer_file(self) -> Path:
+        if self.multipage:
+            in_file = self.current_document.in_file
+        else:
+            in_file = self.current_document.root().in_file
+
+        out_file = self.in_to_out_file_map.get(in_file, None)
+        if out_file is None:
+            out_file = _out_file_name(in_file)
+
+        return _docinfo_footer_file_name(out_file)
+
+
+def _out_file_name(in_file: Path) -> Path:
+    return in_file.parent / f".asciidoxy.{in_file.name}"
+
+
+def _embedded_out_file_name(in_file: Path) -> Path:
+    return in_file.parent / f".asciidoxy.{uuid.uuid4()}.{in_file.name}"
+
+
+def _docinfo_footer_file_name(out_file: Path) -> Path:
+    return out_file.parent / f"{out_file.stem}-docinfo-footer.html"

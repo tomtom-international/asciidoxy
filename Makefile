@@ -14,6 +14,7 @@
 
 .PHONY: clean clean-test clean-pyc clean-build docs help
 .DEFAULT_GOAL := help
+.SUFFIXES:
 
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
@@ -40,10 +41,16 @@ export PRINT_HELP_PYSCRIPT
 
 BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 
+export ROOT_DIR = $(CURDIR)
+export BUILD_DIR = $(CURDIR)/build
+
+DOXYGEN_VERSIONS := 1.8.17 1.8.18 1.8.20
+export LATEST_DOXYGEN_VERSION := 1.8.20
+
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test clean-docker ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
 	rm -rf build/
@@ -67,10 +74,8 @@ clean-test: ## remove test and coverage artifacts
 	rm -rf .mypy_cache
 	find . -name '.asciidoxy.*' -exec rm -rf {} +
 
-clean-docker: ## remove docker build artifacts
-	rm -rf docker/.gradle
-	rm -rf docker/build
-	rm -rf docker/src/main/docker/dist
+clean-docs: ## remove documentation generation artifacts
+	rm -rf build/doc
 
 lint: ## check style with flake8
 	flake8 asciidoxy tests
@@ -83,9 +88,6 @@ test: ## run tests quickly with the default Python
 
 test-all: ## run tests on every Python version with tox
 	tox -s
-
-generate-test-xml: ## generate Doxygen XML files required for test cases
-	cd tests/source_code; python3 generate_xml.py doxygen
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source asciidoxy -m pytest
@@ -116,16 +118,24 @@ docker: dist ## build the docker image
 format: ## format the code
 	yapf -r -i -p setup.py asciidoxy tests
 
-docs: ## generate documentation
-	cp -r tests/source_code documentation/source_code
-	mkdir -p documentation/copy
-	cp CHANGELOG.adoc documentation/copy/
-	mkdir -p build/doc/doxygen
-	mkdir -p build/doc/asciidoxy
-	cd documentation && doxygen
-	cd documentation && asciidoxy index.adoc \
-		--build-dir ../build/doc/asciidoxy \
-		--destination-dir ../build/doc/output \
-		--spec-file asciidoxy.toml \
-		--debug --multipage \
-		-a linkcss
+docs: doxygen ## generate documentation
+	cd documentation && $(MAKE)
+
+define DOXYGEN_template
+doxygen-$(1):
+	CONAN_USER_HOME=$(BUILD_DIR) CONAN_DEFAULT_PROFILE_PATH="" DOXYGEN_VERSION=$(1) \
+									conan install doxygen/conanfile.py --install-folder=build/doxygen-$(1) --build missing
+endef
+$(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call DOXYGEN_template,$(version))))
+
+doxygen: doxygen-$(LATEST_DOXYGEN_VERSION) ## Install the latest doxygen version
+
+define GENERATE_TEST_XML_template
+generate-test-xml-$(1): doxygen-$(1)
+	. build/doxygen-$(1)/activate_run.sh; cd tests/source_code; python3 generate_xml.py doxygen
+
+ALL_GENERATE_TEST_XML := $$(ALL_GENERATE_TEST_XML) generate-test-xml-$(1)
+endef
+$(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call GENERATE_TEST_XML_template,$(version))))
+
+generate-test-xml: $(ALL_GENERATE_TEST_XML) ## generate Doxygen XML files required for test cases

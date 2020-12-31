@@ -22,19 +22,14 @@ from asciidoxy.templates.helpers import TemplateHelper
 class PythonTemplateHelper(TemplateHelper):
     NESTED_START: str = "["
     NESTED_END: str = "]"
+    PARAM_NAME_FIRST = True
+    PARAM_NAME_SEP = ": "
 
     def parameter(self, param: Parameter, *, link: bool = True, default_value: bool = False) -> str:
-        if default_value and param.default_value:
-            defval = f" = {param.default_value}"
-        else:
-            defval = ""
-
-        if param.type is None or not param.type.name:
-            return f"{param.name}{defval}"
-        if param.type.name in ("self", "cls"):
+        if param.type is not None and param.type.name in ("self", "cls"):
             return param.type.name
 
-        return (f"{param.name}: {self.print_ref(param.type, link=link)}{defval}".strip())
+        return super().parameter(param, link=link, default_value=default_value)
 
     def _method_prefix(self, method: Member, *, link: bool = True) -> str:
         return "def"
@@ -42,24 +37,24 @@ class PythonTemplateHelper(TemplateHelper):
     def _method_suffix(self, method: Member, *, link: bool = True) -> str:
         return f" -> {self.print_ref(method.returns.type, link=link)}" if method.returns else ""
 
-    def public_static_methods(self) -> Iterator[Member]:
-        return (m for m in super().public_static_methods() if not m.name.startswith("_"))
+    def static_methods(self, prot: str) -> Iterator[Member]:
+        return (m for m in super().static_methods(prot) if not m.name.startswith("_"))
 
-    def public_methods(self):
-        return (m for m in super().public_methods() if not m.name.startswith("_"))
+    def methods(self, prot: str):
+        return (m for m in super().methods(prot) if not m.name.startswith("_"))
 
-    def public_constructors(self) -> Iterator[Member]:
+    def constructors(self, prot: str) -> Iterator[Member]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if m.kind == "function" and m.name == "__init__")
 
-    def public_complex_enclosed_types(self) -> Iterator[Compound]:
-        return (m for m in super().public_complex_enclosed_types() if not m.name.startswith("_"))
+    def complex_enclosed_types(self, prot: str) -> Iterator[Compound]:
+        return (m for m in super().complex_enclosed_types(prot) if not m.name.startswith("_"))
 
-    def public_variables(self) -> Iterator[Member]:
-        return (m for m in super().public_variables() if not m.name.startswith("_"))
+    def variables(self, prot: str) -> Iterator[Member]:
+        return (m for m in super().variables(prot) if not m.name.startswith("_"))
 
 
 def params(method: Member) -> Iterator[Parameter]:

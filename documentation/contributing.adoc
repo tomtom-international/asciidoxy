@@ -12,32 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 = Contributing
-:notitle:
-:icons: font
-:doctype: book
-:source-highlighter: highlightjs
-:toc: right
-:toc-title: On this page
-${api.multipage_toc()}
-
-----
-    ___              _ _ ____
-   /   |  __________(_|_) __ \____  _  ____  __
-  / /| | / ___/ ___/ / / / / / __ \| |/_/ / / /
- / ___ |(__  ) /__/ / / /_/ / /_/ />  </ /_/ /
-/_/  |_/____/\___/_/_/_____/\____/_/|_|\__, /
-                                      /____/
-----
-
-[ ${api.cross_document_ref("index.adoc", "", "Home")} |
-${api.cross_document_ref("about.adoc", "", "What is AsciiDoxy?")} |
-${api.cross_document_ref("usage.adoc", "", "Usage")} |
-${api.cross_document_ref("examples.adoc", "", "Examples")} |
-${api.cross_document_ref("contributing.adoc", "", "Contributing")} |
-${api.cross_document_ref("changelog.adoc", "", "Changelog")} |
-https://github.com/tomtom-international/asciidoxy[GitHub] ]
-
-= {doctitle}
+${include("_header.adoc", always_embed=True, leveloffset=None)}
 
 You can contribute to AsciiDoxy by reporting issues, updating the documentation, fixing issues, or
 developing new features.
