@@ -26,10 +26,10 @@ from mako.exceptions import RichTraceback
 from tqdm import tqdm
 
 from .api_reference import ApiReference
-from .doxygenparser import Driver as ParserDriver
 from .generator import process_adoc, AsciiDocError
 from .model import json_repr
 from .packaging import CollectError, PackageManager, SpecificationError
+from .parser.doxygen import Driver as DoxygenDriver
 from ._version import __version__
 
 
@@ -195,7 +195,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             logger.exception("Failed to collect packages.")
             sys.exit(1)
 
-        xml_parser = ParserDriver(force_language=args.force_language)
+        xml_parser = DoxygenDriver(force_language=args.force_language)
         with tqdm(desc="Loading API reference   ", unit="pkg") as progress:
             pkg_mgr.load_reference(xml_parser, progress)
 

@@ -27,8 +27,8 @@ from .java import JavaParser
 from .objc import ObjectiveCParser
 from .parser_base import ParserBase
 from .python import PythonParser
-from ..api_reference import AmbiguousLookupError, ApiReference
-from ..model import (ReferableElement, TypeRefBase)
+from ...api_reference import AmbiguousLookupError, ApiReference
+from ...model import (ReferableElement, TypeRefBase)
 
 logger = logging.getLogger(__name__)
 

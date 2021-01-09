@@ -22,9 +22,9 @@ import xml.etree.ElementTree as ET
 from typing import List, NamedTuple, Optional
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenCategory
-from asciidoxy.doxygenparser.type_parser import Token, TypeParser, find_tokens
 from asciidoxy.model import Compound, Member
+from asciidoxy.parser.doxygen.language_traits import LanguageTraits, TokenCategory
+from asciidoxy.parser.doxygen.type_parser import Token, TypeParser, find_tokens
 from .shared import assert_equal_or_none_if_empty, sub_element
 
 

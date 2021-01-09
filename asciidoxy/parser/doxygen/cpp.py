@@ -23,7 +23,7 @@ from typing import List, Optional
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser, find_tokens
-from ..model import Compound, Member
+from ...model import Compound, Member
 
 
 class CppTraits(LanguageTraits):

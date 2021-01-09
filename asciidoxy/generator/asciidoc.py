@@ -30,7 +30,7 @@ from tqdm import tqdm
 
 from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
-from ..doxygenparser import safe_language_tag
+from ..parser.doxygen import safe_language_tag
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
 from ..transcoder import TranscoderBase

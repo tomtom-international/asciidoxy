@@ -20,7 +20,7 @@ import re
 
 import xml.etree.ElementTree as ET
 
-from asciidoxy.doxygenparser.description_parser import DescriptionParser
+from asciidoxy.parser.doxygen.description_parser import DescriptionParser
 from tests.shared import sub_element
 
 

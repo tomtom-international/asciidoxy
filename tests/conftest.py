@@ -18,11 +18,11 @@ import pytest
 from pathlib import Path
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.doxygenparser import Driver as ParserDriver
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
 from asciidoxy.generator.navigation import DocumentTreeNode
 from asciidoxy.packaging import Package, PackageManager
+from asciidoxy.parser.doxygen import Driver as ParserDriver
 
 from .builders import SimpleClassBuilder
 

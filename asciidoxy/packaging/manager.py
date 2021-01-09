@@ -20,7 +20,7 @@ from pathlib import Path
 from tqdm import tqdm
 from typing import Dict, Optional
 
-from ..doxygenparser import Driver
+from ..parser.doxygen import Driver
 from .collect import CollectError, Package, collect, specs_from_file
 
 

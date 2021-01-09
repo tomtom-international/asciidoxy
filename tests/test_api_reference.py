@@ -16,7 +16,7 @@
 import pytest
 
 from asciidoxy.api_reference import AmbiguousLookupError, NameFilter, ParameterTypeMatcher
-from asciidoxy.doxygenparser import Driver as ParserDriver
+from asciidoxy.parser.doxygen import Driver as ParserDriver
 
 
 def test_function_matcher__parse__no_arguments():

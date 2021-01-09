@@ -14,7 +14,7 @@
 """Base classes for parser drivers."""
 
 from abc import ABC, abstractmethod
-from ..model import ReferableElement, TypeRefBase
+from ...model import ReferableElement, TypeRefBase
 
 
 class DriverBase(ABC):

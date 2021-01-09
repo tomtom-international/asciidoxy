@@ -21,7 +21,7 @@ from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union
 
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenCategory
-from ..model import Compound, Member, Parameter, TypeRef
+from ...model import Compound, Member, Parameter, TypeRef
 
 logger = logging.getLogger(__name__)
 
