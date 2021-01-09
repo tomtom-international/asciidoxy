@@ -33,7 +33,7 @@ def main() -> int:
         return 1
     doxygen = sys.argv[1]
     version = get_doxygen_version(doxygen)
-    print(f"Genering XML with doxygen version: {version}")
+    print(f"Generating XML with doxygen version: {version}")
 
     xml_dir = (Path(__file__).parent / ".." / "xml" / version).resolve()
     xml_dir.mkdir(parents=True, exist_ok=True)
@@ -41,7 +41,7 @@ def main() -> int:
     env = {key: value for key, value in os.environ.items()}
     for doxyfile in Path(__file__).parent.glob("**/Doxyfile*"):
         cwd = doxyfile.parent.resolve()
-        out_dir = xml_dir / doxyfile.parent
+        out_dir = xml_dir / doxyfile.parent.relative_to(Path(__file__).parent)
         out_dir.mkdir(parents=True, exist_ok=True)
 
         env["OUTPUT_DIR"] = os.fspath(out_dir)
