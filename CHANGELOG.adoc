@@ -17,6 +17,13 @@ All notable changes to this project will be documented in this file.
 The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
+== Unreleased
+
+=== Fixed
+
+  - #27: `xml_subdir` and `include_subdir` should not be mandatory in the package specification if
+    packages with `contents.toml` are used.
+
 
 == 0.7.0 (31 Dec 2020)
 
