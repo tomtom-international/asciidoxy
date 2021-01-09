@@ -70,7 +70,7 @@ class JavaTraits(LanguageTraits):
 
     @classmethod
     def full_name(cls, name: str, parent: str = "") -> str:
-        if name.startswith(parent):
+        if not parent or name.startswith(f"{parent}."):
             return name
         return f"{parent}.{name}"
 

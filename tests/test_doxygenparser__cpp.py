@@ -477,3 +477,13 @@ def test_parse_cpp__default_parameter_values__method(api_reference):
     param2 = member.params[1]
     assert param2.name == "y"
     assert param2.default_value == "3"
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp__constexpr_constructor(api_reference):
+    member = api_reference.find("ConstInt::ConstInt", kind="function", lang="cpp")
+    assert member is not None
+    assert len(member.params) == 1
+
+    assert member.returns is None
+    assert member.constexpr is True

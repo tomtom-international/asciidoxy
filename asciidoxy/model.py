@@ -203,6 +203,7 @@ class Member(ReferableElement):
         const:       The member is constant, not changing itself or its parent.
         deleted:     The member is marked as deleted.
         default:     The member is a default generated member.
+        constexpr:   The member can appear in constant expressions.
     """
 
     definition: str = ""
@@ -220,6 +221,7 @@ class Member(ReferableElement):
     const: bool = False
     deleted: bool = False
     default: bool = False
+    constexpr: bool = False
 
     def __init__(self, language: str):
         super().__init__(language)

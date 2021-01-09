@@ -177,6 +177,7 @@ class ParserBase(ABC):
         member.enumvalues = self.parse_enumvalues(memberdef_element, member.full_name)
         member.static = _yes_no_to_bool(memberdef_element.get("static", "no"))
         member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
+        member.constexpr = _yes_no_to_bool(memberdef_element.get("constexpr", "no"))
 
         self._driver.register(member)
         return member

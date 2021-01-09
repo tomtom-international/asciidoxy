@@ -42,3 +42,7 @@ class CppTemplateHelper(TemplateHelper):
     def operators(self, prot: str) -> Iterator[Member]:
         return (m for m in super().methods(prot)
                 if (m.name.startswith("operator") and not m.default and not m.deleted))
+
+    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
+        constexpr = "constexpr" if method.constexpr else ""
+        return self._method_join(constexpr, super()._method_prefix(method, link=link))

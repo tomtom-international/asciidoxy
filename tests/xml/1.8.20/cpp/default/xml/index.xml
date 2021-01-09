@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.20" xml:lang="en-US">
+  <compound refid="class_const_int" kind="class"><name>ConstInt</name>
+    <member refid="class_const_int_1aa068b95529ad462c527edb8af85323e8" kind="variable"><name>value_</name></member>
+    <member refid="class_const_int_1a80d34fa86fe64d30733534924fda5483" kind="function"><name>ConstInt</name></member>
+  </compound>
   <compound refid="classasciidoxy_1_1_convertor" kind="class"><name>asciidoxy::Convertor</name>
   </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_convertor" kind="class"><name>asciidoxy::geometry::Convertor</name>
@@ -93,6 +97,8 @@
     <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>
     <member refid="traffic__event_8hpp_1adb4a21783ecb2c7bf30726a36c61a502" kind="typedef"><name>Delay</name></member>
     <member refid="overloads_8hpp_1aebc2b625b914c709f972b5b8eca35d39" kind="function"><name>to_string</name></member>
+  </compound>
+  <compound refid="constexpr_8hpp" kind="file"><name>constexpr.hpp</name>
   </compound>
   <compound refid="coordinate_8hpp" kind="file"><name>coordinate.hpp</name>
   </compound>

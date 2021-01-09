@@ -145,6 +145,7 @@ class TranscoderBase(ABC):
         transcoded.const = member.const
         transcoded.deleted = member.deleted
         transcoded.default = member.default
+        transcoded.constexpr = member.constexpr
 
         return transcoded
 

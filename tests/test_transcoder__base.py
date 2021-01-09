@@ -138,7 +138,8 @@ def test_transcode_member__no_nested_elements(transcoder):
     member = make_member(lang="asm",
                          name="getLatitude",
                          namespace="com.asciidoxy.geometry",
-                         const=True)
+                         const=True,
+                         constexpr=True)
 
     transcoded = transcoder.member(member)
 
@@ -158,6 +159,7 @@ def test_transcode_member__no_nested_elements(transcoder):
     assert transcoded.const is True
     assert transcoded.deleted is False
     assert transcoded.default is False
+    assert transcoded.constexpr is True
 
     assert not transcoded.params
     assert not transcoded.exceptions

@@ -59,7 +59,8 @@ def make_member(lang: str,
                 static: bool = False,
                 const: bool = False,
                 deleted: bool = False,
-                default: bool = False) -> Member:
+                default: bool = False,
+                constexpr: bool = False) -> Member:
     member = make_referable(Member, lang, name)
     member.namespace = namespace
 
@@ -86,6 +87,7 @@ def make_member(lang: str,
     member.const = const
     member.deleted = deleted
     member.default = default
+    member.constexpr = constexpr
     return member
 
 

@@ -86,7 +86,7 @@ class ObjectiveCTraits(LanguageTraits):
 
     @classmethod
     def full_name(cls, name: str, parent: str = "") -> str:
-        if name.startswith(parent):
+        if not parent or name.startswith(f"{parent}."):
             return name
         if parent.endswith(".h"):
             # Parent is a header file, do not prepend
