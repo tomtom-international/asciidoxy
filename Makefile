@@ -139,3 +139,6 @@ endef
 $(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call GENERATE_TEST_XML_template,$(version))))
 
 generate-test-xml: $(ALL_GENERATE_TEST_XML) ## generate Doxygen XML files required for test cases
+
+generate-test-source-kitten: ## generate JSON files from SourceKitten for test cases
+	cd tests/source_code/swift/default && $(MAKE)
