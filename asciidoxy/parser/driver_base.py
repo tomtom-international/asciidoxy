@@ -14,17 +14,33 @@
 """Base classes for parser drivers."""
 
 from abc import ABC, abstractmethod
-from ...model import ReferableElement, TypeRefBase
+
+from ..api_reference import ApiReference
+from ..model import ReferableElement, TypeRefBase
 
 
 class DriverBase(ABC):
     """Base class for drivers."""
+    api_reference: ApiReference
+
+    def __init__(self, api_reference: ApiReference):
+        self.api_reference = api_reference
+
     @abstractmethod
     def register(self, element: ReferableElement) -> None:
         """Register a new element."""
-        pass
 
     @abstractmethod
     def unresolved_ref(self, ref: TypeRefBase) -> None:
         """Register an unresolved reference."""
-        pass
+
+    @abstractmethod
+    def parse(self, file_or_path) -> bool:
+        """Parse all objects in a file and make them available for API reference generation.
+
+        Params:
+            file_or_path: File object or path for the file to parse.
+
+        Returns:
+            True if file is parsed. False if the file is invalid.
+        """

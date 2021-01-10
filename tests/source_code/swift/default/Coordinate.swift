@@ -33,5 +33,8 @@ public struct Coordinate {
     public init() {}
 
     /// Update from another coordinate.
+    ///
+    /// - Parameters:
+    ///     - other: The coordinate to update from.
     public mutating func update(_ other: Coordinate) {}
 }
