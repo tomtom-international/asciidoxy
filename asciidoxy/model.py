@@ -23,7 +23,15 @@ def json_repr(obj):
     return data
 
 
-class ReferableElement:
+class ModelBase(ABC):
+    def __init__(self, **kwargs):
+        for name, value in kwargs.items():
+            if not hasattr(self, name):
+                raise TypeError(f"{self.__class__} has no attribute {name}.")
+            setattr(self, name, value)
+
+
+class ReferableElement(ModelBase):
     """Base class for all objects that can be referenced/linked to.
 
     Attributes:
@@ -39,7 +47,8 @@ class ReferableElement:
     language: str
     kind: str = ""
 
-    def __init__(self, language: str):
+    def __init__(self, language: str = "", **kwargs):
+        super().__init__(**kwargs)
         self.language = language
 
     def __str__(self) -> str:
@@ -47,8 +56,15 @@ class ReferableElement:
                 "full name[{self.full_name}]\n lang [{self.language}]\n kind [{self.kind}]")
         return text + "]"
 
+    def __eq__(self, other) -> bool:
+        return ((self.id, self.name, self.full_name, self.language,
+                 self.kind) == (other.id, other.name, other.full_name, other.language, other.kind))
 
-class TypeRefBase(ABC):
+    def __hash__(self):
+        return hash((self.id, self.name, self.full_name, self.language, self.kind))
+
+
+class TypeRefBase(ModelBase, ABC):
     """Base class for references to types.
     Attributes:
         id:        Unique identifier of the type.
@@ -63,13 +79,18 @@ class TypeRefBase(ABC):
     language: str
     namespace: Optional[str] = None
 
-    def __init__(self, language: str, name: str = ""):
+    def __init__(self, language: str = "", name: str = "", **kwargs):
+        super().__init__(**kwargs)
         self.language = language
         self.name = name
 
     @abstractmethod
     def resolve(self, reference_target: ReferableElement) -> None:
         pass
+
+    def __eq__(self, other) -> bool:
+        return ((self.id, self.name, self.language,
+                 self.namespace) == (other.id, other.name, other.language, other.namespace))
 
 
 class TypeRef(TypeRefBase):
@@ -96,10 +117,8 @@ class TypeRef(TypeRefBase):
     args: Optional[List["Parameter"]] = None
     returns: Optional["TypeRef"] = None
 
-    def __init__(self, language: str, name: str = ""):
-        super().__init__(language, name)
-        self.name = name
-        self.language = language
+    def __init__(self, language: str = "", name: str = "", **kwargs):
+        super().__init__(language, name, **kwargs)
 
     def __str__(self) -> str:
         nested_str = ""
@@ -114,8 +133,14 @@ class TypeRef(TypeRefBase):
         self.id = reference_target.id
         self.kind = reference_target.kind
 
+    def __eq__(self, other) -> bool:
+        return (super().__eq__(other)
+                and (self.kind, self.prefix, self.suffix, self.nested, self.args, self.returns)
+                == (other.kind, other.prefix, other.suffix, other.nested, other.args,
+                    other.returns))
 
-class Parameter:
+
+class Parameter(ModelBase):
     """Parameter description.
 
     Representation of doxygen type paramType
@@ -135,8 +160,13 @@ class Parameter:
     default_value: Optional[str] = None
     prefix: Optional[str] = None
 
+    def __eq__(self, other) -> bool:
+        return ((self.type, self.name, self.description, self.default_value,
+                 self.prefix) == (other.type, other.name, other.description, other.default_value,
+                                  other.prefix))
 
-class ReturnValue:
+
+class ReturnValue(ModelBase):
     """Value returned from a member.
 
     Attributes:
@@ -147,8 +177,11 @@ class ReturnValue:
     type: Optional[TypeRef] = None
     description: str = ""
 
+    def __eq__(self, other) -> bool:
+        return (self.type, self.description) == (other.type, other.description)
 
-class ThrowsClause:
+
+class ThrowsClause(ModelBase):
     """Potential exception thrown from a member.
 
     Attributes:
@@ -160,8 +193,12 @@ class ThrowsClause:
     type: TypeRef
     description: str = ""
 
-    def __init__(self, language: str):
-        self.type = TypeRef(language)
+    def __init__(self, language: str = "", type: Optional[TypeRef] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.type = type or TypeRef(language)
+
+    def __eq__(self, other) -> bool:
+        return (self.type, self.description) == (other.type, other.description)
 
 
 class EnumValue(ReferableElement):
@@ -180,6 +217,10 @@ class EnumValue(ReferableElement):
 
     # custom fields
     kind: str = "enumvalue"
+
+    def __eq__(self, other) -> bool:
+        return (super().__eq__(other) and (self.initializer, self.brief, self.description)
+                == (other.initializer, other.brief, other.description))
 
 
 class Member(ReferableElement):
@@ -223,14 +264,30 @@ class Member(ReferableElement):
     default: bool = False
     constexpr: bool = False
 
-    def __init__(self, language: str):
-        super().__init__(language)
-        self.params = []
-        self.exceptions = []
-        self.enumvalues = []
+    def __init__(self,
+                 language: str = "",
+                 *,
+                 params: Optional[List[Parameter]] = None,
+                 exceptions: Optional[List[ThrowsClause]] = None,
+                 enumvalues: Optional[List[EnumValue]] = None,
+                 **kwargs):
+        super().__init__(language, **kwargs)
+        self.params = params or []
+        self.exceptions = exceptions or []
+        self.enumvalues = enumvalues or []
 
     def __str__(self):
         return f"Member [{super().__str__()}]"
+
+    def __eq__(self, other) -> bool:
+        return (super().__eq__(other) and
+                (self.definition, self.args, self.params, self.exceptions, self.brief,
+                 self.description, self.prot, self.returns, self.enumvalues, self.static,
+                 self.include, self.namespace, self.const, self.deleted, self.default,
+                 self.constexpr) == (other.definition, other.args, other.params, other.exceptions,
+                                     other.brief, other.description, other.prot, other.returns,
+                                     other.enumvalues, other.static, other.include, other.namespace,
+                                     other.const, other.deleted, other.default, other.constexpr))
 
 
 class InnerTypeReference(TypeRefBase):
@@ -248,6 +305,10 @@ class InnerTypeReference(TypeRefBase):
 
     def resolve(self, reference_target):
         self.referred_object = reference_target
+
+    def __eq__(self, other) -> bool:
+        return (super().__eq__(other)
+                and (self.referred_object, self.prot) == (other.referred_object, other.prot))
 
 
 class Compound(ReferableElement):
@@ -273,11 +334,26 @@ class Compound(ReferableElement):
     include: Optional[str] = None
     namespace: Optional[str] = None
 
-    def __init__(self, language: str):
-        super().__init__(language)
-        self.members = []
-        self.inner_classes = []
-        self.enumvalues = []
+    def __init__(self,
+                 language: str = "",
+                 members: Optional[List[Member]] = None,
+                 inner_classes: Optional[List[InnerTypeReference]] = None,
+                 enumvalues: Optional[List[EnumValue]] = None,
+                 **kwargs):
+        super().__init__(language, **kwargs)
+        self.members = members or []
+        self.inner_classes = inner_classes or []
+        self.enumvalues = enumvalues or []
 
     def __str__(self):
         return f"Compound [{super().__str__()}]"
+
+    def __eq__(self, other) -> bool:
+        return (super().__eq__(other)
+                and (self.members, self.inner_classes, self.brief, self.description,
+                     self.enumvalues, self.include, self.namespace)
+                == (other.members, other.inner_classes, other.brief, other.description,
+                    other.enumvalues, other.include, other.namespace))
+
+    def __hash__(self):
+        return super().__hash__()
