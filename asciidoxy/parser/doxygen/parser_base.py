@@ -21,9 +21,9 @@ from abc import ABC
 from typing import List, Optional, Tuple, Type
 
 from .description_parser import DescriptionParser, select_descriptions
-from .driver_base import DriverBase
 from .language_traits import LanguageTraits
 from .type_parser import TypeParser, TypeParseError
+from ..driver_base import DriverBase
 from ...model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 
 logger = logging.getLogger(__name__)

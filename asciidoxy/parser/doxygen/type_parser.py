@@ -19,8 +19,8 @@ import xml.etree.ElementTree as ET
 
 from typing import Iterator, List, Optional, Sequence, Tuple, Type
 
-from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenCategory
+from ..driver_base import DriverBase
 from ...model import Parameter, TypeRef
 
 logger = logging.getLogger(__name__)

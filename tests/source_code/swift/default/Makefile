@@ -21,12 +21,16 @@ $(JSON_DIR):
 
 define SOURCEKITTEN_template
 _SWIFT_FILE := $(1)
-_JSON_FILE := $(addprefix $(JSON_DIR)/,$(addsuffix .json,$(1)))
+_DOC_JSON_FILE := $(addprefix $(JSON_DIR)/,$(addsuffix .doc.json,$(1)))
+_STRUCTURE_JSON_FILE := $(addprefix $(JSON_DIR)/,$(addsuffix .structure.json,$(1)))
 
-$$(_JSON_FILE): $$(_SWIFT_FILE) $(JSON_DIR)
+$$(_DOC_JSON_FILE): $$(_SWIFT_FILE) $(JSON_DIR)
 	sourcekitten doc --single-file $$< > $$@
 
-JSON_FILES := $$(JSON_FILES) $$(_JSON_FILE)
+$$(_STRUCTURE_JSON_FILE): $$(_SWIFT_FILE) $(JSON_DIR)
+	sourcekitten structure --file $$< > $$@
+
+JSON_FILES := $$(JSON_FILES) $$(_DOC_JSON_FILE) $$(_STRUCTURE_JSON_FILE)
 endef
 
 $(foreach swift_file,$(wildcard *.swift),$(eval $(call SOURCEKITTEN_template,$(swift_file))))

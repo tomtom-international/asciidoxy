@@ -1,7 +1,7 @@
 {
   "\/Users\/vandermr\/git\/private\/asciidoxy\/tests\/source_code\/swift\/default\/Coordinate.swift" : {
     "key.diagnostic_stage" : "source.diagnostic.stage.swift.parse",
-    "key.length" : 1135,
+    "key.length" : 1217,
     "key.offset" : 0,
     "key.substructure" : [
       {
@@ -13,13 +13,13 @@
             "key.offset" : 753
           }
         ],
-        "key.bodylength" : 354,
+        "key.bodylength" : 436,
         "key.bodyoffset" : 779,
         "key.doc.comment" : "Class to hold information about a coordinate.\n\nA coordinate has a latitude, longitude, and an altitude.",
         "key.doclength" : 115,
         "key.docoffset" : 638,
         "key.kind" : "source.lang.swift.decl.struct",
-        "key.length" : 374,
+        "key.length" : 456,
         "key.name" : "Coordinate",
         "key.namelength" : 10,
         "key.nameoffset" : 767,
@@ -115,25 +115,25 @@
               {
                 "key.attribute" : "source.decl.attribute.mutating",
                 "key.length" : 8,
-                "key.offset" : 1088
+                "key.offset" : 1170
               },
               {
                 "key.attribute" : "source.decl.attribute.public",
                 "key.length" : 6,
-                "key.offset" : 1081
+                "key.offset" : 1163
               }
             ],
             "key.bodylength" : 0,
-            "key.bodyoffset" : 1131,
-            "key.doc.comment" : "Update from another coordinate.",
-            "key.doclength" : 36,
+            "key.bodyoffset" : 1213,
+            "key.doc.comment" : "Update from another coordinate.\n\n- Parameters:\n    - other: The coordinate to update from.",
+            "key.doclength" : 118,
             "key.docoffset" : 1041,
             "key.kind" : "source.lang.swift.decl.function.method.instance",
             "key.length" : 35,
             "key.name" : "update(_:)",
             "key.namelength" : 27,
-            "key.nameoffset" : 1102,
-            "key.offset" : 1097,
+            "key.nameoffset" : 1184,
+            "key.offset" : 1179,
             "key.substructure" : [
 
             ]

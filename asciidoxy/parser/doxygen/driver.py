@@ -22,11 +22,11 @@ from typing import List, Mapping, Optional, Set, Tuple
 from tqdm import tqdm
 
 from .cpp import CppParser
-from .driver_base import DriverBase
 from .java import JavaParser
 from .objc import ObjectiveCParser
 from .parser_base import ParserBase
 from .python import PythonParser
+from ..driver_base import DriverBase
 from ...api_reference import AmbiguousLookupError, ApiReference
 from ...model import Compound, ReferableElement, TypeRef
 
@@ -35,7 +35,6 @@ logger = logging.getLogger(__name__)
 
 class Driver(DriverBase):
     """Driver for parsing Doxygen XML output."""
-    api_reference: ApiReference
     _unresolved_refs: List[TypeRef]
     _inner_type_refs: List[Tuple[Compound, TypeRef]]
     _force_language: Optional[str]
@@ -43,7 +42,7 @@ class Driver(DriverBase):
     _parsers: Mapping[str, ParserBase]
 
     def __init__(self, force_language: Optional[str] = None):
-        self.api_reference = ApiReference()
+        super().__init__(ApiReference())
         self._unresolved_refs = []
         self._inner_type_refs = []
         self._force_language = safe_language_tag(force_language)
