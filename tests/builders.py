@@ -15,8 +15,8 @@
 
 from typing import List, Optional, Type
 
-from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Member, Parameter,
-                             ReferableElement, ReturnValue, ThrowsClause, TypeRef, TypeRefBase)
+from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Parameter, ReferableElement,
+                             ReturnValue, ThrowsClause, TypeRef, TypeRefBase)
 
 
 def make_referable(cls: Type[ReferableElement], lang: str, name: str) -> ReferableElement:
@@ -30,7 +30,7 @@ def make_referable(cls: Type[ReferableElement], lang: str, name: str) -> Referab
 
 def make_compound(lang: str,
                   name: str,
-                  members: Optional[List[Member]] = None,
+                  members: Optional[List[Compound]] = None,
                   inner_classes: Optional[List[InnerTypeReference]] = None,
                   enumvalues: Optional[List[EnumValue]] = None):
     compound = make_referable(Compound, lang, name)
@@ -60,8 +60,8 @@ def make_member(lang: str,
                 const: bool = False,
                 deleted: bool = False,
                 default: bool = False,
-                constexpr: bool = False) -> Member:
-    member = make_referable(Member, lang, name)
+                constexpr: bool = False) -> Compound:
+    member = make_referable(Compound, lang, name)
     member.namespace = namespace
 
     if namespace:

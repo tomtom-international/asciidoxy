@@ -22,7 +22,7 @@ from typing import List, Optional
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import TypeParser, Token, find_tokens
-from ...model import Compound, Member
+from ...model import Compound
 
 
 class ObjectiveCTraits(LanguageTraits):
@@ -154,7 +154,7 @@ class ObjectiveCParser(ParserBase):
     TRAITS = ObjectiveCTraits
     TYPE_PARSER = ObjectiveCTypeParser
 
-    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
+    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
         memberdef_element = self._fix_block_element(memberdef_element)
         member = super().parse_member(memberdef_element, parent)
         return member

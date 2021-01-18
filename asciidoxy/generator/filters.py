@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Generator, List, Mapping, Optional, Pattern, Sequence, Type, TypeVar, Union
 
-from ..model import Compound, EnumValue, InnerTypeReference, Member, ThrowsClause
+from ..model import Compound, EnumValue, InnerTypeReference, ThrowsClause
 
 
 class FilterAction(Enum):
@@ -150,7 +150,7 @@ class MemberFilter(ElementFilter):
         self.kind_filter = kind_filter or AllStringFilter()
         self.prot_filter = prot_filter or AllStringFilter()
 
-    def __call__(self, member: Member) -> bool:
+    def __call__(self, member: Compound) -> bool:
         """Apply the filter to a member.
 
         Returns:
@@ -365,7 +365,7 @@ class InsertionFilter:
         self._enum_value_filter = EnumValueFilter.from_spec(enum_values)
         self._exception_filter = ExceptionFilter.from_spec(exceptions)
 
-    def members(self, compound: Compound) -> Generator[Member, None, None]:
+    def members(self, compound: Compound) -> Generator[Compound, None, None]:
         """Get members matching the filter."""
         for member in compound.members:
             if self._member_filter is None or self._member_filter(member):
@@ -377,13 +377,13 @@ class InsertionFilter:
             if self._inner_class_filter is None or self._inner_class_filter(inner):
                 yield inner
 
-    def enum_values(self, element: Union[Compound, Member]) -> Generator[EnumValue, None, None]:
+    def enum_values(self, element: Compound) -> Generator[EnumValue, None, None]:
         """Get enum values matching the filter."""
         for enum_value in element.enumvalues:
             if self._enum_value_filter is None or self._enum_value_filter(enum_value):
                 yield enum_value
 
-    def exceptions(self, member: Member) -> Generator[ThrowsClause, None, None]:
+    def exceptions(self, member: Compound) -> Generator[ThrowsClause, None, None]:
         """Get exceptions matching the filter."""
         for exception in member.exceptions:
             if self._exception_filter is None or self._exception_filter(exception):

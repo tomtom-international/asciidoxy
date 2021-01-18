@@ -16,7 +16,7 @@
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Member, Parameter, ReturnValue, ThrowsClause, TypeRef
+from asciidoxy.model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 
 from .builders import SimpleClassBuilder
@@ -127,20 +127,20 @@ def test_private_complex_enclosed_types(helper):
 
 
 def test_method_signature__no_params_no_return(helper):
-    method = Member("swift")
+    method = Compound("swift")
     method.name = "start"
     assert helper.method_signature(method) == "func start()"
 
 
 def test_method_signature__no_params_no_return__throws(helper):
-    method = Member("swift")
+    method = Compound("swift")
     method.name = "start"
     method.exceptions = [ThrowsClause("swift")]
     assert helper.method_signature(method) == "func start() throws"
 
 
 def test_method_signature__no_params_simple_return(helper):
-    method = Member("swift")
+    method = Compound("swift")
     method.name = "start"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("swift", name="Int")
@@ -148,7 +148,7 @@ def test_method_signature__no_params_simple_return(helper):
 
 
 def test_method_signature__no_params_simple_return__throws(helper):
-    method = Member("swift")
+    method = Compound("swift")
     method.name = "start"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("swift", name="Int")
@@ -157,7 +157,7 @@ def test_method_signature__no_params_simple_return__throws(helper):
 
 
 def test_method_signature__no_params_link_return(helper):
-    method = Member("swift")
+    method = Compound("swift")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("swift", name="Value")
@@ -166,7 +166,7 @@ def test_method_signature__no_params_link_return(helper):
 
 
 def test_method_signature__no_params_link_return__throws(helper):
-    method = Member("swift")
+    method = Compound("swift")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("swift", name="Value")
@@ -177,7 +177,7 @@ def test_method_signature__no_params_link_return__throws(helper):
 
 
 def test_method_signature__one_param(helper):
-    method = Member("swift")
+    method = Compound("swift")
     method.name = "setValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("swift", name="Value")
@@ -191,7 +191,7 @@ def test_method_signature__one_param(helper):
 
 
 def test_method_signature__closure_param(helper):
-    method = Member("swift")
+    method = Compound("swift")
     method.name = "setValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("swift", name="Value")
@@ -209,7 +209,7 @@ def test_method_signature__closure_param(helper):
 
 
 def test_closure_definition__no_params__void_return(helper):
-    closure = Member("swift")
+    closure = Compound("swift")
     closure.name = "SuccessClosure"
     closure.returns = ReturnValue()
     closure.returns.type = TypeRef("swift", name="Void")
@@ -219,7 +219,7 @@ def test_closure_definition__no_params__void_return(helper):
 
 
 def test_closure_definition__multiple_params_type_only__void_return(helper):
-    closure = Member("swift")
+    closure = Compound("swift")
     closure.name = "SuccessClosure"
     closure.returns = ReturnValue()
     closure.returns.type = TypeRef("swift", name="Void")
@@ -233,7 +233,7 @@ def test_closure_definition__multiple_params_type_only__void_return(helper):
 
 
 def test_closure_definition__multiple_params_type_and_name__void_return(helper):
-    closure = Member("swift")
+    closure = Compound("swift")
     closure.name = "SuccessClosure"
     closure.returns = ReturnValue()
     closure.returns.type = TypeRef("swift", name="Void")
@@ -249,7 +249,7 @@ def test_closure_definition__multiple_params_type_and_name__void_return(helper):
 
 
 def test_closure_definition__no_params__return_type(helper):
-    closure = Member("swift")
+    closure = Compound("swift")
     closure.name = "SuccessClosure"
     closure.returns = ReturnValue()
     closure.returns.type = TypeRef("swift", name="Data")

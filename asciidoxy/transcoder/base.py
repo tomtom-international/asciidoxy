@@ -22,7 +22,7 @@ from typing import Callable, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from ..api_reference import ApiReference
 from ..generator.errors import AsciiDocError
-from ..model import (Compound, EnumValue, InnerTypeReference, Member, Parameter, ReferableElement,
+from ..model import (Compound, EnumValue, InnerTypeReference, Parameter, ReferableElement,
                      ReturnValue, ThrowsClause, TypeRef, TypeRefBase)
 
 
@@ -97,8 +97,6 @@ class TranscoderBase(ABC):
 
         if isinstance(element, Compound):
             return transcoder.compound(element)
-        elif isinstance(element, Member):
-            return transcoder.member(element)
         else:
             assert False, "Invalid element to transcode."
             return element
@@ -112,40 +110,31 @@ class TranscoderBase(ABC):
     def _compound(self, compound: Compound) -> Compound:
         transcoded = self.referable_element(compound)
 
-        transcoded.members = [self.member(m) for m in compound.members]
+        transcoded.members = [self.compound(m) for m in compound.members]
         transcoded.inner_classes = [
             self.inner_type_reference(itr) for itr in compound.inner_classes
         ]
-        transcoded.brief = compound.brief
-        transcoded.description = compound.description
         transcoded.enumvalues = [self.enum_value(ev) for ev in compound.enumvalues]
+        transcoded.params = [self.parameter(p) for p in compound.params]
+        transcoded.exceptions = [self.throws_clause(tc) for tc in compound.exceptions]
+        transcoded.returns = (self.return_value(compound.returns)
+                              if compound.returns is not None else None)
+
         transcoded.include = compound.include
         transcoded.namespace = compound.namespace
 
-        return transcoded
+        transcoded.prot = compound.prot
+        transcoded.definition = compound.definition
+        transcoded.args = compound.args
 
-    def member(self, member: Member) -> Member:
-        return self.find_or_transcode(member, self._member)
+        transcoded.brief = compound.brief
+        transcoded.description = compound.description
 
-    def _member(self, member: Member) -> Member:
-        transcoded = self.referable_element(member)
-
-        transcoded.definition = member.definition
-        transcoded.args = member.args
-        transcoded.params = [self.parameter(a) for a in member.params]
-        transcoded.exceptions = [self.throws_clause(e) for e in member.exceptions]
-        transcoded.brief = member.brief
-        transcoded.description = member.description
-        transcoded.prot = member.prot
-        transcoded.returns = self.return_value(member.returns) if member.returns else None
-        transcoded.enumvalues = [self.enum_value(ev) for ev in member.enumvalues]
-        transcoded.static = member.static
-        transcoded.include = member.include
-        transcoded.namespace = member.namespace
-        transcoded.const = member.const
-        transcoded.deleted = member.deleted
-        transcoded.default = member.default
-        transcoded.constexpr = member.constexpr
+        transcoded.static = compound.static
+        transcoded.const = compound.const
+        transcoded.deleted = compound.deleted
+        transcoded.default = compound.default
+        transcoded.constexpr = compound.constexpr
 
         return transcoded
 
@@ -170,6 +159,7 @@ class TranscoderBase(ABC):
         transcoded.name = parameter.name
         transcoded.description = parameter.description
         transcoded.default_value = parameter.default_value
+        transcoded.prefix = parameter.prefix
 
         return transcoded
 
@@ -204,6 +194,7 @@ class TranscoderBase(ABC):
     def inner_type_reference(self, ref: InnerTypeReference) -> InnerTypeReference:
         transcoded = self.type_ref_base(ref)
 
+        transcoded.prot = ref.prot
         if ref.referred_object is not None:
             transcoded.referred_object = self.compound(ref.referred_object)
 

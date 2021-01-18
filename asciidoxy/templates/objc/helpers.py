@@ -15,12 +15,12 @@
 
 from typing import Iterator
 
-from asciidoxy.model import Member
+from asciidoxy.model import Compound
 from asciidoxy.templates.helpers import TemplateHelper
 
 
 class ObjcTemplateHelper(TemplateHelper):
-    def method_signature(self, method: Member, max_width: int = 80) -> str:
+    def method_signature(self, method: Compound, max_width: int = 80) -> str:
         assert method.returns is not None
 
         method_name_parts = method.name.split(":")
@@ -53,7 +53,7 @@ class ObjcTemplateHelper(TemplateHelper):
         else:
             return f"{prefix}{method_parts[0]}"
 
-    def block_definition(self, block: Member) -> str:
+    def block_definition(self, block: Compound) -> str:
         assert block.returns is not None
         assert block.returns.type is not None
         assert block.returns.type.args is not None
@@ -66,7 +66,7 @@ class ObjcTemplateHelper(TemplateHelper):
         return (f"typedef {self.print_ref(block.returns.type, skip_args=True)}(^{block_name})"
                 f" {self.argument_list(block.returns.type.args)}")
 
-    def simple_enclosed_types(self, prot: str) -> Iterator[Member]:
+    def simple_enclosed_types(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 

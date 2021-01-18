@@ -21,7 +21,7 @@ from unittest.mock import call, Mock
 
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.templates.helpers import has, has_any, TemplateHelper
-from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
+from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 
 
 @pytest.fixture
@@ -690,7 +690,7 @@ def test_parameter__param_name_first(empty_generating_api):
 
 
 def test_method_signature__no_params(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -701,7 +701,7 @@ def test_method_signature__no_params(empty_generating_api):
 
 
 def test_method_signature__const(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
     method.const = True
 
@@ -713,7 +713,7 @@ def test_method_signature__const(empty_generating_api):
 
 
 def test_method_signature__single_param(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -728,7 +728,7 @@ def test_method_signature__single_param(empty_generating_api):
 
 
 def test_method_signature__single_param__too_wide(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -745,7 +745,7 @@ void ShortMethod(
 
 
 def test_method_signature__multiple_params(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -767,7 +767,7 @@ void ShortMethod(int value,
 
 
 def test_method_signature__multiple_params__first_param_too_wide(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -790,7 +790,7 @@ void ShortMethod(
 
 
 def test_method_signature__multiple_params__last_param_too_wide(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -813,7 +813,7 @@ void ShortMethod(
 
 
 def test_method_signature__ignore_return_type_xref_length(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -829,7 +829,7 @@ def test_method_signature__ignore_return_type_xref_length(empty_generating_api):
 
 
 def test_method_signature__ignore_param_type_xref_length(empty_generating_api):
-    method = Member("lang")
+    method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()

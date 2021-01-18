@@ -15,7 +15,7 @@
 
 from typing import Optional, Union
 
-from ..model import Member, ReferableElement, ThrowsClause, TypeRef, TypeRefBase
+from ..model import Compound, ReferableElement, ThrowsClause, TypeRef, TypeRefBase
 from .base import TranscoderBase
 
 
@@ -65,16 +65,16 @@ class SwiftTranscoder(TranscoderBase):
 
         return full_name
 
-    def _member(self, member: Member) -> Member:
-        transcoded = super()._member(member)
+    def _compound(self, compound: Compound) -> Compound:
+        transcoded = super()._compound(compound)
         transcoded = self.remove_with_from_function(transcoded)
         transcoded = self.remove_return_type_from_constructor(transcoded)
-        transcoded = self.replace_nserror_with_exception(member, transcoded)
+        transcoded = self.replace_nserror_with_exception(compound, transcoded)
         transcoded = self.remove_void_return_type(transcoded)
         return transcoded
 
     @staticmethod
-    def remove_with_from_function(transcoded: Member) -> Member:
+    def remove_with_from_function(transcoded: Compound) -> Compound:
         if transcoded.kind == "function" and "With" in transcoded.name and transcoded.params:
             method_name, _, first_param_name = transcoded.name.partition("With")
             transcoded.name = method_name
@@ -90,20 +90,20 @@ class SwiftTranscoder(TranscoderBase):
         return transcoded
 
     @staticmethod
-    def remove_return_type_from_constructor(transcoded: Member) -> Member:
+    def remove_return_type_from_constructor(transcoded: Compound) -> Compound:
         if transcoded.kind == "function" and transcoded.name == "init":
             transcoded.returns = None
         return transcoded
 
     @staticmethod
-    def remove_void_return_type(transcoded: Member) -> Member:
+    def remove_void_return_type(transcoded: Compound) -> Compound:
         if (transcoded.kind == "function" and transcoded.returns is not None
                 and transcoded.returns.type is not None and transcoded.returns.type.name == "void"):
             transcoded.returns = None
         return transcoded
 
     @staticmethod
-    def replace_nserror_with_exception(original: Member, transcoded: Member) -> Member:
+    def replace_nserror_with_exception(original: Compound, transcoded: Compound) -> Compound:
         # https://developer.apple.com/documentation/swift/cocoa_design_patterns/about_imported_cocoa_error_parameters
         if (original.kind == "function" and original.params
                 and "NS_SWIFT_NOTHROW" not in original.args):

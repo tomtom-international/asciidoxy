@@ -223,73 +223,6 @@ class EnumValue(ReferableElement):
                 == (other.initializer, other.brief, other.description))
 
 
-class Member(ReferableElement):
-    """Member of a compound object.
-
-    Representation of the doxygen type memberDef.
-
-    Attributes:
-        definition:  Full definition of the member in source code.
-        args:        The arguments as defined in the source code.
-        params:      List of parameters.
-        exceptions:  List of exceptions that can be thrown.
-        brief:       Brief description of the member.
-        description: Full description of the member.
-        prot:        Protection level of the member.
-        returns:     The return value of the member.
-        enumvalues:  List of enum values contained in the member.
-        static:      True if this is a static member.
-        include:     Name of the include (file) required to use this member.
-        namespace:   Namespace, or scope, the member is contained in.
-        const:       The member is constant, not changing itself or its parent.
-        deleted:     The member is marked as deleted.
-        default:     The member is a default generated member.
-        constexpr:   The member can appear in constant expressions.
-    """
-
-    definition: str = ""
-    args: str = ""
-    params: List[Parameter]
-    exceptions: List[ThrowsClause]
-    brief: str = ""
-    description: str = ""
-    prot: str = ""
-    returns: Optional[ReturnValue] = None
-    enumvalues: List[EnumValue]
-    static: bool = False
-    include: Optional[str] = None
-    namespace: Optional[str] = None
-    const: bool = False
-    deleted: bool = False
-    default: bool = False
-    constexpr: bool = False
-
-    def __init__(self,
-                 language: str = "",
-                 *,
-                 params: Optional[List[Parameter]] = None,
-                 exceptions: Optional[List[ThrowsClause]] = None,
-                 enumvalues: Optional[List[EnumValue]] = None,
-                 **kwargs):
-        super().__init__(language, **kwargs)
-        self.params = params or []
-        self.exceptions = exceptions or []
-        self.enumvalues = enumvalues or []
-
-    def __str__(self):
-        return f"Member [{super().__str__()}]"
-
-    def __eq__(self, other) -> bool:
-        return (super().__eq__(other) and
-                (self.definition, self.args, self.params, self.exceptions, self.brief,
-                 self.description, self.prot, self.returns, self.enumvalues, self.static,
-                 self.include, self.namespace, self.const, self.deleted, self.default,
-                 self.constexpr) == (other.definition, other.args, other.params, other.exceptions,
-                                     other.brief, other.description, other.prot, other.returns,
-                                     other.enumvalues, other.static, other.include, other.namespace,
-                                     other.const, other.deleted, other.default, other.constexpr))
-
-
 class InnerTypeReference(TypeRefBase):
     """Representation of a reference to a type/class/member in the documentation.
 
@@ -326,34 +259,58 @@ class Compound(ReferableElement):
         namespace:     Namespace, or package, the compound is contained in.
     """
 
-    members: List[Member]
+    members: List["Compound"]
     inner_classes: List[InnerTypeReference]
-    brief: str = ""
-    description: str = ""
     enumvalues: List[EnumValue]
+    params: List[Parameter]
+    exceptions: List[ThrowsClause]
+    returns: Optional[ReturnValue] = None
+
     include: Optional[str] = None
     namespace: Optional[str] = None
 
+    prot: str = ""
+    definition: str = ""
+    args: str = ""
+
+    brief: str = ""
+    description: str = ""
+
+    static: bool = False
+    const: bool = False
+    deleted: bool = False
+    default: bool = False
+    constexpr: bool = False
+
     def __init__(self,
                  language: str = "",
-                 members: Optional[List[Member]] = None,
+                 *,
+                 members: Optional[List["Compound"]] = None,
                  inner_classes: Optional[List[InnerTypeReference]] = None,
                  enumvalues: Optional[List[EnumValue]] = None,
+                 params: Optional[List[Parameter]] = None,
+                 exceptions: Optional[List[ThrowsClause]] = None,
                  **kwargs):
         super().__init__(language, **kwargs)
         self.members = members or []
         self.inner_classes = inner_classes or []
         self.enumvalues = enumvalues or []
+        self.params = params or []
+        self.exceptions = exceptions or []
 
     def __str__(self):
         return f"Compound [{super().__str__()}]"
 
     def __eq__(self, other) -> bool:
         return (super().__eq__(other)
-                and (self.members, self.inner_classes, self.brief, self.description,
-                     self.enumvalues, self.include, self.namespace)
-                == (other.members, other.inner_classes, other.brief, other.description,
-                    other.enumvalues, other.include, other.namespace))
+                and (self.members, self.inner_classes, self.enumvalues, self.params,
+                     self.exceptions, self.returns, self.include, self.namespace, self.prot,
+                     self.definition, self.args, self.brief, self.description, self.static,
+                     self.const, self.deleted, self.default, self.constexpr)
+                == (other.members, other.inner_classes, other.enumvalues, other.params,
+                    other.exceptions, other.returns, other.include, other.namespace, other.prot,
+                    other.definition, other.args, other.brief, other.description, other.static,
+                    other.const, other.deleted, other.default, other.constexpr))
 
     def __hash__(self):
         return super().__hash__()

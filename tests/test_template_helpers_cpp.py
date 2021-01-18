@@ -18,7 +18,7 @@ Tests for C++ template helpers.
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Member, ReturnValue, TypeRef
+from asciidoxy.model import Compound, ReturnValue, TypeRef
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 
 
@@ -143,7 +143,7 @@ def test_private_static_methods__no_filter(helper):
 
 
 def test_method_signature(helper):
-    method = Member("cpp")
+    method = Compound("cpp")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -153,7 +153,7 @@ def test_method_signature(helper):
 
 
 def test_method_signature__constexpr(helper):
-    method = Member("cpp")
+    method = Compound("cpp")
     method.name = "ShortMethod"
     method.constexpr = True
 

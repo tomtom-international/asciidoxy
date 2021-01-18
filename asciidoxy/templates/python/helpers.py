@@ -15,7 +15,7 @@
 
 from typing import Iterator
 
-from asciidoxy.model import Compound, Member, Parameter
+from asciidoxy.model import Compound, Parameter
 from asciidoxy.templates.helpers import TemplateHelper
 
 
@@ -31,19 +31,19 @@ class PythonTemplateHelper(TemplateHelper):
 
         return super().parameter(param, link=link, default_value=default_value)
 
-    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
+    def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
         return "def"
 
-    def _method_suffix(self, method: Member, *, link: bool = True) -> str:
+    def _method_suffix(self, method: Compound, *, link: bool = True) -> str:
         return f" -> {self.print_ref(method.returns.type, link=link)}" if method.returns else ""
 
-    def static_methods(self, prot: str) -> Iterator[Member]:
+    def static_methods(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().static_methods(prot) if not m.name.startswith("_"))
 
     def methods(self, prot: str):
         return (m for m in super().methods(prot) if not m.name.startswith("_"))
 
-    def constructors(self, prot: str) -> Iterator[Member]:
+    def constructors(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
@@ -53,10 +53,10 @@ class PythonTemplateHelper(TemplateHelper):
     def complex_enclosed_types(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().complex_enclosed_types(prot) if not m.name.startswith("_"))
 
-    def variables(self, prot: str) -> Iterator[Member]:
+    def variables(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().variables(prot) if not m.name.startswith("_"))
 
 
-def params(method: Member) -> Iterator[Parameter]:
+def params(method: Compound) -> Iterator[Parameter]:
     return (param for param in method.params
             if (not param.type or param.type.name not in ("self", "cls")))

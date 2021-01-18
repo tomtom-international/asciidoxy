@@ -15,7 +15,7 @@
 Tests for the `asciidoxy.model` module.
 """
 
-from asciidoxy.model import (Compound, EnumValue, Member, Parameter, ReferableElement, ReturnValue,
+from asciidoxy.model import (Compound, EnumValue, Parameter, ReferableElement, ReturnValue,
                              ThrowsClause, TypeRef, InnerTypeReference)
 
 
@@ -25,7 +25,6 @@ def test_minimal_constructed_repr():
     assert repr(ReturnValue())
     assert repr(ThrowsClause("lang"))
     assert repr(EnumValue("lang"))
-    assert repr(Member("lang"))
     assert repr(Compound("lang"))
     assert repr(InnerTypeReference("lang"))
 
@@ -481,196 +480,6 @@ def test_enum_value__eq__full():
         setattr(second, attr_name, getattr(first, attr_name))
 
 
-def test_member__init__default():
-    member = Member()
-    assert member.id is None
-    assert member.name == ""
-    assert member.full_name == ""
-    assert member.language == ""
-    assert member.kind == ""
-    assert member.definition == ""
-    assert member.params == []
-    assert member.exceptions == []
-    assert member.brief == ""
-    assert member.description == ""
-    assert member.prot == ""
-    assert member.returns is None
-    assert member.enumvalues == []
-    assert member.static is False
-    assert member.include is None
-    assert member.namespace is None
-    assert member.const is False
-    assert member.deleted is False
-    assert member.default is False
-    assert member.constexpr is False
-
-
-def test_member__init__positional():
-    member = Member("lang")
-    assert member.id is None
-    assert member.name == ""
-    assert member.full_name == ""
-    assert member.language == "lang"
-    assert member.kind == ""
-    assert member.definition == ""
-    assert member.params == []
-    assert member.exceptions == []
-    assert member.brief == ""
-    assert member.description == ""
-    assert member.prot == ""
-    assert member.returns is None
-    assert member.enumvalues == []
-    assert member.static is False
-    assert member.include is None
-    assert member.namespace is None
-    assert member.const is False
-    assert member.deleted is False
-    assert member.default is False
-    assert member.constexpr is False
-
-
-def test_member__init__keywords():
-    member = Member(id="id",
-                    name="name",
-                    full_name="full_name",
-                    language="lang",
-                    kind="kind",
-                    definition="definition",
-                    params=[Parameter(name="parameter")],
-                    exceptions=[ThrowsClause(description="exception")],
-                    brief="brief",
-                    description="description",
-                    prot="prot",
-                    returns=ReturnValue(description="returns"),
-                    enumvalues=[EnumValue(name="enumvalue")],
-                    static=True,
-                    include="include",
-                    namespace="namespace",
-                    const=True,
-                    deleted=True,
-                    default=True,
-                    constexpr=True)
-    assert member.id == "id"
-    assert member.name == "name"
-    assert member.full_name == "full_name"
-    assert member.language == "lang"
-    assert member.kind == "kind"
-    assert member.definition == "definition"
-    assert len(member.params) == 1
-    assert member.params[0].name == "parameter"
-    assert len(member.exceptions) == 1
-    assert member.exceptions[0].description == "exception"
-    assert member.brief == "brief"
-    assert member.description == "description"
-    assert member.prot == "prot"
-    assert member.returns is not None
-    assert member.returns.description == "returns"
-    assert len(member.enumvalues) == 1
-    assert member.enumvalues[0].name == "enumvalue"
-    assert member.static is True
-    assert member.include == "include"
-    assert member.namespace == "namespace"
-    assert member.const is True
-    assert member.deleted is True
-    assert member.default is True
-    assert member.constexpr is True
-
-
-def test_member__eq__default():
-    first = Member()
-    second = Member()
-
-    assert first == second
-    assert second == first
-
-
-def test_member__eq__minimal():
-    first = Member("lang")
-    second = Member("lang")
-
-    assert first == second
-    assert second == first
-
-
-def test_member__eq__full():
-    first = Member(id="id",
-                   name="name",
-                   full_name="full_name",
-                   language="lang",
-                   kind="kind",
-                   definition="definition",
-                   params=[Parameter(name="parameter")],
-                   exceptions=[ThrowsClause(description="exception")],
-                   brief="brief",
-                   description="description",
-                   prot="prot",
-                   returns=ReturnValue(description="returns"),
-                   enumvalues=[EnumValue(name="enumvalue")],
-                   static=True,
-                   include="include",
-                   namespace="namespace",
-                   const=True,
-                   deleted=True,
-                   default=True,
-                   constexpr=True)
-    second = Member(id="id",
-                    name="name",
-                    full_name="full_name",
-                    language="lang",
-                    kind="kind",
-                    definition="definition",
-                    params=[Parameter(name="parameter")],
-                    exceptions=[ThrowsClause(description="exception")],
-                    brief="brief",
-                    description="description",
-                    prot="prot",
-                    returns=ReturnValue(description="returns"),
-                    enumvalues=[EnumValue(name="enumvalue")],
-                    static=True,
-                    include="include",
-                    namespace="namespace",
-                    const=True,
-                    deleted=True,
-                    default=True,
-                    constexpr=True)
-
-    assert first == second
-    assert second == first
-
-    for attr_name in ("id", "name", "full_name", "language", "kind", "definition", "brief",
-                      "description", "prot", "include", "namespace"):
-        setattr(second, attr_name, "other")
-        assert first != second
-        assert second != first
-        setattr(second, attr_name, getattr(first, attr_name))
-
-    for attr_name in ("static", "const", "deleted", "default", "constexpr"):
-        setattr(second, attr_name, False)
-        assert first != second
-        assert second != first
-        setattr(second, attr_name, getattr(first, attr_name))
-
-    second.params[0].name = "other"
-    assert first != second
-    assert second != first
-    second.params[0].name = first.params[0].name
-
-    second.exceptions[0].description = "other"
-    assert first != second
-    assert second != first
-    second.exceptions[0].description = first.exceptions[0].description
-
-    second.returns.description = "other"
-    assert first != second
-    assert second != first
-    second.returns.description = first.returns.description
-
-    second.enumvalues[0].name = "other"
-    assert first != second
-    assert second != first
-    second.enumvalues[0].name = first.enumvalues[0].name
-
-
 def test_inner_type_reference__init__default():
     ref = InnerTypeReference()
     assert ref.id is None
@@ -758,13 +567,29 @@ def test_compound__init__default():
     assert compound.full_name == ""
     assert compound.language == ""
     assert compound.kind == ""
+
     assert compound.members == []
     assert compound.inner_classes == []
-    assert compound.brief == ""
-    assert compound.description == ""
     assert compound.enumvalues == []
+    assert compound.params == []
+    assert compound.exceptions == []
+    assert compound.returns is None
+
     assert compound.include is None
     assert compound.namespace is None
+
+    assert compound.prot == ""
+    assert compound.definition == ""
+    assert compound.args == ""
+
+    assert compound.brief == ""
+    assert compound.description == ""
+
+    assert compound.static is False
+    assert compound.const is False
+    assert compound.deleted is False
+    assert compound.default is False
+    assert compound.constexpr is False
 
 
 def test_compound__init__positional():
@@ -774,13 +599,29 @@ def test_compound__init__positional():
     assert compound.full_name == ""
     assert compound.language == "lang"
     assert compound.kind == ""
+
     assert compound.members == []
     assert compound.inner_classes == []
-    assert compound.brief == ""
-    assert compound.description == ""
     assert compound.enumvalues == []
+    assert compound.params == []
+    assert compound.exceptions == []
+    assert compound.returns is None
+
     assert compound.include is None
     assert compound.namespace is None
+
+    assert compound.prot == ""
+    assert compound.definition == ""
+    assert compound.args == ""
+
+    assert compound.brief == ""
+    assert compound.description == ""
+
+    assert compound.static is False
+    assert compound.const is False
+    assert compound.deleted is False
+    assert compound.default is False
+    assert compound.constexpr is False
 
 
 def test_compound__init__keyword():
@@ -789,28 +630,59 @@ def test_compound__init__keyword():
                         full_name="full_name",
                         language="lang",
                         kind="kind",
-                        members=[Member(name="member_name")],
+                        members=[Compound(name="member_name")],
                         inner_classes=[InnerTypeReference(name="inner_type_name")],
+                        enumvalues=[EnumValue(name="enum_value_name")],
+                        params=[Parameter(name="parameter")],
+                        exceptions=[ThrowsClause(description="exception")],
+                        returns=ReturnValue(description="returns"),
+                        include="include",
+                        namespace="namespace",
+                        prot="prot",
+                        definition="definition",
+                        args="args",
                         brief="brief",
                         description="description",
-                        enumvalues=[EnumValue(name="enum_value_name")],
-                        include="include",
-                        namespace="namespace")
+                        static=True,
+                        const=True,
+                        deleted=True,
+                        default=True,
+                        constexpr=True)
+
     assert compound.id == "id"
     assert compound.name == "name"
     assert compound.full_name == "full_name"
     assert compound.language == "lang"
     assert compound.kind == "kind"
+
     assert len(compound.members) == 1
     assert compound.members[0].name == "member_name"
     assert len(compound.inner_classes) == 1
     assert compound.inner_classes[0].name == "inner_type_name"
-    assert compound.brief == "brief"
-    assert compound.description == "description"
     assert len(compound.enumvalues) == 1
     assert compound.enumvalues[0].name == "enum_value_name"
+    assert len(compound.params) == 1
+    assert compound.params[0].name == "parameter"
+    assert len(compound.exceptions) == 1
+    assert compound.exceptions[0].description == "exception"
+    assert compound.returns is not None
+    assert compound.returns.description == "returns"
+
     assert compound.include == "include"
     assert compound.namespace == "namespace"
+
+    assert compound.prot == "prot"
+    assert compound.definition == "definition"
+    assert compound.args == "args"
+
+    assert compound.brief == "brief"
+    assert compound.description == "description"
+
+    assert compound.static is True
+    assert compound.const is True
+    assert compound.deleted is True
+    assert compound.default is True
+    assert compound.constexpr is True
 
 
 def test_compound__eq__default():
@@ -835,32 +707,60 @@ def test_compound__eq__full():
                      full_name="full_name",
                      language="lang",
                      kind="kind",
-                     members=[Member(name="member_name")],
+                     members=[Compound(name="member_name")],
                      inner_classes=[InnerTypeReference(name="inner_type_name")],
+                     enumvalues=[EnumValue(name="enum_value_name")],
+                     params=[Parameter(name="parameter")],
+                     exceptions=[ThrowsClause(description="exception")],
+                     returns=ReturnValue(description="returns"),
+                     include="include",
+                     namespace="namespace",
+                     prot="prot",
+                     definition="definition",
+                     args="args",
                      brief="brief",
                      description="description",
-                     enumvalues=[EnumValue(name="enum_value_name")],
-                     include="include",
-                     namespace="namespace")
+                     static=True,
+                     const=True,
+                     deleted=True,
+                     default=True,
+                     constexpr=True)
     second = Compound(id="id",
                       name="name",
                       full_name="full_name",
                       language="lang",
                       kind="kind",
-                      members=[Member(name="member_name")],
+                      members=[Compound(name="member_name")],
                       inner_classes=[InnerTypeReference(name="inner_type_name")],
+                      enumvalues=[EnumValue(name="enum_value_name")],
+                      params=[Parameter(name="parameter")],
+                      exceptions=[ThrowsClause(description="exception")],
+                      returns=ReturnValue(description="returns"),
+                      include="include",
+                      namespace="namespace",
+                      prot="prot",
+                      definition="definition",
+                      args="args",
                       brief="brief",
                       description="description",
-                      enumvalues=[EnumValue(name="enum_value_name")],
-                      include="include",
-                      namespace="namespace")
+                      static=True,
+                      const=True,
+                      deleted=True,
+                      default=True,
+                      constexpr=True)
 
     assert first == second
     assert second == first
 
-    for attr_name in ("id", "name", "full_name", "language", "kind", "brief", "description",
-                      "include", "namespace"):
+    for attr_name in ("id", "name", "full_name", "language", "kind", "include", "namespace", "prot",
+                      "definition", "args", "brief", "description"):
         setattr(second, attr_name, "other")
+        assert first != second
+        assert second != first
+        setattr(second, attr_name, getattr(first, attr_name))
+
+    for attr_name in ("static", "const", "deleted", "default", "constexpr"):
+        setattr(second, attr_name, False)
         assert first != second
         assert second != first
         setattr(second, attr_name, getattr(first, attr_name))
@@ -879,3 +779,18 @@ def test_compound__eq__full():
     assert first != second
     assert second != first
     second.enumvalues[0].name = first.enumvalues[0].name
+
+    second.params[0].name = "other"
+    assert first != second
+    assert second != first
+    second.params[0].name = first.params[0].name
+
+    second.exceptions[0].description = "other"
+    assert first != second
+    assert second != first
+    second.exceptions[0].description = first.exceptions[0].description
+
+    second.returns.description = "other"
+    assert first != second
+    assert second != first
+    second.returns.description = first.returns.description

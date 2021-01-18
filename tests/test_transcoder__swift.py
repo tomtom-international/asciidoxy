@@ -16,10 +16,30 @@
 import pytest
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.model import ReferableElement
 from asciidoxy.transcoder.swift import SwiftTranscoder
 
-from .builders import make_member, make_parameter, make_referable, make_return_value, make_type_ref
+from .builders2 import (make_compound, make_parameter, make_return_value, make_throws_clause,
+                        make_type_ref)
+
+
+def make_objc_compound(**kwargs):
+    return make_compound(language="objc", **kwargs)
+
+
+def make_swift_compound(**kwargs):
+    return make_compound(language="swift", **kwargs)
+
+
+def make_objc_type_ref(**kwargs):
+    return make_type_ref(language="objc", **kwargs)
+
+
+def make_swift_type_ref(**kwargs):
+    return make_type_ref(language="swift", **kwargs)
+
+
+def make_swift_throws_clause(**kwargs):
+    return make_throws_clause(language="swift", **kwargs)
 
 
 @pytest.fixture
@@ -27,21 +47,31 @@ def transcoder():
     return SwiftTranscoder(ApiReference())
 
 
-def test_transcode_member__no_arguments(transcoder):
-    member = make_member("objc", name="update", namespace="Geo")
-    transcoded = transcoder.member(member)
+def test_transcode_function__no_arguments(transcoder):
+    compound = make_objc_compound(name="update",
+                                  namespace="Geo",
+                                  full_name="Geo.update",
+                                  kind="function")
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(name="update",
+                                             namespace="Geo",
+                                             full_name="Geo.update",
+                                             kind="function")
 
-    assert transcoded.language == "swift"
-    assert transcoded.full_name == "Geo.update"
-    assert not transcoded.params
 
-
-def test_transcode_member__single_argument(transcoder):
-    member = make_member("objc",
-                         name="updateWithName:",
-                         namespace="Geo",
-                         params=[make_parameter("name")])
-    transcoded = transcoder.member(member)
+def test_transcode_function__single_argument(transcoder):
+    compound = make_objc_compound(name="updateWithName:",
+                                  namespace="Geo",
+                                  full_name="Geo.updateWithName:",
+                                  params=[make_parameter(name="name")],
+                                  kind="function")
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(id="swift-updatewithname:",
+                                             name="update",
+                                             namespace="Geo",
+                                             full_name="Geo.update",
+                                             params=[make_parameter(name="withName")],
+                                             kind="function")
 
     assert transcoded.language == "swift"
     assert transcoded.name == "update"
@@ -50,366 +80,384 @@ def test_transcode_member__single_argument(transcoder):
     assert transcoded.params[0].name == "withName"
 
 
-def test_transcode_member__multiple_arguments(transcoder):
-    member = make_member(
-        "objc",
-        name="updateWithName:andType:andAge:",
+def test_transcode_compound__multiple_arguments(transcoder):
+    compound = make_objc_compound(name="updateWithName:andType:andAge:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="name"),
+                                      make_parameter(name="type"),
+                                      make_parameter(name="age")
+                                  ])
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(id="swift-updatewithname:andtype:andage:",
+                                             name="update",
+                                             namespace="Geo",
+                                             kind="function",
+                                             params=[
+                                                 make_parameter(name="withName"),
+                                                 make_parameter(name="type"),
+                                                 make_parameter(name="age")
+                                             ])
+
+
+def test_transcode_compound__init(transcoder):
+    compound = make_objc_compound(
+        name="init",
         namespace="Geo",
-        params=[make_parameter("name"),
-                make_parameter("type"),
-                make_parameter("age")])
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert len(transcoded.params) == 3
-    assert transcoded.params[0].name == "withName"
+        kind="function",
+        returns=make_return_value(type=make_objc_type_ref(name="instancetype")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(name="init",
+                                             namespace="Geo",
+                                             kind="function",
+                                             returns=None)
 
 
-def test_transcode_member__init(transcoder):
-    member = make_member("objc",
-                         name="init",
-                         namespace="Geo",
-                         returns=make_return_value(make_type_ref("objc", "instancetype")))
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.full_name == "Geo.init"
-    assert not transcoded.params
-    assert not transcoded.returns
-
-
-def test_transcode_member__init__single_argument(transcoder):
-    member = make_member("objc",
-                         name="initWithName:",
-                         namespace="Geo",
-                         params=[make_parameter("name")],
-                         returns=make_return_value(make_type_ref("objc", "instancetype")))
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.full_name == "Geo.init"
-    assert len(transcoded.params) == 1
-    assert transcoded.params[0].name == "name"
-    assert not transcoded.returns
+def test_transcode_compound__init__single_argument(transcoder):
+    compound = make_objc_compound(
+        name="initWithName:",
+        namespace="Geo",
+        kind="function",
+        params=[make_parameter(name="name")],
+        returns=make_return_value(type=make_objc_type_ref(name="instancetype")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(id="swift-initwithname:",
+                                             name="init",
+                                             namespace="Geo",
+                                             kind="function",
+                                             params=[make_parameter(name="name")],
+                                             returns=None)
 
 
-def test_transcode_member__init__multiple_arguments(transcoder):
-    member = make_member("objc",
-                         name="initWithName:andAge",
-                         namespace="Geo",
-                         params=[make_parameter("nameValue"),
-                                 make_parameter("age")],
-                         returns=make_return_value(make_type_ref("objc", "instancetype")))
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.full_name == "Geo.init"
-    assert len(transcoded.params) == 2
-    assert transcoded.params[0].name == "name"
-    assert transcoded.params[1].name == "age"
-    assert not transcoded.returns
-
-
-def test_transcode_member__block(transcoder):
-    closure = make_member("objc",
-                          name="SuccessBlock",
-                          namespace="Geo",
-                          kind="block",
-                          params=[
-                              make_parameter("number", type_=make_type_ref("objc", "NSInteger")),
-                              make_parameter("data", type_=make_type_ref("objc", "data"))
-                          ],
-                          returns=make_return_value(make_type_ref("objc", name="BOOL")))
-    transcoded = transcoder.member(closure)
-
-    assert transcoded.language == "swift"
-    assert transcoded.full_name == "Geo.SuccessBlock"
-    assert transcoded.kind == "closure"
+def test_transcode_compound__init__multiple_arguments(transcoder):
+    compound = make_objc_compound(
+        name="initWithName:andAge:",
+        namespace="Geo",
+        kind="function",
+        params=[make_parameter(name="nameValue"),
+                make_parameter(name="age")],
+        returns=make_return_value(type=make_objc_type_ref(name="instancetype")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-initwithname:andage:",
+        name="init",
+        namespace="Geo",
+        kind="function",
+        params=[make_parameter(name="name"),
+                make_parameter(name="age")],
+        returns=None)
 
 
-def test_transcode_member__only_argument_nserror__no_return(transcoder):
-    member = make_member("objc",
-                         name="update:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**"))
-                         ])
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert not transcoded.params
-    assert len(transcoded.exceptions) == 1
-    assert transcoded.exceptions[0].type
-    assert transcoded.exceptions[0].type.name == "Error"
-    assert not transcoded.exceptions[0].type.prefix
-    assert not transcoded.exceptions[0].type.suffix
-
-
-def test_transcode_member__only_argument_nserror__bool_return(transcoder):
-    member = make_member("objc",
-                         name="update:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**"))
-                         ],
-                         returns=make_return_value(make_type_ref("objc", name="BOOL")))
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert not transcoded.params
-    assert len(transcoded.exceptions) == 1
-    assert transcoded.exceptions[0].type
-    assert transcoded.exceptions[0].type.name == "Error"
-    assert not transcoded.exceptions[0].type.prefix
-    assert not transcoded.exceptions[0].type.suffix
-    assert not transcoded.returns
+def test_transcode_compound__block(transcoder):
+    closure = make_objc_compound(name="SuccessBlock",
+                                 namespace="Geo",
+                                 kind="block",
+                                 params=[
+                                     make_parameter(name="number",
+                                                    type=make_objc_type_ref(name="NSInteger")),
+                                     make_parameter(name="data",
+                                                    type=make_objc_type_ref(name="data"))
+                                 ],
+                                 returns=make_return_value(type=make_objc_type_ref(name="BOOL")))
+    transcoded = transcoder.compound(closure)
+    assert transcoded == make_swift_compound(
+        name="SuccessBlock",
+        namespace="Geo",
+        kind="closure",
+        params=[
+            make_parameter(name="number",
+                           type=make_swift_type_ref(name="Integer", id="swift-nsinteger")),
+            make_parameter(name="data", type=make_swift_type_ref(name="data"))
+        ],
+        returns=make_return_value(type=make_swift_type_ref(name="Bool")))
 
 
-def test_transcode_member__only_argument_nserror__other_return(transcoder):
-    member = make_member("objc",
-                         name="update:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**"))
-                         ],
-                         returns=make_return_value(make_type_ref("objc", name="NSString")))
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert not transcoded.params
-    assert len(transcoded.exceptions) == 1
-    assert transcoded.exceptions[0].type
-    assert transcoded.exceptions[0].type.name == "Error"
-    assert not transcoded.exceptions[0].type.prefix
-    assert not transcoded.exceptions[0].type.suffix
-    assert transcoded.returns
-    assert transcoded.returns.type
-    assert transcoded.returns.type.name == "String"
+def test_transcode_compound__only_argument_nserror__no_return(transcoder):
+    compound = make_objc_compound(name="update:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="error",
+                                                     type=make_objc_type_ref(name="NSError",
+                                                                             prefix="",
+                                                                             suffix="**"))
+                                  ])
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-update:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[],
+        exceptions=[
+            make_swift_throws_clause(
+                type=make_swift_type_ref(name="Error", id="swift-nserror", prefix="", suffix=""))
+        ])
 
 
-def test_transcode_member__last_argument_nserror__bool_return(transcoder):
-    member = make_member("objc",
-                         name="update:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("value", type_=make_type_ref("objc", "NSString")),
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**"))
-                         ],
-                         returns=make_return_value(make_type_ref("objc", name="BOOL")))
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert len(transcoded.params) == 1
-    assert transcoded.params[0].type
-    assert transcoded.params[0].type.name == "String"
-    assert len(transcoded.exceptions) == 1
-    assert transcoded.exceptions[0].type
-    assert transcoded.exceptions[0].type.name == "Error"
-    assert not transcoded.exceptions[0].type.prefix
-    assert not transcoded.exceptions[0].type.suffix
-    assert not transcoded.returns
+def test_transcode_compound__only_argument_nserror__bool_return(transcoder):
+    compound = make_objc_compound(name="update:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="error",
+                                                     type=make_objc_type_ref(name="NSError",
+                                                                             prefix="",
+                                                                             suffix="**"))
+                                  ],
+                                  returns=make_return_value(type=make_objc_type_ref(name="BOOL")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-update:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[],
+        returns=None,
+        exceptions=[
+            make_swift_throws_clause(
+                type=make_swift_type_ref(name="Error", id="swift-nserror", prefix="", suffix=""))
+        ])
 
 
-def test_transcode_member__nserror_not_last(transcoder):
-    member = make_member("objc",
-                         name="update:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**")),
-                             make_parameter("value", type_=make_type_ref("objc", "NSString")),
-                         ],
-                         returns=make_return_value(make_type_ref("objc", name="BOOL")))
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert len(transcoded.params) == 2
-    assert not transcoded.exceptions
-    assert transcoded.returns
-
-
-def test_transcode_member__only_argument_nserror__with_error(transcoder):
-    member = make_member("objc",
-                         name="updateWithError:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**"))
-                         ])
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert not transcoded.params
-    assert len(transcoded.exceptions) == 1
-    assert transcoded.exceptions[0].type
-    assert transcoded.exceptions[0].type.name == "Error"
-    assert not transcoded.exceptions[0].type.prefix
-    assert not transcoded.exceptions[0].type.suffix
+def test_transcode_compound__only_argument_nserror__other_return(transcoder):
+    compound = make_objc_compound(
+        name="update:",
+        namespace="Geo",
+        kind="function",
+        params=[
+            make_parameter(name="error",
+                           type=make_objc_type_ref(name="NSError", prefix="", suffix="**"))
+        ],
+        returns=make_return_value(type=make_objc_type_ref(name="NSString")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-update:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[],
+        exceptions=[
+            make_swift_throws_clause(
+                type=make_swift_type_ref(name="Error", id="swift-nserror", prefix="", suffix=""))
+        ],
+        returns=make_return_value(type=make_swift_type_ref(name="String", id="swift-nsstring")))
 
 
-def test_transcode_member__only_argument_nserror__and_return_error(transcoder):
-    member = make_member("objc",
-                         name="updateAndReturnError:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**"))
-                         ])
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert not transcoded.params
-    assert len(transcoded.exceptions) == 1
-    assert transcoded.exceptions[0].type
-    assert transcoded.exceptions[0].type.name == "Error"
-    assert not transcoded.exceptions[0].type.prefix
-    assert not transcoded.exceptions[0].type.suffix
-
-
-def test_transcode_member__return_optional_removed(transcoder):
-    member = make_member("objc",
-                         name="updateAndReturnError:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**")),
-                         ],
-                         returns=make_return_value(
-                             make_type_ref("objc", name="NSString", prefix="", suffix="?")))
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert not transcoded.params
-    assert len(transcoded.exceptions) == 1
-    assert transcoded.exceptions[0].type
-    assert transcoded.exceptions[0].type.name == "Error"
-    assert not transcoded.exceptions[0].type.prefix
-    assert not transcoded.exceptions[0].type.suffix
-    assert transcoded.returns
-    assert transcoded.returns.type
-    assert transcoded.returns.type.name == "String"
-    assert not transcoded.returns.type.suffix
+def test_transcode_compound__last_argument_nserror__bool_return(transcoder):
+    compound = make_objc_compound(name="update:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="value",
+                                                     type=make_objc_type_ref(name="NSString")),
+                                      make_parameter(name="error",
+                                                     type=make_objc_type_ref(name="NSError",
+                                                                             prefix="",
+                                                                             suffix="**"))
+                                  ],
+                                  returns=make_return_value(type=make_objc_type_ref(name="BOOL")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-update:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[
+            make_parameter(name="value",
+                           type=make_swift_type_ref(name="String", id="swift-nsstring")),
+        ],
+        returns=None,
+        exceptions=[
+            make_swift_throws_clause(
+                type=make_swift_type_ref(name="Error", id="swift-nserror", prefix="", suffix=""))
+        ],
+    )
 
 
-def test_transcode_member__nserror_followed_by_closure(transcoder):
-    member = make_member("objc",
-                         name="update:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**")),
-                             make_parameter("callback",
-                                            type_=make_type_ref("objc", "", prefix="", suffix=""))
-                         ])
-    member.params[1].type.args = [make_parameter("value")]
-    member.params[1].returns = make_type_ref("objc", "void", prefix="", suffix="")
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert len(transcoded.params) == 1
-    assert transcoded.params[0].name == "callback"
-    assert len(transcoded.exceptions) == 1
-    assert transcoded.exceptions[0].type
-    assert transcoded.exceptions[0].type.name == "Error"
-    assert not transcoded.exceptions[0].type.prefix
-    assert not transcoded.exceptions[0].type.suffix
-
-
-def test_transcode_member__only_argument_nserror__swift_nothrow(transcoder):
-    member = make_member("objc",
-                         name="update:",
-                         namespace="Geo",
-                         kind="function",
-                         params=[
-                             make_parameter("error",
-                                            type_=make_type_ref("objc",
-                                                                "NSError",
-                                                                prefix="",
-                                                                suffix="**"))
-                         ],
-                         returns=make_return_value(make_type_ref("objc", name="BOOL")))
-    member.args = "([error] NSError ** NS_SWIFT_NOTHROW)"
-    transcoded = transcoder.member(member)
-
-    assert transcoded.language == "swift"
-    assert transcoded.name == "update"
-    assert transcoded.full_name == "Geo.update"
-    assert len(transcoded.params) == 1
-    assert not transcoded.exceptions
-    assert transcoded.returns
+def test_transcode_compound__nserror_not_last(transcoder):
+    compound = make_objc_compound(name="update:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="error",
+                                                     type=make_objc_type_ref(name="NSError",
+                                                                             prefix="",
+                                                                             suffix="**")),
+                                      make_parameter(name="value",
+                                                     type=make_objc_type_ref(name="NSString")),
+                                  ],
+                                  returns=make_return_value(type=make_objc_type_ref(name="BOOL")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-update:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[
+            make_parameter(name="error",
+                           type=make_swift_type_ref(id="swift-nserror",
+                                                    name="Error",
+                                                    prefix="",
+                                                    suffix="")),
+            make_parameter(name="value",
+                           type=make_swift_type_ref(id="swift-nsstring", name="String")),
+        ],
+        returns=make_return_value(type=make_swift_type_ref(name="Bool")))
 
 
-def test_transcode_member__void_return(transcoder):
-    member = make_member("objc",
-                         name="update",
-                         namespace="Geo",
-                         kind="function",
-                         returns=make_return_value(make_type_ref("objc", name="void")))
-    transcoded = transcoder.member(member)
+def test_transcode_compound__only_argument_nserror__with_error(transcoder):
+    compound = make_objc_compound(name="updateWithError:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="error",
+                                                     type=make_objc_type_ref(name="NSError",
+                                                                             prefix="",
+                                                                             suffix="**"))
+                                  ])
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-updatewitherror:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[],
+        exceptions=[
+            make_swift_throws_clause(
+                type=make_swift_type_ref(name="Error", id="swift-nserror", prefix="", suffix=""))
+        ])
 
-    assert transcoded.language == "swift"
-    assert transcoded.full_name == "Geo.update"
-    assert transcoded.returns is None
+
+def test_transcode_compound__only_argument_nserror__and_return_error(transcoder):
+    compound = make_objc_compound(name="updateAndReturnError:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="error",
+                                                     type=make_objc_type_ref(name="NSError",
+                                                                             prefix="",
+                                                                             suffix="**"))
+                                  ])
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-updateandreturnerror:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[],
+        exceptions=[
+            make_swift_throws_clause(
+                type=make_swift_type_ref(name="Error", id="swift-nserror", prefix="", suffix=""))
+        ])
+
+
+def test_transcode_compound__return_optional_removed(transcoder):
+    compound = make_objc_compound(
+        name="updateAndReturnError:",
+        namespace="Geo",
+        kind="function",
+        params=[
+            make_parameter(name="error",
+                           type=make_objc_type_ref(name="NSError", prefix="", suffix="**")),
+        ],
+        returns=make_return_value(type=make_objc_type_ref(name="NSString", prefix="", suffix="?")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-updateandreturnerror:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[],
+        returns=make_return_value(
+            type=make_swift_type_ref(id="swift-nsstring", name="String", prefix="", suffix="")),
+        exceptions=[
+            make_swift_throws_clause(
+                type=make_swift_type_ref(name="Error", id="swift-nserror", prefix="", suffix=""))
+        ])
+
+
+def test_transcode_compound__nserror_followed_by_closure(transcoder):
+    compound = make_objc_compound(name="update:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="error",
+                                                     type=make_objc_type_ref(name="NSError",
+                                                                             prefix="",
+                                                                             suffix="**")),
+                                      make_parameter(name="callback",
+                                                     type=make_objc_type_ref(
+                                                         name="",
+                                                         prefix="",
+                                                         suffix="",
+                                                         args=[make_parameter(name="value")],
+                                                         returns=make_objc_type_ref(name="void",
+                                                                                    prefix="",
+                                                                                    suffix="")))
+                                  ])
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-update:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[
+            make_parameter(name="callback",
+                           type=make_swift_type_ref(name="",
+                                                    prefix="",
+                                                    suffix="",
+                                                    args=[make_parameter(name="value")],
+                                                    returns=make_swift_type_ref(name="void",
+                                                                                prefix="",
+                                                                                suffix="")))
+        ],
+        exceptions=[
+            make_swift_throws_clause(
+                type=make_swift_type_ref(name="Error", id="swift-nserror", prefix="", suffix=""))
+        ])
+
+
+def test_transcode_compound__only_argument_nserror__swift_nothrow(transcoder):
+    compound = make_objc_compound(name="update:",
+                                  namespace="Geo",
+                                  kind="function",
+                                  params=[
+                                      make_parameter(name="error",
+                                                     type=make_objc_type_ref(name="NSError",
+                                                                             prefix="",
+                                                                             suffix="**"))
+                                  ],
+                                  returns=make_return_value(type=make_objc_type_ref(name="BOOL")),
+                                  args="([error] NSError ** NS_SWIFT_NOTHROW)")
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(
+        id="swift-update:",
+        name="update",
+        namespace="Geo",
+        kind="function",
+        params=[
+            make_parameter(name="error",
+                           type=make_swift_type_ref(id="swift-nserror",
+                                                    name="Error",
+                                                    prefix="",
+                                                    suffix=""))
+        ],
+        returns=make_return_value(type=make_swift_type_ref(name="Bool")),
+        args="([error] NSError ** NS_SWIFT_NOTHROW)")
+
+
+def test_transcode_compound__void_return(transcoder):
+    compound = make_objc_compound(name="update",
+                                  namespace="Geo",
+                                  kind="function",
+                                  returns=make_return_value(type=make_objc_type_ref(name="void")))
+    transcoded = transcoder.compound(compound)
+    assert transcoded == make_swift_compound(name="update",
+                                             namespace="Geo",
+                                             kind="function",
+                                             returns=None)
 
 
 @pytest.mark.parametrize("objc_name, swift_name", [
@@ -433,7 +481,7 @@ def test_transcode_member__void_return(transcoder):
     ("BOOL", "Bool"),
 ])
 def test_convert_name(transcoder, objc_name, swift_name):
-    element = make_referable(ReferableElement, lang="objc", name=objc_name)
+    element = make_objc_compound(name=objc_name)
     assert transcoder.convert_name(element) == swift_name
 
 
@@ -446,99 +494,107 @@ def test_convert_name(transcoder, objc_name, swift_name):
     ("initWithName:andAge:", "MyClass.initWithName:andAge:", "MyClass.initWithName"),
 ])
 def test_convert_full_name(transcoder, objc_name, objc_full_name, swift_full_name):
-    element = make_referable(ReferableElement, lang="objc", name=objc_name)
+    element = make_objc_compound(name=objc_name)
     element.full_name = objc_full_name
     assert transcoder.convert_full_name(element) == swift_full_name
 
 
 def test_transcode_type_ref__nullable_prefix(transcoder):
-    type_ref = make_type_ref(lang="objc", name="MyClass", prefix="nullable ", suffix="")
+    type_ref = make_objc_type_ref(name="MyClass", prefix="nullable ", suffix="")
     transcoded = transcoder.type_ref(type_ref)
-    assert transcoded.name == "MyClass"
-    assert not transcoded.prefix
-    assert transcoded.suffix == "?"
+    assert transcoded == make_swift_type_ref(name="MyClass", prefix="", suffix="?")
 
 
 def test_transcode_type_ref__nullable_suffix(transcoder):
-    type_ref = make_type_ref(lang="objc", name="MyClass", prefix="", suffix=" _Nullable")
+    type_ref = make_objc_type_ref(name="MyClass", prefix="", suffix=" _Nullable")
     transcoded = transcoder.type_ref(type_ref)
-    assert transcoded.name == "MyClass"
-    assert not transcoded.prefix
-    assert transcoded.suffix == "?"
+    assert transcoded == make_swift_type_ref(name="MyClass", prefix="", suffix="?")
 
 
 def test_transcode_type_ref__pointer(transcoder):
-    type_ref = make_type_ref(lang="objc", name="MyClass", prefix="", suffix=" *")
+    type_ref = make_objc_type_ref(name="MyClass", prefix="", suffix=" *")
     transcoded = transcoder.type_ref(type_ref)
-    assert transcoded.name == "MyClass"
-    assert not transcoded.prefix
-    assert not transcoded.suffix
+    assert transcoded == make_swift_type_ref(name="MyClass", prefix="", suffix="")
 
 
 def test_transcode_type_ref__autoreleasing(transcoder):
-    type_ref = make_type_ref(lang="objc", name="MyClass", prefix="", suffix="*__autoreleasing")
+    type_ref = make_objc_type_ref(name="MyClass", prefix="", suffix="*__autoreleasing")
     transcoded = transcoder.type_ref(type_ref)
-    assert transcoded.name == "MyClass"
-    assert not transcoded.prefix
-    assert not transcoded.suffix
+    assert transcoded == make_swift_type_ref(name="MyClass", prefix="", suffix="")
 
 
 def test_transcode_type_ref__bare_id(transcoder):
-    type_ref = make_type_ref(lang="objc", name="id", prefix="", suffix="")
+    type_ref = make_objc_type_ref(name="id", prefix="", suffix="")
     transcoded = transcoder.type_ref(type_ref)
-    assert transcoded.name == "Any"
-    assert not transcoded.prefix
-    assert not transcoded.suffix
+    assert transcoded == make_swift_type_ref(id="swift-id", name="Any", prefix="", suffix="")
 
 
 def test_transcode_type_ref__id_type(transcoder):
-    type_ref = make_type_ref(lang="objc", name="id", prefix="", suffix="")
-    type_ref.nested = [make_type_ref(lang="objc", name="MyClass", prefix="", suffix="")]
+    type_ref = make_objc_type_ref(name="id",
+                                  prefix="",
+                                  suffix="",
+                                  nested=[make_objc_type_ref(name="MyClass", prefix="", suffix="")])
     transcoded = transcoder.type_ref(type_ref)
-    assert transcoded.name == "MyClass"
-    assert not transcoded.prefix
-    assert not transcoded.suffix
-    assert not transcoded.nested
+    assert transcoded == make_swift_type_ref(name="MyClass", prefix="", suffix="", nested=None)
 
 
 def test_transcode_type_ref__closure(transcoder):
-    type_ref = make_type_ref("objc", name="", prefix="", suffix="")
-    type_ref.returns = make_type_ref("objc", "Coordinate", prefix="", suffix="")
-    type_ref.args = [
-        make_parameter("arg1"),
-        make_parameter("arg2", make_type_ref("objc", "MyType", prefix="", suffix="")),
-    ]
-
+    type_ref = make_objc_type_ref(name="",
+                                  prefix="",
+                                  suffix="",
+                                  returns=make_objc_type_ref(name="Coordinate",
+                                                             prefix="",
+                                                             suffix=""),
+                                  args=[
+                                      make_parameter(name="arg1"),
+                                      make_parameter(name="arg2",
+                                                     type=make_objc_type_ref(name="MyType",
+                                                                             prefix="",
+                                                                             suffix="")),
+                                  ])
     transcoded = transcoder.type_ref(type_ref)
-
-    assert transcoded is not type_ref
-    assert transcoded.language == "swift"
-    assert not transcoded.name
-    assert not transcoded.nested
-    assert len(transcoded.args) == 2
-    assert transcoded.returns is not None
-    assert not transcoded.prefix
-    assert not transcoded.suffix
+    assert transcoded == make_swift_type_ref(name="",
+                                             prefix="",
+                                             suffix="",
+                                             returns=make_swift_type_ref(name="Coordinate",
+                                                                         prefix="",
+                                                                         suffix=""),
+                                             args=[
+                                                 make_parameter(name="arg1"),
+                                                 make_parameter(name="arg2",
+                                                                type=make_swift_type_ref(
+                                                                    name="MyType",
+                                                                    prefix="",
+                                                                    suffix="")),
+                                             ])
 
 
 def test_transcode_type_ref__nullable_closure(transcoder):
-    type_ref = make_type_ref("objc", name="", prefix="", suffix="")
-    type_ref.returns = make_type_ref("objc", "Coordinate", prefix="nullable ", suffix="")
-    type_ref.args = [
-        make_parameter("arg1"),
-        make_parameter("arg2", make_type_ref("objc", "MyType", prefix="", suffix="")),
-    ]
-
+    type_ref = make_objc_type_ref(name="",
+                                  prefix="",
+                                  suffix="",
+                                  returns=make_objc_type_ref(name="Coordinate",
+                                                             prefix="nullable ",
+                                                             suffix=""),
+                                  args=[
+                                      make_parameter(name="arg1"),
+                                      make_parameter(name="arg2",
+                                                     type=make_objc_type_ref(name="MyType",
+                                                                             prefix="",
+                                                                             suffix="")),
+                                  ])
     transcoded = transcoder.type_ref(type_ref)
-
-    assert transcoded is not type_ref
-    assert transcoded.language == "swift"
-    assert not transcoded.name
-    assert not transcoded.nested
-    assert len(transcoded.args) == 2
-
-    assert transcoded.returns is not None
-    assert not transcoded.prefix
-    assert transcoded.suffix == "?"
-    assert not transcoded.returns.prefix
-    assert not transcoded.returns.suffix
+    assert transcoded == make_swift_type_ref(name="",
+                                             prefix="",
+                                             suffix="?",
+                                             returns=make_swift_type_ref(name="Coordinate",
+                                                                         prefix="",
+                                                                         suffix=""),
+                                             args=[
+                                                 make_parameter(name="arg1"),
+                                                 make_parameter(name="arg2",
+                                                                type=make_swift_type_ref(
+                                                                    name="MyType",
+                                                                    prefix="",
+                                                                    suffix="")),
+                                             ])

@@ -15,15 +15,15 @@
 
 from typing import Iterator
 
-from asciidoxy.model import Member
+from asciidoxy.model import Compound
 from asciidoxy.templates.helpers import TemplateHelper
 
 
 class CppTemplateHelper(TemplateHelper):
-    def constructors(self, prot: str) -> Iterator[Member]:
+    def constructors(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().constructors(prot) if (not m.default and not m.deleted))
 
-    def destructors(self, prot: str) -> Iterator[Member]:
+    def destructors(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
@@ -32,17 +32,17 @@ class CppTemplateHelper(TemplateHelper):
                 if (m.kind == "function" and m.name == destructor_name and m.prot == prot
                     and not m.default and not m.deleted))
 
-    def static_methods(self, prot: str) -> Iterator[Member]:
+    def static_methods(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().static_methods(prot) if not m.name.startswith("operator"))
 
-    def methods(self, prot: str) -> Iterator[Member]:
+    def methods(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().methods(prot)
                 if (not m.name.startswith("operator") and not m.default and not m.deleted))
 
-    def operators(self, prot: str) -> Iterator[Member]:
+    def operators(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().methods(prot)
                 if (m.name.startswith("operator") and not m.default and not m.deleted))
 
-    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
+    def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
         constexpr = "constexpr" if method.constexpr else ""
         return self._method_join(constexpr, super()._method_prefix(method, link=link))

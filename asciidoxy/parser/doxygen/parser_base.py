@@ -18,13 +18,13 @@ import logging
 import xml.etree.ElementTree as ET
 
 from abc import ABC
-from typing import List, Optional, Tuple, Type, Union
+from typing import List, Optional, Tuple, Type
 
 from .description_parser import DescriptionParser, select_descriptions
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
 from .type_parser import TypeParser, TypeParseError
-from ...model import (Compound, EnumValue, Member, Parameter, ReturnValue, ThrowsClause, TypeRef,
+from ...model import (Compound, EnumValue, Parameter, ReturnValue, ThrowsClause, TypeRef,
                       InnerTypeReference)
 
 logger = logging.getLogger(__name__)
@@ -70,14 +70,14 @@ class ParserBase(ABC):
                     descriptions.append((parameter_name.text, desc))
         return descriptions
 
-    def parse_parameters(self, memberdef_element: ET.Element, parent: Member) -> List[Parameter]:
+    def parse_parameters(self, memberdef_element: ET.Element, parent: Compound) -> List[Parameter]:
         descriptions = self.parse_parameterlist(memberdef_element, "param")
         params = []
         for param_element in memberdef_element.iterfind("param"):
             param = Parameter()
             param.type = self.parse_type(param_element.find("type"),
                                          param_element.find("array"),
-                                         parent=parent)
+                                         namespace=parent.namespace)
             param.name = param_element.findtext("declname", "")
             param.default_value = param_element.findtext("defval", "")
 
@@ -93,7 +93,7 @@ class ParserBase(ABC):
     def parse_type(self,
                    type_element: Optional[ET.Element],
                    array_element: Optional[ET.Element] = None,
-                   parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
+                   namespace: Optional[str] = None) -> Optional[TypeRef]:
         if type_element is None:
             return None
 
@@ -101,13 +101,14 @@ class ParserBase(ABC):
             return self.TYPE_PARSER.parse_xml(type_element,
                                               array_element,
                                               driver=self._driver,
-                                              parent=parent)
+                                              namespace=namespace)
         except TypeParseError:
             logger.exception(
                 f"Failed to parse type {ET.tostring(type_element, encoding='unicode')}.")
             return None
 
-    def parse_exceptions(self, memberdef_element: ET.Element, parent: Member) -> List[ThrowsClause]:
+    def parse_exceptions(self, memberdef_element: ET.Element,
+                         parent: Compound) -> List[ThrowsClause]:
         exceptions = []
         for name, desc in self.parse_parameterlist(memberdef_element, "exception"):
             exception = ThrowsClause(self.TRAITS.TAG)
@@ -118,9 +119,10 @@ class ParserBase(ABC):
             self._driver.unresolved_ref(exception.type)
         return exceptions
 
-    def parse_returns(self, memberdef_element: ET.Element, parent: Member) -> Optional[ReturnValue]:
+    def parse_returns(self, memberdef_element: ET.Element,
+                      parent: Compound) -> Optional[ReturnValue]:
         returns = ReturnValue()
-        returns.type = self.parse_type(memberdef_element.find("type"), parent=parent)
+        returns.type = self.parse_type(memberdef_element.find("type"), namespace=parent.namespace)
 
         description = memberdef_element.find("detaileddescription/para/simplesect[@kind='return']")
         if description:
@@ -151,8 +153,8 @@ class ParserBase(ABC):
 
         return values
 
-    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
-        member = Member(self.TRAITS.TAG)
+    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
+        member = Compound(self.TRAITS.TAG)
         member.id = self.TRAITS.unique_id(memberdef_element.get("id"))
         member.kind = memberdef_element.get("kind", "")
         member.prot = memberdef_element.get("prot", "")

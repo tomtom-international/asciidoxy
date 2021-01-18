@@ -16,7 +16,7 @@
 from typing import List, Optional, Tuple, Union
 
 from .base import TranscoderBase
-from ..model import Compound, Member, Parameter, ReferableElement, TypeRef, TypeRefBase
+from ..model import Compound, Parameter, ReferableElement, TypeRef, TypeRefBase
 
 # https://kotlinlang.org/docs/reference/java-interop.html#mapped-types
 _MAPPED_TYPES = {
@@ -178,8 +178,9 @@ class KotlinTranscoder(TranscoderBase):
     def convert_full_name(self, source_element: ReferableElement) -> str:
         return _MAPPED_TYPES.get(source_element.full_name, source_element.full_name)
 
-    def _member(self, member: Member) -> Member:
-        transcoded = super()._member(member)
+    def _compound(self, compound: Compound) -> Compound:
+        transcoded = super()._compound(compound)
+        transform_properties(transcoded.members)
 
         if (transcoded.returns is not None and transcoded.returns.type is not None
                 and transcoded.returns.type.name == "Unit"):
@@ -200,16 +201,11 @@ class KotlinTranscoder(TranscoderBase):
 
     def parameter(self, parameter: Parameter) -> Parameter:
         transcoded = super().parameter(parameter)
-        transcoded = transform_vararg(parameter)
-        return transcoded
-
-    def _compound(self, compound: Compound) -> Compound:
-        transcoded = super()._compound(compound)
-        transform_properties(transcoded.members)
+        transcoded = transform_vararg(transcoded)
         return transcoded
 
 
-def transform_properties(members: List[Member]) -> List[Member]:
+def transform_properties(members: List[Compound]) -> List[Compound]:
     getters = {
         m.name: m
         for m in members
