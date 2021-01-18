@@ -18,8 +18,8 @@ import pytest
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.swift import SwiftTranscoder
 
-from .builders2 import (make_compound, make_parameter, make_return_value, make_throws_clause,
-                        make_type_ref)
+from .builders import (make_compound, make_parameter, make_return_value, make_throws_clause,
+                       make_type_ref)
 
 
 def make_objc_compound(**kwargs):

@@ -18,7 +18,7 @@ import pytest
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.kotlin import KotlinTranscoder
 
-from .builders2 import make_compound, make_parameter, make_return_value, make_type_ref
+from .builders import make_compound, make_parameter, make_return_value, make_type_ref
 
 
 @pytest.fixture

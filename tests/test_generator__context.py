@@ -73,12 +73,12 @@ def test_file_with_element__different_file(empty_context):
     empty_context.multipage = True
 
     empty_context.current_document.in_file = Path("file_1.adoc")
-    empty_context.insert(make_compound(lang="lang", name="type1"))
-    empty_context.insert(make_compound(lang="lang", name="type2"))
+    empty_context.insert(make_compound(language="lang", name="type1"))
+    empty_context.insert(make_compound(language="lang", name="type2"))
 
     empty_context.current_document.in_file = Path("file_2.adoc")
-    empty_context.insert(make_compound(lang="lang", name="type3"))
-    empty_context.insert(make_compound(lang="lang", name="type4"))
+    empty_context.insert(make_compound(language="lang", name="type3"))
+    empty_context.insert(make_compound(language="lang", name="type4"))
 
     assert empty_context.file_with_element("lang-type1") == Path("file_1.adoc")
     assert empty_context.file_with_element("lang-type2") == Path("file_1.adoc")
@@ -88,12 +88,12 @@ def test_file_with_element__same_file(empty_context):
     empty_context.multipage = True
 
     empty_context.current_document.in_file = Path("file_1.adoc")
-    empty_context.insert(make_compound(lang="lang", name="type1"))
-    empty_context.insert(make_compound(lang="lang", name="type2"))
+    empty_context.insert(make_compound(language="lang", name="type1"))
+    empty_context.insert(make_compound(language="lang", name="type2"))
 
     empty_context.current_document.in_file = Path("file_2.adoc")
-    empty_context.insert(make_compound(lang="lang", name="type3"))
-    empty_context.insert(make_compound(lang="lang", name="type4"))
+    empty_context.insert(make_compound(language="lang", name="type3"))
+    empty_context.insert(make_compound(language="lang", name="type4"))
 
     assert empty_context.file_with_element("lang-type3") is None
     assert empty_context.file_with_element("lang-type4") is None
@@ -103,12 +103,12 @@ def test_file_with_element__not_in_singlepage(empty_context):
     empty_context.multipage = False
 
     empty_context.current_document.in_file = Path("file_1.adoc")
-    empty_context.insert(make_compound(lang="lang", name="type1"))
-    empty_context.insert(make_compound(lang="lang", name="type2"))
+    empty_context.insert(make_compound(language="lang", name="type1"))
+    empty_context.insert(make_compound(language="lang", name="type2"))
 
     empty_context.current_document.in_file = Path("file_2.adoc")
-    empty_context.insert(make_compound(lang="lang", name="type3"))
-    empty_context.insert(make_compound(lang="lang", name="type4"))
+    empty_context.insert(make_compound(language="lang", name="type3"))
+    empty_context.insert(make_compound(language="lang", name="type4"))
 
     assert empty_context.file_with_element("lang-type1") is None
     assert empty_context.file_with_element("lang-type2") is None
