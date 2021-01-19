@@ -57,6 +57,8 @@ class ReferableElement(ModelBase):
         return text + "]"
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return ((self.id, self.name, self.full_name, self.language,
                  self.kind) == (other.id, other.name, other.full_name, other.language, other.kind))
 
@@ -89,6 +91,8 @@ class TypeRefBase(ModelBase, ABC):
         pass
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return ((self.id, self.name, self.language,
                  self.namespace) == (other.id, other.name, other.language, other.namespace))
 
@@ -134,6 +138,8 @@ class TypeRef(TypeRefBase):
         self.kind = reference_target.kind
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return (super().__eq__(other)
                 and (self.kind, self.prefix, self.suffix, self.nested, self.args, self.returns)
                 == (other.kind, other.prefix, other.suffix, other.nested, other.args,
@@ -161,6 +167,8 @@ class Parameter(ModelBase):
     prefix: Optional[str] = None
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return ((self.type, self.name, self.description, self.default_value,
                  self.prefix) == (other.type, other.name, other.description, other.default_value,
                                   other.prefix))
@@ -178,6 +186,8 @@ class ReturnValue(ModelBase):
     description: str = ""
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return (self.type, self.description) == (other.type, other.description)
 
 
@@ -198,6 +208,8 @@ class ThrowsClause(ModelBase):
         self.type = type or TypeRef(language)
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return (self.type, self.description) == (other.type, other.description)
 
 
@@ -219,6 +231,8 @@ class EnumValue(ReferableElement):
     kind: str = "enumvalue"
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return (super().__eq__(other) and (self.initializer, self.brief, self.description)
                 == (other.initializer, other.brief, other.description))
 
@@ -240,6 +254,8 @@ class InnerTypeReference(TypeRefBase):
         self.referred_object = reference_target
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return (super().__eq__(other)
                 and (self.referred_object, self.prot) == (other.referred_object, other.prot))
 
@@ -302,6 +318,8 @@ class Compound(ReferableElement):
         return f"Compound [{super().__str__()}]"
 
     def __eq__(self, other) -> bool:
+        if other is None:
+            return False
         return (super().__eq__(other)
                 and (self.members, self.inner_classes, self.enumvalues, self.params,
                      self.exceptions, self.returns, self.include, self.namespace, self.prot,

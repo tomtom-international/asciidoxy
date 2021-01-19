@@ -91,6 +91,15 @@ def test_referable_element__init__keywords():
     assert element.kind == "kind"
 
 
+def test_referable_element__eq__none():
+    element = ReferableElement()
+    assert not element == None
+    assert not None == element
+
+    assert element != None
+    assert None!= element
+
+
 def test_referable_element__eq__default():
     first = ReferableElement()
     second = ReferableElement()
@@ -199,6 +208,15 @@ def test_typeref__init__keywords():
     assert ref.returns.name == "returns"
 
 
+def test_typeref__eq__none():
+    ref = TypeRef()
+    assert not ref == None
+    assert not None == ref
+
+    assert ref != None
+    assert None!= ref
+
+
 def test_typeref__eq__default():
     first = TypeRef()
     second = TypeRef()
@@ -295,6 +313,15 @@ def test_parameter__init__keywords():
     assert param.prefix == "prefix"
 
 
+def test_parameter__eq__none():
+    param = Parameter()
+    assert not param == None
+    assert not None == param
+
+    assert param != None
+    assert None!= param
+
+
 def test_parameter__eq__minimal():
     first = Parameter()
     second = Parameter()
@@ -343,6 +370,15 @@ def test_return_value__init__keywords():
     assert return_value.description == "description"
 
 
+def test_return_value__eq__none():
+    return_value = ReturnValue()
+    assert not return_value == None
+    assert not None == return_value
+
+    assert return_value != None
+    assert None!= return_value
+
+
 def test_return_value__eq__minimal():
     first = ReturnValue()
     second = ReturnValue()
@@ -388,6 +424,15 @@ def test_throws_clause__init__typeref():
     assert throws_clause.type is not None
     assert throws_clause.type.name == "type"
     assert throws_clause.description == "description"
+
+
+def test_throws_clause__eq__none():
+    throws_clause = ThrowsClause()
+    assert not throws_clause == None
+    assert not None == throws_clause
+
+    assert throws_clause != None
+    assert None!= throws_clause
 
 
 def test_throws_clause__eq__default():
@@ -444,6 +489,15 @@ def test_enum_value__init__full():
     assert enum_value.initializer == "initializer"
     assert enum_value.brief == "brief"
     assert enum_value.description == "description"
+
+
+def test_enum_value__eq__none():
+    enum_value = EnumValue()
+    assert not enum_value == None
+    assert not None == enum_value
+
+    assert enum_value != None
+    assert None!= enum_value
 
 
 def test_enum_value__eq__default():
@@ -514,6 +568,15 @@ def test_inner_type_reference__init__keyword():
     assert ref.referred_object is not None
     assert ref.referred_object.name == "inner_type"
     assert ref.prot == "prot"
+
+
+def test_inner_type_reference__eq__none():
+    inner_type_reference = InnerTypeReference()
+    assert not inner_type_reference == None
+    assert not None == inner_type_reference
+
+    assert inner_type_reference != None
+    assert None!= inner_type_reference
 
 
 def test_inner_type_reference__eq__default():
@@ -683,6 +746,15 @@ def test_compound__init__keyword():
     assert compound.deleted is True
     assert compound.default is True
     assert compound.constexpr is True
+
+
+def test_compound__eq__none():
+    compound = Compound()
+    assert not compound == None
+    assert not None == compound
+
+    assert compound != None
+    assert None!= compound
 
 
 def test_compound__eq__default():
