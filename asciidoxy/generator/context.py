@@ -144,13 +144,13 @@ class Context(object):
         sub.multipage = self.multipage
         sub.embedded = self.embedded
         sub.env = copy.copy(self.env)
+        sub.insert_filter = copy.deepcopy(self.insert_filter)
 
         # References
         sub.linked = self.linked
         sub.inserted = self.inserted
         sub.in_to_out_file_map = self.in_to_out_file_map
         sub.embedded_file_map = self.embedded_file_map
-        sub.insert_filter = self.insert_filter  # TODO: this should be a copy!
         sub.progress = self.progress
 
         return sub

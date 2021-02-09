@@ -58,6 +58,8 @@ def test_create_sub_context(empty_context):
     assert sub.current_document is context.current_document
     assert sub.current_package is context.current_package
 
+    assert sub.insert_filter is not context.insert_filter
+
     sub.namespace = "other"
     sub.language = "objc"
     sub.source_language = "python"
