@@ -93,11 +93,11 @@ def test_referable_element__init__keywords():
 
 def test_referable_element__eq__none():
     element = ReferableElement()
-    assert not element == None
-    assert not None == element
+    assert not element == None  # noqa: E711
+    assert not None == element  # noqa: E711
 
-    assert element != None
-    assert None!= element
+    assert element != None  # noqa: E711
+    assert None != element  # noqa: E711
 
 
 def test_referable_element__eq__default():
@@ -210,11 +210,11 @@ def test_typeref__init__keywords():
 
 def test_typeref__eq__none():
     ref = TypeRef()
-    assert not ref == None
-    assert not None == ref
+    assert not ref == None  # noqa: E711
+    assert not None == ref  # noqa: E711
 
-    assert ref != None
-    assert None!= ref
+    assert ref != None  # noqa: E711
+    assert None != ref  # noqa: E711
 
 
 def test_typeref__eq__default():
@@ -315,11 +315,11 @@ def test_parameter__init__keywords():
 
 def test_parameter__eq__none():
     param = Parameter()
-    assert not param == None
-    assert not None == param
+    assert not param == None  # noqa: E711
+    assert not None == param  # noqa: E711
 
-    assert param != None
-    assert None!= param
+    assert param != None  # noqa: E711
+    assert None != param  # noqa: E711
 
 
 def test_parameter__eq__minimal():
@@ -372,11 +372,11 @@ def test_return_value__init__keywords():
 
 def test_return_value__eq__none():
     return_value = ReturnValue()
-    assert not return_value == None
-    assert not None == return_value
+    assert not return_value == None  # noqa: E711
+    assert not None == return_value  # noqa: E711
 
-    assert return_value != None
-    assert None!= return_value
+    assert return_value != None  # noqa: E711
+    assert None != return_value  # noqa: E711
 
 
 def test_return_value__eq__minimal():
@@ -428,11 +428,11 @@ def test_throws_clause__init__typeref():
 
 def test_throws_clause__eq__none():
     throws_clause = ThrowsClause()
-    assert not throws_clause == None
-    assert not None == throws_clause
+    assert not throws_clause == None  # noqa: E711
+    assert not None == throws_clause  # noqa: E711
 
-    assert throws_clause != None
-    assert None!= throws_clause
+    assert throws_clause != None  # noqa: E711
+    assert None != throws_clause  # noqa: E711
 
 
 def test_throws_clause__eq__default():
@@ -493,11 +493,11 @@ def test_enum_value__init__full():
 
 def test_enum_value__eq__none():
     enum_value = EnumValue()
-    assert not enum_value == None
-    assert not None == enum_value
+    assert not enum_value == None  # noqa: E711
+    assert not None == enum_value  # noqa: E711
 
-    assert enum_value != None
-    assert None!= enum_value
+    assert enum_value != None  # noqa: E711
+    assert None != enum_value  # noqa: E711
 
 
 def test_enum_value__eq__default():
@@ -572,11 +572,11 @@ def test_inner_type_reference__init__keyword():
 
 def test_inner_type_reference__eq__none():
     inner_type_reference = InnerTypeReference()
-    assert not inner_type_reference == None
-    assert not None == inner_type_reference
+    assert not inner_type_reference == None  # noqa: E711
+    assert not None == inner_type_reference  # noqa: E711
 
-    assert inner_type_reference != None
-    assert None!= inner_type_reference
+    assert inner_type_reference != None  # noqa: E711
+    assert None != inner_type_reference  # noqa: E711
 
 
 def test_inner_type_reference__eq__default():
@@ -750,11 +750,11 @@ def test_compound__init__keyword():
 
 def test_compound__eq__none():
     compound = Compound()
-    assert not compound == None
-    assert not None == compound
+    assert not compound == None  # noqa: E711
+    assert not None == compound  # noqa: E711
 
-    assert compound != None
-    assert None!= compound
+    assert compound != None  # noqa: E711
+    assert None != compound  # noqa: E711
 
 
 def test_compound__eq__default():
