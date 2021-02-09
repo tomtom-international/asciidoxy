@@ -29,6 +29,7 @@ def test_create_sub_context(empty_context):
     context.warnings_are_errors = True
     context.multipage = True
     context.embedded = True
+    context.env.variable = 42
 
     sub = context.sub_context()
     assert sub is not context
@@ -39,6 +40,9 @@ def test_create_sub_context(empty_context):
     assert sub.namespace == "ns"
     assert sub.language == "lang"
     assert sub.source_language == "java"
+
+    assert sub.env is not context.env
+    assert sub.env.variable == 42
 
     assert sub.warnings_are_errors is True
     assert sub.multipage is True
@@ -57,9 +61,11 @@ def test_create_sub_context(empty_context):
     sub.namespace = "other"
     sub.language = "objc"
     sub.source_language = "python"
+    sub.env.variable = 50
     assert context.namespace == "ns"
     assert context.language == "lang"
     assert context.source_language == "java"
+    assert context.env.variable == 42
 
     assert len(context.linked) == 0
     assert "element" not in context.inserted

@@ -13,6 +13,7 @@
 # limitations under the License.
 """Context of the document being generated."""
 
+import copy
 import logging
 import uuid
 
@@ -31,6 +32,25 @@ from .navigation import DocumentTreeNode, relative_path
 logger = logging.getLogger(__name__)
 
 
+class Environment(object):
+    """Namespace for holding environment variables to be shared between different AsciiDoc files.
+
+    AsciiDoc files can assign variables in the environment namespace to be reused in other AsciiDoc
+    files that are included from it. Like other concepts in AsciiDoxy, the changes should only
+    apply to the current file, and any include from the current file. The parent namespace should
+    remain unchanged.
+
+    This class is intentionaly simple. New variables can be added to an instance by simply
+    assigining them:
+
+      env = Environment()
+      env.new_var = "value"
+
+    To copy the environment to subcontexts use copy.copy(). This prevents changing the variables
+    in the parent scopes.
+    """
+
+
 class Context(object):
     """Contextual information about the document being generated.
 
@@ -44,6 +64,7 @@ class Context(object):
         namespace:          Current namespace to use when looking up references.
         language:           Default language to use when looking up references.
         insert_filter:      Filter used to select members of elements to insert.
+        env:                Environment variables to share with subdocuments.
         warnings_are_errors:True to treat every warning as an error.
         multipage:          True when multi page output is enabled.
         reference:          API reference information.
@@ -60,6 +81,7 @@ class Context(object):
     language: Optional[str] = None
     source_language: Optional[str] = None
     insert_filter: InsertionFilter
+    env: Environment
 
     warnings_are_errors: bool = False
     multipage: bool = False
@@ -84,6 +106,7 @@ class Context(object):
 
         self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]},
                                              inner_classes={"prot": ["+public", "+protected"]})
+        self.env = Environment()
 
         self.reference = reference
         self.package_manager = package_manager
@@ -120,13 +143,14 @@ class Context(object):
         sub.warnings_are_errors = self.warnings_are_errors
         sub.multipage = self.multipage
         sub.embedded = self.embedded
+        sub.env = copy.copy(self.env)
 
         # References
         sub.linked = self.linked
         sub.inserted = self.inserted
         sub.in_to_out_file_map = self.in_to_out_file_map
         sub.embedded_file_map = self.embedded_file_map
-        sub.insert_filter = self.insert_filter
+        sub.insert_filter = self.insert_filter  # TODO: this should be a copy!
         sub.progress = self.progress
 
         return sub

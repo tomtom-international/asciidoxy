@@ -1102,6 +1102,35 @@ def test_process_adoc_multi_file(fragment_dir, single_and_multipage, api_referen
     assert progress_mock.total == 2 * len(output_files)
 
 
+def test_process_adoc_env_variables(fragment_dir, single_and_multipage, api_reference,
+                                    package_manager, adoc_data_work_file):
+    main_doc_file = adoc_data_work_file("env_variables.adoc")
+    sub_doc_file = main_doc_file.parent / "env_variables_include.adoc"
+
+    progress_mock = ProgressMock()
+    output_files = process_adoc(main_doc_file,
+                                api_reference,
+                                package_manager,
+                                warnings_are_errors=True,
+                                multipage=single_and_multipage,
+                                progress=progress_mock)
+    assert len(output_files) == 2
+    assert (
+        output_files[main_doc_file] == main_doc_file.with_name(f".asciidoxy.{main_doc_file.name}"))
+    assert (output_files[sub_doc_file] == sub_doc_file.with_name(f".asciidoxy.{sub_doc_file.name}"))
+    for input_file, output_file in output_files.items():
+        assert output_file.is_file()
+        expected_output_file = input_file.with_suffix(
+            ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
+        content = output_file.read_text()
+        content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
+        content = content.replace(os.fspath(main_doc_file.parent), "SRC_DIR")
+        assert content == expected_output_file.read_text()
+
+    assert progress_mock.ready == progress_mock.total
+    assert progress_mock.total == 2 * len(output_files)
+
+
 def test_process_adoc__embedded_file_not_in_output_map(single_and_multipage, api_reference,
                                                        package_manager, adoc_data_work_file):
     main_doc_file = adoc_data_work_file("embeddedfile_test.input.adoc")

@@ -19,6 +19,10 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == Unreleased
 
+=== Added
+
+  - [AD-59] Support for variables that are shared between included documents.
+
 === Fixed
 
   - #27: `xml_subdir` and `include_subdir` should not be mandatory in the package specification if

@@ -1,0 +1,18 @@
+= Test document
+
+
+
+42
+
+<<env_variables_include.adoc#,Included document>>
+
+42
+
+[frame=none, grid=none, cols="<.^,^.^,>.^"]
+|===
+|
+
+|
+
+|<<env_variables_include.adoc#,Next>>
+|===

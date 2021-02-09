@@ -1,0 +1,11 @@
+= Test document
+
+
+
+42
+
+[[top-env_variables_include-top]]
+include::SRC_DIR/.asciidoxy.env_variables_include.adoc[leveloffset=+1]
+
+42
+

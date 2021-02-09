@@ -1,0 +1,17 @@
+= Included document
+
+42
+
+
+
+13
+
+[frame=none, grid=none, cols="<.^,^.^,>.^"]
+|===
+|<<env_variables.adoc#,Prev>>
+
+|<<env_variables.adoc#,Up>> +
+<<env_variables.adoc#,Home>>
+
+|
+|===
