@@ -53,7 +53,7 @@ class ReferableElement(ModelBase):
 
     def __str__(self) -> str:
         text = (f"ReferableElement [\n id [{self.id}]\n  name [{self.name}]\n "
-                "full name[{self.full_name}]\n lang [{self.language}]\n kind [{self.kind}]")
+                f"full name[{self.full_name}]\n lang [{self.language}]\n kind [{self.kind}]")
         return text + "]"
 
     def __eq__(self, other) -> bool:
