@@ -184,22 +184,17 @@ class ParserBase(ABC):
         self._driver.register(member)
         return member
 
-    def parse_innerclass(self, parent: Compound, parent_compound: ET.Element) \
-            -> List[InnerTypeReference]:
-        inner_classes = []
+    def parse_innerclass(self, parent: Compound, innerclass_element: ET.Element) \
+            -> InnerTypeReference:
+        inner_type = InnerTypeReference(parent.language)
+        inner_type.id = self.TRAITS.unique_id(innerclass_element.get("refid"))
+        inner_type.name = \
+            self.TRAITS.cleanup_name(innerclass_element.text if innerclass_element.text else "")
+        inner_type.namespace = parent.full_name
+        inner_type.prot = innerclass_element.get("prot", "")
 
-        for xml_inner_class in parent_compound.iterfind("innerclass"):
-            inner_type = InnerTypeReference(parent.language)
-            inner_type.id = self.TRAITS.unique_id(xml_inner_class.get("refid"))
-            inner_type.name = \
-                self.TRAITS.cleanup_name(xml_inner_class.text if xml_inner_class.text else "")
-            inner_type.namespace = parent.full_name
-            inner_type.prot = xml_inner_class.get("prot", "")
-
-            inner_classes.append(inner_type)
-            self._driver.unresolved_ref(inner_type)
-
-        return inner_classes
+        self._driver.unresolved_ref(inner_type)
+        return inner_type
 
     def parse_compounddef(self, compounddef_element: ET.Element) -> None:
         compound = Compound(self.TRAITS.TAG)
@@ -218,7 +213,10 @@ class ParserBase(ABC):
                            for memberdef in compounddef_element.iterfind("sectiondef/memberdef"))
             if member is not None
         ]
-        compound.inner_classes = self.parse_innerclass(compound, compounddef_element)
+        compound.inner_classes = [
+            self.parse_innerclass(compound, innerclass_element)
+            for innerclass_element in compounddef_element.iterfind("innerclass")
+        ]
 
         compound.brief, compound.description = select_descriptions(
             self.parse_description(compounddef_element.find("briefdescription")),
