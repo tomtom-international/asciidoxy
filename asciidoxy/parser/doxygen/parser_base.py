@@ -134,24 +134,26 @@ class ParserBase(ABC):
             return None
 
     def parse_enumvalues(self, container_element: ET.Element, parent_name: str) -> List[EnumValue]:
-        values = []
-        for enumvalue_element in container_element.iterfind("enumvalue"):
-            v = EnumValue(self.TRAITS.TAG)
-            v.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
+        return [
+            self.parse_enumvalue(enumvalue_element, parent_name)
+            for enumvalue_element in container_element.iterfind("enumvalue")
+        ]
 
-            name = self.TRAITS.cleanup_name(enumvalue_element.findtext("name", ""))
-            v.name = self.TRAITS.short_name(name)
-            v.full_name = self.TRAITS.full_name(name, parent_name)
+    def parse_enumvalue(self, enumvalue_element: ET.Element, parent_name: str) -> EnumValue:
+        enumvalue = EnumValue(self.TRAITS.TAG)
+        enumvalue.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
 
-            v.initializer = enumvalue_element.findtext("initializer", "")
-            v.brief, v.description = select_descriptions(
-                self.parse_description(enumvalue_element.find("briefdescription")),
-                self.parse_description(enumvalue_element.find("detaileddescription")))
+        name = self.TRAITS.cleanup_name(enumvalue_element.findtext("name", ""))
+        enumvalue.name = self.TRAITS.short_name(name)
+        enumvalue.full_name = self.TRAITS.full_name(name, parent_name)
 
-            values.append(v)
-            self._driver.register(v)
+        enumvalue.initializer = enumvalue_element.findtext("initializer", "")
+        enumvalue.brief, enumvalue.description = select_descriptions(
+            self.parse_description(enumvalue_element.find("briefdescription")),
+            self.parse_description(enumvalue_element.find("detaileddescription")))
 
-        return values
+        self._driver.register(enumvalue)
+        return enumvalue
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
         member = Compound(self.TRAITS.TAG)
