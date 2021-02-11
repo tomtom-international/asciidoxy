@@ -136,26 +136,28 @@ class LanguageTraits(ABC):
         return name
 
     @classmethod
-    def full_name(cls, name: str, parent: str = "") -> str:
+    def full_name(cls, name: str, parent: str = "", kind: Optional[str] = None) -> str:
         """Determine the long version of a type name.
 
         The long name should include the namespace. If needed the namespace is deduced from a parent
         type.
 
         Args:
-            name: Long or short version of the name.
+            name:   Long or short version of the name.
             parent: Name of a parent. Used to deduce namespace if needed.
+            kind:   Kind of element this name applies to.
         Returns:
             Long version of the name.
         """
         return name
 
     @classmethod
-    def namespace(cls, full_name: str) -> Optional[str]:
+    def namespace(cls, full_name: str, kind: Optional[str] = None) -> Optional[str]:
         """Determine the namespace part of a type name.
 
         Args:
             full_name: Long version of a type name.
+            kind:      Kind of element this namespace applies to.
         Returns:
             The namespace part of the name, or None if there is no namespace.
         """

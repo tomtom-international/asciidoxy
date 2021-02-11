@@ -85,7 +85,9 @@ class ObjectiveCTraits(LanguageTraits):
         return name
 
     @classmethod
-    def full_name(cls, name: str, parent: str = "") -> str:
+    def full_name(cls, name: str, parent: str = "", kind: Optional[str] = None) -> str:
+        if kind in ("enum", "enumvalue", "interface", "protocol"):
+            return name
         if not parent or name.startswith(f"{parent}."):
             return name
         if parent.endswith(".h"):
@@ -94,12 +96,13 @@ class ObjectiveCTraits(LanguageTraits):
         return f"{parent}.{name}"
 
     @classmethod
-    def namespace(cls, full_name: str) -> Optional[str]:
+    def namespace(cls, full_name: str, kind: Optional[str] = None) -> Optional[str]:
+        if kind in ("enum", "enumvalue", "interface", "protocol"):
+            return None
         if "." in full_name:
             namespace, _ = full_name.rsplit(".", maxsplit=1)
             return namespace
-        else:
-            return None
+        return None
 
     @classmethod
     def is_member_blacklisted(cls, kind: str, name: str) -> bool:

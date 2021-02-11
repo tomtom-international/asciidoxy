@@ -13,10 +13,10 @@
   </compound>
   <compound refid="interface_traffic_event_data" kind="class"><name>TrafficEventData</name>
     <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273" kind="enum"><name>ADSeverity</name></member>
-    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414" kind="enumvalue"><name>Low</name></member>
-    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7" kind="enumvalue"><name>Medium</name></member>
-    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d" kind="enumvalue"><name>High</name></member>
-    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff" kind="enumvalue"><name>Unknown</name></member>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a2e99d30bdeb60d88efab9c1f1b0f941d" kind="enumvalue"><name>ADSeverityLow</name></member>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a30638ab30516654ec0bc609510e92f38" kind="enumvalue"><name>ADSeverityMedium</name></member>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273ae0df39be1faf7f462fac153063744958" kind="enumvalue"><name>ADSeverityHigh</name></member>
+    <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a505a6b31acd5b18078487c3ddad40701" kind="enumvalue"><name>ADSeverityUnknown</name></member>
     <member refid="interface_traffic_event_data_1a8353496d09d78db82e9e62f8c2808d34" kind="variable"><name>cause</name></member>
     <member refid="interface_traffic_event_data_1ab4a315c870a75cc68f5bba648b9b8be0" kind="variable"><name>delay</name></member>
     <member refid="interface_traffic_event_data_1a3136b600b8d16811c66914ff3afa48ca" kind="variable"><name>severity</name></member>

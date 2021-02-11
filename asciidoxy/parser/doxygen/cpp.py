@@ -85,13 +85,13 @@ class CppTraits(LanguageTraits):
         return name.split("::")[-1]
 
     @classmethod
-    def full_name(cls, name: str, parent: str = "") -> str:
+    def full_name(cls, name: str, parent: str = "", kind: Optional[str] = None) -> str:
         if not parent or name.startswith(f"{parent}::"):
             return name
         return f"{parent}::{name}"
 
     @classmethod
-    def namespace(cls, full_name: str) -> Optional[str]:
+    def namespace(cls, full_name: str, kind: Optional[str] = None) -> Optional[str]:
         if "::" in full_name:
             namespace, _ = full_name.rsplit("::", maxsplit=1)
             return namespace

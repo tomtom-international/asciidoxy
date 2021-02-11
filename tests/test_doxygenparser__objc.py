@@ -17,6 +17,9 @@ Tests for parsing Objective C from Doxygen XML files.
 
 import pytest
 
+from asciidoxy.model import Compound, EnumValue
+from asciidoxy.parser.doxygen.objc import ObjectiveCTraits
+
 
 @pytest.mark.parametrize("api_reference_set", [["objc/default"]])
 def test_parse_objc_interface(api_reference):
@@ -161,3 +164,116 @@ def test_parse_objc_block(api_reference):
     assert not arg.type.prefix
     assert not arg.type.suffix
     assert not arg.type.nested
+
+
+@pytest.mark.parametrize("api_reference_set", [["objc/default"]])
+def test_parse_objc_enum__ignore_nesting(api_reference):
+    element = api_reference.find("ADSeverity", kind="enum", lang="objc")
+    assert element == Compound(
+        id="objc-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273",
+        name="ADSeverity",
+        full_name="ADSeverity",
+        language="objc",
+        kind="enum",
+        include="ADTrafficEvent.h",
+        namespace=None,
+        prot="protected",
+        brief="Severity scale for traffic events.",
+        description=  # noqa: E251
+        "The more severe the traffic event, the more likely it is to have a large delay.",
+        enumvalues=[
+            EnumValue(
+                id="objc-interface_traffic_event_data_"
+                "1a2b685c89f864a1bc00a329d00ce0b273a2e99d30bdeb60d88efab9c1f1b0f941d",
+                name="ADSeverityLow",
+                full_name="ADSeverityLow",
+                language="objc",
+                kind="enumvalue",
+                brief="Low severity.",
+                description="",
+                initializer="= 1",
+            ),
+            EnumValue(
+                id="objc-interface_traffic_event_data_"
+                "1a2b685c89f864a1bc00a329d00ce0b273a30638ab30516654ec0bc609510e92f38",
+                name="ADSeverityMedium",
+                full_name="ADSeverityMedium",
+                language="objc",
+                kind="enumvalue",
+                brief="Medium severity.",
+                description="",
+                initializer="= 2",
+            ),
+            EnumValue(
+                id="objc-interface_traffic_event_data_"
+                "1a2b685c89f864a1bc00a329d00ce0b273ae0df39be1faf7f462fac153063744958",
+                name="ADSeverityHigh",
+                full_name="ADSeverityHigh",
+                language="objc",
+                kind="enumvalue",
+                brief="High severity.",
+                description="Better stay away here.",
+                initializer="= 3",
+            ),
+            EnumValue(
+                id="objc-interface_traffic_event_data_"
+                "1a2b685c89f864a1bc00a329d00ce0b273a505a6b31acd5b18078487c3ddad40701",
+                name="ADSeverityUnknown",
+                full_name="ADSeverityUnknown",
+                language="objc",
+                kind="enumvalue",
+                brief="Severity unknown.",
+                description="",
+                initializer="= 4",
+            ),
+        ],
+    )
+
+
+@pytest.mark.parametrize("api_reference_set", [["objc/default"]])
+def test_parse_objc_enum_value__ignore_nesting(api_reference):
+    element = api_reference.find("ADSeverityLow", kind="enumvalue", lang="objc")
+    assert element == EnumValue(
+        id="objc-interface_traffic_event_data_"
+        "1a2b685c89f864a1bc00a329d00ce0b273a2e99d30bdeb60d88efab9c1f1b0f941d",
+        name="ADSeverityLow",
+        full_name="ADSeverityLow",
+        language="objc",
+        kind="enumvalue",
+        brief="Low severity.",
+        description="",
+        initializer="= 1",
+    )
+
+
+@pytest.mark.parametrize("kind", [None, "", "function", "variable"])
+def test_traits__full_name__add_parent_as_namespace(kind):
+    assert ObjectiveCTraits.full_name("name", "parent", kind) == "parent.name"
+
+
+@pytest.mark.parametrize("kind", ["enum", "enumvalue", "interface", "protocol"])
+def test_traits__full_name__do_not_add_parent_as_namespace(kind):
+    assert ObjectiveCTraits.full_name("name", "parent", kind) == "name"
+
+
+def test_traits__full_name__no_parent():
+    assert ObjectiveCTraits.full_name("name") == "name"
+    assert ObjectiveCTraits.full_name("name", "") == "name"
+
+
+def test_traits__full_name__parent_already_in_namespace():
+    assert ObjectiveCTraits.full_name("parent.name", "parent") == "parent.name"
+
+
+@pytest.mark.parametrize("kind", [None, "", "function", "variable"])
+def test_traits__namespace(kind):
+    assert ObjectiveCTraits.namespace("name", kind) is None
+    assert ObjectiveCTraits.namespace("parent.name", kind) == "parent"
+    assert ObjectiveCTraits.namespace("root.parent.name", kind) == "root.parent"
+
+
+@pytest.mark.parametrize("kind", ["enum", "enumvalue", "interface", "protocol"])
+def test_traits__namespace__ignored(kind):
+    assert ObjectiveCTraits.namespace("name", kind) is None
+    assert ObjectiveCTraits.namespace("parent.name", kind) is None
+    assert ObjectiveCTraits.namespace("root.parent.name", kind) is None

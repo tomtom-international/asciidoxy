@@ -29,6 +29,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     packages with `contents.toml` are used.
   - #28: {Cpp}: support `constexpr` functions and constructors.
   - Changes to the insertion filter in included documents will no longer affect parent documents.
+  - Objective C: Do not append enclosing type to full name of nested types.
 
 
 == 0.7.0 (31 Dec 2020)
