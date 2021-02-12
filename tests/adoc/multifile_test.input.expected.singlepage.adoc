@@ -10,10 +10,10 @@ Reference to sub-document:
 <<sub_directory/.asciidoxy.multifile_subdoc_test.input.adoc#sub-document-chapter,Reference to sub-document>>
 
 Link to sub-document API:
-xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]
+xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]
 
 Link to sub-document API member:
-xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[IsValid]
+xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[+++IsValid+++]
 
 [[top-sub_directory-multifile_subdoc_test.input-top]]
 include::SRC_DIR/sub_directory/.asciidoxy.multifile_subdoc_test.input.adoc[leveloffset=+1]

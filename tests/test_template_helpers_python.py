@@ -333,8 +333,8 @@ def test_method_signature__ignore_return_type_xref_length(helper):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    assert (
-        helper.method_signature(method) == f"def ShortMethod(value: int) -> xref:{'ab' * 80}[Type]")
+    assert (helper.method_signature(method) ==
+            f"def ShortMethod(value: int) -> xref:{'ab' * 80}[+++Type+++]")
 
 
 def test_method_signature__ignore_param_type_xref_length(helper):
@@ -349,8 +349,8 @@ def test_method_signature__ignore_param_type_xref_length(helper):
     method.params[0].type = TypeRef("python", "int")
     method.params[0].type.id = "ab" * 80
 
-    assert (
-        helper.method_signature(method) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")
+    assert (helper.method_signature(method) ==
+            f"def ShortMethod(value: xref:{'ab' * 80}[+++int+++]) -> None")
 
 
 def test_parameter(helper):
@@ -363,8 +363,8 @@ def test_parameter(helper):
     param.name = "arg"
     param.default_value = "12"
 
-    assert helper.parameter(param,
-                            default_value=True) == "arg: xref:lang-tomtom_1_MyType[MyType] = 12"
+    assert (helper.parameter(
+        param, default_value=True) == "arg: xref:lang-tomtom_1_MyType[+++MyType+++] = 12")
 
 
 def test_parameter__self(helper):

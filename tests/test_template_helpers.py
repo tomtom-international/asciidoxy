@@ -72,7 +72,7 @@ def test_print_ref__link__name_prefix_suffix_with_id(api_mock):
     ref.suffix = " &"
     ref.id = "lang-tomtom_1_MyType"
     helper = TemplateHelper(api_mock)
-    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType] &"
+    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[+++MyType+++] &"
     api_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
@@ -83,7 +83,7 @@ def test_print_ref__link__strip_surrounding_whitespace(api_mock):
     ref.suffix = " &  "
     ref.id = "lang-tomtom_1_MyType"
     helper = TemplateHelper(api_mock)
-    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType] &"
+    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[+++MyType+++] &"
     api_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
@@ -104,7 +104,8 @@ def test_print_ref__link__nested_types(api_mock):
 
     helper = TemplateHelper(api_mock)
     assert (helper.print_ref(ref) ==
-            "const xref:lang-tomtom_1_MyType[MyType]&lt;xref:lang-nested1[Nested1], Nested2&gt; &")
+            "const xref:lang-tomtom_1_MyType[+++MyType+++]&lt;xref:lang-nested1[+++Nested1+++], "
+            "Nested2&gt; &")
     api_mock.link_to_element.assert_has_calls(
         [call(nested_type_with_id.id, nested_type_with_id.name),
          call(ref.id, ref.name)])
@@ -119,7 +120,7 @@ def test_print_ref__link__empty_nested_types(api_mock):
     ref.nested = []
 
     helper = TemplateHelper(api_mock)
-    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType]&lt;&gt; &"
+    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[+++MyType+++]&lt;&gt; &"
     api_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
@@ -148,7 +149,8 @@ def test_print_ref__link__closure(api_mock):
 
     helper = TemplateHelper(api_mock)
     assert (helper.print_ref(ref) ==
-            "xref:lang-tomtom_1_MyType[MyType](xref:lang-argtype1[ArgType1], ArgType2 value)")
+            "xref:lang-tomtom_1_MyType[+++MyType+++](xref:lang-argtype1[+++ArgType1+++], ArgType2 "
+            "value)")
     api_mock.link_to_element.assert_has_calls(
         [call(arg1_type.id, arg1_type.name),
          call(return_type.id, return_type.name)])
@@ -175,7 +177,7 @@ def test_print_ref__link__complex_closure(api_mock):
     helper = TemplateHelper(api_mock)
     assert (helper.print_ref(ref) ==
             "std::function&lt;void(const std::shared_ptr&lt;xref:lang-successdescriptor"
-            "[detail::SuccessDescriptor]&gt;&)&gt;")
+            "[+++detail::SuccessDescriptor+++]&gt;&)&gt;")
     api_mock.link_to_element.assert_has_calls(
         [call(ref.nested[0].args[0].type.nested[0].id, ref.nested[0].args[0].type.nested[0].name)])
 
@@ -192,7 +194,7 @@ def test_print_ref__link__empty_closure(api_mock):
     ref.returns = return_type
 
     helper = TemplateHelper(api_mock)
-    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[MyType] &()"
+    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[+++MyType+++] &()"
     api_mock.link_to_element.assert_called_once_with(return_type.id, return_type.name)
 
 
@@ -225,8 +227,8 @@ def test_print_ref__link__closure_with_nested_types__custom_start_and_end(api_mo
         ARGS_END: str = "#"
 
     helper = TestHelper(api_mock)
-    assert (helper.print_ref(ref) ==
-            "const xref:lang-tomtom_1_MyType[MyType]{Nested1; &@xref:lang-argtype[ArgType]#")
+    assert (helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[+++MyType+++]{Nested1; "
+            "&@xref:lang-argtype[+++ArgType+++]#")
 
 
 def test_print_ref__no_link__empty(api_mock):
@@ -438,8 +440,8 @@ def test_argument_list(empty_generating_api):
 
     helper = TemplateHelper(empty_generating_api)
     assert (helper.argument_list([param1, param2,
-                                  param3]) == "(const Type1, xref:lang-type2[Type2] & arg2, "
-            "Type3&lt;const Type1, xref:lang-type2[Type2] &&gt; arg3)")
+                                  param3]) == "(const Type1, xref:lang-type2[+++Type2+++] & arg2, "
+            "Type3&lt;const Type1, xref:lang-type2[+++Type2+++] &&gt; arg3)")
 
 
 def test_type_list(empty_generating_api):
@@ -564,7 +566,7 @@ def test_parameter(empty_generating_api):
     param.name = "arg"
 
     helper = TemplateHelper(empty_generating_api)
-    assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
+    assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[+++MyType+++] & arg"
 
 
 def test_parameter__no_link(empty_generating_api):
@@ -594,7 +596,7 @@ def test_parameter__no_name(empty_generating_api):
     param.name = ""
 
     helper = TemplateHelper(empty_generating_api)
-    assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[MyType] &"
+    assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[+++MyType+++] &"
 
 
 def test_parameter__default_value(empty_generating_api):
@@ -611,7 +613,7 @@ def test_parameter__default_value(empty_generating_api):
 
     helper = TemplateHelper(empty_generating_api)
     assert helper.parameter(
-        param, default_value=True) == "const xref:lang-tomtom_1_MyType[MyType] & arg = 12"
+        param, default_value=True) == "const xref:lang-tomtom_1_MyType[+++MyType+++] & arg = 12"
 
 
 def test_parameter__ignore_default_value(empty_generating_api):
@@ -627,8 +629,9 @@ def test_parameter__ignore_default_value(empty_generating_api):
     param.default_value = "12"
 
     helper = TemplateHelper(empty_generating_api)
-    assert helper.parameter(param,
-                            default_value=False) == "const xref:lang-tomtom_1_MyType[MyType] & arg"
+    assert (helper.parameter(
+        param, default_value=False) == "const xref:lang-tomtom_1_MyType[+++MyType+++] "
+            "& arg")
 
 
 def test_parameter__prefix(empty_generating_api):
@@ -644,7 +647,7 @@ def test_parameter__prefix(empty_generating_api):
     param.prefix = "vararg "
 
     helper = TemplateHelper(empty_generating_api)
-    assert helper.parameter(param) == "vararg const xref:lang-tomtom_1_MyType[MyType] & arg"
+    assert helper.parameter(param) == "vararg const xref:lang-tomtom_1_MyType[+++MyType+++] & arg"
 
 
 def test_parameter__param_name_separator(empty_generating_api):
@@ -664,8 +667,9 @@ def test_parameter__param_name_separator(empty_generating_api):
     param.default_value = "12"
 
     helper = _TemplateHelper(empty_generating_api)
-    assert helper.parameter(
-        param, default_value=True) == "vararg const xref:lang-tomtom_1_MyType[MyType] &_@_arg = 12"
+    assert (helper.parameter(
+        param, default_value=True) == "vararg const xref:lang-tomtom_1_MyType[+++MyType+++] "
+            "&_@_arg = 12")
 
 
 def test_parameter__param_name_first(empty_generating_api):
@@ -685,8 +689,9 @@ def test_parameter__param_name_first(empty_generating_api):
     param.default_value = "12"
 
     helper = _TemplateHelper(empty_generating_api)
-    assert helper.parameter(
-        param, default_value=True) == "vararg arg const xref:lang-tomtom_1_MyType[MyType] & = 12"
+    assert (helper.parameter(
+        param, default_value=True) == "vararg arg const xref:lang-tomtom_1_MyType[+++MyType+++] "
+            "& = 12")
 
 
 def test_method_signature__no_params(empty_generating_api):
@@ -825,7 +830,8 @@ def test_method_signature__ignore_return_type_xref_length(empty_generating_api):
     method.params[0].type = TypeRef("lang", "int")
 
     helper = TemplateHelper(empty_generating_api)
-    assert (helper.method_signature(method) == f"xref:{'ab' * 80}[void] ShortMethod(int value)")
+    assert (helper.method_signature(method) == f"xref:{'ab' * 80}[+++void+++] ShortMethod(int "
+            "value)")
 
 
 def test_method_signature__ignore_param_type_xref_length(empty_generating_api):
@@ -841,7 +847,8 @@ def test_method_signature__ignore_param_type_xref_length(empty_generating_api):
     method.params[0].type.id = "ab" * 80
 
     helper = TemplateHelper(empty_generating_api)
-    assert (helper.method_signature(method) == f"void ShortMethod(xref:{'ab' * 80}[int] value)")
+    assert (helper.method_signature(method) == f"void ShortMethod(xref:{'ab' * 80}[+++int+++] "
+            "value)")
 
 
 def test_public_static_methods__no_filter(helper):

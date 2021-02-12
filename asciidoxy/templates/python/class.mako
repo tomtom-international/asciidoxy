@@ -41,7 +41,7 @@ ${element.description}
 |*Enclosed types*
 |
 % for enclosed in helper.complex_enclosed_types(prot="public"):
-`xref:${enclosed.id}[+++${enclosed.name}+++]`::
+`<<${enclosed.id},+++${enclosed.name}+++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -51,7 +51,7 @@ ${enclosed.brief}
 |*Constructors*
 |
 % for constructor in helper.constructors(prot="public"):
-`xref:${constructor.id}[+++${constructor.name}+++]`::
+`<<${constructor.id},+++${constructor.name}+++>>`::
 ${constructor.brief}
 % endfor
 
@@ -61,7 +61,7 @@ ${constructor.brief}
 |*Variables*
 |
 % for variable in helper.variables(prot="public"):
-`xref:${variable.id}[+++${variable.name}+++]`::
+`<<${variable.id},+++${variable.name}+++>>`::
 ${variable.brief}
 % endfor
 % endif
@@ -70,7 +70,7 @@ ${variable.brief}
 |*Static methods*
 |
 % for method in helper.static_methods(prot="public"):
-`xref:${method.id}[+++${method.name}+++]`::
+`<<${method.id},+++${method.name}+++>>`::
 ${method.brief}
 % endfor
 
@@ -80,7 +80,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in helper.methods(prot="public"):
-`xref:${method.id}[+++${method.name}+++]`::
+`<<${method.id},+++${method.name}+++>>`::
 ${method.brief}
 % endfor
 

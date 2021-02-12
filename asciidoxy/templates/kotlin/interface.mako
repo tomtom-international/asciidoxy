@@ -41,7 +41,7 @@ ${element.description}
 |*${prot.capitalize()} Constants*
 |
 % for constant in helper.constants(prot=prot):
-`xref:${constant.id}[${constant.returns.type.name} ${constant.name}]`::
+`<<${constant.id},+++${constant.returns.type.name} ${constant.name}+++>>`::
 ${constant.brief}
 % endfor
 
@@ -51,7 +51,7 @@ ${constant.brief}
 |*${prot.capitalize()} Static Methods*
 |
 % for method in helper.static_methods(prot=prot):
-`xref:${method.id}[static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
+`<<${method.id},+++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
 ${method.brief}
 % endfor
 
@@ -61,7 +61,7 @@ ${method.brief}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`xref:${method.id}[${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}]`::
+`<<${method.id},+++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
 ${method.brief}
 % endfor
 

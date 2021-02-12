@@ -18,11 +18,11 @@ A coordinate has a latitude, longitude, and an altitude.
 |===
 |*Public Properties*
 |
-`xref:objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94[latitude]`::
+`<<objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,+++latitude+++>>`::
 The latitude in degrees.
-`xref:objc-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e[longitude]`::
+`<<objc-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e,+++longitude+++>>`::
 The longitude in degrees.
-`xref:objc-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2[altitude]`::
+`<<objc-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2,+++altitude+++>>`::
 The altitude in meters.
 
 |===

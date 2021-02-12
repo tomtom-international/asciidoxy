@@ -2,7 +2,7 @@
 
 This is some generic text.
 
-A link: xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]
+A link: xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]
 
 The class reference:
 

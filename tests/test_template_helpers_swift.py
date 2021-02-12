@@ -162,7 +162,8 @@ def test_method_signature__no_params_link_return(helper):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("swift", name="Value")
     method.returns.type.id = "swift-value"
-    assert helper.method_signature(method) == "func retrieveValue() -> xref:swift-value[Value]"
+    assert (
+        helper.method_signature(method) == "func retrieveValue() -> xref:swift-value[+++Value+++]")
 
 
 def test_method_signature__no_params_link_return__throws(helper):
@@ -172,8 +173,8 @@ def test_method_signature__no_params_link_return__throws(helper):
     method.returns.type = TypeRef("swift", name="Value")
     method.returns.type.id = "swift-value"
     method.exceptions = [ThrowsClause("swift")]
-    assert (
-        helper.method_signature(method) == "func retrieveValue() throws -> xref:swift-value[Value]")
+    assert (helper.method_signature(method) ==
+            "func retrieveValue() throws -> xref:swift-value[+++Value+++]")
 
 
 def test_method_signature__one_param(helper):
@@ -229,7 +230,7 @@ def test_closure_definition__multiple_params_type_only__void_return(helper):
     closure.returns.type.args[1].type.id = "swift-data"
 
     assert (helper.closure_definition(closure) ==
-            "typealias SuccessClosure = (int, xref:swift-data[Data]) -> Void")
+            "typealias SuccessClosure = (int, xref:swift-data[+++Data+++]) -> Void")
 
 
 def test_closure_definition__multiple_params_type_and_name__void_return(helper):
@@ -245,7 +246,8 @@ def test_closure_definition__multiple_params_type_and_name__void_return(helper):
     closure.returns.type.args[1].name = "theData"
 
     assert (helper.closure_definition(closure) ==
-            "typealias SuccessClosure = (number: int, theData: xref:swift-data[Data]) -> Void")
+            "typealias SuccessClosure = (number: int, theData: xref:swift-data[+++Data+++]) "
+            "-> Void")
 
 
 def test_closure_definition__no_params__return_type(helper):
@@ -257,7 +259,7 @@ def test_closure_definition__no_params__return_type(helper):
     closure.returns.type.args = []
 
     assert (helper.closure_definition(closure) ==
-            "typealias SuccessClosure = () -> xref:swift-data[Data]")
+            "typealias SuccessClosure = () -> xref:swift-data[+++Data+++]")
 
 
 def test_parameter(helper):
@@ -270,5 +272,6 @@ def test_parameter(helper):
     param.name = "arg"
     param.default_value = "12"
 
-    assert helper.parameter(param,
-                            default_value=True) == "arg: xref:swift-tomtom_1_MyType[MyType] = 12"
+    assert (helper.parameter(param,
+                             default_value=True) == "arg: xref:swift-tomtom_1_MyType[+++MyType+++]"
+            " = 12")
