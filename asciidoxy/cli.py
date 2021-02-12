@@ -183,7 +183,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         logger.error(f"Backend {args.backend} is not supported.")
         sys.exit(1)
 
-    pkg_mgr = PackageManager(args.build_dir)
+    pkg_mgr = PackageManager(args.build_dir, args.warnings_are_errors)
     if args.spec_file is not None:
         try:
             with tqdm(desc="Collecting packages     ", unit="pkg") as progress:

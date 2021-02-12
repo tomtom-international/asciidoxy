@@ -23,6 +23,11 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
   - [AD-59] Support for variables that are shared between included documents.
 
+=== Changed
+
+  - Collisions between files in packages are now warnings by default. Use `--warnings-are-errors`
+    to change them back to errors. Collisions between files and directories are still fatal errors.
+
 === Fixed
 
   - #27: `xml_subdir` and `include_subdir` should not be mandatory in the package specification if
