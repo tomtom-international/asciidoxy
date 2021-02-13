@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="class_const_int" kind="class" language="C++" prot="public">
+    <compoundname>ConstInt</compoundname>
+    <includes refid="constexpr_8hpp" local="no">constexpr.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_const_int_1aa068b95529ad462c527edb8af85323e8" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int ConstInt::value_</definition>
+        <argsstring></argsstring>
+        <name>value_</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="constexpr.hpp" line="30" column="7" bodyfile="constexpr.hpp" bodystart="30" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_const_int_1a80d34fa86fe64d30733534924fda5483" prot="public" static="no" constexpr="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>constexpr</type>
+        <definition>constexpr ConstInt::ConstInt</definition>
+        <argsstring>(int value)</argsstring>
+        <name>ConstInt</name>
+        <param>
+          <type>int</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Construct with a given value.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The value to hold. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="constexpr.hpp" line="27" column="13" bodyfile="constexpr.hpp" bodystart="27" bodyend="27"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Class holding a constant integer. </para>
+    </detaileddescription>
+    <location file="constexpr.hpp" line="20" column="15" bodyfile="constexpr.hpp" bodystart="20" bodyend="31"/>
+    <listofallmembers>
+      <member refid="class_const_int_1a80d34fa86fe64d30733534924fda5483" prot="public" virt="non-virtual"><scope>ConstInt</scope><name>ConstInt</name></member>
+      <member refid="class_const_int_1aa068b95529ad462c527edb8af85323e8" prot="private" virt="non-virtual"><scope>ConstInt</scope><name>value_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

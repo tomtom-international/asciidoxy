@@ -1,0 +1,11 @@
+= Test document
+
+<%
+env.variable = 42
+%>
+
+${env.variable}
+
+${include("env_variables_include.adoc")}
+
+${env.variable}

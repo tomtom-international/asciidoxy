@@ -1,12 +1,12 @@
 
-= [[objc-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273,TrafficEventData.ADSeverity]]ADSeverity
+= [[objc-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273,ADSeverity]]ADSeverity
 
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
 #import &lt;ADTrafficEvent.h&gt;
 
-enum TrafficEventData.ADSeverity
+enum ADSeverity
 ----
 
 Severity scale for traffic events.
@@ -15,20 +15,6 @@ The more severe the traffic event, the more likely it is to have a large delay.
 
 [cols='h,5a']
 |===
-
-
-| [[objc-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414,Low]]Low
-|
-Low severity.
-
-
-
-
-| [[objc-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7,Medium]]Medium
-|
-Medium severity.
-
-
 
 |===
 

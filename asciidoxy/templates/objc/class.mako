@@ -45,7 +45,7 @@ ${element.description}
 |*${prot.capitalize()} Enclosed Types*
 |
 % for enclosed in helper.simple_enclosed_types(prot=prot):
-`xref:${enclosed.id}[${enclosed.name}]`::
+`<<${enclosed.id},+++${enclosed.name}+++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -55,7 +55,7 @@ ${enclosed.brief}
 |*${prot.capitalize()} Properties*
 |
 % for prop in helper.properties(prot=prot):
-`xref:${prop.id}[${prop.name}]`::
+`<<${prop.id},+++${prop.name}+++>>`::
 ${prop.brief}
 % endfor
 
@@ -65,7 +65,7 @@ ${prop.brief}
 |*${prot.capitalize()} Class Methods*
 |
 % for method in helper.class_methods(prot=prot):
-`xref:${method.id}[+ ${method.name}]`::
+`<<${method.id},++++ ${method.name}+++>>`::
 ${method.brief}
 % endfor
 
@@ -75,7 +75,7 @@ ${method.brief}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`xref:${method.id}[- ${method.name}]`::
+`<<${method.id},+++- ${method.name}+++>>`::
 ${method.brief}
 % endfor
 

@@ -181,15 +181,15 @@ class PackageSpec(ABC):
         get = cls._make_getter(name, raw_spec)
 
         spec = cls(name, **init_args)
-        spec.xml_subdir = get("xml_subdir")
-        spec.include_subdir = get("include_subdir")
+        spec.xml_subdir = get("xml_subdir", optional=True)
+        spec.include_subdir = get("include_subdir", optional=True)
         return spec
 
     @staticmethod
     def _make_getter(name, raw_spec):
-        def get(attr_name):
+        def get(attr_name, optional=False):
             value = raw_spec.get(attr_name, None)
-            if value is None:
+            if not optional and value is None:
                 raise SpecificationError(f"Package {name}, or its source, has no `{attr_name}`.")
             return value
 
@@ -202,7 +202,7 @@ class PackageSpec(ABC):
         if pkg_contents_file.is_file():
             pkg.load_from_toml(package_dir, toml.load(pkg_contents_file))
 
-        else:
+        elif self.xml_subdir or self.include_subdir:
             if self.xml_subdir:
                 xml_dir = package_dir / self.xml_subdir
                 if xml_dir.is_dir():
@@ -214,6 +214,11 @@ class PackageSpec(ABC):
                 if include_dir.is_dir():
                     logger.debug(f"{self.name} has include subdirectory")
                     pkg.adoc_src_dir = include_dir
+        else:
+            raise InvalidPackageError(
+                self.name, "Package does not contain `contents.toml` and package"
+                " specification does not specify the XML or include"
+                " directory.")
 
         if pkg.reference_dir is None and pkg.adoc_src_dir is None:
             raise InvalidPackageError(self.name, "Package does not contain XML or include files.")

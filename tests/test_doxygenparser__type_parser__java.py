@@ -19,9 +19,9 @@ import xml.etree.ElementTree as ET
 
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.language_traits import TokenCategory
-from asciidoxy.doxygenparser.java import JavaTypeParser
-from asciidoxy.doxygenparser.type_parser import Token
+from asciidoxy.parser.doxygen.language_traits import TokenCategory
+from asciidoxy.parser.doxygen.java import JavaTypeParser
+from asciidoxy.parser.doxygen.type_parser import Token
 from tests.shared import assert_equal_or_none_if_empty
 
 

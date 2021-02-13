@@ -15,12 +15,12 @@
 
 from typing import Iterator
 
-from asciidoxy.model import Member
+from asciidoxy.model import Compound
 from asciidoxy.templates.helpers import TemplateHelper
 
 
 class JavaTemplateHelper(TemplateHelper):
-    def constants(self, prot: str) -> Iterator[Member]:
+    def constants(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 

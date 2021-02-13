@@ -22,7 +22,7 @@ from typing import List, Optional
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import TypeParser, Token, find_tokens
-from ..model import Compound, Member
+from ...model import Compound
 
 
 class ObjectiveCTraits(LanguageTraits):
@@ -85,8 +85,10 @@ class ObjectiveCTraits(LanguageTraits):
         return name
 
     @classmethod
-    def full_name(cls, name: str, parent: str = "") -> str:
-        if name.startswith(parent):
+    def full_name(cls, name: str, parent: str = "", kind: Optional[str] = None) -> str:
+        if kind in ("enum", "enumvalue", "interface", "protocol"):
+            return name
+        if not parent or name.startswith(f"{parent}."):
             return name
         if parent.endswith(".h"):
             # Parent is a header file, do not prepend
@@ -94,12 +96,13 @@ class ObjectiveCTraits(LanguageTraits):
         return f"{parent}.{name}"
 
     @classmethod
-    def namespace(cls, full_name: str) -> Optional[str]:
+    def namespace(cls, full_name: str, kind: Optional[str] = None) -> Optional[str]:
+        if kind in ("enum", "enumvalue", "interface", "protocol"):
+            return None
         if "." in full_name:
             namespace, _ = full_name.rsplit(".", maxsplit=1)
             return namespace
-        else:
-            return None
+        return None
 
     @classmethod
     def is_member_blacklisted(cls, kind: str, name: str) -> bool:
@@ -154,7 +157,7 @@ class ObjectiveCParser(ParserBase):
     TRAITS = ObjectiveCTraits
     TYPE_PARSER = ObjectiveCTypeParser
 
-    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
+    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
         memberdef_element = self._fix_block_element(memberdef_element)
         member = super().parse_member(memberdef_element, parent)
         return member

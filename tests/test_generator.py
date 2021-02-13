@@ -402,46 +402,47 @@ def test_insert_class__global_filter_members__extend(generating_api):
 
 def test_link_class(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
 
 
 def test_link_function(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate::IsValid")
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
-                      "1a8d7e0eac29549fa4666093e36914deac[IsValid]")
+                      "1a8d7e0eac29549fa4666093e36914deac[+++IsValid+++]")
 
 
 def test_link_class_explicit(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate", kind="class")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
 
 
 def test_link_function_explicit(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate::IsValid", kind="function")
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
-                      "1a8d7e0eac29549fa4666093e36914deac[IsValid]")
+                      "1a8d7e0eac29549fa4666093e36914deac[+++IsValid+++]")
 
 
 def test_link_class_with_full_name(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate", full_name=True)
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[asciidoxy::geometry::"
-                      "Coordinate]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++asciidoxy::geometry::"
+                      "Coordinate+++]")
 
 
 def test_link_class_with_custom_text(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate", text="LINK HERE")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[LINK HERE]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++LINK HERE+++]")
 
 
 def test_link_class_with_alternative_language_tag(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate", lang="c++")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
 
 
 def test_link_class_with_transcoding(generating_api):
     generating_api.language("kotlin", source="java")
     result = generating_api.link("com.asciidoxy.geometry.Coordinate")
-    assert result == "xref:kotlin-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate[Coordinate]"
+    assert result == ("xref:kotlin-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate"
+                      "[+++Coordinate+++]")
 
 
 def test_link_class_with_transcoding__not_found_warning(generating_api):
@@ -1102,6 +1103,35 @@ def test_process_adoc_multi_file(fragment_dir, single_and_multipage, api_referen
     assert progress_mock.total == 2 * len(output_files)
 
 
+def test_process_adoc_env_variables(fragment_dir, single_and_multipage, api_reference,
+                                    package_manager, adoc_data_work_file):
+    main_doc_file = adoc_data_work_file("env_variables.adoc")
+    sub_doc_file = main_doc_file.parent / "env_variables_include.adoc"
+
+    progress_mock = ProgressMock()
+    output_files = process_adoc(main_doc_file,
+                                api_reference,
+                                package_manager,
+                                warnings_are_errors=True,
+                                multipage=single_and_multipage,
+                                progress=progress_mock)
+    assert len(output_files) == 2
+    assert (
+        output_files[main_doc_file] == main_doc_file.with_name(f".asciidoxy.{main_doc_file.name}"))
+    assert (output_files[sub_doc_file] == sub_doc_file.with_name(f".asciidoxy.{sub_doc_file.name}"))
+    for input_file, output_file in output_files.items():
+        assert output_file.is_file()
+        expected_output_file = input_file.with_suffix(
+            ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
+        content = output_file.read_text()
+        content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
+        content = content.replace(os.fspath(main_doc_file.parent), "SRC_DIR")
+        assert content == expected_output_file.read_text()
+
+    assert progress_mock.ready == progress_mock.total
+    assert progress_mock.total == 2 * len(output_files)
+
+
 def test_process_adoc__embedded_file_not_in_output_map(single_and_multipage, api_reference,
                                                        package_manager, adoc_data_work_file):
     main_doc_file = adoc_data_work_file("embeddedfile_test.input.adoc")
@@ -1217,7 +1247,7 @@ def test_context_link_to_element_singlepage(context, generating_api):
     link_text = "Link"
     context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
     assert generating_api.link_to_element(element_id,
-                                          link_text) == f"xref:{element_id}[{link_text}]"
+                                          link_text) == f"xref:{element_id}[+++{link_text}+++]"
 
 
 def test_context_link_to_element_multipage(context, multipage, generating_api):
@@ -1226,7 +1256,7 @@ def test_context_link_to_element_multipage(context, multipage, generating_api):
     link_text = "Link"
     context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
     assert (generating_api.link_to_element(
-        element_id, link_text) == f"xref:{file_containing_element}#{element_id}[{link_text}]")
+        element_id, link_text) == f"xref:{file_containing_element}#{element_id}[+++{link_text}+++]")
 
 
 def test_context_link_to_element_multipage_element_in_the_same_document(
@@ -1235,7 +1265,7 @@ def test_context_link_to_element_multipage_element_in_the_same_document(
     link_text = "Link"
     context.inserted[element_id] = context.current_document.in_file
     assert (generating_api.link_to_element(element_id,
-                                           link_text) == f"xref:{element_id}[{link_text}]")
+                                           link_text) == f"xref:{element_id}[+++{link_text}+++]")
 
 
 def test_context_link_to_element_element_not_inserted(context, single_and_multipage,
@@ -1244,7 +1274,7 @@ def test_context_link_to_element_element_not_inserted(context, single_and_multip
     link_text = "Link"
     assert element_id not in context.inserted
     assert generating_api.link_to_element(element_id,
-                                          link_text) == f"xref:{element_id}[{link_text}]"
+                                          link_text) == f"xref:{element_id}[+++{link_text}+++]"
 
 
 def test_api_proxy__filter(generating_api):
@@ -1275,13 +1305,13 @@ def test_api_proxy__insert_class(generating_api):
 def test_api_proxy__link(generating_api):
     api = ApiProxy(generating_api)
     result = api.link("asciidoxy::geometry::Coordinate")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
 
 
 def test_api_proxy__link_class(generating_api):
     api = ApiProxy(generating_api)
     result = api.link_class("asciidoxy::geometry::Coordinate")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[Coordinate]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
 
 
 def test_api_proxy__cross_document_ref(test_data_builder, tdb_single_and_multipage):

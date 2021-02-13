@@ -43,7 +43,7 @@ ${element.description}
 |*${prot.capitalize()} Enclosed Types*
 |
 % for enclosed in helper.complex_enclosed_types(prot=prot):
-`xref:${enclosed.id}[${enclosed.name}]`::
+`<<${enclosed.id},+++${enclosed.name}+++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -53,7 +53,7 @@ ${enclosed.brief}
 |*${prot.capitalize()} Constants*
 |
 % for constant in helper.constants(prot=prot):
-`const val xref:${constant.id}[${constant.name}: ${constant.returns.type.name}]`::
+`const val <<${constant.id},+++${constant.name}: ${constant.returns.type.name}+++>>`::
 ${constant.brief}
 % endfor
 
@@ -63,7 +63,7 @@ ${constant.brief}
 |*${prot.capitalize()} Constructors*
 |
 % for constructor in helper.constructors(prot=prot):
-`xref:${constructor.id}[${constructor.name}${helper.type_list(constructor.params)}]`::
+`<<${constructor.id},+++${constructor.name}${helper.type_list(constructor.params)}+++>>`::
 ${constructor.brief}
 % endfor
 
@@ -73,7 +73,7 @@ ${constructor.brief}
 |*${prot.capitalize()} Properties*
 |
 % for prop in helper.properties(prot=prot):
-`xref:${prop.id}[${prop.name}]`::
+`<<${prop.id},+++${prop.name}+++>>`::
 ${prop.brief}
 % endfor
 
@@ -83,7 +83,7 @@ ${prop.brief}
 |*${prot.capitalize()} Static Java Methods*
 |
 % for method in java_helper.static_methods(prot=prot):
-`xref:${method.id}[static ${java_helper.print_ref(method.returns.type, link=False)} ${method.name}${java_helper.type_list(method.params)}]`::
+`<<${method.id},+++static ${java_helper.print_ref(method.returns.type, link=False)} ${method.name}${java_helper.type_list(method.params)}+++>>`::
 ${method.brief}
 % endfor
 
@@ -94,9 +94,9 @@ ${method.brief}
 |
 % for method in helper.methods(prot=prot):
 % if method.returns and method.returns.type.name != 'void':
-`xref:${method.id}[${method.name}${helper.type_list(method.params)}: ${helper.print_ref(method.returns.type, link=False)}]`::
+`<<${method.id},+++${method.name}${helper.type_list(method.params)}: ${helper.print_ref(method.returns.type, link=False)}+++>>`::
 % else:
-`xref:${method.id}[${method.name}${helper.type_list(method.params)}]`::
+`<<${method.id},+++${method.name}${helper.type_list(method.params)}+++>>`::
 % endif
 ${method.brief}
 % endfor

@@ -15,7 +15,7 @@
 
 from typing import Iterator
 
-from asciidoxy.model import Member
+from asciidoxy.model import Compound
 from asciidoxy.templates.helpers import TemplateHelper
 
 
@@ -25,10 +25,10 @@ class SwiftTemplateHelper(TemplateHelper):
     PARAM_NAME_FIRST = True
     PARAM_NAME_SEP = ": "
 
-    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
+    def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
         return "func"
 
-    def _method_suffix(self, method: Member, *, link: bool = True) -> str:
+    def _method_suffix(self, method: Compound, *, link: bool = True) -> str:
         suffixes = []
         if method.exceptions:
             suffixes.append(" throws")
@@ -36,7 +36,7 @@ class SwiftTemplateHelper(TemplateHelper):
             suffixes.append(f" -> {self.print_ref(method.returns.type, link=link)}")
         return "".join(suffixes)
 
-    def closure_definition(self, closure: Member) -> str:
+    def closure_definition(self, closure: Compound) -> str:
         assert closure.returns is not None
         assert closure.returns.type is not None
         assert closure.returns.type.args is not None
@@ -44,14 +44,14 @@ class SwiftTemplateHelper(TemplateHelper):
         return (f"typealias {closure.name} = {self.argument_list(closure.returns.type.args)}"
                 f" -> {self.print_ref(closure.returns.type, skip_args=True)}")
 
-    def static_methods(self, prot: str) -> Iterator[Member]:
+    def static_methods(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if (m.kind == "function" and m.prot == prot and m.static))
 
-    def methods(self, prot: str) -> Iterator[Member]:
+    def methods(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
@@ -60,7 +60,7 @@ class SwiftTemplateHelper(TemplateHelper):
 
     type_methods = static_methods
 
-    def constructors(self, prot: str) -> Iterator[Member]:
+    def constructors(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 

@@ -1,0 +1,9 @@
+= Included document
+
+${env.variable}
+
+<%
+env.variable = 13
+%>
+
+${env.variable}

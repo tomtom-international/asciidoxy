@@ -16,7 +16,7 @@
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
+from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
 
 from .builders import SimpleClassBuilder
@@ -46,7 +46,7 @@ def python_class():
 
 
 def test_params__empty():
-    member = Member("lang")
+    member = Compound("lang")
     assert list(params(member)) == []
 
 
@@ -65,7 +65,7 @@ def test_params__normal():
     param2.type = type2
     param2.name = "arg2"
 
-    member = Member("lang")
+    member = Compound("lang")
     member.params = [param1, param2]
 
     assert list(params(member)) == [param1, param2]
@@ -85,7 +85,7 @@ def test_params__self():
     param2.type = type2
     param2.name = "arg2"
 
-    member = Member("lang")
+    member = Compound("lang")
     member.params = [param1, param2]
 
     assert list(params(member)) == [param2]
@@ -105,7 +105,7 @@ def test_params__cls():
     param2.type = type2
     param2.name = "arg2"
 
-    member = Member("lang")
+    member = Compound("lang")
     member.params = [param1, param2]
 
     assert list(params(member)) == [param2]
@@ -120,7 +120,7 @@ def test_params__no_type():
     param2.type = None
     param2.name = "arg2"
 
-    member = Member("lang")
+    member = Compound("lang")
     member.params = [param1, param2]
 
     assert list(params(member)) == [param1, param2]
@@ -217,7 +217,7 @@ def test_public_variables__filter_no_match(helper):
 
 
 def test_method_signature__no_params(helper):
-    method = Member("python")
+    method = Compound("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -227,7 +227,7 @@ def test_method_signature__no_params(helper):
 
 
 def test_method_signature__single_param(helper):
-    method = Member("python")
+    method = Compound("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -241,7 +241,7 @@ def test_method_signature__single_param(helper):
 
 
 def test_method_signature__single_param__too_wide(helper):
-    method = Member("python")
+    method = Compound("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -257,7 +257,7 @@ def ShortMethod(
 
 
 def test_method_signature__multiple_params(helper):
-    method = Member("python")
+    method = Compound("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -278,7 +278,7 @@ def ShortMethod(value: int,
 
 
 def test_method_signature__multiple_params__first_param_too_wide(helper):
-    method = Member("python")
+    method = Compound("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -300,7 +300,7 @@ def ShortMethod(
 
 
 def test_method_signature__multiple_params__last_param_too_wide(helper):
-    method = Member("python")
+    method = Compound("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -322,7 +322,7 @@ def ShortMethod(
 
 
 def test_method_signature__ignore_return_type_xref_length(helper):
-    method = Member("python")
+    method = Compound("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -333,12 +333,12 @@ def test_method_signature__ignore_return_type_xref_length(helper):
     method.params[0].name = "value"
     method.params[0].type = TypeRef("python", "int")
 
-    assert (
-        helper.method_signature(method) == f"def ShortMethod(value: int) -> xref:{'ab' * 80}[Type]")
+    assert (helper.method_signature(method) ==
+            f"def ShortMethod(value: int) -> xref:{'ab' * 80}[+++Type+++]")
 
 
 def test_method_signature__ignore_param_type_xref_length(helper):
-    method = Member("python")
+    method = Compound("python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
@@ -349,8 +349,8 @@ def test_method_signature__ignore_param_type_xref_length(helper):
     method.params[0].type = TypeRef("python", "int")
     method.params[0].type.id = "ab" * 80
 
-    assert (
-        helper.method_signature(method) == f"def ShortMethod(value: xref:{'ab' * 80}[int]) -> None")
+    assert (helper.method_signature(method) ==
+            f"def ShortMethod(value: xref:{'ab' * 80}[+++int+++]) -> None")
 
 
 def test_parameter(helper):
@@ -363,8 +363,8 @@ def test_parameter(helper):
     param.name = "arg"
     param.default_value = "12"
 
-    assert helper.parameter(param,
-                            default_value=True) == "arg: xref:lang-tomtom_1_MyType[MyType] = 12"
+    assert (helper.parameter(
+        param, default_value=True) == "arg: xref:lang-tomtom_1_MyType[+++MyType+++] = 12")
 
 
 def test_parameter__self(helper):

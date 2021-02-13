@@ -2,7 +2,7 @@
 
 This is some generic text.
 
-A link: xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483[Altitude]
+A link: xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483[+++Altitude+++]
 
 The class reference:
 

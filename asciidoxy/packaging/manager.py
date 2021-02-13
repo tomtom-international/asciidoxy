@@ -14,14 +14,17 @@
 """Documentation package manager."""
 
 import asyncio
+import logging
 import shutil
 
 from pathlib import Path
 from tqdm import tqdm
 from typing import Dict, Optional
 
-from ..doxygenparser import Driver
+from ..parser.doxygen import Driver
 from .collect import CollectError, Package, collect, specs_from_file
+
+logger = logging.getLogger(__name__)
 
 
 class FileCollisionError(CollectError):
@@ -58,11 +61,14 @@ class PackageManager:
     work_dir: Path
     image_work_dir: Path
     packages: Dict[str, Package]
+    warnings_are_errors: bool
 
     INPUT_FILES: str = "INPUT"
 
-    def __init__(self, build_dir: Path):
+    def __init__(self, build_dir: Path, warnings_are_errors: bool = True):
         self.build_dir = build_dir
+        self.warnings_are_errors = warnings_are_errors
+
         self.work_dir = build_dir / "intermediate"
         self.image_work_dir = self.work_dir / "images"
         self.packages = {}
@@ -159,11 +165,11 @@ class PackageManager:
 
         for pkg in self.packages.values():
             if pkg.adoc_src_dir is not None:
-                _copy_dir_contents(pkg.adoc_src_dir, self.work_dir, pkg)
+                self._copy_dir_contents(pkg.adoc_src_dir, self.work_dir, pkg)
             elif pkg.adoc_root_doc is not None:
                 shutil.copy2(pkg.adoc_root_doc, self.work_dir)
             if pkg.adoc_image_dir is not None:
-                _copy_dir_contents(pkg.adoc_image_dir, self.image_work_dir, pkg)
+                self._copy_dir_contents(pkg.adoc_image_dir, self.image_work_dir, pkg)
             if progress is not None:
                 progress.update()
 
@@ -189,7 +195,7 @@ class PackageManager:
         image_dir.mkdir(parents=True, exist_ok=True)
         for pkg in self.packages.values():
             if pkg.adoc_image_dir is not None:
-                _copy_dir_contents(pkg.adoc_image_dir, image_dir, pkg)
+                self._copy_dir_contents(pkg.adoc_image_dir, image_dir, pkg)
             if progress is not None:
                 progress.update()
 
@@ -236,27 +242,34 @@ class PackageManager:
         assert self.INPUT_FILES in self.packages
         return self.packages[self.INPUT_FILES]
 
+    def _warning_or_error(self, error: Exception):
+        if self.warnings_are_errors:
+            raise error
+        else:
+            logger.warning(str(error))
 
-def _copy_dir_contents(src: Path, dst: Path, pkg: Package) -> None:
-    # In Python 3.8 we can use:
-    # `shutil.copytree(src, dst, dirs_exist_ok=True)`
+    def _copy_dir_contents(self, src: Path, dst: Path, pkg: Package) -> None:
+        if dst.is_file():
+            raise FileCollisionError(
+                pkg.name, f"Another package contains file {dst.name}, which is a directory"
+                f" in {pkg.name}.")
+        dst.mkdir(parents=True, exist_ok=True)
 
-    if dst.is_file():
-        raise FileCollisionError(
-            pkg.name, f"Another package contains file {dst.name}, which is a directory"
-            f" in {pkg.name}.")
-    dst.mkdir(parents=True, exist_ok=True)
+        for src_entry in src.iterdir():
+            if src_entry.is_symlink():
+                continue
 
-    for src_entry in src.iterdir():
-        if src_entry.is_symlink():
-            continue
-
-        dst_entry = dst / src_entry.relative_to(src)
-        if src_entry.is_file():
-            if dst_entry.exists():
-                raise FileCollisionError(
-                    pkg.name, f"File {dst_entry.name} from {pkg.name} already exists in"
-                    "another package.")
-            shutil.copy2(src_entry, dst_entry)
-        elif src_entry.is_dir():
-            _copy_dir_contents(src_entry, dst_entry, pkg)
+            dst_entry = dst / src_entry.relative_to(src)
+            if src_entry.is_file():
+                if dst_entry.is_file():
+                    file_collision_error = FileCollisionError(
+                        pkg.name, f"File {dst_entry.name} from {pkg.name} already exists in"
+                        " another package.")
+                    self._warning_or_error(file_collision_error)
+                elif dst_entry.is_dir():
+                    raise FileCollisionError(
+                        pkg.name, f"Another package contains file {dst_entry.name}, which is a"
+                        f"directory in {pkg.name}.")
+                shutil.copy2(src_entry, dst_entry)
+            elif src_entry.is_dir():
+                self._copy_dir_contents(src_entry, dst_entry, pkg)

@@ -18,7 +18,7 @@ Tests for Objective C template helpers.
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Member, ReturnValue, Parameter, TypeRef
+from asciidoxy.model import Compound, ReturnValue, Parameter, TypeRef
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 
 from .builders import SimpleClassBuilder
@@ -123,7 +123,7 @@ def test_public_simple_enclosed_types__filter_no_match(helper):
 
 
 def test_objc_method_signature__no_params_simple_return(helper):
-    method = Member("objc")
+    method = Compound("objc")
     method.name = "start"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="void")
@@ -131,16 +131,16 @@ def test_objc_method_signature__no_params_simple_return(helper):
 
 
 def test_objc_method_signature__no_params_link_return(helper):
-    method = Member("objc")
+    method = Compound("objc")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="Value")
     method.returns.type.id = "objc-value"
-    assert helper.method_signature(method) == "- (xref:objc-value[Value])retrieveValue"
+    assert helper.method_signature(method) == "- (xref:objc-value[+++Value+++])retrieveValue"
 
 
 def test_objc_method_signature__one_param(helper):
-    method = Member("objc")
+    method = Compound("objc")
     method.name = "setValue:"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="Value")
@@ -151,11 +151,11 @@ def test_objc_method_signature__one_param(helper):
     param1.type = TypeRef("objc", "Type1")
     method.params = [param1]
 
-    assert helper.method_signature(method) == "- (xref:objc-value[Value])setValue:(Type1)arg1"
+    assert helper.method_signature(method) == "- (xref:objc-value[+++Value+++])setValue:(Type1)arg1"
 
 
 def test_objc_method_signature__multiple_params_simple_return(helper):
-    method = Member("objc")
+    method = Compound("objc")
     method.name = "setValue:withUnit:andALongerParam:"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="Value")
@@ -177,12 +177,12 @@ def test_objc_method_signature__multiple_params_simple_return(helper):
 
     assert (helper.method_signature(method) == """\
 - (Value)setValue:(Type1)arg1
-         withUnit:(xref:objc-type2[Type2])arg2
+         withUnit:(xref:objc-type2[+++Type2+++])arg2
   andALongerParam:(Type3)arg3""")
 
 
 def test_objc_method_signature__multiple_params_linked_return(helper):
-    method = Member("objc")
+    method = Compound("objc")
     method.name = "setValue:withUnit:andALongerParam:"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="Value")
@@ -204,13 +204,13 @@ def test_objc_method_signature__multiple_params_linked_return(helper):
     method.params = [param1, param2, param3]
 
     assert (helper.method_signature(method) == """\
-- (xref:objc-value[Value])setValue:(Type1)arg1
-         withUnit:(xref:objc-type2[Type2])arg2
+- (xref:objc-value[+++Value+++])setValue:(Type1)arg1
+         withUnit:(xref:objc-type2[+++Type2+++])arg2
   andALongerParam:(Type3)arg3""")
 
 
 def test_objc_method_signature__class_method(helper):
-    method = Member("objc")
+    method = Compound("objc")
     method.name = "start"
     method.static = True
     method.returns = ReturnValue()

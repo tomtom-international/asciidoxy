@@ -26,10 +26,10 @@ from mako.exceptions import RichTraceback
 from tqdm import tqdm
 
 from .api_reference import ApiReference
-from .doxygenparser import Driver as ParserDriver
 from .generator import process_adoc, AsciiDocError
 from .model import json_repr
 from .packaging import CollectError, PackageManager, SpecificationError
+from .parser.doxygen import Driver as DoxygenDriver
 from ._version import __version__
 
 
@@ -183,7 +183,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         logger.error(f"Backend {args.backend} is not supported.")
         sys.exit(1)
 
-    pkg_mgr = PackageManager(args.build_dir)
+    pkg_mgr = PackageManager(args.build_dir, args.warnings_are_errors)
     if args.spec_file is not None:
         try:
             with tqdm(desc="Collecting packages     ", unit="pkg") as progress:
@@ -195,7 +195,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             logger.exception("Failed to collect packages.")
             sys.exit(1)
 
-        xml_parser = ParserDriver(force_language=args.force_language)
+        xml_parser = DoxygenDriver(force_language=args.force_language)
         with tqdm(desc="Loading API reference   ", unit="pkg") as progress:
             pkg_mgr.load_reference(xml_parser, progress)
 

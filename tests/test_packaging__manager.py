@@ -28,6 +28,12 @@ def package_manager(build_dir):
     return PackageManager(build_dir)
 
 
+@pytest.fixture(params=[True, False], ids=["warnings-are-errors", "warnings-are-not-errors"])
+def warnings_are_and_are_not_errors(request, package_manager):
+    package_manager.warnings_are_errors = request.param
+    return request.param
+
+
 def create_package_dir(parent: Path,
                        name: str,
                        xml: bool = True,
@@ -276,7 +282,8 @@ def test_prepare_work_directory__implicit_images(package_manager, event_loop, tm
     assert (work_dir / "images" / "b.png").is_file()
 
 
-def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp_path, build_dir):
+def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp_path, build_dir,
+                                                warnings_are_and_are_not_errors):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -289,12 +296,17 @@ def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp
     (src_dir / "a.adoc").touch()
 
     package_manager.set_input_files(in_file, src_dir)
-    with pytest.raises(FileCollisionError):
+
+    if warnings_are_and_are_not_errors:
+        with pytest.raises(FileCollisionError):
+            package_manager.prepare_work_directory(in_file)
+    else:
         package_manager.prepare_work_directory(in_file)
 
 
-def test_prepare_work_directory__dir_and_file_collision(package_manager, event_loop, tmp_path,
-                                                        build_dir):
+def test_prepare_work_directory__dir_and_file_collision_1(package_manager, event_loop, tmp_path,
+                                                          build_dir,
+                                                          warnings_are_and_are_not_errors):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -305,6 +317,44 @@ def test_prepare_work_directory__dir_and_file_collision(package_manager, event_l
     in_file = src_dir / "index.adoc"
     in_file.touch()
     (src_dir / "a.adoc").mkdir()
+
+    package_manager.set_input_files(in_file, src_dir)
+    with pytest.raises(FileCollisionError):
+        package_manager.prepare_work_directory(in_file)
+
+
+def test_prepare_work_directory__dir_and_file_collision_2(package_manager, event_loop, tmp_path,
+                                                          build_dir,
+                                                          warnings_are_and_are_not_errors):
+    create_package_dir(tmp_path, "a")
+    pkg_b_dir = create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (pkg_b_dir / "adoc" / "a.adoc").mkdir()
+
+    package_manager.set_input_files(in_file, src_dir)
+    with pytest.raises(FileCollisionError):
+        package_manager.prepare_work_directory(in_file)
+
+
+def test_prepare_work_directory__dir_and_file_collision_3(package_manager, event_loop, tmp_path,
+                                                          build_dir,
+                                                          warnings_are_and_are_not_errors):
+    pkg_a_dir = create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (pkg_a_dir / "adoc" / "b.adoc").mkdir()
 
     package_manager.set_input_files(in_file, src_dir)
     with pytest.raises(FileCollisionError):

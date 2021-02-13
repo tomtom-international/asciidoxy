@@ -17,7 +17,7 @@ from typing import Iterator, Optional, Sequence
 
 from asciidoxy.generator.asciidoc import Api
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Compound, Member, Parameter, TypeRef
+from asciidoxy.model import Compound, Parameter, TypeRef
 
 
 class TemplateHelper:
@@ -120,7 +120,7 @@ class TemplateHelper:
     def type_list(self, params: Sequence[Parameter], *, link: bool = False) -> str:
         return f"({', '.join(self.print_ref(p.type, link=link) for p in params)})"
 
-    def method_signature(self, method: Member, max_width: int = 80) -> str:
+    def method_signature(self, method: Compound, max_width: int = 80) -> str:
         method_without_params = self._method_join(self._method_prefix(method), method.name)
         suffix = self._method_suffix(method)
 
@@ -147,13 +147,13 @@ class TemplateHelper:
 
         return (f"{method_without_params}({first_indent}{formatted_params}){suffix}")
 
-    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
+    def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
         static = "static" if method.static else ""
         return_type = self.print_ref(method.returns.type, link=link) if method.returns else ""
 
         return self._method_join(static, return_type)
 
-    def _method_suffix(self, method: Member, *, link: bool = True) -> str:
+    def _method_suffix(self, method: Compound, *, link: bool = True) -> str:
         if method.const:
             return " const"
         return ""
@@ -162,21 +162,21 @@ class TemplateHelper:
     def _method_join(*parts: str) -> str:
         return " ".join(part for part in parts if part)
 
-    def static_methods(self, prot: str) -> Iterator[Member]:
+    def static_methods(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if (m.kind == "function" and m.returns and m.prot == prot and m.static))
 
-    def methods(self, prot: str) -> Iterator[Member]:
+    def methods(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if (m.kind == "function" and m.returns and m.prot == prot and not m.static))
 
-    def constructors(self, prot: str) -> Iterator[Member]:
+    def constructors(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
@@ -184,7 +184,7 @@ class TemplateHelper:
         return (m for m in self.insert_filter.members(self.element)
                 if m.kind == "function" and m.name == constructor_name and m.prot == prot)
 
-    def simple_enclosed_types(self, prot: str) -> Iterator[Member]:
+    def simple_enclosed_types(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
@@ -198,14 +198,14 @@ class TemplateHelper:
         return (m.referred_object for m in self.insert_filter.inner_classes(self.element)
                 if m.referred_object is not None and m.prot == prot)
 
-    def variables(self, prot: str) -> Iterator[Member]:
+    def variables(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
                 if m.kind == "variable" and m.prot == prot)
 
-    def properties(self, prot: str) -> Iterator[Member]:
+    def properties(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 

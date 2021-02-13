@@ -19,7 +19,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
-from .model import Member, ReferableElement
+from .model import Compound, ReferableElement
 
 
 class AmbiguousLookupError(Exception):
@@ -256,7 +256,7 @@ class ParameterTypeMatcher(ElementFilter):
         if self.arg_types is None:
             return True
 
-        if not isinstance(potential_match, Member):
+        if not isinstance(potential_match, Compound):
             return False
 
         params = potential_match.params or []

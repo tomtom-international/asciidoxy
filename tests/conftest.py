@@ -18,11 +18,13 @@ import pytest
 from pathlib import Path
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.doxygenparser import Driver as ParserDriver
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
 from asciidoxy.generator.navigation import DocumentTreeNode
+from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Parameter, ReturnValue,
+                             ThrowsClause, TypeRef)
 from asciidoxy.packaging import Package, PackageManager
+from asciidoxy.parser.doxygen import Driver as ParserDriver
 
 from .builders import SimpleClassBuilder
 
@@ -245,3 +247,57 @@ def empty_preprocessing_api(input_file, empty_context):
 @pytest.fixture
 def empty_generating_api(input_file, empty_context):
     return GeneratingApi(input_file, empty_context)
+
+
+_custom_types = {
+    Compound: ([
+        "id", "name", "full_name", "language", "kind", "include", "namespace", "prot", "definition",
+        "args", "brief", "description", "static", "const", "deleted", "default", "constexpr"
+    ], ["members", "inner_classes", "enumvalues", "params", "exceptions", "returns"]),
+    TypeRef: (["id", "name", "language", "namespace", "kind", "prefix",
+               "suffix"], ["nested", "args", "returns"]),
+    Parameter: (["name", "description", "default_value", "prefix"], ["type"]),
+    ReturnValue: (["description"], ["type"]),
+    ThrowsClause: (["description"], ["type"]),
+    EnumValue:
+    (["id", "name", "full_name", "language", "kind", "initializer", "brief", "description"], []),
+    InnerTypeReference: (["id", "name", "language", "namespace", "prot"], ["referred_object"]),
+}
+
+
+def repr_compare_eq(left, right, prefix=""):
+    simple_attributes, complex_attributes = _custom_types[type(left)]
+
+    mismatches = [
+        f"{prefix}{attr}: `{getattr(left, attr)}` != `{getattr(right, attr)}`"
+        for attr in simple_attributes if getattr(left, attr) != getattr(right, attr)
+    ]
+
+    for attr in complex_attributes:
+        attr_left = getattr(left, attr)
+        attr_right = getattr(right, attr)
+
+        if attr_left != attr_right:
+            if ((attr_left is None and attr_right is not None)
+                    or (attr_left is not None and attr_right is None)):
+                mismatches.append(f"{prefix}{attr}: {attr_left} != {attr_right}")
+            elif isinstance(attr_left, list):
+                assert isinstance(attr_right, list)
+
+                if len(attr_left) != len(attr_right):
+                    mismatches.append(f"len({prefix}{attr}): {len(attr_left)} != {len(attr_right)}")
+                else:
+                    for i, (item_left, item_right) in enumerate(zip(attr_left, attr_right)):
+                        mismatches.extend(
+                            repr_compare_eq(item_left, item_right, prefix=f"{prefix}{attr}[{i}]."))
+            else:
+                mismatches.extend(repr_compare_eq(attr_left, attr_right, prefix=f"{prefix}{attr}."))
+
+    return mismatches
+
+
+def pytest_assertrepr_compare(op, left, right):
+    if op == "==" and isinstance(right, left.__class__) and type(left) in _custom_types:
+        mismatches = [f"Instances of {type(left)} do not match:"]
+        mismatches += repr_compare_eq(left, right)
+        return mismatches

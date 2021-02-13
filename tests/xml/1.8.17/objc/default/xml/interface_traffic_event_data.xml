@@ -8,8 +8,8 @@
       <memberdef kind="enum" id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273" prot="protected" static="no" strong="no">
         <type></type>
         <name>ADSeverity</name>
-        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414" prot="protected">
-          <name>Low</name>
+        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a2e99d30bdeb60d88efab9c1f1b0f941d" prot="protected">
+          <name>ADSeverityLow</name>
           <initializer>= 1</initializer>
           <briefdescription>
           </briefdescription>
@@ -17,8 +17,8 @@
 <para>Low severity. </para>
           </detaileddescription>
         </enumvalue>
-        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7" prot="protected">
-          <name>Medium</name>
+        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a30638ab30516654ec0bc609510e92f38" prot="protected">
+          <name>ADSeverityMedium</name>
           <initializer>= 2</initializer>
           <briefdescription>
           </briefdescription>
@@ -26,8 +26,8 @@
 <para>Medium severity. </para>
           </detaileddescription>
         </enumvalue>
-        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d" prot="protected">
-          <name>High</name>
+        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273ae0df39be1faf7f462fac153063744958" prot="protected">
+          <name>ADSeverityHigh</name>
           <initializer>= 3</initializer>
           <briefdescription>
           </briefdescription>
@@ -36,8 +36,8 @@
 <para>Better stay away here. </para>
           </detaileddescription>
         </enumvalue>
-        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff" prot="protected">
-          <name>Unknown</name>
+        <enumvalue id="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a505a6b31acd5b18078487c3ddad40701" prot="protected">
+          <name>ADSeverityUnknown</name>
           <initializer>= 4</initializer>
           <briefdescription>
           </briefdescription>
@@ -131,13 +131,13 @@
     <location file="ADTrafficEvent.h" line="30" column="1" bodyfile="ADTrafficEvent.h" bodystart="29" bodyend="-1"/>
     <listofallmembers>
       <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>ADSeverity</name></member>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273ae0df39be1faf7f462fac153063744958" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>ADSeverityHigh</name></member>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a2e99d30bdeb60d88efab9c1f1b0f941d" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>ADSeverityLow</name></member>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a30638ab30516654ec0bc609510e92f38" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>ADSeverityMedium</name></member>
+      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a505a6b31acd5b18078487c3ddad40701" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>ADSeverityUnknown</name></member>
       <member refid="interface_traffic_event_data_1a8353496d09d78db82e9e62f8c2808d34" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>cause</name></member>
       <member refid="interface_traffic_event_data_1ab4a315c870a75cc68f5bba648b9b8be0" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>delay</name></member>
-      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a5626672fedefafd23840b2c85478739d" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>High</name></member>
-      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273afe0e45097786800e59e5efe099aa3414" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>Low</name></member>
-      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a08b5f376577786d7422c2485228aa9c7" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>Medium</name></member>
       <member refid="interface_traffic_event_data_1a3136b600b8d16811c66914ff3afa48ca" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>severity</name></member>
-      <member refid="interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273a93c68b8f2ae8621ef0e60776cdc4a6ff" prot="protected" virt="non-virtual"><scope>TrafficEventData</scope><name>Unknown</name></member>
     </listofallmembers>
   </compounddef>
 </doxygen>

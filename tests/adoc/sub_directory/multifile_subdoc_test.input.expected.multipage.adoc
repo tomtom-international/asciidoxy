@@ -10,7 +10,7 @@ Reference to main-document:
 <<../multifile_test.input.adoc#main-document-chapter,Reference to main-document>>
 
 Link to sub-document API:
-xref:../multifile_test.input.adoc#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[Severity]
+xref:../multifile_test.input.adoc#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[+++Severity+++]
 
 [frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===

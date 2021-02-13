@@ -13,139 +13,123 @@
 # limitations under the License.
 """Builders to create models for testing."""
 
-from typing import List, Optional, Type
-
-from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Member, Parameter,
-                             ReferableElement, ReturnValue, ThrowsClause, TypeRef, TypeRefBase)
+from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Parameter, ReturnValue,
+                             ThrowsClause, TypeRef)
 
 
-def make_referable(cls: Type[ReferableElement], lang: str, name: str) -> ReferableElement:
-    element = cls(lang)
-    element.id = f"{lang}-{name.lower()}"
-    element.name = name
-    element.full_name = f"com.asciidoxy.geometry.{name}"
-    element.kind = "class"
-    return element
+def make_compound(*,
+                  id=None,
+                  name="",
+                  full_name=None,
+                  language="",
+                  kind="class",
+                  include="include.file",
+                  namespace="asciidoxy",
+                  prot="public",
+                  definition="definition",
+                  args="args",
+                  brief="Brief description",
+                  description="Long description",
+                  **kwargs):
+    if id is None:
+        id = f"{language}-{name.lower()}"
+    if full_name is None:
+        full_name = f"{namespace}.{name}"
+    return Compound(id=id,
+                    name=name,
+                    language=language,
+                    full_name=full_name,
+                    kind=kind,
+                    include=include,
+                    namespace=namespace,
+                    prot=prot,
+                    definition=definition,
+                    args=args,
+                    brief=brief,
+                    description=description,
+                    **kwargs)
 
 
-def make_compound(lang: str,
-                  name: str,
-                  members: Optional[List[Member]] = None,
-                  inner_classes: Optional[List[InnerTypeReference]] = None,
-                  enumvalues: Optional[List[EnumValue]] = None):
-    compound = make_referable(Compound, lang, name)
-    if members is not None:
-        compound.members = members
-    if inner_classes is not None:
-        compound.inner_classes = inner_classes
-    compound.brief = "Brief description"
-    compound.description = "Long description"
-    if enumvalues is not None:
-        compound.enumvalues = enumvalues
-    compound.include = "include.file"
-    compound.namespace = "com.asciidoxy.geometry"
-    return compound
+def make_inner_type_ref(*,
+                        id=None,
+                        name="",
+                        language="",
+                        namespace="asciidoxy",
+                        prot="public",
+                        **kwargs):
+    if id is None:
+        id = f"{language}-{name.lower()}"
+    return InnerTypeReference(id=id,
+                              name=name,
+                              language=language,
+                              namespace=namespace,
+                              prot=prot,
+                              **kwargs)
 
 
-def make_member(lang: str,
-                name: str,
-                kind: str = "function",
-                prot: str = "public",
-                params: Optional[List[Parameter]] = None,
-                exceptions: Optional[List[Exception]] = None,
-                returns: Optional[ReturnValue] = None,
-                enumvalues: Optional[List[EnumValue]] = None,
-                namespace: Optional[str] = None,
-                static: bool = False,
-                const: bool = False,
-                deleted: bool = False,
-                default: bool = False) -> Member:
-    member = make_referable(Member, lang, name)
-    member.namespace = namespace
-
-    if namespace:
-        member.full_name = f"{namespace}.{name}"
-    else:
-        member.full_name = name
-
-    member.kind = kind
-    member.definition = "definition"
-    member.args = "args"
-    if params is not None:
-        member.params = params
-    if exceptions is not None:
-        member.exceptions = exceptions
-    member.brief = "Brief description"
-    member.description = "Long description"
-    member.prot = prot
-    member.returns = returns
-    if enumvalues is not None:
-        member.enumvalues = enumvalues
-    member.static = static
-    member.include = "include.file"
-    member.const = const
-    member.deleted = deleted
-    member.default = default
-    return member
+def make_enum_value(*,
+                    id=None,
+                    name="",
+                    full_name=None,
+                    language="",
+                    initializer=" = 1",
+                    brief="Brief description",
+                    description="Long description",
+                    **kwargs):
+    if id is None:
+        id = f"{language}-{name.lower()}"
+    if full_name is None:
+        full_name = f"asciidoxy.{name}"
+    return EnumValue(id=id,
+                     name=name,
+                     language=language,
+                     full_name=full_name,
+                     initializer=initializer,
+                     brief=brief,
+                     description=description,
+                     **kwargs)
 
 
-def make_type_ref_base(cls: Type[TypeRefBase], lang: str, name: str) -> TypeRefBase:
-    type_ref = cls(lang)
-    type_ref.id = f"{lang}-{name.lower()}"
-    type_ref.name = name
-    type_ref.namespace = "com.asciidoxy.geometry"
-    return type_ref
+def make_parameter(*,
+                   name="",
+                   description="Description",
+                   default_value="42",
+                   prefix="out ",
+                   **kwargs):
+    return Parameter(name=name,
+                     description=description,
+                     default_value=default_value,
+                     prefix=prefix,
+                     **kwargs)
 
 
-def make_type_ref(lang: str, name: str, prefix: str = "", suffix: str = "") -> TypeRef:
-    type_ref = make_type_ref_base(TypeRef, lang, name)
-    type_ref.kind = "class"
-    type_ref.prefix = prefix
-    type_ref.suffix = suffix
-    return type_ref
+def make_type_ref(*,
+                  id=None,
+                  name="",
+                  language="",
+                  namespace="asciidoxy",
+                  kind="class",
+                  prefix="prefix",
+                  suffix="suffix",
+                  **kwargs):
+    if id is None:
+        id = f"{language}-{name.lower()}"
+    return TypeRef(id=id,
+                   name=name,
+                   language=language,
+                   namespace=namespace,
+                   kind=kind,
+                   prefix=prefix,
+                   suffix=suffix,
+                   **kwargs)
 
 
-def make_inner_type_ref(lang: str,
-                        name: str,
-                        prot: str = "public",
-                        element: Optional[Compound] = None) -> InnerTypeReference:
-    type_ref = make_type_ref_base(InnerTypeReference, lang, name)
-    type_ref.prot = prot
-    type_ref.referred_object = element
-    return type_ref
+def make_throws_clause(*, language="", description="Description", **kwargs):
+    return ThrowsClause(language=language, description=description, **kwargs)
 
 
-def make_parameter(name: str, type_: Optional[TypeRef] = None) -> Parameter:
-    param = Parameter()
-    param.type = type_
-    param.name = name
-    param.description = "Description"
-    param.default_value = "42"
-    return param
-
-
-def make_enum_value(lang: str, name: str) -> EnumValue:
-    element = make_referable(EnumValue, lang, name)
-    element.initializer = " = 2"
-    element.brief = "Brief description"
-    element.description = "Long description"
-    element.kind = "enumvalue"
-    return element
-
-
-def make_throws_clause(lang: str, type_ref: Optional[TypeRef] = None) -> ThrowsClause:
-    clause = ThrowsClause(lang)
-    if type_ref is not None:
-        clause.type = type_ref
-    clause.description = "Description"
-    return clause
-
-
-def make_return_value(type_ref: Optional[TypeRef] = None) -> ReturnValue:
-    value = ReturnValue()
-    value.type = type_ref
-    value.description = "Description"
-    return value
+def make_return_value(*, description="Description", **kwargs):
+    return ReturnValue(description=description, **kwargs)
 
 
 class SimpleClassBuilder:
@@ -160,20 +144,22 @@ class SimpleClassBuilder:
         if name is None:
             name = f"{prot.capitalize()}{kind.capitalize()}"
         self.compound.members.append(
-            make_member(lang=self.lang, name=name, prot=prot, kind=kind, **kwargs))
+            make_compound(language=self.lang, name=name, prot=prot, kind=kind, **kwargs))
 
     def member_variable(self, prot: str = "public", name: str = None, type_prefix: str = ""):
-        self.simple_member(kind="variable",
-                           prot=prot,
-                           name=name,
-                           returns=make_return_value(
-                               make_type_ref(self.lang, name="Type", prefix=type_prefix)))
+        self.simple_member(
+            kind="variable",
+            prot=prot,
+            name=name,
+            returns=make_return_value(
+                type=make_type_ref(language=self.lang, name="Type", prefix=type_prefix)))
 
     def member_property(self, prot: str, name: str = None):
-        self.simple_member(kind="property",
-                           prot=prot,
-                           name=name,
-                           returns=make_return_value(make_type_ref(self.lang, name="Type")))
+        self.simple_member(
+            kind="property",
+            prot=prot,
+            name=name,
+            returns=make_return_value(type=make_type_ref(language=self.lang, name="Type")))
 
     def member_function(self, has_return_value: bool = True, **kwargs):
         if has_return_value:
@@ -181,11 +167,11 @@ class SimpleClassBuilder:
         else:
             returns = None
         self.compound.members.append(
-            make_member(lang=self.lang, kind="function", returns=returns, **kwargs))
+            make_compound(language=self.lang, kind="function", returns=returns, **kwargs))
 
     def inner_class(self, prot: str = "public", name: str = ""):
         self.compound.inner_classes.append(
-            make_inner_type_ref(lang=self.lang,
+            make_inner_type_ref(language=self.lang,
                                 name=name,
                                 prot=prot,
-                                element=make_compound(lang=self.lang, name=name)))
+                                referred_object=make_compound(language=self.lang, name=name)))

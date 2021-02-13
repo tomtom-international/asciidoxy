@@ -37,24 +37,24 @@ typedef enum {
  /**
   * Low severity.
   */
- Low = 1,
+ ADSeverityLow = 1,
 
  /**
   * Medium severity.
   */
- Medium = 2,
+ ADSeverityMedium = 2,
 
  /**
   * High severity.
   *
   * Better stay away here.
   */
- High = 3,
+ ADSeverityHigh = 3,
 
  /**
   * Severity unknown.
   */
- Unknown = 4
+ ADSeverityUnknown = 4
 } ADSeverity;
 
 /*!

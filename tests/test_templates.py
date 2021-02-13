@@ -46,7 +46,7 @@ def _read_fragment(include_statement: str) -> str:
     ("com.asciidoxy.system.Service", "java", "fragments/java/interface.adoc"),
     ("com.asciidoxy.traffic.TrafficEvent", "java", "fragments/java/nested.adoc"),
     ("ADTrafficEvent", "objc", "fragments/objc/protocol.adoc"),
-    ("TrafficEventData.ADSeverity", "objc", "fragments/objc/enum.adoc"),
+    ("ADSeverity", "objc", "fragments/objc/enum.adoc"),
     ("ADCoordinate", "objc", "fragments/objc/interface.adoc"),
     ("OnTrafficEventCallback", "objc", "fragments/objc/block.adoc"),
     ("TpegCauseCode", "objc", "fragments/objc/typedef.adoc"),
@@ -109,7 +109,7 @@ filtered_testdata = [
             "kind": "-property"
         }
     }, "fragments/objc/protocol_filtered.adoc"),
-    ("TrafficEventData.ADSeverity", "objc", {
+    ("ADSeverity", "objc", {
         "enum_values": ["Low", "Medium"]
     }, "fragments/objc/enum_filtered.adoc"),
     ("ADCoordinate", "objc", {
@@ -155,7 +155,7 @@ def test_local_filter(generating_api, adoc_data, fragment_dir, element_name, lan
 
 @pytest.mark.parametrize("element_name,source,target,expected_result", [
     ("ADTrafficEvent", "objc", "swift", "fragments/swift/transcoded_protocol.adoc"),
-    ("TrafficEventData.ADSeverity", "objc", "swift", "fragments/swift/transcoded_enum.adoc"),
+    ("ADSeverity", "objc", "swift", "fragments/swift/transcoded_enum.adoc"),
     ("ADCoordinate", "objc", "swift", "fragments/swift/transcoded_interface.adoc"),
     ("OnTrafficEventCallback", "objc", "swift", "fragments/swift/transcoded_block.adoc"),
     ("TpegCauseCode", "objc", "swift", "fragments/swift/transcoded_typedef.adoc"),

@@ -158,3 +158,90 @@ ${"""
 
 Regular python blocks are only executed when the surrounding text is rendered.
 ====
+
+== Using variables
+
+It is possible to define and use variables, like in normal Python code. Usually you define the
+variables in Python blocks (`${"""<% ... %>"""}`). You can then use them in other Python blocks
+and in expressions:
+
+[source]
+----
+${"""
+<%
+    platform = "android"
+%>
+
+= Instructions for ${platform}
+
+${include(f"instructions-{platform}.adoc")}
+"""}
+----
+
+Variables defined in Python blocks are only available within the same AsciiDoc files. They are not
+carried over to any of the included files.
+
+== Sharing variables and functions
+
+To share variables, and other objects like functions, with included AsciiDoc files, you can assign
+them to the built-in environment called `env`. The environment will get copied to any document
+included from the current document.
+
+When changing variables, or assigning new variables, in an included document, the variables in its
+parent will not change. The change is limited to the current document, and any document in
+includes.
+
+For example, you can set a variable in the entry point document:
+
+[source]
+.android.adoc
+----
+${"""
+<%
+    env.platform = "android"
+%>
+
+${include("instructions.adoc")}
+
+"""}
+----
+
+Now you can use this variable in the included document:
+
+[source]
+.instructions.adoc
+----
+${"""
+= Instructions for ${env.platform}
+
+...
+"""}
+----
+
+You can even share functions using the environment:
+
+[source]
+.main.adoc
+----
+${"""
+<%!
+    def my_sum(*values):
+        return sum(values)
+%>
+<%
+    env.my_sum = my_sum
+%>
+
+The sum of 3 and 4 is ${my_sum(3, 4)}.
+
+${include("sub.adoc")}
+"""}
+----
+
+[source]
+.sub.adoc
+----
+${"""
+The sum of 1, 2, 3 and 4 is ${env.my_sum(1, 2, 3, 4)}.
+"""}
+----

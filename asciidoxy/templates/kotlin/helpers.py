@@ -15,7 +15,7 @@
 
 from typing import Iterator
 
-from asciidoxy.model import Member
+from asciidoxy.model import Compound
 from asciidoxy.templates.helpers import TemplateHelper
 
 
@@ -23,7 +23,7 @@ class KotlinTemplateHelper(TemplateHelper):
     PARAM_NAME_FIRST = True
     PARAM_NAME_SEP = ": "
 
-    def constants(self, prot: str) -> Iterator[Member]:
+    def constants(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
@@ -31,10 +31,10 @@ class KotlinTemplateHelper(TemplateHelper):
                 if (m.kind == "variable" and m.prot == prot and m.returns and m.returns.type
                     and m.returns.type.prefix and "final" in m.returns.type.prefix))
 
-    def _method_prefix(self, method: Member, *, link: bool = True) -> str:
+    def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
         return "fun"
 
-    def _method_suffix(self, method: Member, *, link: bool = True) -> str:
+    def _method_suffix(self, method: Compound, *, link: bool = True) -> str:
         if method.returns:
             return f": {self.print_ref(method.returns.type, link=link)}"
         return ""

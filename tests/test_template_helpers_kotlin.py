@@ -16,7 +16,7 @@
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Member, Parameter, ReturnValue, TypeRef
+from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
 
 from .builders import SimpleClassBuilder
@@ -98,18 +98,18 @@ def test_parameter(helper):
     param.name = "arg"
     param.default_value = "12"
 
-    assert helper.parameter(param,
-                            default_value=True) == "arg: xref:kotlin-tomtom_1_MyType[MyType] = 12"
+    assert (helper.parameter(param, default_value=True) == "arg: xref:kotlin-tomtom_1_MyType"
+            "[+++MyType+++] = 12")
 
 
 def test_method_signature__no_params_no_return(helper):
-    method = Member("kotlin")
+    method = Compound("kotlin")
     method.name = "start"
     assert helper.method_signature(method) == "fun start()"
 
 
 def test_method_signature__no_params_simple_return(helper):
-    method = Member("kotlin")
+    method = Compound("kotlin")
     method.name = "start"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("kotlin", name="Int")
@@ -117,16 +117,16 @@ def test_method_signature__no_params_simple_return(helper):
 
 
 def test_method_signature__no_params_link_return(helper):
-    method = Member("kotlin")
+    method = Compound("kotlin")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("kotlin", name="Value")
     method.returns.type.id = "kotlin-value"
-    assert helper.method_signature(method) == "fun retrieveValue(): xref:kotlin-value[Value]"
+    assert helper.method_signature(method) == "fun retrieveValue(): xref:kotlin-value[+++Value+++]"
 
 
 def test_method_signature__one_param(helper):
-    method = Member("kotlin")
+    method = Compound("kotlin")
     method.name = "setValue"
     method.returns = ReturnValue()
     method.returns.type = TypeRef("kotlin", name="Value")

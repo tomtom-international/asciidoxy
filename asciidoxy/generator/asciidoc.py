@@ -30,7 +30,7 @@ from tqdm import tqdm
 
 from .. import templates
 from ..api_reference import AmbiguousLookupError, ApiReference
-from ..doxygenparser import safe_language_tag
+from ..parser.doxygen import safe_language_tag
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
 from ..transcoder import TranscoderBase
@@ -666,7 +666,7 @@ class PreprocessingApi(Api):
             self._context.progress.update(0)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
-        template.render(api=ApiProxy(self), **self._commands())
+        template.render(api=ApiProxy(self), env=self._context.env, **self._commands())
 
         if self._context.progress is not None:
             self._context.progress.update()
@@ -776,7 +776,7 @@ class GeneratingApi(Api):
         else:
             file_part = ""
 
-        return f"xref:{file_part}{element_id}[{link_text}]"
+        return f"xref:{file_part}{element_id}[+++{link_text}+++]"
 
     def process_adoc(self):
         logger.info(f"Processing {self._current_file}")
@@ -785,7 +785,9 @@ class GeneratingApi(Api):
         out_file = self._context.register_adoc_file(self._current_file)
 
         template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
-        rendered_doc = template.render(api=ApiProxy(self), **self._commands())
+        rendered_doc = template.render(api=ApiProxy(self),
+                                       env=self._context.env,
+                                       **self._commands())
 
         with out_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)

@@ -23,7 +23,7 @@ from typing import List, Optional
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser, find_tokens
-from ..model import Compound, Member
+from ...model import Compound
 
 
 class CppTraits(LanguageTraits):
@@ -47,9 +47,11 @@ class CppTraits(LanguageTraits):
     SEPARATORS = ",",
     NAMESPACE_SEPARATORS = ":",
     OPERATORS = "*", "&", "...",
-    QUALIFIERS = "const", "volatile", "constexpr", "mutable", "enum", "class",
+    QUALIFIERS = "const", "volatile", "mutable", "enum", "class",
     BUILT_IN_NAMES = ("void", "bool", "signed", "unsigned", "char", "wchar_t", "char16_t",
                       "char32_t", "char8_t", "float", "double", "long", "short", "int")
+    # constexpr should not be part of the return type
+    INVALID = "constexpr",
 
     TOKENS = {
         TokenCategory.NESTED_START: NESTED_STARTS,
@@ -60,14 +62,17 @@ class CppTraits(LanguageTraits):
         TokenCategory.OPERATOR: OPERATORS,
         TokenCategory.QUALIFIER: QUALIFIERS,
         TokenCategory.BUILT_IN_NAME: BUILT_IN_NAMES,
+        TokenCategory.INVALID: INVALID,
     }
     TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + SEPARATORS +
-                        OPERATORS + NAMESPACE_SEPARATORS + tuple(string.whitespace))
+                        OPERATORS + NAMESPACE_SEPARATORS + INVALID + tuple(string.whitespace))
     SEPARATOR_TOKENS_OVERLAP = True
 
-    ALLOWED_PREFIXES = TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+    ALLOWED_PREFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
+                        TokenCategory.INVALID)
     ALLOWED_SUFFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
-                        TokenCategory.NAME, TokenCategory.NAMESPACE_SEPARATOR)
+                        TokenCategory.NAME, TokenCategory.NAMESPACE_SEPARATOR,
+                        TokenCategory.INVALID)
     ALLOWED_NAMES = (TokenCategory.WHITESPACE, TokenCategory.NAME,
                      TokenCategory.NAMESPACE_SEPARATOR, TokenCategory.BUILT_IN_NAME)
 
@@ -80,13 +85,13 @@ class CppTraits(LanguageTraits):
         return name.split("::")[-1]
 
     @classmethod
-    def full_name(cls, name: str, parent: str = "") -> str:
-        if name.startswith(parent):
+    def full_name(cls, name: str, parent: str = "", kind: Optional[str] = None) -> str:
+        if not parent or name.startswith(f"{parent}::"):
             return name
         return f"{parent}::{name}"
 
     @classmethod
-    def namespace(cls, full_name: str) -> Optional[str]:
+    def namespace(cls, full_name: str, kind: Optional[str] = None) -> Optional[str]:
         if "::" in full_name:
             namespace, _ = full_name.rsplit("::", maxsplit=1)
             return namespace
@@ -107,6 +112,7 @@ class CppTypeParser(TypeParser):
                      tokens: List[Token],
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
         tokens = super().adapt_tokens(tokens, array_tokens)
+        tokens = [t for t in tokens if t.category != TokenCategory.INVALID]
 
         suffixes_without_name: List[Optional[TokenCategory]] = list(cls.TRAITS.ALLOWED_SUFFIXES)
         suffixes_without_name.remove(TokenCategory.NAME)
@@ -140,7 +146,7 @@ class CppParser(ParserBase):
     DEFAULTED_RE = re.compile(r"=\s*default\s*$")
     DELETED_RE = re.compile(r"=\s*delete\s*$")
 
-    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
+    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
         member = super().parse_member(memberdef_element, parent)
 
         if member is not None and member.kind == "function" and member.args:

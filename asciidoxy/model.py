@@ -23,7 +23,15 @@ def json_repr(obj):
     return data
 
 
-class ReferableElement:
+class ModelBase(ABC):
+    def __init__(self, **kwargs):
+        for name, value in kwargs.items():
+            if not hasattr(self, name):
+                raise TypeError(f"{self.__class__} has no attribute {name}.")
+            setattr(self, name, value)
+
+
+class ReferableElement(ModelBase):
     """Base class for all objects that can be referenced/linked to.
 
     Attributes:
@@ -39,16 +47,26 @@ class ReferableElement:
     language: str
     kind: str = ""
 
-    def __init__(self, language: str):
+    def __init__(self, language: str = "", **kwargs):
+        super().__init__(**kwargs)
         self.language = language
 
     def __str__(self) -> str:
         text = (f"ReferableElement [\n id [{self.id}]\n  name [{self.name}]\n "
-                "full name[{self.full_name}]\n lang [{self.language}]\n kind [{self.kind}]")
+                f"full name[{self.full_name}]\n lang [{self.language}]\n kind [{self.kind}]")
         return text + "]"
 
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return ((self.id, self.name, self.full_name, self.language,
+                 self.kind) == (other.id, other.name, other.full_name, other.language, other.kind))
 
-class TypeRefBase(ABC):
+    def __hash__(self):
+        return hash((self.id, self.name, self.full_name, self.language, self.kind))
+
+
+class TypeRefBase(ModelBase, ABC):
     """Base class for references to types.
     Attributes:
         id:        Unique identifier of the type.
@@ -63,13 +81,20 @@ class TypeRefBase(ABC):
     language: str
     namespace: Optional[str] = None
 
-    def __init__(self, language: str, name: str = ""):
+    def __init__(self, language: str = "", name: str = "", **kwargs):
+        super().__init__(**kwargs)
         self.language = language
         self.name = name
 
     @abstractmethod
     def resolve(self, reference_target: ReferableElement) -> None:
         pass
+
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return ((self.id, self.name, self.language,
+                 self.namespace) == (other.id, other.name, other.language, other.namespace))
 
 
 class TypeRef(TypeRefBase):
@@ -96,10 +121,8 @@ class TypeRef(TypeRefBase):
     args: Optional[List["Parameter"]] = None
     returns: Optional["TypeRef"] = None
 
-    def __init__(self, language: str, name: str = ""):
-        super().__init__(language, name)
-        self.name = name
-        self.language = language
+    def __init__(self, language: str = "", name: str = "", **kwargs):
+        super().__init__(language, name, **kwargs)
 
     def __str__(self) -> str:
         nested_str = ""
@@ -114,8 +137,16 @@ class TypeRef(TypeRefBase):
         self.id = reference_target.id
         self.kind = reference_target.kind
 
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return (super().__eq__(other)
+                and (self.kind, self.prefix, self.suffix, self.nested, self.args, self.returns)
+                == (other.kind, other.prefix, other.suffix, other.nested, other.args,
+                    other.returns))
 
-class Parameter:
+
+class Parameter(ModelBase):
     """Parameter description.
 
     Representation of doxygen type paramType
@@ -135,8 +166,15 @@ class Parameter:
     default_value: Optional[str] = None
     prefix: Optional[str] = None
 
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return ((self.type, self.name, self.description, self.default_value,
+                 self.prefix) == (other.type, other.name, other.description, other.default_value,
+                                  other.prefix))
 
-class ReturnValue:
+
+class ReturnValue(ModelBase):
     """Value returned from a member.
 
     Attributes:
@@ -147,8 +185,13 @@ class ReturnValue:
     type: Optional[TypeRef] = None
     description: str = ""
 
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return (self.type, self.description) == (other.type, other.description)
 
-class ThrowsClause:
+
+class ThrowsClause(ModelBase):
     """Potential exception thrown from a member.
 
     Attributes:
@@ -160,8 +203,14 @@ class ThrowsClause:
     type: TypeRef
     description: str = ""
 
-    def __init__(self, language: str):
-        self.type = TypeRef(language)
+    def __init__(self, language: str = "", type: Optional[TypeRef] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.type = type or TypeRef(language)
+
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return (self.type, self.description) == (other.type, other.description)
 
 
 class EnumValue(ReferableElement):
@@ -181,54 +230,11 @@ class EnumValue(ReferableElement):
     # custom fields
     kind: str = "enumvalue"
 
-
-class Member(ReferableElement):
-    """Member of a compound object.
-
-    Representation of the doxygen type memberDef.
-
-    Attributes:
-        definition:  Full definition of the member in source code.
-        args:        The arguments as defined in the source code.
-        params:      List of parameters.
-        exceptions:  List of exceptions that can be thrown.
-        brief:       Brief description of the member.
-        description: Full description of the member.
-        prot:        Protection level of the member.
-        returns:     The return value of the member.
-        enumvalues:  List of enum values contained in the member.
-        static:      True if this is a static member.
-        include:     Name of the include (file) required to use this member.
-        namespace:   Namespace, or scope, the member is contained in.
-        const:       The member is constant, not changing itself or its parent.
-        deleted:     The member is marked as deleted.
-        default:     The member is a default generated member.
-    """
-
-    definition: str = ""
-    args: str = ""
-    params: List[Parameter]
-    exceptions: List[ThrowsClause]
-    brief: str = ""
-    description: str = ""
-    prot: str = ""
-    returns: Optional[ReturnValue] = None
-    enumvalues: List[EnumValue]
-    static: bool = False
-    include: Optional[str] = None
-    namespace: Optional[str] = None
-    const: bool = False
-    deleted: bool = False
-    default: bool = False
-
-    def __init__(self, language: str):
-        super().__init__(language)
-        self.params = []
-        self.exceptions = []
-        self.enumvalues = []
-
-    def __str__(self):
-        return f"Member [{super().__str__()}]"
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return (super().__eq__(other) and (self.initializer, self.brief, self.description)
+                == (other.initializer, other.brief, other.description))
 
 
 class InnerTypeReference(TypeRefBase):
@@ -247,6 +253,12 @@ class InnerTypeReference(TypeRefBase):
     def resolve(self, reference_target):
         self.referred_object = reference_target
 
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return (super().__eq__(other)
+                and (self.referred_object, self.prot) == (other.referred_object, other.prot))
+
 
 class Compound(ReferableElement):
     """Compound object. E.g. a class or enum.
@@ -263,19 +275,60 @@ class Compound(ReferableElement):
         namespace:     Namespace, or package, the compound is contained in.
     """
 
-    members: List[Member]
+    members: List["Compound"]
     inner_classes: List[InnerTypeReference]
-    brief: str = ""
-    description: str = ""
     enumvalues: List[EnumValue]
+    params: List[Parameter]
+    exceptions: List[ThrowsClause]
+    returns: Optional[ReturnValue] = None
+
     include: Optional[str] = None
     namespace: Optional[str] = None
 
-    def __init__(self, language: str):
-        super().__init__(language)
-        self.members = []
-        self.inner_classes = []
-        self.enumvalues = []
+    prot: str = ""
+    definition: str = ""
+    args: str = ""
+
+    brief: str = ""
+    description: str = ""
+
+    static: bool = False
+    const: bool = False
+    deleted: bool = False
+    default: bool = False
+    constexpr: bool = False
+
+    def __init__(self,
+                 language: str = "",
+                 *,
+                 members: Optional[List["Compound"]] = None,
+                 inner_classes: Optional[List[InnerTypeReference]] = None,
+                 enumvalues: Optional[List[EnumValue]] = None,
+                 params: Optional[List[Parameter]] = None,
+                 exceptions: Optional[List[ThrowsClause]] = None,
+                 **kwargs):
+        super().__init__(language, **kwargs)
+        self.members = members or []
+        self.inner_classes = inner_classes or []
+        self.enumvalues = enumvalues or []
+        self.params = params or []
+        self.exceptions = exceptions or []
 
     def __str__(self):
         return f"Compound [{super().__str__()}]"
+
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+        return (super().__eq__(other)
+                and (self.members, self.inner_classes, self.enumvalues, self.params,
+                     self.exceptions, self.returns, self.include, self.namespace, self.prot,
+                     self.definition, self.args, self.brief, self.description, self.static,
+                     self.const, self.deleted, self.default, self.constexpr)
+                == (other.members, other.inner_classes, other.enumvalues, other.params,
+                    other.exceptions, other.returns, other.include, other.namespace, other.prot,
+                    other.definition, other.args, other.brief, other.description, other.static,
+                    other.const, other.deleted, other.default, other.constexpr))
+
+    def __hash__(self):
+        return super().__hash__()

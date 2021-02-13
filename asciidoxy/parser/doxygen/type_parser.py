@@ -17,11 +17,11 @@ import logging
 
 import xml.etree.ElementTree as ET
 
-from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union
+from typing import Iterator, List, Optional, Sequence, Tuple, Type
 
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenCategory
-from ..model import Compound, Member, Parameter, TypeRef
+from ...model import Parameter, TypeRef
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ class TypeParser:
                   type_element: ET.Element,
                   array_element: Optional[ET.Element] = None,
                   driver: Optional[DriverBase] = None,
-                  parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
+                  namespace: Optional[str] = None) -> Optional[TypeRef]:
         """Parse a type from an XML element.
 
         Information from the Doxygen `<type>` and `<array>` elements are combined if needed.
@@ -100,7 +100,7 @@ class TypeParser:
             type_element:  The `<type>` element from Doxygen.
             array_element: The `<array>` element from Doxygen, if available.
             driver:        Driver to register types without refids with.
-            parent:        Parent element for resolving the namespace.
+            namespace:     Namespace containing the type.
         Returns:
             A `TypeRef` for the type, or None if there is no type information.
         """
@@ -109,7 +109,7 @@ class TypeParser:
         tokens = cls.adapt_tokens(tokens, array_tokens)
         if len(tokens) == 0 or all(token.category == TokenCategory.WHITESPACE for token in tokens):
             return None
-        return cls.type_from_tokens(tokens, driver, parent)
+        return cls.type_from_tokens(tokens, driver, namespace)
 
     @classmethod
     def adapt_tokens(cls,
@@ -234,7 +234,7 @@ class TypeParser:
     def type_from_tokens(cls,
                          tokens: List[Token],
                          driver: Optional[DriverBase] = None,
-                         parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
+                         namespace: Optional[str] = None) -> Optional[TypeRef]:
         """Create a `TypeRef` from a sequence of tokens.
 
         Returns:
@@ -258,7 +258,7 @@ class TypeParser:
 
         nested_types: Optional[List[TypeRef]] = []
         try:
-            nested_types, tokens = cls.nested_types(tokens, driver, parent)
+            nested_types, tokens = cls.nested_types(tokens, driver, namespace)
         except TypeParseError as e:
             logger.warning(f"Failed to parse nested types: {e}")
             return fallback()
@@ -268,7 +268,7 @@ class TypeParser:
 
         arg_types: Optional[List[Parameter]] = []
         try:
-            arg_types, tokens = cls.arg_types(tokens, driver, parent)
+            arg_types, tokens = cls.arg_types(tokens, driver, namespace)
         except TypeParseError as e:
             logger.warning(f"Failed to parse args: {e}")
             return fallback()
@@ -303,11 +303,7 @@ class TypeParser:
             type_ref.kind = names[0].kind
 
         type_ref.args = arg_types
-
-        if isinstance(parent, Compound):
-            type_ref.namespace = parent.full_name
-        elif isinstance(parent, Member):
-            type_ref.namespace = parent.namespace
+        type_ref.namespace = namespace
 
         if (driver is not None and type_ref.name and not type_ref.id
                 and not cls.TRAITS.is_language_standard_type(type_ref.name)):
@@ -362,11 +358,10 @@ class TypeParser:
 
     @classmethod
     def nested_types(
-        cls,
-        tokens: List[Token],
-        driver: Optional[DriverBase] = None,
-        parent: Optional[Union[Compound, Member]] = None
-    ) -> Tuple[Optional[List[TypeRef]], List[Token]]:
+            cls,
+            tokens: List[Token],
+            driver: Optional[DriverBase] = None,
+            namespace: Optional[str] = None) -> Tuple[Optional[List[TypeRef]], List[Token]]:
         """Parse nested types from tokens if present.
 
         Returns:
@@ -379,16 +374,14 @@ class TypeParser:
                                                               TokenCategory.NESTED_SEPARATOR)
         if nested_type_tokens is None:
             return None, tokens
-        types = (cls.type_from_tokens(ntt, driver, parent) for ntt in nested_type_tokens)
+        types = (cls.type_from_tokens(ntt, driver, namespace) for ntt in nested_type_tokens)
         return [t for t in types if t is not None], tokens
 
     @classmethod
-    def arg_types(
-        cls,
-        tokens: List[Token],
-        driver: Optional[DriverBase] = None,
-        parent: Optional[Union[Compound, Member]] = None
-    ) -> Tuple[Optional[List[Parameter]], List[Token]]:
+    def arg_types(cls,
+                  tokens: List[Token],
+                  driver: Optional[DriverBase] = None,
+                  namespace: Optional[str] = None) -> Tuple[Optional[List[Parameter]], List[Token]]:
         """Parse function argument types from tokens if present.
 
         Returns:
@@ -402,14 +395,14 @@ class TypeParser:
         if nested_type_tokens is None:
             return None, tokens
 
-        args = (cls.arg_from_tokens(ntt, driver, parent) for ntt in nested_type_tokens)
+        args = (cls.arg_from_tokens(ntt, driver, namespace) for ntt in nested_type_tokens)
         return [a for a in args if a is not None], tokens
 
     @classmethod
     def arg_from_tokens(cls,
                         tokens: List[Token],
                         driver: Optional[DriverBase] = None,
-                        parent: Optional[Union[Compound, Member]] = None) -> Optional[Parameter]:
+                        namespace: Optional[str] = None) -> Optional[Parameter]:
         """Parse an argument definition from a sequence of tokens.
 
         Returns:
@@ -423,7 +416,7 @@ class TypeParser:
             name_tokens.insert(0, tokens.pop(-1))
 
         arg = Parameter()
-        arg.type = cls.type_from_tokens(tokens, driver, parent)
+        arg.type = cls.type_from_tokens(tokens, driver, namespace)
         arg.name = "".join(t.text for t in name_tokens)
         return arg
 

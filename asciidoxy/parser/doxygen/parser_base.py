@@ -18,14 +18,14 @@ import logging
 import xml.etree.ElementTree as ET
 
 from abc import ABC
-from typing import List, Optional, Tuple, Type, Union
+from typing import List, Optional, Tuple, Type
 
 from .description_parser import DescriptionParser, select_descriptions
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
 from .type_parser import TypeParser, TypeParseError
-from ..model import (Compound, EnumValue, Member, Parameter, ReturnValue, ThrowsClause, TypeRef,
-                     InnerTypeReference)
+from ...model import (Compound, EnumValue, Parameter, ReturnValue, ThrowsClause, TypeRef,
+                      InnerTypeReference)
 
 logger = logging.getLogger(__name__)
 
@@ -70,14 +70,14 @@ class ParserBase(ABC):
                     descriptions.append((parameter_name.text, desc))
         return descriptions
 
-    def parse_parameters(self, memberdef_element: ET.Element, parent: Member) -> List[Parameter]:
+    def parse_parameters(self, memberdef_element: ET.Element, parent: Compound) -> List[Parameter]:
         descriptions = self.parse_parameterlist(memberdef_element, "param")
         params = []
         for param_element in memberdef_element.iterfind("param"):
             param = Parameter()
             param.type = self.parse_type(param_element.find("type"),
                                          param_element.find("array"),
-                                         parent=parent)
+                                         namespace=parent.namespace)
             param.name = param_element.findtext("declname", "")
             param.default_value = param_element.findtext("defval", "")
 
@@ -93,7 +93,7 @@ class ParserBase(ABC):
     def parse_type(self,
                    type_element: Optional[ET.Element],
                    array_element: Optional[ET.Element] = None,
-                   parent: Optional[Union[Compound, Member]] = None) -> Optional[TypeRef]:
+                   namespace: Optional[str] = None) -> Optional[TypeRef]:
         if type_element is None:
             return None
 
@@ -101,13 +101,14 @@ class ParserBase(ABC):
             return self.TYPE_PARSER.parse_xml(type_element,
                                               array_element,
                                               driver=self._driver,
-                                              parent=parent)
+                                              namespace=namespace)
         except TypeParseError:
             logger.exception(
                 f"Failed to parse type {ET.tostring(type_element, encoding='unicode')}.")
             return None
 
-    def parse_exceptions(self, memberdef_element: ET.Element, parent: Member) -> List[ThrowsClause]:
+    def parse_exceptions(self, memberdef_element: ET.Element,
+                         parent: Compound) -> List[ThrowsClause]:
         exceptions = []
         for name, desc in self.parse_parameterlist(memberdef_element, "exception"):
             exception = ThrowsClause(self.TRAITS.TAG)
@@ -118,9 +119,10 @@ class ParserBase(ABC):
             self._driver.unresolved_ref(exception.type)
         return exceptions
 
-    def parse_returns(self, memberdef_element: ET.Element, parent: Member) -> Optional[ReturnValue]:
+    def parse_returns(self, memberdef_element: ET.Element,
+                      parent: Compound) -> Optional[ReturnValue]:
         returns = ReturnValue()
-        returns.type = self.parse_type(memberdef_element.find("type"), parent=parent)
+        returns.type = self.parse_type(memberdef_element.find("type"), namespace=parent.namespace)
 
         description = memberdef_element.find("detaileddescription/para/simplesect[@kind='return']")
         if description:
@@ -132,35 +134,37 @@ class ParserBase(ABC):
             return None
 
     def parse_enumvalues(self, container_element: ET.Element, parent_name: str) -> List[EnumValue]:
-        values = []
-        for enumvalue_element in container_element.iterfind("enumvalue"):
-            v = EnumValue(self.TRAITS.TAG)
-            v.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
+        return [
+            self.parse_enumvalue(enumvalue_element, parent_name)
+            for enumvalue_element in container_element.iterfind("enumvalue")
+        ]
 
-            name = self.TRAITS.cleanup_name(enumvalue_element.findtext("name", ""))
-            v.name = self.TRAITS.short_name(name)
-            v.full_name = self.TRAITS.full_name(name, parent_name)
+    def parse_enumvalue(self, enumvalue_element: ET.Element, parent_name: str) -> EnumValue:
+        enumvalue = EnumValue(self.TRAITS.TAG)
+        enumvalue.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
 
-            v.initializer = enumvalue_element.findtext("initializer", "")
-            v.brief, v.description = select_descriptions(
-                self.parse_description(enumvalue_element.find("briefdescription")),
-                self.parse_description(enumvalue_element.find("detaileddescription")))
+        name = self.TRAITS.cleanup_name(enumvalue_element.findtext("name", ""))
+        enumvalue.name = self.TRAITS.short_name(name)
+        enumvalue.full_name = self.TRAITS.full_name(name, parent_name, "enumvalue")
 
-            values.append(v)
-            self._driver.register(v)
+        enumvalue.initializer = enumvalue_element.findtext("initializer", "")
+        enumvalue.brief, enumvalue.description = select_descriptions(
+            self.parse_description(enumvalue_element.find("briefdescription")),
+            self.parse_description(enumvalue_element.find("detaileddescription")))
 
-        return values
+        self._driver.register(enumvalue)
+        return enumvalue
 
-    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Member]:
-        member = Member(self.TRAITS.TAG)
+    def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
+        member = Compound(self.TRAITS.TAG)
         member.id = self.TRAITS.unique_id(memberdef_element.get("id"))
         member.kind = memberdef_element.get("kind", "")
         member.prot = memberdef_element.get("prot", "")
 
         name = self.TRAITS.cleanup_name(memberdef_element.findtext("name", ""))
         member.name = self.TRAITS.short_name(name)
-        member.full_name = self.TRAITS.full_name(name, parent.full_name)
-        member.namespace = self.TRAITS.namespace(member.full_name)
+        member.full_name = self.TRAITS.full_name(name, parent.full_name, member.kind)
+        member.namespace = self.TRAITS.namespace(member.full_name, member.kind)
         member.include = self.find_include(memberdef_element)
 
         if self.TRAITS.is_member_blacklisted(member.kind, member.name):
@@ -177,26 +181,22 @@ class ParserBase(ABC):
         member.enumvalues = self.parse_enumvalues(memberdef_element, member.full_name)
         member.static = _yes_no_to_bool(memberdef_element.get("static", "no"))
         member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
+        member.constexpr = _yes_no_to_bool(memberdef_element.get("constexpr", "no"))
 
         self._driver.register(member)
         return member
 
-    def parse_innerclass(self, parent: Compound, parent_compound: ET.Element) \
-            -> List[InnerTypeReference]:
-        inner_classes = []
+    def parse_innerclass(self, parent: Compound, innerclass_element: ET.Element) \
+            -> InnerTypeReference:
+        inner_type = InnerTypeReference(parent.language)
+        inner_type.id = self.TRAITS.unique_id(innerclass_element.get("refid"))
+        inner_type.name = \
+            self.TRAITS.cleanup_name(innerclass_element.text if innerclass_element.text else "")
+        inner_type.namespace = parent.full_name
+        inner_type.prot = innerclass_element.get("prot", "")
 
-        for xml_inner_class in parent_compound.iterfind("innerclass"):
-            inner_type = InnerTypeReference(parent.language)
-            inner_type.id = self.TRAITS.unique_id(xml_inner_class.get("refid"))
-            inner_type.name = \
-                self.TRAITS.cleanup_name(xml_inner_class.text if xml_inner_class.text else "")
-            inner_type.namespace = parent.full_name
-            inner_type.prot = xml_inner_class.get("prot", "")
-
-            inner_classes.append(inner_type)
-            self._driver.unresolved_ref(inner_type)
-
-        return inner_classes
+        self._driver.unresolved_ref(inner_type)
+        return inner_type
 
     def parse_compounddef(self, compounddef_element: ET.Element) -> None:
         compound = Compound(self.TRAITS.TAG)
@@ -205,8 +205,8 @@ class ParserBase(ABC):
 
         name = self.TRAITS.cleanup_name(compounddef_element.findtext("compoundname", ""))
         compound.name = self.TRAITS.short_name(name)
-        compound.full_name = self.TRAITS.full_name(name)
-        compound.namespace = self.TRAITS.namespace(compound.full_name)
+        compound.full_name = self.TRAITS.full_name(name, kind=compound.kind)
+        compound.namespace = self.TRAITS.namespace(compound.full_name, kind=compound.kind)
         compound.include = self.find_include(compounddef_element)
 
         compound.members = [
@@ -215,7 +215,10 @@ class ParserBase(ABC):
                            for memberdef in compounddef_element.iterfind("sectiondef/memberdef"))
             if member is not None
         ]
-        compound.inner_classes = self.parse_innerclass(compound, compounddef_element)
+        compound.inner_classes = [
+            self.parse_innerclass(compound, innerclass_element)
+            for innerclass_element in compounddef_element.iterfind("innerclass")
+        ]
 
         compound.brief, compound.description = select_descriptions(
             self.parse_description(compounddef_element.find("briefdescription")),

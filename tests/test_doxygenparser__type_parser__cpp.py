@@ -19,16 +19,16 @@ import xml.etree.ElementTree as ET
 
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.cpp import CppTypeParser
-from asciidoxy.doxygenparser.language_traits import TokenCategory
-from asciidoxy.doxygenparser.type_parser import Token
+from asciidoxy.parser.doxygen.cpp import CppTypeParser
+from asciidoxy.parser.doxygen.language_traits import TokenCategory
+from asciidoxy.parser.doxygen.type_parser import Token
 from tests.shared import assert_equal_or_none_if_empty, sub_element
 from .test_doxygenparser__type_parser import name, args_start, whitespace, args_end, arg_name
 
 
 @pytest.fixture(params=[
-    "", "const ", "volatile ", "constexpr ", "mutable ", "enum ", "class ", "const class ",
-    "mutable volatile enum ", "constexpr class "
+    "", "const ", "volatile ", "mutable ", "enum ", "class ", "const class ",
+    "mutable volatile enum "
 ])
 def cpp_type_prefix(request):
     return request.param
@@ -437,6 +437,35 @@ def test_parse_cpp_type_with_function_arguments_with_space_in_type(cpp_type_with
     assert not type_ref.args[0].type.prefix
     assert not type_ref.args[0].type.suffix
     assert not type_ref.args[0].type.nested
+
+
+def test_parse_cpp_type__remove_constexpr():
+    type_element = ET.Element("type")
+    type_element.text = "constexpr double"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()  # built-in type
+
+    assert type_ref is not None
+    assert type_ref.id is None
+    assert type_ref.kind is None
+    assert type_ref.language == "cpp"
+    assert type_ref.name == "double"
+    assert not type_ref.prefix
+    assert not type_ref.suffix
+    assert not type_ref.nested
+
+
+def test_parse_cpp_type__remove_constexpr_only():
+    type_element = ET.Element("type")
+    type_element.text = "constexpr"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()  # built-in type
+
+    assert type_ref is None
 
 
 def namespace_sep(text: str = ":") -> Token:

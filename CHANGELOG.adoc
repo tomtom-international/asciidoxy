@@ -17,6 +17,26 @@ All notable changes to this project will be documented in this file.
 The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
+== 0.7.1 (13 Feb 2021)
+
+=== Added
+
+  - [AD-59] Support for variables that are shared between included documents.
+
+=== Changed
+
+  - Collisions between files in packages are now warnings by default. Use `--warnings-are-errors`
+    to change them back to errors. Collisions between files and directories are still fatal errors.
+
+=== Fixed
+
+  - #27: `xml_subdir` and `include_subdir` should not be mandatory in the package specification if
+    packages with `contents.toml` are used.
+  - #28: {Cpp}: support `constexpr` functions and constructors.
+  - Changes to the insertion filter in included documents will no longer affect parent documents.
+  - Objective C: Do not append enclosing type to full name of nested types.
+  - Improve escaping of names in links.
+
 
 == 0.7.0 (31 Dec 2020)
 

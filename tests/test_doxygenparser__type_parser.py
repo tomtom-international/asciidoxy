@@ -22,9 +22,8 @@ import xml.etree.ElementTree as ET
 from typing import List, NamedTuple, Optional
 from unittest.mock import MagicMock
 
-from asciidoxy.doxygenparser.language_traits import LanguageTraits, TokenCategory
-from asciidoxy.doxygenparser.type_parser import Token, TypeParser, find_tokens
-from asciidoxy.model import Compound, Member
+from asciidoxy.parser.doxygen.language_traits import LanguageTraits, TokenCategory
+from asciidoxy.parser.doxygen.type_parser import Token, TypeParser, find_tokens
 from .shared import assert_equal_or_none_if_empty, sub_element
 
 
@@ -697,7 +696,7 @@ def test_type_parser__type_from_tokens__deep_nested_type():
     assert not type_ref.nested[1].nested
 
 
-def test_type_parser__type_from_tokens__namespace_from_compound():
+def test_type_parser__type_from_tokens__namespace():
     tokens = [
         name("MyType"),
         nested_start(),
@@ -712,11 +711,7 @@ def test_type_parser__type_from_tokens__namespace_from_compound():
         nested_end()
     ]
 
-    parent = Compound("mylang")
-    parent.full_name = "asciidoxy::test"
-    parent.namespace = "asciidoxy"
-
-    type_ref = TestParser.type_from_tokens(tokens, parent=parent)
+    type_ref = TestParser.type_from_tokens(tokens, namespace="asciidoxy::test")
 
     assert type_ref.name == "MyType"
     assert type_ref.namespace == "asciidoxy::test"
@@ -732,7 +727,7 @@ def test_type_parser__type_from_tokens__namespace_from_compound():
     assert type_ref.nested[1].namespace == "asciidoxy::test"
 
 
-def test_type_parser__type_from_tokens__namespace_from_member():
+def test_type_parser__type_from_tokens__no_namespace():
     tokens = [
         name("MyType"),
         nested_start(),
@@ -747,24 +742,20 @@ def test_type_parser__type_from_tokens__namespace_from_member():
         nested_end()
     ]
 
-    parent = Member("mylang")
-    parent.full_name = "asciidoxy::test"
-    parent.namespace = "asciidoxy"
-
-    type_ref = TestParser.type_from_tokens(tokens, parent=parent)
+    type_ref = TestParser.type_from_tokens(tokens, namespace=None)
 
     assert type_ref.name == "MyType"
-    assert type_ref.namespace == "asciidoxy"
+    assert type_ref.namespace is None
     assert len(type_ref.nested) == 2
     assert type_ref.nested[0].name == "NestedType"
-    assert type_ref.nested[0].namespace == "asciidoxy"
+    assert type_ref.nested[0].namespace is None
     assert len(type_ref.nested[0].nested) == 2
     assert type_ref.nested[0].nested[0].name == "OtherType"
-    assert type_ref.nested[0].nested[0].namespace == "asciidoxy"
+    assert type_ref.nested[0].nested[0].namespace is None
     assert type_ref.nested[0].nested[1].name == "MyType"
-    assert type_ref.nested[0].nested[1].namespace == "asciidoxy"
+    assert type_ref.nested[0].nested[1].namespace is None
     assert type_ref.nested[1].name == "OtherType"
-    assert type_ref.nested[1].namespace == "asciidoxy"
+    assert type_ref.nested[1].namespace is None
 
 
 def test_type_parser__type_from_tokens__do_not_register_builtin_types():
@@ -1066,15 +1057,12 @@ def test_type_parser__parse_xml__do_not_register_ref_with_id():
     assert not type_ref.nested
 
 
-def test_type_parser__parse_xml__namespace_from_parent():
+def test_type_parser__parse_xml__namespace():
     element = ET.Element("type")
     sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
 
-    parent = Compound("mylang")
-    parent.full_name = "asciidoxy::test"
-
     driver_mock = MagicMock()
-    type_ref = TestParser.parse_xml(element, driver=driver_mock, parent=parent)
+    type_ref = TestParser.parse_xml(element, driver=driver_mock, namespace="asciidoxy::test")
     driver_mock.unresolved_ref.assert_not_called()
 
     assert type_ref is not None
