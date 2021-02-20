@@ -104,8 +104,8 @@ def test_print_ref__link__nested_types(api_mock):
 
     helper = TemplateHelper(api_mock)
     assert (helper.print_ref(ref) ==
-            "const xref:lang-tomtom_1_MyType[++MyType++]&lt;xref:lang-nested1[++Nested1++], "
-            "Nested2&gt; &")
+            "const xref:lang-tomtom_1_MyType[++MyType++]<xref:lang-nested1[++Nested1++], "
+            "Nested2> &")
     api_mock.link_to_element.assert_has_calls(
         [call(nested_type_with_id.id, nested_type_with_id.name),
          call(ref.id, ref.name)])
@@ -120,7 +120,7 @@ def test_print_ref__link__empty_nested_types(api_mock):
     ref.nested = []
 
     helper = TemplateHelper(api_mock)
-    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[++MyType++]&lt;&gt; &"
+    assert helper.print_ref(ref) == "const xref:lang-tomtom_1_MyType[++MyType++]<> &"
     api_mock.link_to_element.assert_called_once_with(ref.id, ref.name)
 
 
@@ -176,8 +176,8 @@ def test_print_ref__link__complex_closure(api_mock):
 
     helper = TemplateHelper(api_mock)
     assert (helper.print_ref(ref) ==
-            "std::function&lt;void(const std::shared_ptr&lt;xref:lang-successdescriptor"
-            "[++detail::SuccessDescriptor++]&gt;&)&gt;")
+            "std::function<void(const std::shared_ptr<xref:lang-successdescriptor"
+            "[++detail::SuccessDescriptor++]>&)>")
     api_mock.link_to_element.assert_has_calls(
         [call(ref.nested[0].args[0].type.nested[0].id, ref.nested[0].args[0].type.nested[0].name)])
 
@@ -286,7 +286,7 @@ def test_print_ref__no_link__nested_types(api_mock):
     ref.nested = [nested_type_with_id, nested_type_without_id]
 
     helper = TemplateHelper(api_mock)
-    assert helper.print_ref(ref, link=False) == "const MyType&lt;Nested1, Nested2&gt; &"
+    assert helper.print_ref(ref, link=False) == "const MyType<Nested1, Nested2> &"
 
 
 def test_print_ref__no_link__empty_nested_types(api_mock):
@@ -298,7 +298,7 @@ def test_print_ref__no_link__empty_nested_types(api_mock):
     ref.nested = []
 
     helper = TemplateHelper(api_mock)
-    assert helper.print_ref(ref, link=False) == "const MyType&lt;&gt; &"
+    assert helper.print_ref(ref, link=False) == "const MyType<> &"
 
 
 def test_print_ref__no_link__closure(api_mock):
@@ -441,7 +441,7 @@ def test_argument_list(empty_generating_api):
     helper = TemplateHelper(empty_generating_api)
     assert (helper.argument_list([param1, param2,
                                   param3]) == "(const Type1, xref:lang-type2[++Type2++] & arg2, "
-            "Type3&lt;const Type1, xref:lang-type2[++Type2++] &&gt; arg3)")
+            "Type3<const Type1, xref:lang-type2[++Type2++] &> arg3)")
 
 
 def test_type_list(empty_generating_api):
@@ -471,8 +471,8 @@ def test_type_list(empty_generating_api):
     param3.name = "arg3"
 
     helper = TemplateHelper(empty_generating_api)
-    assert (helper.type_list([param1, param2, param3
-                              ]) == "(const Type1, Type2 &, Type3&lt;const Type1, Type2 &&gt;)")
+    assert (helper.type_list([param1, param2,
+                              param3]) == "(const Type1, Type2 &, Type3<const Type1, Type2 &>)")
 
 
 def test_has__list():

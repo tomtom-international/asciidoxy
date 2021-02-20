@@ -41,9 +41,9 @@ Longitude.
 Check if the coordinate is valid.
 `<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,++void Update(const Coordinate &)++>>`::
 Update from another coordinate.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,++void Update(std::tuple&lt;double, double, double&gt;)++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,++void Update(std::tuple<double, double, double>)++>>`::
 Update from a tuple of latitude, longitude and altitue.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,++void Update(std::tuple&lt;double, double&gt;)++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,++void Update(std::tuple<double, double>)++>>`::
 Update from a tuple of only latitude and longitude.
 `<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,++void Update(double, double)++>>`::
 Update latitude and longitude.

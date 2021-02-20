@@ -8,7 +8,7 @@
 ----
 #include &lt;traffic_event.hpp&gt;
 
-std::shared_ptr&lt;xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]&gt; SharedData() const
+std::shared_ptr<xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]> SharedData() const
 ----
 
 
@@ -20,7 +20,7 @@ Not sure why you want this.
 |===
 | Returns
 |
-`std::shared_ptr&lt;xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]&gt;`::
+`std::shared_ptr<xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]>`::
 The shared pointer.
 
 | Throws

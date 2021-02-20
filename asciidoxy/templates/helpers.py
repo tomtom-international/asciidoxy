@@ -25,8 +25,8 @@ class TemplateHelper:
     element: Optional[Compound]
     insert_filter: Optional[InsertionFilter]
 
-    NESTED_START: str = "&lt;"
-    NESTED_END: str = "&gt;"
+    NESTED_START: str = "<"
+    NESTED_END: str = ">"
     ARGS_START: str = "("
     ARGS_END: str = ")"
     ARGS_BEFORE_TYPE = False
