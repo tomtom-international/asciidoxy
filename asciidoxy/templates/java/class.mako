@@ -41,7 +41,7 @@ ${element.description}
 |*${prot.capitalize()} Enclosed Types*
 |
 % for enclosed in helper.complex_enclosed_types(prot=prot):
-`<<${enclosed.id},+++${enclosed.name}+++>>`::
+`<<${enclosed.id},++${enclosed.name}++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -51,7 +51,7 @@ ${enclosed.brief}
 |*${prot.capitalize()} Constants*
 |
 % for constant in helper.constants(prot=prot):
-`<<${constant.id},+++${constant.returns.type.name} ${constant.name}+++>>`::
+`<<${constant.id},++${constant.returns.type.name} ${constant.name}++>>`::
 ${constant.brief}
 % endfor
 
@@ -61,7 +61,7 @@ ${constant.brief}
 |*${prot.capitalize()} Constructors*
 |
 % for constructor in helper.constructors(prot=prot):
-`<<${constructor.id},+++${constructor.name}${helper.type_list(constructor.params)}+++>>`::
+`<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
 ${constructor.brief}
 % endfor
 
@@ -71,7 +71,7 @@ ${constructor.brief}
 |*${prot.capitalize()} Static Methods*
 |
 % for method in helper.static_methods(prot=prot):
-`<<${method.id},+++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
@@ -81,7 +81,7 @@ ${method.brief}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`<<${method.id},+++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 

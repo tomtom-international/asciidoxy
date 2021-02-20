@@ -16,12 +16,12 @@ Information about a traffic event.
 |===
 |*Public Properties*
 |
-`<<swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,+++data+++>>`::
+`<<swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,++data++>>`::
 Traffic event details.
 
 |*Public Methods*
 |
-`<<swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,+++update(Integer, Integer)+++>>`::
+`<<swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,++update(Integer, Integer)++>>`::
 Update the traffic event data.
 
 |===
@@ -34,7 +34,7 @@ Update the traffic event data.
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-var data: xref:swift-interface_traffic_event_data[+++TrafficEventData+++]
+var data: xref:swift-interface_traffic_event_data[++TrafficEventData++]
 ----
 
 Traffic event details.

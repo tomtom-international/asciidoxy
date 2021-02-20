@@ -776,7 +776,7 @@ class GeneratingApi(Api):
         else:
             file_part = ""
 
-        return f"xref:{file_part}{element_id}[+++{link_text}+++]"
+        return f"xref:{file_part}{element_id}[++{link_text}++]"
 
     def process_adoc(self):
         logger.info(f"Processing {self._current_file}")

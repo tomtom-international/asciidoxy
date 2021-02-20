@@ -6,7 +6,7 @@
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-typedef void(^ OnTrafficEventCallback) (id&lt;xref:objc-protocol_a_d_traffic_event-p[+++ADTrafficEvent+++]&gt;, NSInteger delay)
+typedef void(^ OnTrafficEventCallback) (id&lt;xref:objc-protocol_a_d_traffic_event-p[++ADTrafficEvent++]&gt;, NSInteger delay)
 ----
 Callback for receiving new traffic events.
 

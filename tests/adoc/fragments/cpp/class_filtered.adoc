@@ -18,45 +18,45 @@ A coordinate has a latitude, longitude, and an altitude.
 |===
 |*Public Constructors*
 |
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,+++Coordinate()+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,++Coordinate()++>>`::
 Default constructor.
 
 |*Public Destructors*
 |
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,+++~Coordinate()+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,++~Coordinate()++>>`::
 Destructor.
 
 |*Public Operators*
 |
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,+++operator+(const Coordinate &)+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,++operator+(const Coordinate &)++>>`::
 Coordinates can be added.
 
 |*Public Methods*
 |
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,+++double Latitude() const+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,++double Latitude() const++>>`::
 Latitude.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,+++double Longitude() const+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,++double Longitude() const++>>`::
 Longitude.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,+++bool IsValid() const+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,++bool IsValid() const++>>`::
 Check if the coordinate is valid.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,+++void Update(const Coordinate &)+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,++void Update(const Coordinate &)++>>`::
 Update from another coordinate.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,+++void Update(std::tuple&lt;double, double, double&gt;)+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,++void Update(std::tuple&lt;double, double, double&gt;)++>>`::
 Update from a tuple of latitude, longitude and altitue.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,+++void Update(std::tuple&lt;double, double&gt;)+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,++void Update(std::tuple&lt;double, double&gt;)++>>`::
 Update from a tuple of only latitude and longitude.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,+++void Update(double, double)+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,++void Update(double, double)++>>`::
 Update latitude and longitude.
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,+++void Update(double, double, double)+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,++void Update(double, double, double)++>>`::
 Update from separate values.
 
 |*Private Variables*
 |
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a52b32f5ac1d5690a56645ba6cc45ed3d,+++latitude_+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a52b32f5ac1d5690a56645ba6cc45ed3d,++latitude_++>>`::
 
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aa1f1fa30bae57977d397929654496270,+++longitude_+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aa1f1fa30bae57977d397929654496270,++longitude_++>>`::
 
-`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac5f3b7b213473d7fedbdc7ccda7816f6,+++altitude_+++>>`::
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac5f3b7b213473d7fedbdc7ccda7816f6,++altitude_++>>`::
 
 |===
 

@@ -16,9 +16,9 @@ Base class for services.
 |===
 |*Methods*
 |
-`<<java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c,+++void Start()+++>>`::
+`<<java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c,++void Start()++>>`::
 Start the service.
-`<<java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1ad536a549ed8f7722de70a708fb415bcc,+++void Stop()+++>>`::
+`<<java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1ad536a549ed8f7722de70a708fb415bcc,++void Stop()++>>`::
 Stop the service.
 
 |===

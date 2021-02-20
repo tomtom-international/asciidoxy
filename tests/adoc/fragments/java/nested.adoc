@@ -16,21 +16,21 @@ Information about a traffic event.
 |===
 |*Public Enclosed Types*
 |
-`<<java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity,+++Severity+++>>`::
+`<<java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity,++Severity++>>`::
 xref:java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity[Severity] scale for traffic events.
-`<<java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,+++TrafficEventData+++>>`::
+`<<java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,++TrafficEventData++>>`::
 Details about a traffic event.
 
 |*Public Constructors*
 |
-`<<java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e,+++TrafficEvent(TrafficEventData)+++>>`::
+`<<java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e,++TrafficEvent(TrafficEventData)++>>`::
 Construct a traffic event from data.
 
 |*Public Methods*
 |
-`<<java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac,+++TrafficEventData Data()+++>>`::
+`<<java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac,++TrafficEventData Data()++>>`::
 Get the traffic event details.
-`<<java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a72847da5fa4e03763f089c5d044085d4,+++boolean Update(int, int)+++>>`::
+`<<java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a72847da5fa4e03763f089c5d044085d4,++boolean Update(int, int)++>>`::
 Update the traffic event data.
 
 |===
@@ -40,7 +40,7 @@ Update the traffic event data.
 
 [source,java,subs="-specialchars,macros+"]
 ----
-TrafficEvent(xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[+++TrafficEventData+++] data)
+TrafficEvent(xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] data)
 ----
 
 Construct a traffic event from data.
@@ -51,7 +51,7 @@ Construct a traffic event from data.
 |===
 | Parameters
 |
-`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[+++TrafficEventData+++] data`::
+`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] data`::
 The data to contain.
 
 |===
@@ -60,7 +60,7 @@ The data to contain.
 
 [source,java,subs="-specialchars,macros+"]
 ----
-xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[+++TrafficEventData+++] Data()
+xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] Data()
 ----
 
 Get the traffic event details.
@@ -71,7 +71,7 @@ Get the traffic event details.
 |===
 | Returns
 |
-`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[+++TrafficEventData+++]`::
+`xref:java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]`::
 Traffic event details.
 
 |===

@@ -402,47 +402,47 @@ def test_insert_class__global_filter_members__extend(generating_api):
 
 def test_link_class(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]")
 
 
 def test_link_function(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate::IsValid")
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
-                      "1a8d7e0eac29549fa4666093e36914deac[+++IsValid+++]")
+                      "1a8d7e0eac29549fa4666093e36914deac[++IsValid++]")
 
 
 def test_link_class_explicit(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate", kind="class")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]")
 
 
 def test_link_function_explicit(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate::IsValid", kind="function")
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
-                      "1a8d7e0eac29549fa4666093e36914deac[+++IsValid+++]")
+                      "1a8d7e0eac29549fa4666093e36914deac[++IsValid++]")
 
 
 def test_link_class_with_full_name(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate", full_name=True)
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++asciidoxy::geometry::"
-                      "Coordinate+++]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++asciidoxy::geometry::"
+                      "Coordinate++]")
 
 
 def test_link_class_with_custom_text(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate", text="LINK HERE")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++LINK HERE+++]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++LINK HERE++]")
 
 
 def test_link_class_with_alternative_language_tag(generating_api):
     result = generating_api.link("asciidoxy::geometry::Coordinate", lang="c++")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]")
 
 
 def test_link_class_with_transcoding(generating_api):
     generating_api.language("kotlin", source="java")
     result = generating_api.link("com.asciidoxy.geometry.Coordinate")
     assert result == ("xref:kotlin-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate"
-                      "[+++Coordinate+++]")
+                      "[++Coordinate++]")
 
 
 def test_link_class_with_transcoding__not_found_warning(generating_api):
@@ -1247,7 +1247,7 @@ def test_context_link_to_element_singlepage(context, generating_api):
     link_text = "Link"
     context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
     assert generating_api.link_to_element(element_id,
-                                          link_text) == f"xref:{element_id}[+++{link_text}+++]"
+                                          link_text) == f"xref:{element_id}[++{link_text}++]"
 
 
 def test_context_link_to_element_multipage(context, multipage, generating_api):
@@ -1256,7 +1256,7 @@ def test_context_link_to_element_multipage(context, multipage, generating_api):
     link_text = "Link"
     context.inserted[element_id] = context.current_document.in_file.parent / file_containing_element
     assert (generating_api.link_to_element(
-        element_id, link_text) == f"xref:{file_containing_element}#{element_id}[+++{link_text}+++]")
+        element_id, link_text) == f"xref:{file_containing_element}#{element_id}[++{link_text}++]")
 
 
 def test_context_link_to_element_multipage_element_in_the_same_document(
@@ -1265,7 +1265,7 @@ def test_context_link_to_element_multipage_element_in_the_same_document(
     link_text = "Link"
     context.inserted[element_id] = context.current_document.in_file
     assert (generating_api.link_to_element(element_id,
-                                           link_text) == f"xref:{element_id}[+++{link_text}+++]")
+                                           link_text) == f"xref:{element_id}[++{link_text}++]")
 
 
 def test_context_link_to_element_element_not_inserted(context, single_and_multipage,
@@ -1274,7 +1274,7 @@ def test_context_link_to_element_element_not_inserted(context, single_and_multip
     link_text = "Link"
     assert element_id not in context.inserted
     assert generating_api.link_to_element(element_id,
-                                          link_text) == f"xref:{element_id}[+++{link_text}+++]"
+                                          link_text) == f"xref:{element_id}[++{link_text}++]"
 
 
 def test_api_proxy__filter(generating_api):
@@ -1305,13 +1305,13 @@ def test_api_proxy__insert_class(generating_api):
 def test_api_proxy__link(generating_api):
     api = ApiProxy(generating_api)
     result = api.link("asciidoxy::geometry::Coordinate")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]")
 
 
 def test_api_proxy__link_class(generating_api):
     api = ApiProxy(generating_api)
     result = api.link_class("asciidoxy::geometry::Coordinate")
-    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[+++Coordinate+++]")
+    assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]")
 
 
 def test_api_proxy__cross_document_ref(test_data_builder, tdb_single_and_multipage):
