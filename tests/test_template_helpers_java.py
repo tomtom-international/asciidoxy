@@ -45,8 +45,6 @@ def java_class():
         builder.member_variable(prot=visibility,
                                 name=f"{visibility.capitalize()}Constant",
                                 type_prefix="final ")
-        # add nested type
-        builder.inner_class(prot=visibility, name=f"{visibility.capitalize()}Type")
 
     return builder.compound
 

@@ -22,8 +22,8 @@ from typing import Callable, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from ..api_reference import ApiReference
 from ..generator.errors import AsciiDocError
-from ..model import (Compound, EnumValue, InnerTypeReference, Parameter, ReferableElement,
-                     ReturnValue, ThrowsClause, TypeRef, TypeRefBase)
+from ..model import (Compound, EnumValue, Parameter, ReferableElement, ReturnValue, ThrowsClause,
+                     TypeRef)
 
 
 class TranscoderError(AsciiDocError):
@@ -111,9 +111,6 @@ class TranscoderBase(ABC):
         transcoded = self.referable_element(compound)
 
         transcoded.members = [self.compound(m) for m in compound.members]
-        transcoded.inner_classes = [
-            self.inner_type_reference(itr) for itr in compound.inner_classes
-        ]
         transcoded.enumvalues = [self.enum_value(ev) for ev in compound.enumvalues]
         transcoded.params = [self.parameter(p) for p in compound.params]
         transcoded.exceptions = [self.throws_clause(tc) for tc in compound.exceptions]
@@ -139,7 +136,11 @@ class TranscoderBase(ABC):
         return transcoded
 
     def type_ref(self, type_ref: TypeRef) -> TypeRef:
-        transcoded = self.type_ref_base(type_ref)
+        transcoded = TypeRef(self.TARGET)
+
+        transcoded.id = self.convert_id(type_ref.id)
+        transcoded.name = self.convert_name(type_ref)
+        transcoded.namespace = type_ref.namespace
 
         transcoded.kind = self.convert_kind(type_ref)
         transcoded.prefix = type_ref.prefix
@@ -191,15 +192,6 @@ class TranscoderBase(ABC):
 
         return transcoded
 
-    def inner_type_reference(self, ref: InnerTypeReference) -> InnerTypeReference:
-        transcoded = self.type_ref_base(ref)
-
-        transcoded.prot = ref.prot
-        if ref.referred_object is not None:
-            transcoded.referred_object = self.compound(ref.referred_object)
-
-        return transcoded
-
     def convert_id(self, old_id: Optional[str]) -> Optional[str]:
         if not old_id:
             return old_id
@@ -212,7 +204,7 @@ class TranscoderBase(ABC):
     def convert_kind(self, source_element: Union[ReferableElement, TypeRef]) -> Optional[str]:
         return source_element.kind
 
-    def convert_name(self, source_element: Union[ReferableElement, TypeRefBase]) -> str:
+    def convert_name(self, source_element: Union[ReferableElement, TypeRef]) -> str:
         return source_element.name
 
     def convert_full_name(self, source_element: ReferableElement) -> str:
@@ -242,16 +234,5 @@ class TranscoderBase(ABC):
         transcoded.name = self.convert_name(element)
         transcoded.full_name = self.convert_full_name(element)
         transcoded.kind = self.convert_kind(element) or ""
-
-        return transcoded
-
-    RefType = TypeVar("RefType", bound=TypeRefBase)
-
-    def type_ref_base(self, type_ref: RefType) -> RefType:
-        transcoded = type_ref.__class__(self.TARGET)
-
-        transcoded.id = self.convert_id(type_ref.id)
-        transcoded.name = self.convert_name(type_ref)
-        transcoded.namespace = type_ref.namespace
 
         return transcoded

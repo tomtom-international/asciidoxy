@@ -24,8 +24,7 @@ from .description_parser import DescriptionParser, select_descriptions
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
 from .type_parser import TypeParser, TypeParseError
-from ...model import (Compound, EnumValue, Parameter, ReturnValue, ThrowsClause, TypeRef,
-                      InnerTypeReference)
+from ...model import Compound, EnumValue, Parameter, ReturnValue, ThrowsClause, TypeRef
 
 logger = logging.getLogger(__name__)
 
@@ -186,17 +185,15 @@ class ParserBase(ABC):
         self._driver.register(member)
         return member
 
-    def parse_innerclass(self, parent: Compound, innerclass_element: ET.Element) \
-            -> InnerTypeReference:
-        inner_type = InnerTypeReference(parent.language)
+    def parse_innerclass(self, parent: Compound, innerclass_element: ET.Element) -> None:
+        inner_type = TypeRef(parent.language)
         inner_type.id = self.TRAITS.unique_id(innerclass_element.get("refid"))
         inner_type.name = \
             self.TRAITS.cleanup_name(innerclass_element.text if innerclass_element.text else "")
         inner_type.namespace = parent.full_name
         inner_type.prot = innerclass_element.get("prot", "")
 
-        self._driver.unresolved_ref(inner_type)
-        return inner_type
+        self._driver.inner_type_ref(parent, inner_type)
 
     def parse_compounddef(self, compounddef_element: ET.Element) -> None:
         compound = Compound(self.TRAITS.TAG)
@@ -216,15 +213,14 @@ class ParserBase(ABC):
                            for memberdef in compounddef_element.iterfind("sectiondef/memberdef"))
             if member is not None
         ]
-        compound.inner_classes = [
-            self.parse_innerclass(compound, innerclass_element)
-            for innerclass_element in compounddef_element.iterfind("innerclass")
-        ]
 
         compound.brief, compound.description = select_descriptions(
             self.parse_description(compounddef_element.find("briefdescription")),
             self.parse_description(compounddef_element.find("detaileddescription")))
         compound.enumvalues = self.parse_enumvalues(compounddef_element, compound.full_name)
+
+        for innerclass_element in compounddef_element.iterfind("innerclass"):
+            self.parse_innerclass(compound, innerclass_element)
 
         self._driver.register(compound)
 

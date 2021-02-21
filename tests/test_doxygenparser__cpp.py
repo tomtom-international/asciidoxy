@@ -59,18 +59,17 @@ def test_parse_cpp_class_with_nested_class(api_reference):
     assert cpp_class is not None
     assert cpp_class.id == "cpp-classasciidoxy_1_1traffic_1_1_traffic_event"
     assert cpp_class.namespace == "asciidoxy::traffic"
-    assert len(cpp_class.inner_classes) == 1
 
-    nested_class = cpp_class.inner_classes[0]
-    assert nested_class.name == "asciidoxy::traffic::TrafficEvent::TrafficEventData"
+    inner_classes = [m for m in cpp_class.members if m.kind == "struct"]
+    assert len(inner_classes) == 1
+
+    nested_class = inner_classes[0]
+    assert nested_class.full_name == "asciidoxy::traffic::TrafficEvent::TrafficEventData"
     assert nested_class.namespace == "asciidoxy::traffic::TrafficEvent"
     assert nested_class.id == ("cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_"
                                "event_data")
     assert nested_class.language == "cpp"
     assert nested_class.prot == "public"
-
-    assert nested_class.referred_object is not None
-    assert nested_class.referred_object.id == nested_class.id
 
 
 @pytest.mark.parametrize("api_reference_set", [["cpp/default"]])

@@ -29,7 +29,7 @@ def swift_class():
 
     # fill class with typical members
     for visibility in ("public", "internal", "fileprivate", "private"):
-        for member_type in ("enum", "trash"):
+        for member_type in ("enum", "trash", "class", "protocol", "struct"):
             builder.simple_member(kind=member_type, prot=visibility)
 
         # add property
@@ -49,10 +49,6 @@ def swift_class():
                                 name=visibility.capitalize() + "TypeMethodNoReturn",
                                 has_return_value=False,
                                 static=True)
-
-        for inner_type in ("class", "protocol", "struct"):
-            builder.inner_class(name=f"{visibility.capitalize()}{inner_type.capitalize()}",
-                                prot=visibility)
 
         builder.member_function(prot=visibility, name="init", has_return_value=False)
 

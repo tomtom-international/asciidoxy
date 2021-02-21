@@ -29,7 +29,7 @@ def kotlin_class():
 
     # fill class with typical members
     for visibility in ("public", "internal", "protected", "private"):
-        for member_type in ("enum", "trash"):
+        for member_type in ("enum", "trash", "class"):
             builder.simple_member(kind=member_type, prot=visibility)
 
         # add property
@@ -53,8 +53,6 @@ def kotlin_class():
         builder.member_variable(prot=visibility,
                                 name=f"{visibility.capitalize()}Constant",
                                 type_prefix="final ")
-        # add nested type
-        builder.inner_class(name=f"{visibility.capitalize()}Class", prot=visibility)
 
     builder.member_function(prot="public", name="init", has_return_value=False)
 

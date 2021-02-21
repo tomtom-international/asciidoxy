@@ -17,7 +17,7 @@ import logging
 
 import xml.etree.ElementTree as ET
 
-from typing import List, Mapping, Optional, Set
+from typing import List, Mapping, Optional, Set, Tuple
 
 from tqdm import tqdm
 
@@ -28,7 +28,7 @@ from .objc import ObjectiveCParser
 from .parser_base import ParserBase
 from .python import PythonParser
 from ...api_reference import AmbiguousLookupError, ApiReference
-from ...model import (ReferableElement, TypeRefBase)
+from ...model import Compound, ReferableElement, TypeRef
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,8 @@ logger = logging.getLogger(__name__)
 class Driver(DriverBase):
     """Driver for parsing Doxygen XML output."""
     api_reference: ApiReference
-    _unresolved_refs: List[TypeRefBase]
+    _unresolved_refs: List[TypeRef]
+    _inner_type_refs: List[Tuple[Compound, TypeRef]]
     _force_language: Optional[str]
 
     _parsers: Mapping[str, ParserBase]
@@ -44,6 +45,7 @@ class Driver(DriverBase):
     def __init__(self, force_language: Optional[str] = None):
         self.api_reference = ApiReference()
         self._unresolved_refs = []
+        self._inner_type_refs = []
         self._force_language = safe_language_tag(force_language)
 
         self._parsers = {
@@ -98,50 +100,77 @@ class Driver(DriverBase):
     def register(self, element: ReferableElement) -> None:
         self.api_reference.append(element)
 
-    def unresolved_ref(self, ref: TypeRefBase) -> None:
+    def unresolved_ref(self, ref: TypeRef) -> None:
         self._unresolved_refs.append(ref)
+
+    def inner_type_ref(self, parent: Compound, ref: TypeRef) -> None:
+        self._inner_type_refs.append((parent, ref))
 
     def resolve_references(self, progress: Optional[tqdm] = None) -> None:
         """Resolve all references between objects from different XML files."""
 
         unresolved_names: Set[str] = set()
-        still_unresolved = []
         if progress is not None:
-            progress.total = len(self._unresolved_refs)
+            progress.total = len(self._unresolved_refs) + len(self._inner_type_refs)
+
+        still_unresolved_refs = []
         for ref in self._unresolved_refs:
             if progress is not None:
                 progress.update()
             assert ref.name
+            element = self.resolve_reference(ref)
+            if element is not None:
+                ref.resolve(element)
+            else:
+                still_unresolved_refs.append(ref)
+                unresolved_names.add(ref.name)
 
-            # Try perfect match
-            try:
-                class_match = self.api_reference.find(ref.name,
-                                                      target_id=ref.id,
-                                                      lang=ref.language,
-                                                      namespace=ref.namespace)
-                if class_match is not None:
-                    ref.resolve(class_match)
-                    continue
-            except AmbiguousLookupError:
-                pass
+        still_unresolved_inner_type_refs: List[Tuple[Compound, TypeRef]] = []
+        for parent, ref in self._inner_type_refs:
+            if progress is not None:
+                progress.update()
+            assert ref.name
+            element = self.resolve_reference(ref)
+            assert isinstance(element, Compound)
+            if element is not None:
+                if ref.prot:
+                    element.prot = ref.prot
+                parent.members.append(element)
+            else:
+                still_unresolved_inner_type_refs.append((parent, ref))
+                unresolved_names.add(ref.name)
 
-            # Find partial matches in namespaces or other scopes
-            matches = []
-            for compound in self.api_reference.elements:
-                if compound.name and compound.full_name.endswith(f"::{ref.name}"):
-                    matches.append(compound)
-            if len(matches) == 1:
-                ref.resolve(matches[0])
-                continue
-            elif len(matches) > 1:
-                logger.debug(f"Multiple matches: {ref.name} ")
+        resolved_ref_count = len(self._unresolved_refs) - len(still_unresolved_refs)
+        resolved_inner_type_ref_count = (len(self._inner_type_refs) -
+                                         len(still_unresolved_inner_type_refs))
+        unresolved_ref_count = len(still_unresolved_refs) + len(still_unresolved_inner_type_refs)
+        logger.debug(f"Resolved refs: {resolved_ref_count + resolved_inner_type_ref_count}")
+        logger.debug(f"Still unresolved: {unresolved_ref_count}: {', '.join(unresolved_names)}")
 
-            still_unresolved.append(ref)
-            unresolved_names.add(ref.name)
+        self._unresolved_refs = still_unresolved_refs
+        self._inner_type_refs = still_unresolved_inner_type_refs
 
-        logger.debug(f"Resolved refs: {len(self._unresolved_refs) - len(still_unresolved)}")
-        logger.debug(f"Still unresolved: {len(still_unresolved)}: {', '.join(unresolved_names)}")
-        self._unresolved_refs = still_unresolved
+    def resolve_reference(self, ref: TypeRef) -> Optional[ReferableElement]:
+        try:
+            perfect_match = self.api_reference.find(ref.name,
+                                                    target_id=ref.id,
+                                                    lang=ref.language,
+                                                    namespace=ref.namespace)
+            if perfect_match is not None:
+                return perfect_match
+        except AmbiguousLookupError:
+            pass
+
+        partial_matches = []
+        for compound in self.api_reference.elements:
+            if compound.name and compound.full_name.endswith(f"::{ref.name}"):
+                partial_matches.append(compound)
+        if len(partial_matches) == 1:
+            return partial_matches[0]
+        elif len(partial_matches) > 1:
+            logger.debug(f"Multiple partial matches: {ref.name} ")
+
+        return None
 
 
 def safe_language_tag(name: Optional[str]) -> str:

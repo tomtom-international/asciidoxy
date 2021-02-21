@@ -85,9 +85,9 @@ filtered_testdata = [
     }, "fragments/cpp/struct_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent", "cpp", {
         "members": {
-            "prot": "ALL"
+            "prot": "ALL",
+            "name": "-TrafficEventData",
         },
-        "inner_classes": ["+Severity", "-TrafficEventData"]
     }, "fragments/cpp/nested_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", {
         "exceptions": "-std::"
@@ -102,7 +102,7 @@ filtered_testdata = [
         "members": "Start"
     }, "fragments/java/interface_filtered.adoc"),
     ("com.asciidoxy.traffic.TrafficEvent", "java", {
-        "inner_classes": "TrafficEventData"
+        "members": "-Severity"
     }, "fragments/java/nested_filtered.adoc"),
     ("ADTrafficEvent", "objc", {
         "members": {

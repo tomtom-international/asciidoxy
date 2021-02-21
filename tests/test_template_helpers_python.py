@@ -38,9 +38,9 @@ def python_class():
     builder.member_variable(name="public_variable"),
     builder.member_variable(name="_private_variable"),
     builder.member_variable(name="__mangled_private_variable"),
-    builder.inner_class(name="NestedClass"),
-    builder.inner_class(name="_PrivateNestedClass"),
-    builder.inner_class(name="__MangledPrivateNestedClass"),
+    builder.simple_member(kind="class", prot="public", name="NestedClass"),
+    builder.simple_member(kind="class", prot="public", name="_PrivateNestedClass"),
+    builder.simple_member(kind="class", prot="public", name="__MangledPrivateNestedClass"),
 
     return builder.compound
 
@@ -188,13 +188,13 @@ def test_public_enclosed_types__no_filter(helper):
 
 
 def test_public_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="ALL")
+    helper.insert_filter = InsertionFilter(members="ALL")
     result = list(m.name for m in helper.complex_enclosed_types(prot="public"))
     assert sorted(result) == sorted(["NestedClass"])
 
 
 def test_public_enclosed_types__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="NONE")
+    helper.insert_filter = InsertionFilter(members="NONE")
     result = list(m.name for m in helper.complex_enclosed_types(prot="public"))
     assert not result
 

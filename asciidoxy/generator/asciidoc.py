@@ -83,14 +83,13 @@ class Api(ABC):
     def filter(self,
                *,
                members: Optional[FilterSpec] = None,
-               inner_classes: Optional[FilterSpec] = None,
                enum_values: Optional[FilterSpec] = None,
                exceptions: Optional[FilterSpec] = None) -> str:
         """Set a default filter used when inserting API reference documentation.
 
         The filter controls which members of an element are inserted. Only the members matching the
         filter are inserted, the others are ignored. Depending on the exact type of element
-        inserted, its members, inner classes, enum values and/or exceptions can be filtered.
+        inserted, its members, enum values and/or exceptions can be filtered.
 
         A filter specification is either a single string, a list of strings, or a dictionary.
 
@@ -118,8 +117,6 @@ class Api(ABC):
         Args:
             members:       Filter to apply to members of a compound. Supports filtering on `name`,
                                `kind`, and `prot`ection level.
-            inner_classes: Filter to apply to inner classes of a compound. Supports filtering on
-                               `name`, `kind`, and `prot`ection level.
             enum_values:   Filter to apply to enum values of a compound or member. Supports
                                filtering on `name` only.
             exceptions:    Filter to apply to exceptions thrown by a member. Supports filtering on
@@ -128,8 +125,7 @@ class Api(ABC):
         Returns:
             An empty string.
         """
-        self._context.insert_filter = InsertionFilter(members, inner_classes, enum_values,
-                                                      exceptions)
+        self._context.insert_filter = InsertionFilter(members, enum_values, exceptions)
         return ""
 
     def insert(self,
@@ -138,7 +134,6 @@ class Api(ABC):
                kind: Optional[str] = None,
                lang: Optional[str] = None,
                members: Optional[FilterSpec] = None,
-               inner_classes: Optional[FilterSpec] = None,
                enum_values: Optional[FilterSpec] = None,
                exceptions: Optional[FilterSpec] = None,
                ignore_global_filter: bool = False,
@@ -157,8 +152,6 @@ class Api(ABC):
             lang:                 Programming language of the object.
             members:              Filter to apply to members of a compound. Supports filtering on
                                       `name`, `kind`, and `prot`ection level.
-            inner_classes:        Filter to apply to inner classes of a compound. Supports
-                                      filtering on `name`, `kind`, and `prot`ection level.
             enum_values:          Filter to apply to enum values of a compound or member. Supports
                                       filtering on `name` only.
             exceptions:           Filter to apply to exceptions thrown by a member. Supports
@@ -174,11 +167,9 @@ class Api(ABC):
             AsciiDoc text to include in the document.
         """
         if ignore_global_filter:
-            insert_filter = InsertionFilter(members, inner_classes, enum_values, exceptions)
-        elif (members is not None or inner_classes is not None or enum_values is not None
-              or exceptions is not None):
-            insert_filter = self._context.insert_filter.extend(members, inner_classes, enum_values,
-                                                               exceptions)
+            insert_filter = InsertionFilter(members, enum_values, exceptions)
+        elif (members is not None or enum_values is not None or exceptions is not None):
+            insert_filter = self._context.insert_filter.extend(members, enum_values, exceptions)
         else:
             insert_filter = self._context.insert_filter
 

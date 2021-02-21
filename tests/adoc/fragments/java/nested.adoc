@@ -35,6 +35,8 @@ Update the traffic event data.
 
 |===
 
+include::DIRECTORY/java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity.adoc[leveloffset=+1]
+
 == Members
 [[java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e,TrafficEvent]]
 
@@ -107,10 +109,5 @@ True if the update is valid.
 '''
 
 
-include::DIRECTORY/java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity.adoc[leveloffset=+1]
 include::DIRECTORY/java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data.adoc[leveloffset=+1]
-
-
-
-
 

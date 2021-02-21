@@ -98,29 +98,6 @@ def test_private_properties__no_filter(helper):
     assert result == ["PrivateProperty"]
 
 
-def test_public_simple_enclosed_types__no_filter(helper):
-    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
-    assert sorted(result) == sorted([
-        "PublicEnum",
-        "PublicClass",
-        "PublicProtocol",
-    ])
-
-
-def test_public_simple_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(members=".*Enum")
-    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
-    assert sorted(result) == sorted([
-        "PublicEnum",
-    ])
-
-
-def test_public_simple_enclosed_types__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
-    assert len(result) == 0
-
-
 def test_objc_method_signature__no_params_simple_return(helper):
     method = Compound("objc")
     method.name = "start"

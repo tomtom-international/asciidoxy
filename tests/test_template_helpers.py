@@ -969,29 +969,29 @@ def test_private_simple_enclosed_types__no_filter(helper):
 
 def test_public_complex_enclosed_types__no_filter(helper):
     result = [m.name for m in helper.complex_enclosed_types(prot="public")]
-    assert result == ["PublicType"]
+    assert result == ["PublicClass", "PublicStruct"]
 
 
 def test_public_complex_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes=".*Type")
+    helper.insert_filter = InsertionFilter(members=".*Class")
     result = [m.name for m in helper.complex_enclosed_types(prot="public")]
-    assert result == ["PublicType"]
+    assert result == ["PublicClass"]
 
 
 def test_public_complex_enclosed_types__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(inner_classes="NONE")
+    helper.insert_filter = InsertionFilter(members="NONE")
     result = [m.name for m in helper.complex_enclosed_types(prot="public")]
     assert len(result) == 0
 
 
 def test_protected_complex_enclosed_types__no_filter(helper):
     result = [m.name for m in helper.complex_enclosed_types(prot="protected")]
-    assert result == ["ProtectedType"]
+    assert result == ["ProtectedClass", "ProtectedStruct"]
 
 
 def test_private_complex_enclosed_types__no_filter(helper):
     result = [m.name for m in helper.complex_enclosed_types(prot="private")]
-    assert result == ["PrivateType"]
+    assert result == ["PrivateClass", "PrivateStruct"]
 
 
 def test_public_variables__no_filter(helper):

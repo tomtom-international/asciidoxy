@@ -118,16 +118,16 @@ def test_resolve_references_for_inner_type_reference(parser_driver_factory):
                                              kind="class",
                                              lang="cpp")
     assert parent_class is not None
-    assert len(parent_class.inner_classes) > 0
-
-    nested_class = parent_class.inner_classes[0]
-    assert nested_class.name == "asciidoxy::traffic::TrafficEvent::TrafficEventData"
-    assert nested_class.referred_object is None
+    inner_classes = [m for m in parent_class.members if m.kind == "struct"]
+    assert len(inner_classes) == 0
 
     parser.resolve_references()
 
-    assert nested_class.referred_object is not None
-    assert nested_class.referred_object.full_name == nested_class.name
+    inner_classes = [m for m in parent_class.members if m.kind == "struct"]
+    assert len(inner_classes) > 0
+
+    nested_class = inner_classes[0]
+    assert nested_class.full_name == "asciidoxy::traffic::TrafficEvent::TrafficEventData"
 
 
 def test_resolve_references_for_exceptions(parser_driver_factory):

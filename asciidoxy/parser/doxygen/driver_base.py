@@ -14,7 +14,7 @@
 """Base classes for parser drivers."""
 
 from abc import ABC, abstractmethod
-from ...model import ReferableElement, TypeRefBase
+from ...model import Compound, ReferableElement, TypeRef
 
 
 class DriverBase(ABC):
@@ -25,6 +25,11 @@ class DriverBase(ABC):
         pass
 
     @abstractmethod
-    def unresolved_ref(self, ref: TypeRefBase) -> None:
+    def unresolved_ref(self, ref: TypeRef) -> None:
         """Register an unresolved reference."""
+        pass
+
+    @abstractmethod
+    def inner_type_ref(self, parent: Compound, ref: TypeRef) -> None:
+        """Register an inner type reference."""
         pass

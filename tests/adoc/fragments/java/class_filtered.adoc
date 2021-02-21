@@ -30,6 +30,7 @@ Altitude.
 
 |===
 
+
 == Members
 [[java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1ab88068a456629b5519234b68de8c375f,Coordinate]]
 
@@ -103,10 +104,6 @@ The altitude in meters.
 
 |===
 '''
-
-
-
-
 
 
 

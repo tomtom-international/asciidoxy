@@ -21,8 +21,7 @@ from asciidoxy.api_reference import ApiReference
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
 from asciidoxy.generator.navigation import DocumentTreeNode
-from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Parameter, ReturnValue,
-                             ThrowsClause, TypeRef)
+from asciidoxy.model import (Compound, EnumValue, Parameter, ReturnValue, ThrowsClause, TypeRef)
 from asciidoxy.packaging import Package, PackageManager
 from asciidoxy.parser.doxygen import Driver as ParserDriver
 
@@ -199,8 +198,6 @@ def cpp_class():
         builder.member_function(prot=visibility,
                                 name=visibility.capitalize() + "StaticMethod",
                                 static=True)
-        # nested type
-        builder.inner_class(prot=visibility, name=f"{visibility.capitalize()}Type")
 
     return builder.compound
 
@@ -261,7 +258,6 @@ _custom_types = {
     ThrowsClause: (["description"], ["type"]),
     EnumValue:
     (["id", "name", "full_name", "language", "kind", "initializer", "brief", "description"], []),
-    InnerTypeReference: (["id", "name", "language", "namespace", "prot"], ["referred_object"]),
 }
 
 

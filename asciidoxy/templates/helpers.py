@@ -33,6 +33,16 @@ class TemplateHelper:
     ARGS_TO_TYPE = ""
     PARAM_NAME_FIRST = False
     PARAM_NAME_SEP = " "
+    SIMPLE_ENCLOSED_TYPES = (
+        "typedef",
+        "enum",
+    )
+    COMPLEX_ENCLOSED_TYPES = (
+        "class",
+        "interface",
+        "protocol",
+        "struct",
+    )
 
     def __init__(self,
                  api: Api,
@@ -189,14 +199,14 @@ class TemplateHelper:
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if m.prot == prot and m.kind in ("enum", "typedef"))
+                if m.prot == prot and m.kind in self.SIMPLE_ENCLOSED_TYPES)
 
     def complex_enclosed_types(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
-        return (m.referred_object for m in self.insert_filter.inner_classes(self.element)
-                if m.referred_object is not None and m.prot == prot)
+        return (m for m in self.insert_filter.members(self.element)
+                if m.prot == prot and m.kind in self.COMPLEX_ENCLOSED_TYPES)
 
     def variables(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None

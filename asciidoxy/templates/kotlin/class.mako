@@ -14,9 +14,10 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
+from itertools import chain
 %>
 <%
 helper = KotlinTemplateHelper(api, element, insert_filter)
@@ -39,10 +40,10 @@ ${element.description}
 |===
 % for prot in ("public", "protected", "internal", "private"):
 ###################################################################################################
-% if has(helper.complex_enclosed_types(prot=prot)):
+% if has_any(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 |*${prot.capitalize()} Enclosed Types*
 |
-% for enclosed in helper.complex_enclosed_types(prot=prot):
+% for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 `<<${enclosed.id},++${enclosed.name}++>>`::
 ${enclosed.brief}
 % endfor
@@ -104,6 +105,13 @@ ${method.brief}
 % endif
 % endfor
 |===
+
+########################################################################## Enclosed simple types ##
+% for prot in ("public", "protected", "internal", "private"):
+% for enclosed in helper.simple_enclosed_types(prot=prot):
+${api.insert_fragment(enclosed, insert_filter)}
+% endfor
+% endfor
 
 == Members
 % for prot in ("public", "protected", "internal", "private"):
@@ -265,9 +273,11 @@ ${exception.description}
 % endif
 '''
 % endfor
+% endfor
 
 ############################################################################# Inner/Nested types ##
 
+% for prot in ("public", "protected", "internal", "private"):
 % for enclosed in helper.complex_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor

@@ -33,6 +33,7 @@ Update the traffic event data.
 
 |===
 
+
 == Members
 [[java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e,TrafficEvent]]
 
@@ -106,8 +107,4 @@ True if the update is valid.
 
 
 include::DIRECTORY/java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data.adoc[leveloffset=+1]
-
-
-
-
 

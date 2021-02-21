@@ -32,6 +32,7 @@ Check if the coordinate is valid.
 
 |===
 
+
 == Members
 [[java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate_1ab88068a456629b5519234b68de8c375f,Coordinate]]
 
@@ -125,10 +126,6 @@ True if valid, false if not.
 
 |===
 '''
-
-
-
-
 
 
 
