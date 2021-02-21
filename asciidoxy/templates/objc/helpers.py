@@ -70,8 +70,7 @@ class ObjcTemplateHelper(TemplateHelper):
         assert self.element is not None
         assert self.insert_filter is not None
 
-        # For some reason enclosed types are always set to private, so ignore visibility
         return (m for m in self.insert_filter.members(self.element)
-                if m.kind in ["enum", "class", "protocol"])
+                if m.prot == prot and m.kind in ["enum", "typedef", "class", "protocol"])
 
     class_methods = TemplateHelper.static_methods

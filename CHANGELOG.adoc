@@ -23,6 +23,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Fixed
 
   - Bring back character escaping in links.
+  - [AD-56] Objective C: Fix visibility of enclosed types to match the enclosing type. Objects
+    exposed in a header file are always accessible.
 
 
 == 0.7.1 (13 Feb 2021)

@@ -101,8 +101,9 @@ def test_private_properties__no_filter(helper):
 def test_public_simple_enclosed_types__no_filter(helper):
     result = [m.name for m in helper.simple_enclosed_types(prot="public")]
     assert sorted(result) == sorted([
-        "PublicEnum", "ProtectedEnum", "PrivateEnum", "PublicClass", "ProtectedClass",
-        "PrivateClass", "PublicProtocol", "ProtectedProtocol", "PrivateProtocol"
+        "PublicEnum",
+        "PublicClass",
+        "PublicProtocol",
     ])
 
 
@@ -111,8 +112,6 @@ def test_public_simple_enclosed_types__filter_match(helper):
     result = [m.name for m in helper.simple_enclosed_types(prot="public")]
     assert sorted(result) == sorted([
         "PublicEnum",
-        "ProtectedEnum",
-        "PrivateEnum",
     ])
 
 

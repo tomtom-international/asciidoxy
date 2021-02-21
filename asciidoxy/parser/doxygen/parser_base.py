@@ -202,6 +202,7 @@ class ParserBase(ABC):
         compound = Compound(self.TRAITS.TAG)
         compound.id = self.TRAITS.unique_id(compounddef_element.get("id"))
         compound.kind = compounddef_element.get("kind", "")
+        compound.prot = compounddef_element.get("prot", "")
 
         name = self.TRAITS.cleanup_name(compounddef_element.findtext("compoundname", ""))
         compound.name = self.TRAITS.short_name(name)
