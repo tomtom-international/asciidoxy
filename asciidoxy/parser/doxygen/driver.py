@@ -131,8 +131,8 @@ class Driver(DriverBase):
                 progress.update()
             assert ref.name
             element = self.resolve_reference(ref)
-            assert isinstance(element, Compound)
             if element is not None:
+                assert isinstance(element, Compound)
                 if ref.prot:
                     element.prot = ref.prot
                 parent.members.append(element)

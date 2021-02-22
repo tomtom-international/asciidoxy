@@ -30,7 +30,6 @@ def test_parse_java_class(api_reference):
     assert java_class.namespace == "com.asciidoxy.geometry"
 
     assert len(java_class.members) == 8
-    assert len(java_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in java_class.members)
     assert member_names == sorted([
@@ -97,7 +96,6 @@ def test_parse_java_method(api_reference):
 
     assert len(member.params) == 2
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     assert member.returns is not None
     assert member.returns.type is not None

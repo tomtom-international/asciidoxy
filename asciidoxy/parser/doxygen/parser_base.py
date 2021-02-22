@@ -24,7 +24,7 @@ from .description_parser import DescriptionParser, select_descriptions
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
 from .type_parser import TypeParser, TypeParseError
-from ...model import Compound, EnumValue, Parameter, ReturnValue, ThrowsClause, TypeRef
+from ...model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 
 logger = logging.getLogger(__name__)
 
@@ -132,15 +132,16 @@ class ParserBase(ABC):
         else:
             return None
 
-    def parse_enumvalues(self, container_element: ET.Element, parent_name: str) -> List[EnumValue]:
+    def parse_enumvalues(self, container_element: ET.Element, parent_name: str) -> List[Compound]:
         return [
             self.parse_enumvalue(enumvalue_element, parent_name)
             for enumvalue_element in container_element.iterfind("enumvalue")
         ]
 
-    def parse_enumvalue(self, enumvalue_element: ET.Element, parent_name: str) -> EnumValue:
-        enumvalue = EnumValue(self.TRAITS.TAG)
+    def parse_enumvalue(self, enumvalue_element: ET.Element, parent_name: str) -> Compound:
+        enumvalue = Compound(self.TRAITS.TAG, kind="enumvalue")
         enumvalue.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
+        enumvalue.prot = enumvalue_element.get("prot", "")
 
         name = self.TRAITS.cleanup_name(enumvalue_element.findtext("name", ""))
         enumvalue.name = self.TRAITS.short_name(name)
@@ -177,7 +178,7 @@ class ParserBase(ABC):
             self.parse_description(memberdef_element.find("briefdescription")),
             self.parse_description(memberdef_element.find("detaileddescription")))
         member.returns = self.parse_returns(memberdef_element, member)
-        member.enumvalues = self.parse_enumvalues(memberdef_element, member.full_name)
+        member.members = self.parse_enumvalues(memberdef_element, member.full_name)
         member.static = _yes_no_to_bool(memberdef_element.get("static", "no"))
         member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
         member.constexpr = _yes_no_to_bool(memberdef_element.get("constexpr", "no"))
@@ -212,12 +213,11 @@ class ParserBase(ABC):
             for member in (self.parse_member(memberdef, compound)
                            for memberdef in compounddef_element.iterfind("sectiondef/memberdef"))
             if member is not None
-        ]
+        ] + self.parse_enumvalues(compounddef_element, compound.full_name)
 
         compound.brief, compound.description = select_descriptions(
             self.parse_description(compounddef_element.find("briefdescription")),
             self.parse_description(compounddef_element.find("detaileddescription")))
-        compound.enumvalues = self.parse_enumvalues(compounddef_element, compound.full_name)
 
         for innerclass_element in compounddef_element.iterfind("innerclass"):
             self.parse_innerclass(compound, innerclass_element)

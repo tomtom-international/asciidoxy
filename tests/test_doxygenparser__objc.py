@@ -17,7 +17,7 @@ Tests for parsing Objective C from Doxygen XML files.
 
 import pytest
 
-from asciidoxy.model import Compound, EnumValue, ReturnValue, TypeRef
+from asciidoxy.model import Compound, ReturnValue, TypeRef
 from asciidoxy.parser.doxygen.objc import ObjectiveCTraits
 
 
@@ -36,7 +36,6 @@ def test_parse_objc_interface(api_reference):
     assert objc_class.namespace is None
 
     assert len(objc_class.members) == 5
-    assert len(objc_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in objc_class.members)
     assert member_names == sorted([
@@ -62,7 +61,6 @@ def test_parse_objc_protocol(api_reference):
     assert objc_class.namespace is None
 
     assert len(objc_class.members) == 2
-    assert len(objc_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in objc_class.members)
     assert member_names == sorted([
@@ -89,8 +87,6 @@ def test_parse_objc_member_function(api_reference):
     assert member.prot == "public"
     assert member.static is False
     assert member.namespace == "ADTrafficEvent"
-
-    assert len(member.enumvalues) == 0
 
     assert len(member.params) == 2
 
@@ -193,8 +189,8 @@ def test_parse_objc__nested_types(api_reference):
                 brief="Severity scale for traffic events.",
                 description=  # noqa: E251
                 "The more severe the traffic event, the more likely it is to have a large delay.",
-                enumvalues=[
-                    EnumValue(
+                members=[
+                    Compound(
                         id="objc-interface_traffic_event_data_"
                         "1a2b685c89f864a1bc00a329d00ce0b273a2e99d30bdeb60d88efab9c1f1b0f941d",
                         name="ADSeverityLow",
@@ -204,8 +200,9 @@ def test_parse_objc__nested_types(api_reference):
                         brief="Low severity.",
                         description="",
                         initializer="= 1",
+                        prot="public",
                     ),
-                    EnumValue(
+                    Compound(
                         id="objc-interface_traffic_event_data_"
                         "1a2b685c89f864a1bc00a329d00ce0b273a30638ab30516654ec0bc609510e92f38",
                         name="ADSeverityMedium",
@@ -215,8 +212,9 @@ def test_parse_objc__nested_types(api_reference):
                         brief="Medium severity.",
                         description="",
                         initializer="= 2",
+                        prot="public",
                     ),
-                    EnumValue(
+                    Compound(
                         id="objc-interface_traffic_event_data_"
                         "1a2b685c89f864a1bc00a329d00ce0b273ae0df39be1faf7f462fac153063744958",
                         name="ADSeverityHigh",
@@ -226,8 +224,9 @@ def test_parse_objc__nested_types(api_reference):
                         brief="High severity.",
                         description="Better stay away here.",
                         initializer="= 3",
+                        prot="public",
                     ),
-                    EnumValue(
+                    Compound(
                         id="objc-interface_traffic_event_data_"
                         "1a2b685c89f864a1bc00a329d00ce0b273a505a6b31acd5b18078487c3ddad40701",
                         name="ADSeverityUnknown",
@@ -237,6 +236,7 @@ def test_parse_objc__nested_types(api_reference):
                         brief="Severity unknown.",
                         description="",
                         initializer="= 4",
+                        prot="public",
                     ),
                 ],
             ),
@@ -324,8 +324,8 @@ def test_parse_objc_enum__ignore_nesting(api_reference):
         brief="Severity scale for traffic events.",
         description=  # noqa: E251
         "The more severe the traffic event, the more likely it is to have a large delay.",
-        enumvalues=[
-            EnumValue(
+        members=[
+            Compound(
                 id="objc-interface_traffic_event_data_"
                 "1a2b685c89f864a1bc00a329d00ce0b273a2e99d30bdeb60d88efab9c1f1b0f941d",
                 name="ADSeverityLow",
@@ -335,8 +335,9 @@ def test_parse_objc_enum__ignore_nesting(api_reference):
                 brief="Low severity.",
                 description="",
                 initializer="= 1",
+                prot="public",
             ),
-            EnumValue(
+            Compound(
                 id="objc-interface_traffic_event_data_"
                 "1a2b685c89f864a1bc00a329d00ce0b273a30638ab30516654ec0bc609510e92f38",
                 name="ADSeverityMedium",
@@ -346,8 +347,9 @@ def test_parse_objc_enum__ignore_nesting(api_reference):
                 brief="Medium severity.",
                 description="",
                 initializer="= 2",
+                prot="public",
             ),
-            EnumValue(
+            Compound(
                 id="objc-interface_traffic_event_data_"
                 "1a2b685c89f864a1bc00a329d00ce0b273ae0df39be1faf7f462fac153063744958",
                 name="ADSeverityHigh",
@@ -357,8 +359,9 @@ def test_parse_objc_enum__ignore_nesting(api_reference):
                 brief="High severity.",
                 description="Better stay away here.",
                 initializer="= 3",
+                prot="public",
             ),
-            EnumValue(
+            Compound(
                 id="objc-interface_traffic_event_data_"
                 "1a2b685c89f864a1bc00a329d00ce0b273a505a6b31acd5b18078487c3ddad40701",
                 name="ADSeverityUnknown",
@@ -368,6 +371,7 @@ def test_parse_objc_enum__ignore_nesting(api_reference):
                 brief="Severity unknown.",
                 description="",
                 initializer="= 4",
+                prot="public",
             ),
         ],
     )
@@ -376,7 +380,7 @@ def test_parse_objc_enum__ignore_nesting(api_reference):
 @pytest.mark.parametrize("api_reference_set", [["objc/default"]])
 def test_parse_objc_enum_value__ignore_nesting(api_reference):
     element = api_reference.find("ADSeverityLow", kind="enumvalue", lang="objc")
-    assert element == EnumValue(
+    assert element == Compound(
         id="objc-interface_traffic_event_data_"
         "1a2b685c89f864a1bc00a329d00ce0b273a2e99d30bdeb60d88efab9c1f1b0f941d",
         name="ADSeverityLow",
@@ -386,6 +390,7 @@ def test_parse_objc_enum_value__ignore_nesting(api_reference):
         brief="Low severity.",
         description="",
         initializer="= 1",
+        prot="public",
     )
 
 

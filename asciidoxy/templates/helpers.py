@@ -222,6 +222,13 @@ class TemplateHelper:
         return (m for m in self.insert_filter.members(self.element)
                 if m.kind == "property" and m.prot == prot)
 
+    def enum_values(self, prot: str) -> Iterator[Compound]:
+        assert self.element is not None
+        assert self.insert_filter is not None
+
+        return (m for m in self.insert_filter.members(self.element)
+                if m.prot == prot and m.kind == "enumvalue")
+
 
 def has(elements):
     return any(True for _ in elements)

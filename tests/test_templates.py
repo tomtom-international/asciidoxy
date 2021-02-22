@@ -75,7 +75,7 @@ filtered_testdata = [
         }
     }, "fragments/cpp/class_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent::Severity", "cpp", {
-        "enum_values": ["+Medium", "+High"]
+        "members": ["+Medium", "+High"]
     }, "fragments/cpp/enum_filtered.adoc"),
     ("asciidoxy::system::Service", "cpp", {
         "members": "+Start"
@@ -110,7 +110,7 @@ filtered_testdata = [
         }
     }, "fragments/objc/protocol_filtered.adoc"),
     ("ADSeverity", "objc", {
-        "enum_values": ["Low", "Medium"]
+        "members": ["Low", "Medium"]
     }, "fragments/objc/enum_filtered.adoc"),
     ("ADCoordinate", "objc", {
         "members": {

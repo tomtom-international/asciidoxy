@@ -192,30 +192,6 @@ class ThrowsClause(ModelBase):
         return (self.type, self.description) == (other.type, other.description)
 
 
-class EnumValue(ReferableElement):
-    """Single value in an enum type.
-
-    Attributes:
-        initializer: Value assigned to the enum.
-        brief:       Brief description of the enum value.
-        description: Full description of the enum value.
-    """
-
-    # doxygen based fields
-    initializer: str = ""
-    brief: str = ""
-    description: str = ""
-
-    # custom fields
-    kind: str = "enumvalue"
-
-    def __eq__(self, other) -> bool:
-        if other is None:
-            return False
-        return (super().__eq__(other) and (self.initializer, self.brief, self.description)
-                == (other.initializer, other.brief, other.description))
-
-
 class Compound(ReferableElement):
     """Compound object. E.g. a class or enum.
 
@@ -223,15 +199,25 @@ class Compound(ReferableElement):
 
     Attributes:
         members:       List of members in the compound.
-        brief:         Brief description of the compound.
-        description:   Full description of the compound.
-        enumvalues:    List of enum values contained in the compound.
+        params:        List of parameters.
+        exceptions:    List of exceptions that can be thrown.
+        returns:       Return value.
         include:       Name of the include (file) required to use this compound.
         namespace:     Namespace, or package, the compound is contained in.
+        prot:          Protection or visibility level.
+        definition:    Full definition in source code.
+        args:          All arguments as in source code.
+        initializer:   Initial value assignment.
+        brief:         Brief description of the compound.
+        description:   Full description of the compound.
+        static:        True if this is marked as static.
+        const:         True if this is marked as const.
+        deleted:       True if this is marked as deleted.
+        default:       True if this is marked as default.
+        constexpr:     True if this is marked as constexpr.
     """
 
     members: List["Compound"]
-    enumvalues: List[EnumValue]
     params: List[Parameter]
     exceptions: List[ThrowsClause]
     returns: Optional[ReturnValue] = None
@@ -242,6 +228,7 @@ class Compound(ReferableElement):
     prot: str = ""
     definition: str = ""
     args: str = ""
+    initializer: str = ""
 
     brief: str = ""
     description: str = ""
@@ -256,13 +243,11 @@ class Compound(ReferableElement):
                  language: str = "",
                  *,
                  members: Optional[List["Compound"]] = None,
-                 enumvalues: Optional[List[EnumValue]] = None,
                  params: Optional[List[Parameter]] = None,
                  exceptions: Optional[List[ThrowsClause]] = None,
                  **kwargs):
         super().__init__(language, **kwargs)
         self.members = members or []
-        self.enumvalues = enumvalues or []
         self.params = params or []
         self.exceptions = exceptions or []
 
@@ -273,12 +258,12 @@ class Compound(ReferableElement):
         if other is None:
             return False
         return (super().__eq__(other)
-                and (self.members, self.enumvalues, self.params, self.exceptions, self.returns,
-                     self.include, self.namespace, self.prot, self.definition, self.args,
+                and (self.members, self.params, self.exceptions, self.returns, self.include,
+                     self.namespace, self.prot, self.definition, self.args, self.initializer,
                      self.brief, self.description, self.static, self.const, self.deleted,
                      self.default, self.constexpr)
-                == (other.members, other.enumvalues, other.params, other.exceptions, other.returns,
-                    other.include, other.namespace, other.prot, other.definition, other.args,
+                == (other.members, other.params, other.exceptions, other.returns, other.include,
+                    other.namespace, other.prot, other.definition, other.args, other.initializer,
                     other.brief, other.description, other.static, other.const, other.deleted,
                     other.default, other.constexpr))
 

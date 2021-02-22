@@ -1019,3 +1019,30 @@ def test_protected_variables__no_filter(helper):
 def test_private_variables__no_filter(helper):
     result = [m.name for m in helper.variables(prot="private")]
     assert result == ["PrivateVariable"]
+
+
+def test_public_enum_values__no_filter(helper):
+    result = [m.name for m in helper.enum_values(prot="public")]
+    assert result == ["PublicEnumvalue"]
+
+
+def test_public_enum_values__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members=".*val.*")
+    result = [m.name for m in helper.enum_values(prot="public")]
+    assert result == ["PublicEnumvalue"]
+
+
+def test_public_enum_values__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.enum_values(prot="public")]
+    assert len(result) == 0
+
+
+def test_protected_enum_values__no_filter(helper):
+    result = [m.name for m in helper.enum_values(prot="protected")]
+    assert result == ["ProtectedEnumvalue"]
+
+
+def test_private_enum_values__no_filter(helper):
+    result = [m.name for m in helper.enum_values(prot="private")]
+    assert result == ["PrivateEnumvalue"]

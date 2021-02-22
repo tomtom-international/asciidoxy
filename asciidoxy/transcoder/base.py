@@ -22,8 +22,7 @@ from typing import Callable, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from ..api_reference import ApiReference
 from ..generator.errors import AsciiDocError
-from ..model import (Compound, EnumValue, Parameter, ReferableElement, ReturnValue, ThrowsClause,
-                     TypeRef)
+from ..model import Compound, Parameter, ReferableElement, ReturnValue, ThrowsClause, TypeRef
 
 
 class TranscoderError(AsciiDocError):
@@ -111,7 +110,6 @@ class TranscoderBase(ABC):
         transcoded = self.referable_element(compound)
 
         transcoded.members = [self.compound(m) for m in compound.members]
-        transcoded.enumvalues = [self.enum_value(ev) for ev in compound.enumvalues]
         transcoded.params = [self.parameter(p) for p in compound.params]
         transcoded.exceptions = [self.throws_clause(tc) for tc in compound.exceptions]
         transcoded.returns = (self.return_value(compound.returns)
@@ -177,18 +175,6 @@ class TranscoderBase(ABC):
 
         transcoded.type = self.type_ref(throws_clause.type)
         transcoded.description = throws_clause.description
-
-        return transcoded
-
-    def enum_value(self, enum_value: EnumValue) -> EnumValue:
-        return self.find_or_transcode(enum_value, self._enum_value)
-
-    def _enum_value(self, enum_value: EnumValue) -> EnumValue:
-        transcoded = self.referable_element(enum_value)
-
-        transcoded.initializer = enum_value.initializer
-        transcoded.brief = enum_value.brief
-        transcoded.description = enum_value.description
 
         return transcoded
 

@@ -21,7 +21,7 @@ from asciidoxy.api_reference import ApiReference
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
 from asciidoxy.generator.navigation import DocumentTreeNode
-from asciidoxy.model import (Compound, EnumValue, Parameter, ReturnValue, ThrowsClause, TypeRef)
+from asciidoxy.model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 from asciidoxy.packaging import Package, PackageManager
 from asciidoxy.parser.doxygen import Driver as ParserDriver
 
@@ -168,7 +168,7 @@ def cpp_class():
 
     # fill class with typical members
     for visibility in ("public", "protected", "private"):
-        for member_type in ("variable", "enum", "class", "typedef", "struct", "trash"):
+        for member_type in ("variable", "enum", "class", "typedef", "struct", "trash", "enumvalue"):
             builder.simple_member(kind=member_type, prot=visibility)
 
         # constructor
@@ -249,15 +249,14 @@ def empty_generating_api(input_file, empty_context):
 _custom_types = {
     Compound: ([
         "id", "name", "full_name", "language", "kind", "include", "namespace", "prot", "definition",
-        "args", "brief", "description", "static", "const", "deleted", "default", "constexpr"
-    ], ["members", "inner_classes", "enumvalues", "params", "exceptions", "returns"]),
+        "args", "initializer", "brief", "description", "static", "const", "deleted", "default",
+        "constexpr"
+    ], ["members", "params", "exceptions", "returns"]),
     TypeRef: (["id", "name", "language", "namespace", "kind", "prefix",
                "suffix"], ["nested", "args", "returns"]),
     Parameter: (["name", "description", "default_value", "prefix"], ["type"]),
     ReturnValue: (["description"], ["type"]),
     ThrowsClause: (["description"], ["type"]),
-    EnumValue:
-    (["id", "name", "full_name", "language", "kind", "initializer", "brief", "description"], []),
 }
 
 

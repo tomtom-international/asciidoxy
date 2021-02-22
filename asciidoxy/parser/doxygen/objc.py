@@ -163,6 +163,11 @@ class ObjectiveCParser(ParserBase):
         member = self._fix_enclosed_type_visibility(member, parent)
         return member
 
+    def parse_enumvalue(self, enumvalue_element: ET.Element, parent_name: str) -> Compound:
+        enumvalue = super().parse_enumvalue(enumvalue_element, parent_name)
+        enumvalue.prot = "public"
+        return enumvalue
+
     def _fix_block_element(self, memberdef_element: ET.Element) -> ET.Element:
         if memberdef_element.get("kind", "") not in ("variable", "typedef"):
             return memberdef_element
@@ -194,7 +199,7 @@ class ObjectiveCParser(ParserBase):
         if member is None:
             return None
 
-        if (member.kind in ("enum", "typedef", "class", "protocol")
-                and parent.kind in ("class", "protocol")):
+        if (member.kind in ("enum", "typedef", "class", "protocol", "enumvalue")
+                and parent.kind in ("class", "protocol", "enum")):
             member.prot = parent.prot
         return member

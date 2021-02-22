@@ -12,6 +12,15 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+################################################################################ Helper includes ##
+<%!
+from asciidoxy.templates.helpers import has
+from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
+%>
+<%
+helper = ObjcTemplateHelper(api, element, insert_filter)
+%>
+######################################################################## Header and introduction ##
 = [[${element.id},${element.full_name}]]${element.name}
 ${api.inserted(element)}
 
@@ -31,7 +40,7 @@ ${element.description}
 [cols='h,5a']
 |===
 
-% for value in insert_filter.enum_values(element):
+% for value in helper.enum_values(prot="public"):
 ${api.inserted(value)}
 | [[${value.id},${value.name}]]${value.name}
 |

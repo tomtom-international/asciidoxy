@@ -31,7 +31,6 @@ def test_parse_cpp_class(api_reference):
     assert cpp_class.namespace == "asciidoxy::geometry"
 
     assert len(cpp_class.members) == 15
-    assert len(cpp_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in cpp_class.members)
     assert member_names == sorted([
@@ -103,7 +102,6 @@ def test_parse_cpp_member_function_no_return_value(api_reference):
 
     assert len(member.params) == 0
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
     assert member.returns is None
 
 
@@ -131,7 +129,6 @@ def test_parse_cpp_member_function_only_return_value(api_reference):
 
     assert len(member.params) == 0
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     assert member.returns is not None
     assert member.returns.description == "True if valid, false if not."
@@ -169,7 +166,6 @@ def test_parse_cpp_member_function_params_and_return_value(api_reference):
     assert member.const is False
 
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     assert len(member.params) == 2
     param1, param2 = member.params
@@ -262,8 +258,8 @@ def test_parse_cpp_member_enum(api_reference):
             "The more severe the traffic event, the more likely it is to have a large delay.")
     assert member.include == "traffic_event.hpp"
 
-    assert len(member.enumvalues) == 4
-    enum_value = [e for e in member.enumvalues if e.name == "High"][0]
+    assert len(member.members) == 4
+    enum_value = [e for e in member.members if e.name == "High"][0]
     assert enum_value.id == ("cpp-classasciidoxy_1_1traffic_1_1_traffic_event_"
                              "1a47c51b1f1f014cb943377fb67ad903b9a655d20c1ca69519ca647684edbb2db35")
     assert enum_value.name == "High"
@@ -273,6 +269,7 @@ def test_parse_cpp_member_enum(api_reference):
     assert enum_value.brief == "High severity."
     assert enum_value.description == "Better stay away here."
     assert enum_value.kind == "enumvalue"
+    assert enum_value.prot == "public"
 
 
 @pytest.mark.parametrize("api_reference_set", [["cpp/default"]])

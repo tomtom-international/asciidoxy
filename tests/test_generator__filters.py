@@ -17,9 +17,9 @@ import pytest
 
 from asciidoxy.generator.filters import (AllStringFilter, NoneStringFilter, IncludeStringFilter,
                                          ExcludeStringFilter, ChainedStringFilter, MemberFilter,
-                                         FilterAction, EnumValueFilter, ExceptionFilter,
-                                         filter_from_strings, InsertionFilter, combine_specs)
-from asciidoxy.model import EnumValue, ThrowsClause
+                                         FilterAction, ExceptionFilter, filter_from_strings,
+                                         InsertionFilter, combine_specs)
+from asciidoxy.model import ThrowsClause
 
 
 def test_all_string_filter():
@@ -123,8 +123,15 @@ def test_member_filter__kind(cpp_class):
     member_filter = MemberFilter.from_spec({"kind": ["NONE", "(enum|class)"]})
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
     assert sorted(member_names) == sorted([
-        "PublicEnum", "ProtectedEnum", "PrivateEnum", "PublicClass", "ProtectedClass",
-        "PrivateClass"
+        "PublicEnum",
+        "ProtectedEnum",
+        "PrivateEnum",
+        "PublicClass",
+        "ProtectedClass",
+        "PrivateClass",
+        "PublicEnumvalue",
+        "ProtectedEnumvalue",
+        "PrivateEnumvalue",
     ])
 
 
@@ -133,8 +140,9 @@ def test_member_filter__prot(cpp_class):
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
     assert sorted(member_names) == sorted([
         "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
-        "ProtectedStruct", "ProtectedTrash", "MyClass", "MyClass", "MyClass", "operator++",
-        "operator=", "operator=", "ProtectedMethod", "ProtectedStaticMethod", "~MyClass"
+        "ProtectedStruct", "ProtectedTrash", "ProtectedEnumvalue", "MyClass", "MyClass", "MyClass",
+        "operator++", "operator=", "operator=", "ProtectedMethod", "ProtectedStaticMethod",
+        "~MyClass"
     ])
 
 
@@ -146,17 +154,6 @@ def test_member_filter__all(cpp_class):
     })
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
     assert sorted(member_names) == sorted(["PublicStaticMethod"])
-
-
-def test_enum_value_filter__name():
-    enum_value_1 = EnumValue("cpp")
-    enum_value_1.name = "kSomeEnumValue"
-    enum_value_2 = EnumValue("cpp")
-    enum_value_2.name = "kAnotherEnumValue"
-
-    member_filter = EnumValueFilter.from_spec(["NONE", ".*ome.*"])
-    assert member_filter(enum_value_1) is True
-    assert member_filter(enum_value_2) is False
 
 
 def test_exception_filter__name():
@@ -273,100 +270,32 @@ def test_filter_from_strings__single_exclude(strings_to_filter):
         ["", "Apple", "AppleTree", "AppleJuice", "Strawberry", "StrawberryDaiquiri"])
 
 
-@pytest.fixture
-def cpp_class_with_enum_values(cpp_class):
-    enum_value = EnumValue("cpp")
-    enum_value.name = "kGreen"
-    cpp_class.enumvalues.append(enum_value)
-
-    enum_value = EnumValue("cpp")
-    enum_value.name = "kBlue"
-    cpp_class.enumvalues.append(enum_value)
-
-    enum_value = EnumValue("cpp")
-    enum_value.name = "kRed"
-    cpp_class.enumvalues.append(enum_value)
-
-    return cpp_class
-
-
-def test_insertion_filter__compound__no_filters(cpp_class_with_enum_values):
+def test_insertion_filter__compound__no_filters(cpp_class):
     insertion_filter = InsertionFilter()
 
-    member_names = [member.name for member in insertion_filter.members(cpp_class_with_enum_values)]
+    member_names = [member.name for member in insertion_filter.members(cpp_class)]
     assert sorted(member_names) == sorted([
         "PublicVariable", "PublicEnum", "PublicClass", "PublicTypedef", "PublicStruct",
-        "PublicTrash", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass",
-        "operator++", "PublicMethod", "PublicStaticMethod", "ProtectedVariable", "ProtectedEnum",
-        "ProtectedClass", "ProtectedTypedef", "ProtectedStruct", "ProtectedTrash", "MyClass",
-        "operator++", "ProtectedMethod", "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum",
-        "PrivateClass", "PrivateTypedef", "PrivateStruct", "PrivateTrash", "MyClass", "operator++",
-        "PrivateMethod", "PrivateStaticMethod", "operator=", "operator=", "operator=", "operator=",
-        "operator=", "operator=", "~MyClass", "~MyClass", "~MyClass"
+        "PublicTrash", "PublicEnumvalue", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass",
+        "MyClass", "MyClass", "operator++", "PublicMethod", "PublicStaticMethod",
+        "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
+        "ProtectedStruct", "ProtectedTrash", "ProtectedEnumvalue", "MyClass", "operator++",
+        "ProtectedMethod", "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum",
+        "PrivateClass", "PrivateTypedef", "PrivateStruct", "PrivateTrash", "PrivateEnumvalue",
+        "MyClass", "operator++", "PrivateMethod", "PrivateStaticMethod", "operator=", "operator=",
+        "operator=", "operator=", "operator=", "operator=", "~MyClass", "~MyClass", "~MyClass"
     ])
 
-    enum_names = [
-        enum_value.name for enum_value in insertion_filter.enum_values(cpp_class_with_enum_values)
-    ]
-    assert sorted(enum_names) == sorted(["kRed", "kGreen", "kBlue"])
 
-
-def test_insertion_filter__compound__filter_members(cpp_class_with_enum_values):
+def test_insertion_filter__compound__filter_members(cpp_class):
     insertion_filter = InsertionFilter(members={"kind": "variable"})
 
-    member_names = [member.name for member in insertion_filter.members(cpp_class_with_enum_values)]
+    member_names = [member.name for member in insertion_filter.members(cpp_class)]
     assert sorted(member_names) == sorted([
         "PublicVariable",
         "ProtectedVariable",
         "PrivateVariable",
     ])
-
-    enum_names = [
-        enum_value.name for enum_value in insertion_filter.enum_values(cpp_class_with_enum_values)
-    ]
-    assert sorted(enum_names) == sorted(["kRed", "kGreen", "kBlue"])
-
-
-def test_insertion_filter__compound__filter_enum_values(cpp_class_with_enum_values):
-    insertion_filter = InsertionFilter(enum_values=".*(Red|Blue)")
-
-    member_names = [member.name for member in insertion_filter.members(cpp_class_with_enum_values)]
-    assert sorted(member_names) == sorted([
-        "PublicVariable", "PublicEnum", "PublicClass", "PublicTypedef", "PublicStruct",
-        "PublicTrash", "MyClass", "operator++", "PublicMethod", "PublicStaticMethod",
-        "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
-        "ProtectedStruct", "ProtectedTrash", "MyClass", "operator++", "ProtectedMethod",
-        "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum", "PrivateClass", "PrivateTypedef",
-        "PrivateStruct", "PrivateTrash", "MyClass", "operator++", "PrivateMethod",
-        "PrivateStaticMethod", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass",
-        "operator=", "operator=", "operator=", "operator=", "operator=", "operator=", "~MyClass",
-        "~MyClass", "~MyClass"
-    ])
-
-    enum_names = [
-        enum_value.name for enum_value in insertion_filter.enum_values(cpp_class_with_enum_values)
-    ]
-    assert sorted(enum_names) == sorted(["kRed", "kBlue"])
-
-
-def test_insertion_filter__member__enum__no_filters(api_reference):
-    member = api_reference.find("asciidoxy::traffic::TrafficEvent::Severity")
-    assert member is not None
-
-    insertion_filter = InsertionFilter()
-
-    enum_names = [enum_value.name for enum_value in insertion_filter.enum_values(member)]
-    assert sorted(enum_names) == sorted(["Low", "Medium", "High", "Unknown"])
-
-
-def test_insertion_filter__member__enum__filter_name(api_reference):
-    member = api_reference.find("asciidoxy::traffic::TrafficEvent::Severity")
-    assert member is not None
-
-    insertion_filter = InsertionFilter(enum_values="High")
-
-    enum_names = [enum_value.name for enum_value in insertion_filter.enum_values(member)]
-    assert sorted(enum_names) == sorted(["High"])
 
 
 def test_insertion_filer__member__exceptions__no_filters(api_reference):
