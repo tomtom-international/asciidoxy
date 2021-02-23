@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
+from html import escape
 from itertools import chain
 %>
 <%
@@ -145,7 +146,7 @@ ${api.inserted(variable)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-${helper.print_ref(variable.returns.type)} ${variable.name}
+${escape(helper.print_ref(variable.returns.type))} ${variable.name}
 ----
 
 ${variable.brief}

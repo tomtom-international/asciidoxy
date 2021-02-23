@@ -14,6 +14,7 @@
 <%!
 from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
+from html import escape
 %>
 <%
 helper = PythonTemplateHelper(api)
@@ -23,7 +24,7 @@ ${api.inserted(element)}
 
 [source,python,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(element)}
+${escape(helper.method_signature(element))}
 ----
 
 ${element.brief}

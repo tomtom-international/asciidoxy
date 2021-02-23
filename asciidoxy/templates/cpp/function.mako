@@ -13,6 +13,7 @@
 ## limitations under the License.
 <%!
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
+from html import escape
 %>
 
 = [[${element.id},${element.full_name}]]${element.name}
@@ -25,6 +26,6 @@ ${api.inserted(element)}
 #include &lt;${element.include}&gt;
 
 % endif
-${CppTemplateHelper(api).method_signature(element)}
+${escape(CppTemplateHelper(api).method_signature(element))}
 ----
 <%include file="/cpp/_function.mako"/>

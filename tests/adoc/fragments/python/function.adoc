@@ -7,7 +7,7 @@
 ----
 def update(self,
            cause: int,
-           delay: int) -> bool
+           delay: int) -&gt; bool
 ----
 
 Update the traffic event data.

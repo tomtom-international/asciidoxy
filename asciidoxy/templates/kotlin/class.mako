@@ -17,6 +17,7 @@
 from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
+from html import escape
 from itertools import chain
 %>
 <%
@@ -136,7 +137,7 @@ ${constant.description}
 ${api.inserted(constructor)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(constructor)}
+${escape(helper.method_signature(constructor))}
 ----
 
 ${constructor.brief}
@@ -189,7 +190,7 @@ ${prop.description}
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${java_helper.method_signature(method)}
+${escape(java_helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -234,7 +235,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}

@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
+from html import escape
 from itertools import chain
 %>
 <%
@@ -100,7 +101,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ${api.inserted(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-@property() ${helper.print_ref(prop.returns.type)} ${prop.name}
+@property() ${escape(helper.print_ref(prop.returns.type))} ${prop.name}
 ----
 
 ${prop.brief}
@@ -115,7 +116,7 @@ ${prop.description}
 ${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)};
+${escape(helper.method_signature(method))};
 ----
 
 ${method.brief}
@@ -161,7 +162,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)};
+${escape(helper.method_signature(method))};
 ----
 
 ${method.brief}

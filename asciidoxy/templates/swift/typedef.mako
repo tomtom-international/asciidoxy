@@ -14,6 +14,7 @@
 
 <%!
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
+from html import escape
 %>
 = [[${element.id},${element.full_name}]]${element.name}
 ${api.inserted(element)}
@@ -21,7 +22,7 @@ ${api.inserted(element)}
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-typedef ${SwiftTemplateHelper(api).print_ref(element.returns.type)} ${element.name}
+typedef ${escape(SwiftTemplateHelper(api).print_ref(element.returns.type))} ${element.name}
 ----
 ${element.brief}
 

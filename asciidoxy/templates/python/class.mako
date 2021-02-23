@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has
 from asciidoxy.templates.python.helpers import PythonTemplateHelper
+from html import escape
 %>
 <%
 helper = PythonTemplateHelper(api, element, insert_filter)
@@ -102,7 +103,7 @@ ${api.inserted(variable)}
 [source,python,subs="-specialchars,macros+"]
 ----
 % if variable.returns is not None:
-${variable.name}: ${helper.print_ref(variable.returns.type)}
+${variable.name}: ${escape(helper.print_ref(variable.returns.type))}
 % else:
 ${variable.name}
 % endif

@@ -47,7 +47,7 @@ Traffic event details.
 [source,swift,subs="-specialchars,macros+"]
 ----
 func update(withCause: Integer,
-            delay: Integer) -> Any
+            delay: Integer) -&gt; Any
 ----
 
 Update the traffic event data.

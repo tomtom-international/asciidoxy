@@ -14,13 +14,14 @@
 
 <%!
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
+from html import escape
 %>
 = [[${element.id},${element.full_name}]]${element.name}
 ${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-using ${element.name} = ${CppTemplateHelper(api).print_ref(element.returns.type)}
+using ${element.name} = ${escape(CppTemplateHelper(api).print_ref(element.returns.type))}
 ----
 ${element.brief}
 

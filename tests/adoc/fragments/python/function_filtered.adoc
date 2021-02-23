@@ -5,7 +5,7 @@
 
 [source,python,subs="-specialchars,macros+"]
 ----
-def refresh_data(self) -> None
+def refresh_data(self) -&gt; None
 ----
 
 Refresh the traffic event data.

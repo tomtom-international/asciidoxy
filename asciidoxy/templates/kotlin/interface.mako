@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
+from html import escape
 %>
 <%
 helper = JavaTemplateHelper(api, element, insert_filter)
@@ -92,7 +93,7 @@ ${constant.description}
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -137,7 +138,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}

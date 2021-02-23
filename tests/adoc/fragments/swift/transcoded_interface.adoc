@@ -92,7 +92,7 @@ The altitude in meters.
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-func isValid() -> Any
+func isValid() -&gt; Any
 ----
 
 Check if the coordinate is valid.

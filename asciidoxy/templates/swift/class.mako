@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
+from html import escape
 %>
 <%
 helper = SwiftTemplateHelper(api, element, insert_filter)
@@ -104,7 +105,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ${api.inserted(constructor)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(constructor)}
+${escape(helper.method_signature(constructor))}
 ----
 
 ${constructor.brief}
@@ -143,7 +144,7 @@ ${exception.description}
 ${api.inserted(prop)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-var ${prop.name}: ${helper.print_ref(prop.returns.type)}
+var ${prop.name}: ${escape(helper.print_ref(prop.returns.type))}
 ----
 
 ${prop.brief}
@@ -158,7 +159,7 @@ ${prop.description}
 ${api.inserted(method)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -204,7 +205,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}
