@@ -8,7 +8,7 @@
 ----
 #include &lt;default_values.hpp&gt;
 
-xref:cpp-classasciidoxy_1_1geometry_1_1_point[+++Point+++] increment(int x = 2,
+xref:cpp-classasciidoxy_1_1geometry_1_1_point[++Point++] increment(int x = 2,
                 int y = 3) const
 ----
 
@@ -33,7 +33,7 @@ Value to increment the Y coordinate with.
 
 | Returns
 |
-`xref:cpp-classasciidoxy_1_1geometry_1_1_point[+++Point+++]`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_point[++Point++]`::
 A new incremented xref:cpp-classasciidoxy_1_1geometry_1_1_point[Point].
 
 |===

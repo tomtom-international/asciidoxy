@@ -21,7 +21,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Generator, List, Mapping, Optional, Pattern, Sequence, Type, TypeVar, Union
 
-from ..model import Compound, EnumValue, InnerTypeReference, ThrowsClause
+from ..model import Compound, ThrowsClause
 
 
 class FilterAction(Enum):
@@ -176,67 +176,6 @@ class MemberFilter(ElementFilter):
         return True
 
 
-class InnerClassFilter(ElementFilter):
-    """Filter for selecting inner classes (of a compound) to insert.
-
-    Ignores class references that have not been resolved.
-
-    Attributes:
-        name_filter: Filter for the name of the members to include.
-        kind_filter: Filter for the kind of the members to include.
-        prot_filter: Filter for the protection level of the members to include.
-    """
-    name_filter: StringFilter
-    kind_filter: StringFilter
-    prot_filter: StringFilter
-
-    def __init__(self,
-                 name_filter: Optional[StringFilter] = None,
-                 kind_filter: Optional[StringFilter] = None,
-                 prot_filter: Optional[StringFilter] = None):
-        self.name_filter = name_filter or AllStringFilter()
-        self.kind_filter = kind_filter or AllStringFilter()
-        self.prot_filter = prot_filter or AllStringFilter()
-
-    def __call__(self, ref: InnerTypeReference) -> bool:
-        """Apply the filter to an inner class.
-
-        Returns:
-            True if the inner class should be included.
-        """
-        if ref.referred_object is None:
-            return False
-        if self.name_filter(ref.referred_object.name) is FilterAction.EXCLUDE:
-            return False
-        if self.kind_filter(ref.referred_object.kind) is FilterAction.EXCLUDE:
-            return False
-        if self.prot_filter(ref.prot) is FilterAction.EXCLUDE:
-            return False
-        return True
-
-
-class EnumValueFilter(ElementFilter):
-    """Filter for selecting enum values (of a compound or member) to insert.
-
-    Attributes:
-        name_filter: Filter for the name of the enum values to include.
-    """
-    name_filter: StringFilter
-
-    def __init__(self, name_filter: StringFilter):
-        self.name_filter = name_filter
-
-    def __call__(self, enum_value: EnumValue) -> bool:
-        """Apply the filter to an enum value.
-
-        Returns:
-            True if the enum value should be included.
-        """
-        if self.name_filter(enum_value.name) is FilterAction.EXCLUDE:
-            return False
-        return True
-
-
 class ExceptionFilter(ElementFilter):
     """Filter for selecting exceptions (of a member) to insert.
 
@@ -252,7 +191,7 @@ class ExceptionFilter(ElementFilter):
         """Apply the filter to an exception in a throws clause.
 
         Returns:
-            True if the enum value should be included.
+            True if the exception value should be included.
         """
         if self.name_filter(throws_clause.type.name) is FilterAction.EXCLUDE:
             return False
@@ -352,28 +291,18 @@ def combine_specs(first: Optional[FilterSpec],
 class InsertionFilter:
     """Filter members of an element to be inserted."""
     _member_filter: Optional[MemberFilter]
-    _inner_class_filter: Optional[InnerClassFilter]
-    _enum_value_filter: Optional[EnumValueFilter]
     _exception_filter: Optional[ExceptionFilter]
 
     _member_spec: Optional[FilterSpec]
-    _inner_class_spec: Optional[FilterSpec]
-    _enum_value_spec: Optional[FilterSpec]
     _exception_spec: Optional[FilterSpec]
 
     def __init__(self,
                  members: Optional[FilterSpec] = None,
-                 inner_classes: Optional[FilterSpec] = None,
-                 enum_values: Optional[FilterSpec] = None,
                  exceptions: Optional[FilterSpec] = None):
         self._member_spec = members
-        self._inner_class_spec = inner_classes
-        self._enum_value_spec = enum_values
         self._exception_spec = exceptions
 
         self._member_filter = MemberFilter.from_spec(members)
-        self._inner_class_filter = InnerClassFilter.from_spec(inner_classes)
-        self._enum_value_filter = EnumValueFilter.from_spec(enum_values)
         self._exception_filter = ExceptionFilter.from_spec(exceptions)
 
     def members(self, compound: Compound) -> Generator[Compound, None, None]:
@@ -381,18 +310,6 @@ class InsertionFilter:
         for member in compound.members:
             if self._member_filter is None or self._member_filter(member):
                 yield member
-
-    def inner_classes(self, compound: Compound) -> Generator[InnerTypeReference, None, None]:
-        """Get inner classes matching the filter."""
-        for inner in compound.inner_classes:
-            if self._inner_class_filter is None or self._inner_class_filter(inner):
-                yield inner
-
-    def enum_values(self, element: Compound) -> Generator[EnumValue, None, None]:
-        """Get enum values matching the filter."""
-        for enum_value in element.enumvalues:
-            if self._enum_value_filter is None or self._enum_value_filter(enum_value):
-                yield enum_value
 
     def exceptions(self, member: Compound) -> Generator[ThrowsClause, None, None]:
         """Get exceptions matching the filter."""
@@ -402,10 +319,6 @@ class InsertionFilter:
 
     def extend(self,
                members: Optional[FilterSpec] = None,
-               inner_classes: Optional[FilterSpec] = None,
-               enum_values: Optional[FilterSpec] = None,
                exceptions: Optional[FilterSpec] = None) -> "InsertionFilter":
         return InsertionFilter(combine_specs(self._member_spec, members),
-                               combine_specs(self._inner_class_spec, inner_classes),
-                               combine_specs(self._enum_value_spec, enum_values),
                                combine_specs(self._exception_spec, exceptions))

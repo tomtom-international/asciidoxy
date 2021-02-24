@@ -98,30 +98,6 @@ def test_private_properties__no_filter(helper):
     assert result == ["PrivateProperty"]
 
 
-def test_public_simple_enclosed_types__no_filter(helper):
-    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
-    assert sorted(result) == sorted([
-        "PublicEnum", "ProtectedEnum", "PrivateEnum", "PublicClass", "ProtectedClass",
-        "PrivateClass", "PublicProtocol", "ProtectedProtocol", "PrivateProtocol"
-    ])
-
-
-def test_public_simple_enclosed_types__filter_match(helper):
-    helper.insert_filter = InsertionFilter(members=".*Enum")
-    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
-    assert sorted(result) == sorted([
-        "PublicEnum",
-        "ProtectedEnum",
-        "PrivateEnum",
-    ])
-
-
-def test_public_simple_enclosed_types__filter_no_match(helper):
-    helper.insert_filter = InsertionFilter(members="NONE")
-    result = [m.name for m in helper.simple_enclosed_types(prot="public")]
-    assert len(result) == 0
-
-
 def test_objc_method_signature__no_params_simple_return(helper):
     method = Compound("objc")
     method.name = "start"
@@ -136,7 +112,7 @@ def test_objc_method_signature__no_params_link_return(helper):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("objc", name="Value")
     method.returns.type.id = "objc-value"
-    assert helper.method_signature(method) == "- (xref:objc-value[+++Value+++])retrieveValue"
+    assert helper.method_signature(method) == "- (xref:objc-value[++Value++])retrieveValue"
 
 
 def test_objc_method_signature__one_param(helper):
@@ -151,7 +127,7 @@ def test_objc_method_signature__one_param(helper):
     param1.type = TypeRef("objc", "Type1")
     method.params = [param1]
 
-    assert helper.method_signature(method) == "- (xref:objc-value[+++Value+++])setValue:(Type1)arg1"
+    assert helper.method_signature(method) == "- (xref:objc-value[++Value++])setValue:(Type1)arg1"
 
 
 def test_objc_method_signature__multiple_params_simple_return(helper):
@@ -177,7 +153,7 @@ def test_objc_method_signature__multiple_params_simple_return(helper):
 
     assert (helper.method_signature(method) == """\
 - (Value)setValue:(Type1)arg1
-         withUnit:(xref:objc-type2[+++Type2+++])arg2
+         withUnit:(xref:objc-type2[++Type2++])arg2
   andALongerParam:(Type3)arg3""")
 
 
@@ -204,8 +180,8 @@ def test_objc_method_signature__multiple_params_linked_return(helper):
     method.params = [param1, param2, param3]
 
     assert (helper.method_signature(method) == """\
-- (xref:objc-value[+++Value+++])setValue:(Type1)arg1
-         withUnit:(xref:objc-type2[+++Type2+++])arg2
+- (xref:objc-value[++Value++])setValue:(Type1)arg1
+         withUnit:(xref:objc-type2[++Type2++])arg2
   andALongerParam:(Type3)arg3""")
 
 

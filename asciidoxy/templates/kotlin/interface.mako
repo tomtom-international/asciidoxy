@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
+from html import escape
 %>
 <%
 helper = JavaTemplateHelper(api, element, insert_filter)
@@ -41,7 +42,7 @@ ${element.description}
 |*${prot.capitalize()} Constants*
 |
 % for constant in helper.constants(prot=prot):
-`<<${constant.id},+++${constant.returns.type.name} ${constant.name}+++>>`::
+`<<${constant.id},++${constant.returns.type.name} ${constant.name}++>>`::
 ${constant.brief}
 % endfor
 
@@ -51,7 +52,7 @@ ${constant.brief}
 |*${prot.capitalize()} Static Methods*
 |
 % for method in helper.static_methods(prot=prot):
-`<<${method.id},+++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
@@ -61,7 +62,7 @@ ${method.brief}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`<<${method.id},+++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
@@ -92,7 +93,7 @@ ${constant.description}
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -137,7 +138,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}

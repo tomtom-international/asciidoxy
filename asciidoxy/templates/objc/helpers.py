@@ -13,8 +13,6 @@
 # limitations under the License.
 """Helper functions for Objective C templates."""
 
-from typing import Iterator
-
 from asciidoxy.model import Compound
 from asciidoxy.templates.helpers import TemplateHelper
 
@@ -65,13 +63,5 @@ class ObjcTemplateHelper(TemplateHelper):
 
         return (f"typedef {self.print_ref(block.returns.type, skip_args=True)}(^{block_name})"
                 f" {self.argument_list(block.returns.type.args)}")
-
-    def simple_enclosed_types(self, prot: str) -> Iterator[Compound]:
-        assert self.element is not None
-        assert self.insert_filter is not None
-
-        # For some reason enclosed types are always set to private, so ignore visibility
-        return (m for m in self.insert_filter.members(self.element)
-                if m.kind in ["enum", "class", "protocol"])
 
     class_methods = TemplateHelper.static_methods

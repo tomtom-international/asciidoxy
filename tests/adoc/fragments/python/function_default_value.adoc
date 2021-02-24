@@ -7,7 +7,7 @@
 ----
 def increment(self,
               x: int = 2,
-              y: int = 3) -> xref:python-classasciidoxy_1_1default-values_1_1_point[+++Point+++]
+              y: int = 3) -&gt; xref:python-classasciidoxy_1_1default-values_1_1_point[++Point++]
 ----
 
 Create a new incremented point.
@@ -30,7 +30,7 @@ Value to increment the Y coordinate with.
 
 | Returns
 |
-`xref:python-classasciidoxy_1_1default-values_1_1_point[+++Point+++]`::
+`xref:python-classasciidoxy_1_1default-values_1_1_point[++Point++]`::
 A new incremented xref:python-classasciidoxy_1_1default__values_1_1_point[Point].
 
 |===

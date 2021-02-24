@@ -6,7 +6,7 @@
 
 [source,swift,subs="-specialchars,macros+"]
 ----
-typealias OnTrafficEventCallback = (xref:swift-protocol_a_d_traffic_event-p[+++ADTrafficEvent+++], delay: Integer) -> void
+typealias OnTrafficEventCallback = (xref:swift-protocol_a_d_traffic_event-p[++ADTrafficEvent++], delay: Integer) -&gt; void
 ----
 Callback for receiving new traffic events.
 

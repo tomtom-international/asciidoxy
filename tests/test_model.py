@@ -15,8 +15,8 @@
 Tests for the `asciidoxy.model` module.
 """
 
-from asciidoxy.model import (Compound, EnumValue, Parameter, ReferableElement, ReturnValue,
-                             ThrowsClause, TypeRef, InnerTypeReference)
+from asciidoxy.model import (Compound, Parameter, ReferableElement, ReturnValue, ThrowsClause,
+                             TypeRef)
 
 
 def test_minimal_constructed_repr():
@@ -24,9 +24,7 @@ def test_minimal_constructed_repr():
     assert repr(Parameter())
     assert repr(ReturnValue())
     assert repr(ThrowsClause("lang"))
-    assert repr(EnumValue("lang"))
     assert repr(Compound("lang"))
-    assert repr(InnerTypeReference("lang"))
 
 
 def test_type_ref_to_str():
@@ -163,6 +161,7 @@ def test_typeref__init__default():
     assert ref.nested is None
     assert ref.args is None
     assert ref.returns is None
+    assert ref.prot is None
 
 
 def test_typeref__init__positional():
@@ -177,6 +176,7 @@ def test_typeref__init__positional():
     assert ref.nested is None
     assert ref.args is None
     assert ref.returns is None
+    assert ref.prot is None
 
 
 def test_typeref__init__keywords():
@@ -189,7 +189,8 @@ def test_typeref__init__keywords():
                   suffix="suffix",
                   nested=[TypeRef(name="nested")],
                   args=[Parameter(name="parameter")],
-                  returns=TypeRef(name="returns"))
+                  returns=TypeRef(name="returns"),
+                  prot="public")
     assert ref.id == "id"
     assert ref.name == "name"
     assert ref.language == "lang"
@@ -197,6 +198,7 @@ def test_typeref__init__keywords():
     assert ref.kind == "kind"
     assert ref.prefix == "prefix"
     assert ref.suffix == "suffix"
+    assert ref.prot == "public"
 
     assert len(ref.nested) == 1
     assert ref.nested[0].name == "nested"
@@ -243,7 +245,8 @@ def test_typeref__eq__full():
                     suffix="suffix",
                     nested=[TypeRef(name="nested")],
                     args=[Parameter(name="parameter")],
-                    returns=TypeRef(name="returns"))
+                    returns=TypeRef(name="returns"),
+                    prot="protected")
     second = TypeRef(language="lang",
                      name="name",
                      id="id",
@@ -253,7 +256,8 @@ def test_typeref__eq__full():
                      suffix="suffix",
                      nested=[TypeRef(name="nested")],
                      args=[Parameter(name="parameter")],
-                     returns=TypeRef(name="returns"))
+                     returns=TypeRef(name="returns"),
+                     prot="protected")
 
     assert first == second
     assert second == first
@@ -461,168 +465,6 @@ def test_throws_clause__eq__full():
     second.description = first.description
 
 
-def test_enum_value__init__default():
-    enum_value = EnumValue()
-    assert enum_value.id is None
-    assert enum_value.name == ""
-    assert enum_value.full_name == ""
-    assert enum_value.language == ""
-    assert enum_value.kind == "enumvalue"
-    assert enum_value.initializer == ""
-    assert enum_value.brief == ""
-    assert enum_value.description == ""
-
-
-def test_enum_value__init__full():
-    enum_value = EnumValue(id="id",
-                           name="name",
-                           full_name="full_name",
-                           language="lang",
-                           initializer="initializer",
-                           brief="brief",
-                           description="description")
-    assert enum_value.id == "id"
-    assert enum_value.name == "name"
-    assert enum_value.full_name == "full_name"
-    assert enum_value.language == "lang"
-    assert enum_value.kind == "enumvalue"
-    assert enum_value.initializer == "initializer"
-    assert enum_value.brief == "brief"
-    assert enum_value.description == "description"
-
-
-def test_enum_value__eq__none():
-    enum_value = EnumValue()
-    assert not enum_value == None  # noqa: E711
-    assert not None == enum_value  # noqa: E711
-
-    assert enum_value != None  # noqa: E711
-    assert None != enum_value  # noqa: E711
-
-
-def test_enum_value__eq__default():
-    first = EnumValue()
-    second = EnumValue()
-
-    assert first == second
-    assert second == first
-
-
-def test_enum_value__eq__full():
-    first = EnumValue(id="id",
-                      name="name",
-                      full_name="full_name",
-                      language="lang",
-                      initializer="initializer",
-                      brief="brief",
-                      description="description")
-    second = EnumValue(id="id",
-                       name="name",
-                       full_name="full_name",
-                       language="lang",
-                       initializer="initializer",
-                       brief="brief",
-                       description="description")
-
-    assert first == second
-    assert second == first
-
-    for attr_name in ("id", "name", "full_name", "language", "initializer", "brief", "description"):
-        setattr(second, attr_name, "other")
-        assert first != second
-        assert second != first
-        setattr(second, attr_name, getattr(first, attr_name))
-
-
-def test_inner_type_reference__init__default():
-    ref = InnerTypeReference()
-    assert ref.id is None
-    assert ref.name == ""
-    assert ref.language == ""
-    assert ref.namespace is None
-    assert ref.referred_object is None
-    assert ref.prot == ""
-
-
-def test_inner_type_reference__init__positional():
-    ref = InnerTypeReference("lang", "name")
-    assert ref.id is None
-    assert ref.name == "name"
-    assert ref.language == "lang"
-    assert ref.namespace is None
-    assert ref.referred_object is None
-    assert ref.prot == ""
-
-
-def test_inner_type_reference__init__keyword():
-    ref = InnerTypeReference(id="id",
-                             language="lang",
-                             name="name",
-                             namespace="namespace",
-                             referred_object=Compound("lang", name="inner_type"),
-                             prot="prot")
-    assert ref.id == "id"
-    assert ref.name == "name"
-    assert ref.language == "lang"
-    assert ref.namespace == "namespace"
-    assert ref.referred_object is not None
-    assert ref.referred_object.name == "inner_type"
-    assert ref.prot == "prot"
-
-
-def test_inner_type_reference__eq__none():
-    inner_type_reference = InnerTypeReference()
-    assert not inner_type_reference == None  # noqa: E711
-    assert not None == inner_type_reference  # noqa: E711
-
-    assert inner_type_reference != None  # noqa: E711
-    assert None != inner_type_reference  # noqa: E711
-
-
-def test_inner_type_reference__eq__default():
-    first = InnerTypeReference()
-    second = InnerTypeReference()
-
-    assert first == second
-    assert second == first
-
-
-def test_inner_type_reference__eq__full():
-    first = InnerTypeReference(id="id",
-                               language="lang",
-                               name="name",
-                               namespace="namespace",
-                               referred_object=Compound("lang", name="inner_type"),
-                               prot="prot")
-    second = InnerTypeReference(id="id",
-                                language="lang",
-                                name="name",
-                                namespace="namespace",
-                                referred_object=Compound("lang", name="inner_type"),
-                                prot="prot")
-
-    assert first == second
-    assert second == first
-
-    for attr_name in ("id", "name", "language", "namespace", "prot"):
-        setattr(second, attr_name, "other")
-        assert first != second
-        assert second != first
-        setattr(second, attr_name, getattr(first, attr_name))
-
-    second.referred_object.name = "other"
-    assert first != second
-    assert second != first
-    second.referred_object.name = first.referred_object.name
-
-
-def test_inner_type_reference__resolve():
-    ref = InnerTypeReference()
-    ref.resolve(Compound(name="inner_type"))
-    assert ref.referred_object is not None
-    assert ref.referred_object.name == "inner_type"
-
-
 def test_compound__init__default():
     compound = Compound()
     assert compound.id is None
@@ -632,8 +474,6 @@ def test_compound__init__default():
     assert compound.kind == ""
 
     assert compound.members == []
-    assert compound.inner_classes == []
-    assert compound.enumvalues == []
     assert compound.params == []
     assert compound.exceptions == []
     assert compound.returns is None
@@ -644,6 +484,7 @@ def test_compound__init__default():
     assert compound.prot == ""
     assert compound.definition == ""
     assert compound.args == ""
+    assert compound.initializer == ""
 
     assert compound.brief == ""
     assert compound.description == ""
@@ -664,8 +505,6 @@ def test_compound__init__positional():
     assert compound.kind == ""
 
     assert compound.members == []
-    assert compound.inner_classes == []
-    assert compound.enumvalues == []
     assert compound.params == []
     assert compound.exceptions == []
     assert compound.returns is None
@@ -676,6 +515,7 @@ def test_compound__init__positional():
     assert compound.prot == ""
     assert compound.definition == ""
     assert compound.args == ""
+    assert compound.initializer == ""
 
     assert compound.brief == ""
     assert compound.description == ""
@@ -694,8 +534,6 @@ def test_compound__init__keyword():
                         language="lang",
                         kind="kind",
                         members=[Compound(name="member_name")],
-                        inner_classes=[InnerTypeReference(name="inner_type_name")],
-                        enumvalues=[EnumValue(name="enum_value_name")],
                         params=[Parameter(name="parameter")],
                         exceptions=[ThrowsClause(description="exception")],
                         returns=ReturnValue(description="returns"),
@@ -704,6 +542,7 @@ def test_compound__init__keyword():
                         prot="prot",
                         definition="definition",
                         args="args",
+                        initializer=" = 2",
                         brief="brief",
                         description="description",
                         static=True,
@@ -720,10 +559,6 @@ def test_compound__init__keyword():
 
     assert len(compound.members) == 1
     assert compound.members[0].name == "member_name"
-    assert len(compound.inner_classes) == 1
-    assert compound.inner_classes[0].name == "inner_type_name"
-    assert len(compound.enumvalues) == 1
-    assert compound.enumvalues[0].name == "enum_value_name"
     assert len(compound.params) == 1
     assert compound.params[0].name == "parameter"
     assert len(compound.exceptions) == 1
@@ -737,6 +572,7 @@ def test_compound__init__keyword():
     assert compound.prot == "prot"
     assert compound.definition == "definition"
     assert compound.args == "args"
+    assert compound.initializer == " = 2"
 
     assert compound.brief == "brief"
     assert compound.description == "description"
@@ -780,8 +616,6 @@ def test_compound__eq__full():
                      language="lang",
                      kind="kind",
                      members=[Compound(name="member_name")],
-                     inner_classes=[InnerTypeReference(name="inner_type_name")],
-                     enumvalues=[EnumValue(name="enum_value_name")],
                      params=[Parameter(name="parameter")],
                      exceptions=[ThrowsClause(description="exception")],
                      returns=ReturnValue(description="returns"),
@@ -790,6 +624,7 @@ def test_compound__eq__full():
                      prot="prot",
                      definition="definition",
                      args="args",
+                     initializer=" = 2",
                      brief="brief",
                      description="description",
                      static=True,
@@ -803,8 +638,6 @@ def test_compound__eq__full():
                       language="lang",
                       kind="kind",
                       members=[Compound(name="member_name")],
-                      inner_classes=[InnerTypeReference(name="inner_type_name")],
-                      enumvalues=[EnumValue(name="enum_value_name")],
                       params=[Parameter(name="parameter")],
                       exceptions=[ThrowsClause(description="exception")],
                       returns=ReturnValue(description="returns"),
@@ -813,6 +646,7 @@ def test_compound__eq__full():
                       prot="prot",
                       definition="definition",
                       args="args",
+                      initializer=" = 2",
                       brief="brief",
                       description="description",
                       static=True,
@@ -825,7 +659,7 @@ def test_compound__eq__full():
     assert second == first
 
     for attr_name in ("id", "name", "full_name", "language", "kind", "include", "namespace", "prot",
-                      "definition", "args", "brief", "description"):
+                      "definition", "args", "initializer", "brief", "description"):
         setattr(second, attr_name, "other")
         assert first != second
         assert second != first
@@ -841,16 +675,6 @@ def test_compound__eq__full():
     assert first != second
     assert second != first
     second.members[0].name = first.members[0].name
-
-    second.inner_classes[0].name = "other"
-    assert first != second
-    assert second != first
-    second.inner_classes[0].name = first.inner_classes[0].name
-
-    second.enumvalues[0].name = "other"
-    assert first != second
-    assert second != first
-    second.enumvalues[0].name = first.enumvalues[0].name
 
     second.params[0].name = "other"
     assert first != second

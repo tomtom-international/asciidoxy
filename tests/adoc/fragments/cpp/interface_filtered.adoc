@@ -18,7 +18,7 @@ Base class for services.
 |===
 |*Public Methods*
 |
-`<<cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8,+++void Start()+++>>`::
+`<<cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8,++void Start()++>>`::
 Start the service.
 
 |===

@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
+from html import escape
 from itertools import chain
 %>
 <%
@@ -46,7 +47,7 @@ ${element.description}
 |*${prot.capitalize()} Enclosed Types*
 |
 % for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
-`<<${enclosed.id},+++${enclosed.name}+++>>`::
+`<<${enclosed.id},++${enclosed.name}++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -56,7 +57,7 @@ ${enclosed.brief}
 |*${prot.capitalize()} Constructors*
 |
 % for constructor in helper.constructors(prot=prot):
-`<<${constructor.id},+++${constructor.name}${helper.type_list(constructor.params)}+++>>`::
+`<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
 ${constructor.brief}
 % endfor
 
@@ -66,7 +67,7 @@ ${constructor.brief}
 |*${prot.capitalize()} Destructors*
 |
 % for destructor in helper.destructors(prot=prot):
-`<<${destructor.id},+++${destructor.name}()+++>>`::
+`<<${destructor.id},++${destructor.name}()++>>`::
 ${destructor.brief}
 % endfor
 
@@ -76,7 +77,7 @@ ${destructor.brief}
 |*${prot.capitalize()} Operators*
 |
 % for operator in helper.operators(prot=prot):
-`<<${operator.id},+++${operator.name}${helper.type_list(operator.params)}+++>>`::
+`<<${operator.id},++${operator.name}${helper.type_list(operator.params)}++>>`::
 ${operator.brief}
 % endfor
 
@@ -86,7 +87,7 @@ ${operator.brief}
 |*${prot.capitalize()} Variables*
 |
 % for variable in helper.variables(prot=prot):
-`<<${variable.id},+++${variable.name}+++>>`::
+`<<${variable.id},++${variable.name}++>>`::
 ${variable.brief}
 % endfor
 % endif
@@ -95,7 +96,7 @@ ${variable.brief}
 |*${prot.capitalize()} Static Methods*
 |
 % for method in helper.static_methods(prot=prot):
-`<<${method.id},+++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
@@ -105,7 +106,7 @@ ${method.brief}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`<<${method.id},+++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${" const" if method.const else ""}+++>>`::
+`<<${method.id},++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${" const" if method.const else ""}++>>`::
 ${method.brief}
 % endfor
 
@@ -145,7 +146,7 @@ ${api.inserted(variable)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-${helper.print_ref(variable.returns.type)} ${variable.name}
+${escape(helper.print_ref(variable.returns.type))} ${variable.name}
 ----
 
 ${variable.brief}

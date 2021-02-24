@@ -18,29 +18,29 @@ Information about a traffic event.
 |===
 |*Public Enclosed Types*
 |
-`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,+++Severity+++>>`::
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,++Severity++>>`::
 Severity scale for traffic events.
-`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,+++TrafficEventData+++>>`::
+`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,++TrafficEventData++>>`::
 Details about a traffic event.
 
 |*Public Constructors*
 |
-`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41,+++TrafficEvent()+++>>`::
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41,++TrafficEvent()++>>`::
 Default constructor.
-`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc,+++TrafficEvent(TrafficEventData)+++>>`::
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc,++TrafficEvent(TrafficEventData)++>>`::
 Construct a traffic event from data.
 
 |*Public Methods*
 |
-`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28,+++const TrafficEventData & Data() const+++>>`::
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28,++const TrafficEventData & Data() const++>>`::
 Get the traffic event details.
-`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b,+++bool Update(int, int)+++>>`::
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b,++bool Update(int, int)++>>`::
 Update the traffic event data.
-`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,+++std::shared_ptr&lt;TrafficEventData&gt; SharedData() const+++>>`::
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,++std::shared_ptr<TrafficEventData> SharedData() const++>>`::
 Get a shared pointer to a copy of the data.
-`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17,+++long CalculateDelay()+++>>`::
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17,++long CalculateDelay()++>>`::
 Calculate the current delay.
-`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0,+++void RegisterTrafficCallback(std::function&lt;void(const TrafficEventData &, int delay)&gt;)+++>>`::
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0,++void RegisterTrafficCallback(std::function<void(const TrafficEventData &, int delay)>)++>>`::
 Register a callback to receive updates for the traffic event.
 
 |===

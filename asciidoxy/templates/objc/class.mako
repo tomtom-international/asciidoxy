@@ -14,8 +14,10 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
+from html import escape
+from itertools import chain
 %>
 <%
 helper = ObjcTemplateHelper(api, element, insert_filter)
@@ -41,11 +43,11 @@ ${element.description}
 |===
 % for prot in ("public", "protected", "private"):
 ###################################################################################################
-% if has(helper.simple_enclosed_types(prot=prot)):
+% if has_any(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 |*${prot.capitalize()} Enclosed Types*
 |
-% for enclosed in helper.simple_enclosed_types(prot=prot):
-`<<${enclosed.id},+++${enclosed.name}+++>>`::
+% for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
+`<<${enclosed.id},++${enclosed.name}++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -55,7 +57,7 @@ ${enclosed.brief}
 |*${prot.capitalize()} Properties*
 |
 % for prop in helper.properties(prot=prot):
-`<<${prop.id},+++${prop.name}+++>>`::
+`<<${prop.id},++${prop.name}++>>`::
 ${prop.brief}
 % endfor
 
@@ -65,7 +67,7 @@ ${prop.brief}
 |*${prot.capitalize()} Class Methods*
 |
 % for method in helper.class_methods(prot=prot):
-`<<${method.id},++++ ${method.name}+++>>`::
+`<<${method.id},+++ ${method.name}++>>`::
 ${method.brief}
 % endfor
 
@@ -75,7 +77,7 @@ ${method.brief}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`<<${method.id},+++- ${method.name}+++>>`::
+`<<${method.id},++- ${method.name}++>>`::
 ${method.brief}
 % endfor
 
@@ -84,8 +86,11 @@ ${method.brief}
 |===
 
 ############################################################################ Simple inner types ##
+% for prot in ("public", "protected", "private"):
 % for enclosed in helper.simple_enclosed_types(prot=prot):
+${enclosed.name}
 ${api.insert_fragment(enclosed, insert_filter)}
+% endfor
 % endfor
 
 == Members
@@ -96,7 +101,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ${api.inserted(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-@property() ${helper.print_ref(prop.returns.type)} ${prop.name}
+@property() ${escape(helper.print_ref(prop.returns.type))} ${prop.name}
 ----
 
 ${prop.brief}
@@ -111,7 +116,7 @@ ${prop.description}
 ${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)};
+${escape(helper.method_signature(method))};
 ----
 
 ${method.brief}
@@ -157,7 +162,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)};
+${escape(helper.method_signature(method))};
 ----
 
 ${method.brief}
@@ -196,5 +201,13 @@ ${exception.description}
 % endif
 
 '''
+% endfor
+% endfor
+
+############################################################################# Inner/Nested types ##
+
+% for prot in ("public", "protected", "private"):
+% for enclosed in helper.complex_enclosed_types(prot=prot):
+${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 % endfor

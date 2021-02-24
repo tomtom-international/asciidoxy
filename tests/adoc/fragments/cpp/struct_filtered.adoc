@@ -18,9 +18,9 @@ Use the cause and delay to properly inform your users.
 |===
 |*Public Variables*
 |
-`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,+++cause+++>>`::
+`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,++cause++>>`::
 TPEG cause code.
-`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,+++severity+++>>`::
+`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,++severity++>>`::
 Severity of the event.
 |===
 
@@ -32,7 +32,7 @@ Severity of the event.
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-xref:cpp-traffic-event_8hpp_1aadd656922dd873c8ab5de7c891b557e1[+++TpegCauseCode+++] cause
+xref:cpp-traffic-event_8hpp_1aadd656922dd873c8ab5de7c891b557e1[++TpegCauseCode++] cause
 ----
 
 TPEG cause code.
@@ -45,7 +45,7 @@ TPEG cause code.
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[+++Severity+++] severity
+xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[++Severity++] severity
 ----
 
 Severity of the event.

@@ -29,7 +29,7 @@ def kotlin_class():
 
     # fill class with typical members
     for visibility in ("public", "internal", "protected", "private"):
-        for member_type in ("enum", "trash"):
+        for member_type in ("enum", "trash", "class"):
             builder.simple_member(kind=member_type, prot=visibility)
 
         # add property
@@ -53,8 +53,6 @@ def kotlin_class():
         builder.member_variable(prot=visibility,
                                 name=f"{visibility.capitalize()}Constant",
                                 type_prefix="final ")
-        # add nested type
-        builder.inner_class(name=f"{visibility.capitalize()}Class", prot=visibility)
 
     builder.member_function(prot="public", name="init", has_return_value=False)
 
@@ -99,7 +97,7 @@ def test_parameter(helper):
     param.default_value = "12"
 
     assert (helper.parameter(param, default_value=True) == "arg: xref:kotlin-tomtom_1_MyType"
-            "[+++MyType+++] = 12")
+            "[++MyType++] = 12")
 
 
 def test_method_signature__no_params_no_return(helper):
@@ -122,7 +120,7 @@ def test_method_signature__no_params_link_return(helper):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("kotlin", name="Value")
     method.returns.type.id = "kotlin-value"
-    assert helper.method_signature(method) == "fun retrieveValue(): xref:kotlin-value[+++Value+++]"
+    assert helper.method_signature(method) == "fun retrieveValue(): xref:kotlin-value[++Value++]"
 
 
 def test_method_signature__one_param(helper):

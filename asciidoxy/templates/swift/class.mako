@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
+from html import escape
 %>
 <%
 helper = SwiftTemplateHelper(api, element, insert_filter)
@@ -41,7 +42,7 @@ ${element.description}
 |*${prot.capitalize()} Enclosed Types*
 |
 % for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
-`<<${enclosed.id},+++${enclosed.name}+++>>`::
+`<<${enclosed.id},++${enclosed.name}++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -51,7 +52,7 @@ ${enclosed.brief}
 |*${prot.capitalize()} Constructors*
 |
 % for constructor in helper.constructors(prot=prot):
-`<<${constructor.id},+++${constructor.name}${helper.type_list(constructor.params)}+++>>`::
+`<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
 ${constructor.brief}
 % endfor
 
@@ -61,7 +62,7 @@ ${constructor.brief}
 |*${prot.capitalize()} Properties*
 |
 % for prop in helper.properties(prot=prot):
-`<<${prop.id},+++${prop.name}+++>>`::
+`<<${prop.id},++${prop.name}++>>`::
 ${prop.brief}
 % endfor
 
@@ -71,7 +72,7 @@ ${prop.brief}
 |*${prot.capitalize()} Type Methods*
 |
 % for method in helper.type_methods(prot=prot):
-`<<${method.id},+++${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
@@ -81,7 +82,7 @@ ${method.brief}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`<<${method.id},+++${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
@@ -104,7 +105,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 ${api.inserted(constructor)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(constructor)}
+${escape(helper.method_signature(constructor))}
 ----
 
 ${constructor.brief}
@@ -143,7 +144,7 @@ ${exception.description}
 ${api.inserted(prop)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-var ${prop.name}: ${helper.print_ref(prop.returns.type)}
+var ${prop.name}: ${escape(helper.print_ref(prop.returns.type))}
 ----
 
 ${prop.brief}
@@ -158,7 +159,7 @@ ${prop.description}
 ${api.inserted(method)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -204,7 +205,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,swift,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}

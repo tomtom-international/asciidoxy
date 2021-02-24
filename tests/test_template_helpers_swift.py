@@ -29,7 +29,7 @@ def swift_class():
 
     # fill class with typical members
     for visibility in ("public", "internal", "fileprivate", "private"):
-        for member_type in ("enum", "trash"):
+        for member_type in ("enum", "trash", "class", "protocol", "struct"):
             builder.simple_member(kind=member_type, prot=visibility)
 
         # add property
@@ -49,10 +49,6 @@ def swift_class():
                                 name=visibility.capitalize() + "TypeMethodNoReturn",
                                 has_return_value=False,
                                 static=True)
-
-        for inner_type in ("class", "protocol", "struct"):
-            builder.inner_class(name=f"{visibility.capitalize()}{inner_type.capitalize()}",
-                                prot=visibility)
 
         builder.member_function(prot=visibility, name="init", has_return_value=False)
 
@@ -163,7 +159,7 @@ def test_method_signature__no_params_link_return(helper):
     method.returns.type = TypeRef("swift", name="Value")
     method.returns.type.id = "swift-value"
     assert (
-        helper.method_signature(method) == "func retrieveValue() -> xref:swift-value[+++Value+++]")
+        helper.method_signature(method) == "func retrieveValue() -> xref:swift-value[++Value++]")
 
 
 def test_method_signature__no_params_link_return__throws(helper):
@@ -174,7 +170,7 @@ def test_method_signature__no_params_link_return__throws(helper):
     method.returns.type.id = "swift-value"
     method.exceptions = [ThrowsClause("swift")]
     assert (helper.method_signature(method) ==
-            "func retrieveValue() throws -> xref:swift-value[+++Value+++]")
+            "func retrieveValue() throws -> xref:swift-value[++Value++]")
 
 
 def test_method_signature__one_param(helper):
@@ -230,7 +226,7 @@ def test_closure_definition__multiple_params_type_only__void_return(helper):
     closure.returns.type.args[1].type.id = "swift-data"
 
     assert (helper.closure_definition(closure) ==
-            "typealias SuccessClosure = (int, xref:swift-data[+++Data+++]) -> Void")
+            "typealias SuccessClosure = (int, xref:swift-data[++Data++]) -> Void")
 
 
 def test_closure_definition__multiple_params_type_and_name__void_return(helper):
@@ -246,7 +242,7 @@ def test_closure_definition__multiple_params_type_and_name__void_return(helper):
     closure.returns.type.args[1].name = "theData"
 
     assert (helper.closure_definition(closure) ==
-            "typealias SuccessClosure = (number: int, theData: xref:swift-data[+++Data+++]) "
+            "typealias SuccessClosure = (number: int, theData: xref:swift-data[++Data++]) "
             "-> Void")
 
 
@@ -259,7 +255,7 @@ def test_closure_definition__no_params__return_type(helper):
     closure.returns.type.args = []
 
     assert (helper.closure_definition(closure) ==
-            "typealias SuccessClosure = () -> xref:swift-data[+++Data+++]")
+            "typealias SuccessClosure = () -> xref:swift-data[++Data++]")
 
 
 def test_parameter(helper):
@@ -273,5 +269,5 @@ def test_parameter(helper):
     param.default_value = "12"
 
     assert (helper.parameter(param,
-                             default_value=True) == "arg: xref:swift-tomtom_1_MyType[+++MyType+++]"
+                             default_value=True) == "arg: xref:swift-tomtom_1_MyType[++MyType++]"
             " = 12")

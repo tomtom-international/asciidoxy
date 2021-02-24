@@ -13,8 +13,7 @@
 # limitations under the License.
 """Builders to create models for testing."""
 
-from asciidoxy.model import (Compound, EnumValue, InnerTypeReference, Parameter, ReturnValue,
-                             ThrowsClause, TypeRef)
+from asciidoxy.model import (Compound, Parameter, ReturnValue, ThrowsClause, TypeRef)
 
 
 def make_compound(*,
@@ -48,46 +47,6 @@ def make_compound(*,
                     brief=brief,
                     description=description,
                     **kwargs)
-
-
-def make_inner_type_ref(*,
-                        id=None,
-                        name="",
-                        language="",
-                        namespace="asciidoxy",
-                        prot="public",
-                        **kwargs):
-    if id is None:
-        id = f"{language}-{name.lower()}"
-    return InnerTypeReference(id=id,
-                              name=name,
-                              language=language,
-                              namespace=namespace,
-                              prot=prot,
-                              **kwargs)
-
-
-def make_enum_value(*,
-                    id=None,
-                    name="",
-                    full_name=None,
-                    language="",
-                    initializer=" = 1",
-                    brief="Brief description",
-                    description="Long description",
-                    **kwargs):
-    if id is None:
-        id = f"{language}-{name.lower()}"
-    if full_name is None:
-        full_name = f"asciidoxy.{name}"
-    return EnumValue(id=id,
-                     name=name,
-                     language=language,
-                     full_name=full_name,
-                     initializer=initializer,
-                     brief=brief,
-                     description=description,
-                     **kwargs)
 
 
 def make_parameter(*,
@@ -168,10 +127,3 @@ class SimpleClassBuilder:
             returns = None
         self.compound.members.append(
             make_compound(language=self.lang, kind="function", returns=returns, **kwargs))
-
-    def inner_class(self, prot: str = "public", name: str = ""):
-        self.compound.inner_classes.append(
-            make_inner_type_ref(language=self.lang,
-                                name=name,
-                                prot=prot,
-                                referred_object=make_compound(language=self.lang, name=name)))

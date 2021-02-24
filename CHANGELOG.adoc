@@ -17,6 +17,17 @@ All notable changes to this project will be documented in this file.
 The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
+
+== 0.7.2 (24 Feb 2021)
+
+=== Fixed
+
+  - Bring back character escaping in links.
+  - Improve character escaping in source blocks.
+  - [AD-56] Objective C: Fix visibility of enclosed types to match the enclosing type. Objects
+    exposed in a header file are always accessible.
+
+
 == 0.7.1 (13 Feb 2021)
 
 === Added

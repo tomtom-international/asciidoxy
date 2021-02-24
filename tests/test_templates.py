@@ -75,7 +75,7 @@ filtered_testdata = [
         }
     }, "fragments/cpp/class_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent::Severity", "cpp", {
-        "enum_values": ["+Medium", "+High"]
+        "members": ["+Medium", "+High"]
     }, "fragments/cpp/enum_filtered.adoc"),
     ("asciidoxy::system::Service", "cpp", {
         "members": "+Start"
@@ -85,9 +85,9 @@ filtered_testdata = [
     }, "fragments/cpp/struct_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent", "cpp", {
         "members": {
-            "prot": "ALL"
+            "prot": "ALL",
+            "name": "-TrafficEventData",
         },
-        "inner_classes": ["+Severity", "-TrafficEventData"]
     }, "fragments/cpp/nested_filtered.adoc"),
     ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", {
         "exceptions": "-std::"
@@ -102,7 +102,7 @@ filtered_testdata = [
         "members": "Start"
     }, "fragments/java/interface_filtered.adoc"),
     ("com.asciidoxy.traffic.TrafficEvent", "java", {
-        "inner_classes": "TrafficEventData"
+        "members": "-Severity"
     }, "fragments/java/nested_filtered.adoc"),
     ("ADTrafficEvent", "objc", {
         "members": {
@@ -110,7 +110,7 @@ filtered_testdata = [
         }
     }, "fragments/objc/protocol_filtered.adoc"),
     ("ADSeverity", "objc", {
-        "enum_values": ["Low", "Medium"]
+        "members": ["Low", "Medium"]
     }, "fragments/objc/enum_filtered.adoc"),
     ("ADCoordinate", "objc", {
         "members": {

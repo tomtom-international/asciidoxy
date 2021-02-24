@@ -19,8 +19,8 @@ from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.base import TranscoderBase, TranscoderError
 from asciidoxy.transcoder.kotlin import KotlinTranscoder
 
-from .builders import (make_compound, make_enum_value, make_inner_type_ref, make_parameter,
-                       make_return_value, make_throws_clause, make_type_ref)
+from .builders import (make_compound, make_parameter, make_return_value, make_throws_clause,
+                       make_type_ref)
 
 
 class _TestTranscoder(TranscoderBase):
@@ -63,48 +63,22 @@ def test_transcode_compound__with_members(transcoder):
 def test_transcode_compound__with_inner_classes(transcoder):
     compound = make_compound(language="asm",
                              name="Coordinate",
-                             inner_classes=[
-                                 make_inner_type_ref(language="asm",
-                                                     name="Point",
-                                                     referred_object=make_compound(language="asm",
-                                                                                   name="Point"))
+                             members=[
+                                 make_compound(language="asm", name="Point"),
                              ])
     transcoded = transcoder.compound(compound)
 
     assert transcoded is not compound
     assert transcoded == make_compound(language="smalltalk",
                                        name="Coordinate",
-                                       inner_classes=[
-                                           make_inner_type_ref(language="smalltalk",
-                                                               name="Point",
-                                                               referred_object=make_compound(
-                                                                   language="smalltalk",
-                                                                   name="Point"))
+                                       members=[
+                                           make_compound(language="smalltalk", name="Point"),
                                        ])
     assert compound == make_compound(language="asm",
                                      name="Coordinate",
-                                     inner_classes=[
-                                         make_inner_type_ref(language="asm",
-                                                             name="Point",
-                                                             referred_object=make_compound(
-                                                                 language="asm", name="Point"))
+                                     members=[
+                                         make_compound(language="asm", name="Point"),
                                      ])
-
-
-def test_transcode_compound__with_enumvalues(transcoder):
-    compound = make_compound(language="asm",
-                             name="Coordinate",
-                             enumvalues=[make_enum_value(language="asm", name="WGS84")])
-    transcoded = transcoder.compound(compound)
-
-    assert transcoded is not compound
-    assert transcoded == make_compound(
-        language="smalltalk",
-        name="Coordinate",
-        enumvalues=[make_enum_value(language="smalltalk", name="WGS84")])
-    assert compound == make_compound(language="asm",
-                                     name="Coordinate",
-                                     enumvalues=[make_enum_value(language="asm", name="WGS84")])
 
 
 def test_transcode_compound__with_params(transcoder):
@@ -206,17 +180,13 @@ def test_transcode_compound__transcode_only_once(transcoder):
 
 def test_transcode_compound__transcode_inner_class_only_once(transcoder):
     inner_class = make_compound(language="asm", name="Point")
-    compound = make_compound(language="asm",
-                             name="Coordinate",
-                             inner_classes=[
-                                 make_inner_type_ref(language="asm",
-                                                     name="Point",
-                                                     referred_object=inner_class)
-                             ])
+    compound = make_compound(language="asm", name="Coordinate", members=[
+        inner_class,
+    ])
 
     transcoded_inner = transcoder.compound(inner_class)
     transcoded = transcoder.compound(compound)
-    assert transcoded.inner_classes[0].referred_object is transcoded_inner
+    assert transcoded.members[0] is transcoded_inner
 
 
 def test_transcode_type_ref__no_nested_elements(transcoder):
@@ -337,54 +307,6 @@ def test_transcode_throws_clause(transcoder):
                                             type=make_type_ref(language="smalltalk", name="MyType"))
     assert throws_clause == make_throws_clause(language="asm",
                                                type=make_type_ref(language="asm", name="MyType"))
-
-
-def test_transcode_enum_value(transcoder):
-    enum_value = make_enum_value(language="asm", name="SomeValue")
-    transcoded = transcoder.enum_value(enum_value)
-
-    assert transcoded is not enum_value
-    assert transcoded == make_enum_value(language="smalltalk", name="SomeValue")
-    assert enum_value == make_enum_value(language="asm", name="SomeValue")
-
-
-def test_transcode_enum_value__store_in_api_reference(transcoder):
-    enum_value = make_enum_value(language="asm", name="SomeValue")
-    transcoded = transcoder.enum_value(enum_value)
-    assert transcoder.reference.find(target_id=transcoded.id) is transcoded
-
-
-def test_transcode_enum_value__transcode_only_once(transcoder):
-    enum_value = make_enum_value(language="asm", name="SomeValue")
-    transcoded = transcoder.enum_value(enum_value)
-    transcoded2 = transcoder.enum_value(enum_value)
-    assert transcoded is transcoded2
-
-
-def test_transcode_inner_type_reference__empty(transcoder):
-    ref = make_inner_type_ref(language="asm", name="Coordinate")
-    transcoded = transcoder.inner_type_reference(ref)
-
-    assert transcoded is not ref
-    assert transcoded == make_inner_type_ref(language="smalltalk", name="Coordinate")
-    assert ref == make_inner_type_ref(language="asm", name="Coordinate")
-
-
-def test_transcode_inner_type_reference__referred_object(transcoder):
-    ref = make_inner_type_ref(language="asm",
-                              name="Coordinate",
-                              referred_object=make_compound(language="asm", name="Coordinate"))
-    transcoded = transcoder.inner_type_reference(ref)
-
-    assert transcoded is not ref
-    assert transcoded == make_inner_type_ref(language="smalltalk",
-                                             name="Coordinate",
-                                             referred_object=make_compound(language="smalltalk",
-                                                                           name="Coordinate"))
-    assert ref == make_inner_type_ref(language="asm",
-                                      name="Coordinate",
-                                      referred_object=make_compound(language="asm",
-                                                                    name="Coordinate"))
 
 
 def test_transcode__load_and_detect_transcoders():

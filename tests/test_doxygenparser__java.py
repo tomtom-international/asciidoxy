@@ -30,7 +30,6 @@ def test_parse_java_class(api_reference):
     assert java_class.namespace == "com.asciidoxy.geometry"
 
     assert len(java_class.members) == 8
-    assert len(java_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in java_class.members)
     assert member_names == sorted([
@@ -51,33 +50,27 @@ def test_parse_java_class_with_nested_class(api_reference):
     assert java_class is not None
     assert java_class.id == "java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event"
     assert java_class.namespace == "com.asciidoxy.traffic"
-    # one for nested class and one for enum
-    assert len(java_class.inner_classes) == 2
 
-    nested_class = java_class.inner_classes[0]
-    assert nested_class.name == "com.asciidoxy.traffic.TrafficEvent.Severity"
+    nested_enums = [m for m in java_class.members if m.kind == "enum"]
+    assert len(nested_enums) == 1
+
+    nested_class = nested_enums[0]
+    assert nested_class.full_name == "com.asciidoxy.traffic.TrafficEvent.Severity"
     assert nested_class.namespace == "com.asciidoxy.traffic.TrafficEvent"
     assert nested_class.language == "java"
     assert nested_class.id == "java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"
     assert nested_class.prot == "public"
 
-    assert nested_class.referred_object is not None
-    assert nested_class.referred_object.id == nested_class.id
-    assert nested_class.referred_object.name == "Severity"
-    assert nested_class.referred_object.kind == "enum"
+    nested_classes = [m for m in java_class.members if m.kind == "class"]
+    assert len(nested_classes) == 1
 
-    nested_class = java_class.inner_classes[1]
-    assert nested_class.name == "com.asciidoxy.traffic.TrafficEvent.TrafficEventData"
+    nested_class = nested_classes[0]
+    assert nested_class.full_name == "com.asciidoxy.traffic.TrafficEvent.TrafficEventData"
     assert nested_class.namespace == "com.asciidoxy.traffic.TrafficEvent"
     assert nested_class.id == ("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_"
                                "traffic_event_data")
     assert nested_class.language == "java"
     assert nested_class.prot == "public"
-
-    assert nested_class.referred_object is not None
-    assert nested_class.referred_object.id == nested_class.id
-    assert nested_class.referred_object.name == "TrafficEventData"
-    assert nested_class.referred_object.kind == "class"
 
 
 @pytest.mark.parametrize("api_reference_set", [["java/default"]])
@@ -103,7 +96,6 @@ def test_parse_java_method(api_reference):
 
     assert len(member.params) == 2
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     assert member.returns is not None
     assert member.returns.type is not None

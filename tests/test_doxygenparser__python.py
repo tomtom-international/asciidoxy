@@ -30,7 +30,6 @@ def test_parse_python_class(api_reference):
     assert python_class.namespace == "asciidoxy.geometry"
 
     assert len(python_class.members) == 8
-    assert len(python_class.enumvalues) == 0
 
     member_names = sorted(m.name for m in python_class.members)
     assert member_names == sorted([
@@ -45,33 +44,24 @@ def test_parse_python_class_with_nested_class(api_reference):
     assert python_class is not None
     assert python_class.id == "python-classasciidoxy_1_1traffic_1_1_traffic_event"
     assert python_class.namespace == "asciidoxy.traffic"
-    # one for nested class and one for enum
-    assert len(python_class.inner_classes) == 2
 
-    nested_class = python_class.inner_classes[0]
-    assert nested_class.name == "asciidoxy.traffic.TrafficEvent.Severity"
+    nested_classes = [m for m in python_class.members if m.kind == "class"]
+    assert len(nested_classes) == 2
+
+    nested_class = nested_classes[0]
+    assert nested_class.full_name == "asciidoxy.traffic.TrafficEvent.Severity"
     assert nested_class.namespace == "asciidoxy.traffic.TrafficEvent"
     assert nested_class.language == "python"
     assert nested_class.id == "python-classasciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"
     assert nested_class.prot == "public"
 
-    assert nested_class.referred_object
-    assert nested_class.referred_object.id == nested_class.id
-    assert nested_class.referred_object.name == "Severity"
-    assert nested_class.referred_object.kind == "class"
-
-    nested_class = python_class.inner_classes[1]
-    assert nested_class.name == "asciidoxy.traffic.TrafficEvent.TrafficEventData"
+    nested_class = nested_classes[1]
+    assert nested_class.full_name == "asciidoxy.traffic.TrafficEvent.TrafficEventData"
     assert nested_class.namespace == "asciidoxy.traffic.TrafficEvent"
     assert nested_class.id == ("python-classasciidoxy_1_1traffic_1_1_traffic_event_1_1_"
                                "traffic_event_data")
     assert nested_class.language == "python"
     assert nested_class.prot == "public"
-
-    assert nested_class.referred_object
-    assert nested_class.referred_object.id == nested_class.id
-    assert nested_class.referred_object.name == "TrafficEventData"
-    assert nested_class.referred_object.kind == "class"
 
 
 @pytest.mark.parametrize("api_reference_set", [["python/default"]])
@@ -116,7 +106,6 @@ def test_parse_python_method(api_reference):
     assert not member.params[2].default_value
 
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     assert member.returns is not None
     assert member.returns.type is not None
@@ -157,7 +146,6 @@ def test_parse_python_classmethod(api_reference):
     assert not member.params[1].description
 
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     assert member.returns is not None
     assert member.returns.type is not None
@@ -213,7 +201,6 @@ def test_parse_python_variable(api_reference):
 
     assert len(member.params) == 0
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     # Not supported by Doxygen yet
     # assert member.returns is not None
@@ -258,7 +245,6 @@ def test_parse_python_constructor(api_reference):
     assert not member.params[0].description
 
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     assert member.returns is None
 
@@ -291,7 +277,6 @@ def test_parse_python_nested_argument_and_return_type(api_reference):
     assert not member.params[1].description
 
     assert len(member.exceptions) == 0
-    assert len(member.enumvalues) == 0
 
     assert member.returns is not None
     assert member.returns.type is not None

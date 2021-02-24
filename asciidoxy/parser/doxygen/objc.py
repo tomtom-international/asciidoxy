@@ -160,7 +160,13 @@ class ObjectiveCParser(ParserBase):
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
         memberdef_element = self._fix_block_element(memberdef_element)
         member = super().parse_member(memberdef_element, parent)
+        member = self._fix_enclosed_type_visibility(member, parent)
         return member
+
+    def parse_enumvalue(self, enumvalue_element: ET.Element, parent_name: str) -> Compound:
+        enumvalue = super().parse_enumvalue(enumvalue_element, parent_name)
+        enumvalue.prot = "public"
+        return enumvalue
 
     def _fix_block_element(self, memberdef_element: ET.Element) -> ET.Element:
         if memberdef_element.get("kind", "") not in ("variable", "typedef"):
@@ -182,3 +188,18 @@ class ObjectiveCParser(ParserBase):
         memberdef_element.set("kind", "block")
 
         return memberdef_element
+
+    def _fix_enclosed_type_visibility(self, member: Optional[Compound],
+                                      parent: Compound) -> Optional[Compound]:
+        """Match the visibility of enclosed types to the enclosing type's visibility.
+
+        There is no such thing as protected or private enclosed types in Objective C. When an object
+        is exposed in a header file, it is accessible, period.
+        """
+        if member is None:
+            return None
+
+        if (member.kind in ("enum", "typedef", "class", "protocol", "enumvalue")
+                and parent.kind in ("class", "protocol", "enum")):
+            member.prot = parent.prot
+        return member

@@ -72,16 +72,13 @@ ${insert("MyNamespace::FreeFunction", lang="c++")}                   # <4>
 === Filtering what is inserted
 
 By default `${link("Api.insert", text="insert")}` inserts all contents of the API element.
-You can control which members, inner classes, enum values, and exceptions get inserted for each
-call to `insert`.
+You can control which members and exceptions get inserted for each call to `insert`.
 
 [source,python]
 ----
 ${"""
 ${insert(...,
          [members=<filter_spec>,]
-         [inner_classes=<filter_spec>,]
-         [enum_values=<filter_spec>,]
          [exceptions=<filter_spec>])}
 """}
 ----
@@ -117,8 +114,6 @@ A global filter can be set that applies to every `insert` after it is set using
 ----
 ${"""
 ${filter([members=<filter_spec>,]
-         [inner_classes=<filter_spec>,]
-         [enum_values=<filter_spec>,]
          [exceptions=<filter_spec>])}
 """}
 ----
@@ -158,8 +153,6 @@ ${"""
 ${insert(...,
          ignore_global_filter=True,
          [members=<filter_spec>,]
-         [inner_classes=<filter_spec>,]
-         [enum_values=<filter_spec>,]
          [exceptions=<filter_spec>])}
 """}
 ----
@@ -547,5 +540,5 @@ ${multipage_toc(side="right")}  # <3>
 == Reference
 
 ${insert("Api", members=["insert$", "filter", "link", "cross_document_ref", "include",
-"language", "namespace"], inner_classes="NONE", leveloffset="+2")}
+"language", "namespace"], leveloffset="+2")}
 

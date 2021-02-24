@@ -14,9 +14,11 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
+from html import escape
+from itertools import chain
 %>
 <%
 helper = KotlinTemplateHelper(api, element, insert_filter)
@@ -39,11 +41,11 @@ ${element.description}
 |===
 % for prot in ("public", "protected", "internal", "private"):
 ###################################################################################################
-% if has(helper.complex_enclosed_types(prot=prot)):
+% if has_any(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 |*${prot.capitalize()} Enclosed Types*
 |
-% for enclosed in helper.complex_enclosed_types(prot=prot):
-`<<${enclosed.id},+++${enclosed.name}+++>>`::
+% for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
+`<<${enclosed.id},++${enclosed.name}++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -53,7 +55,7 @@ ${enclosed.brief}
 |*${prot.capitalize()} Constants*
 |
 % for constant in helper.constants(prot=prot):
-`const val <<${constant.id},+++${constant.name}: ${constant.returns.type.name}+++>>`::
+`const val <<${constant.id},++${constant.name}: ${constant.returns.type.name}++>>`::
 ${constant.brief}
 % endfor
 
@@ -63,7 +65,7 @@ ${constant.brief}
 |*${prot.capitalize()} Constructors*
 |
 % for constructor in helper.constructors(prot=prot):
-`<<${constructor.id},+++${constructor.name}${helper.type_list(constructor.params)}+++>>`::
+`<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
 ${constructor.brief}
 % endfor
 
@@ -73,7 +75,7 @@ ${constructor.brief}
 |*${prot.capitalize()} Properties*
 |
 % for prop in helper.properties(prot=prot):
-`<<${prop.id},+++${prop.name}+++>>`::
+`<<${prop.id},++${prop.name}++>>`::
 ${prop.brief}
 % endfor
 
@@ -83,7 +85,7 @@ ${prop.brief}
 |*${prot.capitalize()} Static Java Methods*
 |
 % for method in java_helper.static_methods(prot=prot):
-`<<${method.id},+++static ${java_helper.print_ref(method.returns.type, link=False)} ${method.name}${java_helper.type_list(method.params)}+++>>`::
+`<<${method.id},++static ${java_helper.print_ref(method.returns.type, link=False)} ${method.name}${java_helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
@@ -94,9 +96,9 @@ ${method.brief}
 |
 % for method in helper.methods(prot=prot):
 % if method.returns and method.returns.type.name != 'void':
-`<<${method.id},+++${method.name}${helper.type_list(method.params)}: ${helper.print_ref(method.returns.type, link=False)}+++>>`::
+`<<${method.id},++${method.name}${helper.type_list(method.params)}: ${helper.print_ref(method.returns.type, link=False)}++>>`::
 % else:
-`<<${method.id},+++${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++${method.name}${helper.type_list(method.params)}++>>`::
 % endif
 ${method.brief}
 % endfor
@@ -104,6 +106,13 @@ ${method.brief}
 % endif
 % endfor
 |===
+
+########################################################################## Enclosed simple types ##
+% for prot in ("public", "protected", "internal", "private"):
+% for enclosed in helper.simple_enclosed_types(prot=prot):
+${api.insert_fragment(enclosed, insert_filter)}
+% endfor
+% endfor
 
 == Members
 % for prot in ("public", "protected", "internal", "private"):
@@ -128,7 +137,7 @@ ${constant.description}
 ${api.inserted(constructor)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(constructor)}
+${escape(helper.method_signature(constructor))}
 ----
 
 ${constructor.brief}
@@ -181,7 +190,7 @@ ${prop.description}
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${java_helper.method_signature(method)}
+${escape(java_helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -226,7 +235,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -265,9 +274,11 @@ ${exception.description}
 % endif
 '''
 % endfor
+% endfor
 
 ############################################################################# Inner/Nested types ##
 
+% for prot in ("public", "protected", "internal", "private"):
 % for enclosed in helper.complex_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor

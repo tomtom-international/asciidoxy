@@ -16,6 +16,7 @@
 <%!
 from asciidoxy.templates.helpers import has
 from asciidoxy.templates.python.helpers import PythonTemplateHelper
+from html import escape
 %>
 <%
 helper = PythonTemplateHelper(api, element, insert_filter)
@@ -41,7 +42,7 @@ ${element.description}
 |*Enclosed types*
 |
 % for enclosed in helper.complex_enclosed_types(prot="public"):
-`<<${enclosed.id},+++${enclosed.name}+++>>`::
+`<<${enclosed.id},++${enclosed.name}++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -51,7 +52,7 @@ ${enclosed.brief}
 |*Constructors*
 |
 % for constructor in helper.constructors(prot="public"):
-`<<${constructor.id},+++${constructor.name}+++>>`::
+`<<${constructor.id},++${constructor.name}++>>`::
 ${constructor.brief}
 % endfor
 
@@ -61,7 +62,7 @@ ${constructor.brief}
 |*Variables*
 |
 % for variable in helper.variables(prot="public"):
-`<<${variable.id},+++${variable.name}+++>>`::
+`<<${variable.id},++${variable.name}++>>`::
 ${variable.brief}
 % endfor
 % endif
@@ -70,7 +71,7 @@ ${variable.brief}
 |*Static methods*
 |
 % for method in helper.static_methods(prot="public"):
-`<<${method.id},+++${method.name}+++>>`::
+`<<${method.id},++${method.name}++>>`::
 ${method.brief}
 % endfor
 
@@ -80,7 +81,7 @@ ${method.brief}
 |*Methods*
 |
 % for method in helper.methods(prot="public"):
-`<<${method.id},+++${method.name}+++>>`::
+`<<${method.id},++${method.name}++>>`::
 ${method.brief}
 % endfor
 
@@ -102,7 +103,7 @@ ${api.inserted(variable)}
 [source,python,subs="-specialchars,macros+"]
 ----
 % if variable.returns is not None:
-${variable.name}: ${helper.print_ref(variable.returns.type)}
+${variable.name}: ${escape(helper.print_ref(variable.returns.type))}
 % else:
 ${variable.name}
 % endif

@@ -14,8 +14,10 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
+from html import escape
+from itertools import chain
 %>
 <%
 helper = JavaTemplateHelper(api, element, insert_filter)
@@ -37,11 +39,11 @@ ${element.description}
 |===
 % for prot in ("public", "protected", "default", "private"):
 ###################################################################################################
-% if has(helper.complex_enclosed_types(prot=prot)):
+% if has_any(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 |*${prot.capitalize()} Enclosed Types*
 |
-% for enclosed in helper.complex_enclosed_types(prot=prot):
-`<<${enclosed.id},+++${enclosed.name}+++>>`::
+% for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
+`<<${enclosed.id},++${enclosed.name}++>>`::
 ${enclosed.brief}
 % endfor
 
@@ -51,7 +53,7 @@ ${enclosed.brief}
 |*${prot.capitalize()} Constants*
 |
 % for constant in helper.constants(prot=prot):
-`<<${constant.id},+++${constant.returns.type.name} ${constant.name}+++>>`::
+`<<${constant.id},++${constant.returns.type.name} ${constant.name}++>>`::
 ${constant.brief}
 % endfor
 
@@ -61,7 +63,7 @@ ${constant.brief}
 |*${prot.capitalize()} Constructors*
 |
 % for constructor in helper.constructors(prot=prot):
-`<<${constructor.id},+++${constructor.name}${helper.type_list(constructor.params)}+++>>`::
+`<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
 ${constructor.brief}
 % endfor
 
@@ -71,7 +73,7 @@ ${constructor.brief}
 |*${prot.capitalize()} Static Methods*
 |
 % for method in helper.static_methods(prot=prot):
-`<<${method.id},+++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
@@ -81,13 +83,20 @@ ${method.brief}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`<<${method.id},+++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}+++>>`::
+`<<${method.id},++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
 ${method.brief}
 % endfor
 
 % endif
 %endfor
 |===
+
+########################################################################## Enclosed simple types ##
+% for prot in ("public", "protected", "private"):
+% for enclosed in helper.simple_enclosed_types(prot=prot):
+${api.insert_fragment(enclosed, insert_filter)}
+% endfor
+% endfor
 
 == Members
 % for prot in ("public", "protected", "private"):
@@ -112,7 +121,7 @@ ${constant.description}
 ${api.inserted(constructor)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(constructor)}
+${escape(helper.method_signature(constructor))}
 ----
 
 ${constructor.brief}
@@ -150,7 +159,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -195,7 +204,7 @@ ${exception.description}
 ${api.inserted(method)}
 [source,java,subs="-specialchars,macros+"]
 ----
-${helper.method_signature(method)}
+${escape(helper.method_signature(method))}
 ----
 
 ${method.brief}
@@ -234,9 +243,11 @@ ${exception.description}
 % endif
 '''
 % endfor
+% endfor
 
 ############################################################################# Inner/Nested types ##
 
+% for prot in ("public", "protected", "private"):
 % for enclosed in helper.complex_enclosed_types(prot=prot):
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor

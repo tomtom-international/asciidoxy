@@ -18,12 +18,12 @@ Information about a traffic event.
 |===
 |*Public Properties*
 |
-`<<objc-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,+++data+++>>`::
+`<<objc-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,++data++>>`::
 Traffic event details.
 
 |*Public Methods*
 |
-`<<objc-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,+++updateWithCause:andDelay:+++>>`::
+`<<objc-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,++updateWithCause:andDelay:++>>`::
 Update the traffic event data.
 
 |===
@@ -34,7 +34,7 @@ Update the traffic event data.
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
-@property() xref:objc-interface_traffic_event_data[+++TrafficEventData+++] data
+@property() xref:objc-interface_traffic_event_data[++TrafficEventData++] data
 ----
 
 Traffic event details.
@@ -72,4 +72,6 @@ True if the update is valid.
 |===
 
 '''
+
+
 
