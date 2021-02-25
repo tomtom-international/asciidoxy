@@ -1,4 +1,4 @@
-## Copyright (C) 2019-2020, TomTom (http://tomtom.com).
+## Copyright (C) 2019-2021, TomTom (http://tomtom.com).
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -88,7 +88,6 @@ ${method.brief}
 ############################################################################ Simple inner types ##
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.simple_enclosed_types(prot=prot):
-${enclosed.name}
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 % endfor
