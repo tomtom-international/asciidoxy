@@ -88,7 +88,6 @@ ${method.brief}
 ############################################################################ Simple inner types ##
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.simple_enclosed_types(prot=prot):
-${enclosed.name}
 ${api.insert_fragment(enclosed, insert_filter)}
 % endfor
 % endfor
