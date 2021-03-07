@@ -62,6 +62,8 @@ class PackageManager:
     image_work_dir: Path
     packages: Dict[str, Package]
     warnings_are_errors: bool
+    copied_files: Dict[Path, Package]
+    copied_dirs: Dict[Path, Package]
 
     INPUT_FILES: str = "INPUT"
 
@@ -72,6 +74,8 @@ class PackageManager:
         self.work_dir = build_dir / "intermediate"
         self.image_work_dir = self.work_dir / "images"
         self.packages = {}
+        self.copied_files = {}
+        self.copied_dirs = {}
 
     def set_input_files(self,
                         in_file: Path,
@@ -249,11 +253,17 @@ class PackageManager:
             logger.warning(str(error))
 
     def _copy_dir_contents(self, src: Path, dst: Path, pkg: Package) -> None:
-        if dst.is_file():
+        if dst in self.copied_files:
             raise FileCollisionError(
-                pkg.name, f"Another package contains file {dst.name}, which is a directory"
-                f" in {pkg.name}.")
+                pkg.name, f"Package {self.copied_files[dst].name} contains file {dst.name}, which"
+                f" is also a directory in package {pkg.name}.")
+        elif dst.is_file():
+            raise FileCollisionError(
+                pkg.name, f"Unexpected file {dst.name}, blocking creation of a directory"
+                f" from package {pkg.name}. You may need to clear your build or output directory.")
+
         dst.mkdir(parents=True, exist_ok=True)
+        self.copied_dirs[dst] = pkg
 
         for src_entry in src.iterdir():
             if src_entry.is_symlink():
@@ -261,15 +271,21 @@ class PackageManager:
 
             dst_entry = dst / src_entry.relative_to(src)
             if src_entry.is_file():
-                if dst_entry.is_file():
+                if dst_entry in self.copied_files:
                     file_collision_error = FileCollisionError(
-                        pkg.name, f"File {dst_entry.name} from {pkg.name} already exists in"
-                        " another package.")
+                        pkg.name, f"File {dst_entry.name} from package {pkg.name} already exists "
+                        f"in package {self.copied_files[dst_entry].name}.")
                     self._warning_or_error(file_collision_error)
+                elif dst_entry in self.copied_dirs:
+                    raise FileCollisionError(
+                        pkg.name, f"File {dst_entry.name} from package {pkg.name} is also a "
+                        f"directory in package {self.copied_dirs[dst_entry].name}.")
                 elif dst_entry.is_dir():
                     raise FileCollisionError(
-                        pkg.name, f"Another package contains file {dst_entry.name}, which is a"
-                        f"directory in {pkg.name}.")
+                        pkg.name, f"Unexpected directory {dst_entry.name}, blocking creation of a "
+                        f"file from package {pkg.name}. You may need to clear your build or output"
+                        "directory.")
                 shutil.copy2(src_entry, dst_entry)
+                self.copied_files[dst_entry] = pkg
             elif src_entry.is_dir():
                 self._copy_dir_contents(src_entry, dst_entry, pkg)

@@ -26,6 +26,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     was never retried and required a manual purge of the build directory.
   - Verify the contents of downloaded packages with `contents.toml`. Delete invalid packages from
     the cache.
+  - Copying image files to an existing output directory no longer results in a file collision
+    error. File collision errors now contain more details about the packages causing the collision
+    and also report about files in the output directory that are not part of any package.
 
 
 == 0.7.3 (25 Feb 2021)

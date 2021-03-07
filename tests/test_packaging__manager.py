@@ -298,15 +298,16 @@ def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp
     package_manager.set_input_files(in_file, src_dir)
 
     if warnings_are_and_are_not_errors:
-        with pytest.raises(FileCollisionError):
+        with pytest.raises(FileCollisionError) as excinfo:
             package_manager.prepare_work_directory(in_file)
+        assert "File a.adoc from package INPUT already exists in package a." in str(excinfo.value)
     else:
         package_manager.prepare_work_directory(in_file)
 
 
-def test_prepare_work_directory__dir_and_file_collision_1(package_manager, event_loop, tmp_path,
-                                                          build_dir,
-                                                          warnings_are_and_are_not_errors):
+def test_prepare_work_directory__dir_and_file_collision__file_overwrites_dir_from_input(
+        package_manager, event_loop, tmp_path, build_dir, warnings_are_and_are_not_errors):
+
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -319,13 +320,15 @@ def test_prepare_work_directory__dir_and_file_collision_1(package_manager, event
     (src_dir / "a.adoc").mkdir()
 
     package_manager.set_input_files(in_file, src_dir)
-    with pytest.raises(FileCollisionError):
+    with pytest.raises(FileCollisionError) as excinfo:
         package_manager.prepare_work_directory(in_file)
+    assert ("Package a contains file a.adoc, which is also a directory in package INPUT."
+            in str(excinfo.value))
 
 
-def test_prepare_work_directory__dir_and_file_collision_2(package_manager, event_loop, tmp_path,
-                                                          build_dir,
-                                                          warnings_are_and_are_not_errors):
+def test_prepare_work_directory__dir_and_file_collision__dir_overwrites_file(
+        package_manager, event_loop, tmp_path, build_dir, warnings_are_and_are_not_errors):
+
     create_package_dir(tmp_path, "a")
     pkg_b_dir = create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -338,13 +341,15 @@ def test_prepare_work_directory__dir_and_file_collision_2(package_manager, event
     (pkg_b_dir / "adoc" / "a.adoc").mkdir()
 
     package_manager.set_input_files(in_file, src_dir)
-    with pytest.raises(FileCollisionError):
+    with pytest.raises(FileCollisionError) as excinfo:
         package_manager.prepare_work_directory(in_file)
+    assert ("Package a contains file a.adoc, which is also a directory in package b."
+            in str(excinfo.value))
 
 
-def test_prepare_work_directory__dir_and_file_collision_3(package_manager, event_loop, tmp_path,
-                                                          build_dir,
-                                                          warnings_are_and_are_not_errors):
+def test_prepare_work_directory__dir_and_file_collision__file_overwrites_dir(
+        package_manager, event_loop, tmp_path, build_dir, warnings_are_and_are_not_errors):
+
     pkg_a_dir = create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -357,8 +362,9 @@ def test_prepare_work_directory__dir_and_file_collision_3(package_manager, event
     (pkg_a_dir / "adoc" / "b.adoc").mkdir()
 
     package_manager.set_input_files(in_file, src_dir)
-    with pytest.raises(FileCollisionError):
+    with pytest.raises(FileCollisionError) as excinfo:
         package_manager.prepare_work_directory(in_file)
+    assert "File b.adoc from package b is also a directory in package a." in str(excinfo.value)
 
 
 def test_prepare_work_directory__same_dir_in_multiple_packages(package_manager, event_loop,
@@ -405,6 +411,29 @@ def test_make_image_directory(package_manager, event_loop, tmp_path, build_dir):
     assert (output_dir / "images" / "b.png").is_file()
 
 
+def test_make_image_directory__existing_output_dir(package_manager, event_loop, tmp_path,
+                                                   build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    output_dir = tmp_path / "output"
+    package_manager.make_image_directory(output_dir)
+
+    assert (output_dir / "images").is_dir()
+    assert (output_dir / "images" / "a.png").is_file()
+    assert (output_dir / "images" / "b.png").is_file()
+
+    package_manager2 = PackageManager(build_dir)
+    package_manager2.collect(spec_file)
+    package_manager2.make_image_directory(output_dir)
+
+    assert (output_dir / "images").is_dir()
+    assert (output_dir / "images" / "a.png").is_file()
+    assert (output_dir / "images" / "b.png").is_file()
+
+
 def test_make_image_directory__from_input_files(package_manager, event_loop, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
@@ -429,6 +458,40 @@ def test_make_image_directory__from_input_files(package_manager, event_loop, tmp
     assert (output_dir / "images" / "image.png").is_file()
     assert (output_dir / "images" / "a.png").is_file()
     assert (output_dir / "images" / "b.png").is_file()
+
+
+def test_make_image_directory__file_collision__file_overwrites_directory(
+        package_manager, event_loop, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    output_dir = tmp_path / "output"
+    (output_dir / "images" / "a.png").mkdir(parents=True)
+    with pytest.raises(FileCollisionError) as excinfo:
+        package_manager.make_image_directory(output_dir)
+    assert ("Unexpected directory a.png, blocking creation of a file from package a."
+            in str(excinfo.value))
+
+
+def test_make_image_directory__file_collision__directory_overwrites_file(
+        package_manager, event_loop, tmp_path, build_dir):
+    pkg_a_dir = create_package_dir(tmp_path, "a")
+    (pkg_a_dir / "images" / "a_subdir").mkdir(parents=True)
+    (pkg_a_dir / "images" / "a_subdir" / "a_subdir_file.png").touch()
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    output_dir = tmp_path / "output"
+    (output_dir / "images").mkdir(parents=True)
+    (output_dir / "images" / "a_subdir").touch()
+
+    with pytest.raises(FileCollisionError) as excinfo:
+        package_manager.make_image_directory(output_dir)
+    assert ("Unexpected file a_subdir, blocking creation of a directory from package a."
+            in str(excinfo.value))
 
 
 def test_file_in_work_directory__present(package_manager, event_loop, tmp_path, build_dir):
