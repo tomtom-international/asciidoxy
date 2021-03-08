@@ -297,10 +297,16 @@ class HttpPackageSpec(PackageSpec):
     async def collect(self, download_dir: Path, session: aiohttp.ClientSession) -> Package:
         """See PackageSpec.collect"""
         package_dir = download_dir / self.name / self.version
-        if not package_dir.is_dir():
-            await self._download_files(package_dir, session)
-        else:
-            logger.debug(f"Using cached version of {self.name}:{self.version}")
+        if package_dir.is_dir():
+            try:
+                logger.debug(f"Using cached version of {self.name}:{self.version}")
+                return self._make_package(package_dir)
+            except InvalidPackageError:
+                logger.exception(f"Cached version of {self.name}:{self.version} is invalid."
+                                 "Downloading package again.")
+                shutil.rmtree(package_dir)
+
+        await self._download_files(package_dir, session)
 
         try:
             return self._make_package(package_dir)
