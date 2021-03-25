@@ -20,6 +20,14 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == Unreleased
 
+=== Added
+
+  - Flexible anchors: With multi-page documents it can be hard to keep cross document references
+    working, especially when moving them between files. Using the new `anchor` command you can
+    create a flexible anchor that will be resolved by AsciiDoxy. Use `cross_document_ref` with only
+    an `anchor` to refer to flexible anchors.
+
+
 === Fixed
 
   - Remove invalid downloaded packages from the cache. This solves an issue where a failed download

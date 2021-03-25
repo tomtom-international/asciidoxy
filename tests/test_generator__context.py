@@ -13,9 +13,12 @@
 # limitations under the License.
 """Tests for the generator's context."""
 
+import pytest
+
 from pathlib import Path
 
 from asciidoxy.model import ReferableElement
+from asciidoxy.generator.errors import DuplicateAnchorError, UnknownAnchorError
 from asciidoxy.generator.navigation import DocumentTreeNode
 
 from .builders import make_compound
@@ -53,6 +56,7 @@ def test_create_sub_context(empty_context):
 
     assert sub.linked is context.linked
     assert sub.inserted is context.inserted
+    assert sub.anchors is context.anchors
     assert sub.in_to_out_file_map is context.in_to_out_file_map
     assert sub.embedded_file_map is context.embedded_file_map
     assert sub.current_document is context.current_document
@@ -283,3 +287,30 @@ def test_docinfo_footer_file__multipage__embedded(empty_context, input_file):
     footer_file = empty_context.docinfo_footer_file()
     assert footer_file.parent == input_file.parent
     assert footer_file.name == f".asciidoxy.{input_file.stem}-docinfo-footer.html"
+
+
+def test_register_and_link_to_anchor__same_file(empty_context, input_file):
+    empty_context.register_anchor("my-anchor", "anchor text", input_file)
+    assert empty_context.link_to_anchor("my-anchor") == (Path(input_file.name), "anchor text")
+
+
+def test_register_and_link_to_anchor__different_file(empty_context, input_file):
+    other_file = input_file.with_name("other.adoc")
+    empty_context.register_anchor("my-anchor", "anchor text", other_file)
+    assert empty_context.link_to_anchor("my-anchor") == (Path(other_file.name), "anchor text")
+
+
+def test_register_and_link_to_anchor__no_link_text(empty_context, input_file):
+    empty_context.register_anchor("my-anchor", None, input_file)
+    assert empty_context.link_to_anchor("my-anchor") == (Path(input_file.name), None)
+
+
+def test_register_anchor__duplicate_name(empty_context, input_file):
+    empty_context.register_anchor("my-anchor", None, input_file)
+    with pytest.raises(DuplicateAnchorError):
+        empty_context.register_anchor("my-anchor", None, input_file)
+
+
+def test_link_to_anchor__unknown(empty_context, input_file):
+    with pytest.raises(UnknownAnchorError):
+        empty_context.link_to_anchor("my-anchor")

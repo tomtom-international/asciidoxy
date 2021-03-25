@@ -26,7 +26,7 @@ from ..api_reference import ApiReference
 from ..model import ReferableElement
 from ..packaging import Package, PackageManager
 from ..path_utils import relative_path
-from .errors import ConsistencyError
+from .errors import ConsistencyError, DuplicateAnchorError, UnknownAnchorError
 from .filters import InsertionFilter
 from .navigation import DocumentTreeNode
 
@@ -71,6 +71,7 @@ class Context(object):
         reference:          API reference information.
         linked:             All elements to which links are inserted in the documentation.
         inserted:           All elements that have been inserted in the documentation.
+        anchors:            Mapping from flexible anchors to the containing files.
         in_to_out_file_map: Mapping from input files for AsciiDoctor to the resulting output files.
         current_document:   Node in the Document Tree that is currently being processed.
         current_package:    Package containing the current files.
@@ -94,6 +95,7 @@ class Context(object):
 
     linked: Set[str]
     inserted: MutableMapping[str, Path]
+    anchors: Dict[str, Tuple[Path, Optional[str]]]
     in_to_out_file_map: Dict[Path, Path]
     embedded_file_map: Dict[Tuple[Path, Path], Path]
     current_document: DocumentTreeNode
@@ -113,6 +115,7 @@ class Context(object):
 
         self.linked = set()
         self.inserted = {}
+        self.anchors = {}
         self.in_to_out_file_map = {}
         self.embedded_file_map = {}
         self.current_document = current_document
@@ -149,6 +152,7 @@ class Context(object):
         # References
         sub.linked = self.linked
         sub.inserted = self.inserted
+        sub.anchors = self.anchors
         sub.in_to_out_file_map = self.in_to_out_file_map
         sub.embedded_file_map = self.embedded_file_map
         sub.progress = self.progress
@@ -186,7 +190,7 @@ class Context(object):
 
         return out_file
 
-    def link_to_adoc_file(self, file_name: Path):
+    def link_to_adoc_file(self, file_name: Path) -> Path:
         """Determine the correct path to link to a file.
 
         The exact path differs for single and multipage mode and whether a file is embedded or not.
@@ -232,6 +236,17 @@ class Context(object):
             out_file = _out_file_name(in_file)
 
         return _docinfo_footer_file_name(out_file)
+
+    def register_anchor(self, name: str, link_text: Optional[str], file_name: Path) -> None:
+        if name in self.anchors:
+            raise DuplicateAnchorError(name)
+        self.anchors[name] = file_name, link_text
+
+    def link_to_anchor(self, name: str) -> Tuple[Path, Optional[str]]:
+        file_name, link_text = self.anchors.get(name, (None, None))
+        if file_name is None:
+            raise UnknownAnchorError(name)
+        return self.link_to_adoc_file(file_name), link_text
 
 
 def _out_file_name(in_file: Path) -> Path:
