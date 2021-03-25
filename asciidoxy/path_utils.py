@@ -11,12 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Version information."""
+"""Utilities for working with paths."""
 
-__title__ = "asciidoxy"
-__description__ = "AsciiDoxy generates API documentation from Doxygen XML output to AsciiDoc."
-__url__ = "https://asciidoxy.org"
-__version__ = "0.7.4"
-__author__ = "Rob van der Most"
-__author_email__ = "Rob.vanderMost@TomTom.com"
-__license__ = "Apache 2.0"
+from pathlib import Path
+
+
+def relative_path(from_file: Path, to_file: Path):
+    assert from_file.is_absolute()
+    assert to_file.is_absolute()
+
+    path = Path()
+    for ancestor in from_file.parents:
+        try:
+            path = path / to_file.relative_to(ancestor)
+            break
+        except ValueError:
+            path = path / '..'
+
+    return path

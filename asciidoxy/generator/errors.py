@@ -207,3 +207,33 @@ class MissingPackageFileError(AsciiDocError):
             return (f"Package `{self.package_name}` does not contain file `{self.file_name}`.")
         else:
             return (f"Package `{self.package_name}` does not specify a root document.")
+
+
+class DuplicateAnchorError(AsciiDocError):
+    """An anchor with the the same name already exists.
+
+    Args:
+        anchor_name: Name of the anchor.
+    """
+    anchor_name: str
+
+    def __init__(self, anchor_name: str):
+        self.anchor_name = anchor_name
+
+    def __str__(self) -> str:
+        return f"Anchor with name `{self.anchor_name}` inserted multiple times."
+
+
+class UnknownAnchorError(AsciiDocError):
+    """The refered anchor does not exist in any included document.
+
+    Args:
+        anchor_name: Name of the anchor.
+    """
+    anchor_name: str
+
+    def __init__(self, anchor_name: str):
+        self.anchor_name = anchor_name
+
+    def __str__(self) -> str:
+        return f"Anchor with name `{self.anchor_name}` does not exist."

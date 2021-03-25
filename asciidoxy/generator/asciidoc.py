@@ -33,15 +33,16 @@ from ..api_reference import AmbiguousLookupError, ApiReference
 from ..parser.doxygen import safe_language_tag
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
+from ..path_utils import relative_path
 from ..transcoder import TranscoderBase
 from .._version import __version__
 from .context import Context
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
                      IncompatibleVersionError, InvalidApiCallError, MissingPackageError,
                      MissingPackageFileError, ReferenceNotFoundError, TemplateMissingError,
-                     UnlinkableError)
+                     UnknownAnchorError, UnlinkableError)
 from .filters import FilterSpec, InsertionFilter
-from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipage_toc
+from .navigation import DocumentTreeNode, navigation_bar, multipage_toc
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +56,7 @@ SUPPORTED_COMMANDS = [
     "multipage_toc",
     "namespace",
     "require_version",
+    "anchor",
 ]
 
 
@@ -237,7 +239,9 @@ class Api(ABC):
                               document. Absolute paths are not supported.
              package_name: Name of the package containing the file. If not specified, the file must
                                come from the same package.
-             anchor:       Anchor to the referred section in the referred AsciiDoc document.
+             anchor:       Anchor to the referred section in the referred AsciiDoc document. If no
+                               `file_name` or `package_name` is given it refers to a flexible
+                               anchor as inserted by `anchor`.
              link_text:    Text for the link to insert. If not provided, either the anchor, the
                                title of the document or the name of the file is used.
 
@@ -248,6 +252,33 @@ class Api(ABC):
             InvalidApiCallError:     Incorrect argument or argument combinations are used.
             MissingPackageError:     The specified package is not available.
             MissingPackageFileError: The specified file name is not available in the package.
+            UnknownAnchorError:      The `anchor` is not a known flexible anchor and no `file_name`
+                                         or `package_name` is provided.
+        """
+        ...
+
+    @abstractmethod
+    def anchor(self, name: str, *, link_text: Optional[str] = None) -> str:
+        """Create a flexible anchor.
+
+        In multi-page mode it may be hard to move content containing anchors between files. All
+        references to the anchor need to be updated to point to the correct files. This command
+        allows you to create flexible anchors.
+
+        In single-page mode, this will result in a normal AsciiDoc anchor. In multi-page mode it
+        will also make sure that other files can refer to the anchor without having to specify the
+        file containing it.
+
+        Args:
+            name:      Name of the anchor. Use this name in `cross_document_ref` to refer to the
+                           anchor.
+            link_text: Optional text to use in links to the anchor.
+
+        Returns:
+            AsciiDoc anchor.
+
+        Raises:
+            DuplicateAnchorError: An anchor with the specified name already exists.
         """
         ...
 
@@ -664,13 +695,21 @@ class PreprocessingApi(Api):
                            package_name: Optional[str] = None,
                            anchor: Optional[str] = None,
                            link_text: Optional[str] = None) -> str:
-        if not file_name and not package_name:
-            raise InvalidApiCallError("At least `file_name` or `package_name` is required.")
+        if not file_name and not package_name and not anchor:
+            raise InvalidApiCallError("At least `file_name`, `package_name`, or `anchor` is "
+                                      "required.")
         if file_name and Path(file_name).is_absolute():
             raise InvalidApiCallError("`file_name` must be a relative path.")
 
-        # Only check the existance of the file in the correct package
-        self._find_absolute_file_path(file_name, package_name)
+        if file_name or package_name:
+            # Only check the existance of the file in the correct package
+            self._find_absolute_file_path(file_name, package_name)
+        return ""
+
+    def anchor(self, name: str, *, link_text: Optional[str] = None) -> str:
+        if not name:
+            raise InvalidApiCallError("`name` cannot be empty.")
+        self._context.register_anchor(name, link_text, self._current_file)
         return ""
 
 
@@ -691,37 +730,58 @@ class GeneratingApi(Api):
                            anchor: Optional[str] = None,
                            link_text: Optional[str] = None) -> str:
 
-        if not file_name and not package_name:
-            raise InvalidApiCallError("At least `file_name` or `package_name` is required.")
         if file_name and Path(file_name).is_absolute():
             raise InvalidApiCallError("`file_name` must be a relative path.")
 
-        absolute_file_path = self._find_absolute_file_path(file_name, package_name)
-        if absolute_file_path is None:
-            return ""
+        if file_name or package_name:
+            absolute_file_path = self._find_absolute_file_path(file_name, package_name)
+            if absolute_file_path is None:
+                return ""
 
-        document = next((d for d in self._context.current_document.all_documents_in_tree()
-                         if d.in_file == absolute_file_path), None)
-        if document is None:
-            msg = (f"Invalid cross-reference from document '{self._current_file}' "
-                   f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
-                   f"is not included anywhere across the whole documentation tree.")
-            self._warning_or_error(ConsistencyError(msg))
-            return ""
+            document = next((d for d in self._context.current_document.all_documents_in_tree()
+                             if d.in_file == absolute_file_path), None)
+            if document is None:
+                msg = (f"Invalid cross-reference from document '{self._current_file}' "
+                       f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
+                       f"is not included anywhere across the whole documentation tree.")
+                self._warning_or_error(ConsistencyError(msg))
+                return ""
 
-        if not anchor and not link_text:
-            link_text = document.title
-        elif not link_text:
-            link_text = anchor
+            if not anchor and not link_text:
+                link_text = document.title
+            elif not link_text:
+                link_text = anchor
 
-        if not anchor:
-            if not self._context.multipage:
-                anchor = self._file_top_anchor(absolute_file_path)
-            else:
-                anchor = ""
+            if not anchor:
+                if not self._context.multipage:
+                    anchor = self._file_top_anchor(absolute_file_path)
+                else:
+                    anchor = ""
 
-        link_file_path = self._context.link_to_adoc_file(absolute_file_path)
+            link_file_path = self._context.link_to_adoc_file(absolute_file_path)
+
+        elif anchor:
+            # Flexible anchor
+            try:
+                link_file_path, default_link_text = self._context.link_to_anchor(anchor)
+            except UnknownAnchorError as ex:
+                self._warning_or_error(ex)
+                link_file_path = self._context.link_to_adoc_file(self._current_file)
+                default_link_text = None
+
+            link_text = link_text or default_link_text or anchor
+
+        else:
+            raise InvalidApiCallError("At least `file_name`, `package_name`, or `anchor` is "
+                                      "required.")
+
         return (f"<<{link_file_path}#{anchor},{link_text}>>")
+
+    def anchor(self, name: str, *, link_text: Optional[str] = None) -> str:
+        if link_text:
+            return f"[[{name},{link_text}]]"
+        else:
+            return f"[[{name}]]"
 
     def insert_fragment(self,
                         element,

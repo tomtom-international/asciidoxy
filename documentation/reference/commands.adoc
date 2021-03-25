@@ -537,8 +537,45 @@ ${multipage_toc(side="right")}  # <3>
 <2> Same as above, but with explicit side.
 <3> Insert a multi-page ToC on the right side of the document.
 
+== Flexible anchors
+
+In multi-page mode it can be hard to keep track of references to other documents. Especially when 
+moving them between files. The `anchor` command allows you to insert a flexible anchor that gets 
+resolved by AsciiDoxy. You can refer to flexible anchors by using `cross_document_ref` with just an 
+`anchor`.
+
+[source,python]
+----
+${"""
+${achor(<name>, [link_text=<left/right>])}
+"""}
+----
+
+`name`:: Name of the anchor. Uses this name to refer to it. The name must be unique accross all 
+included documents.
+`link_text`:: Optionally a text to use for any links to the flexible anchor. If no text is 
+provided, either the link_text provided to `cross_document_ref` is used, or the `name`.
+
+=== Examples
+
+[source,python]
+----
+${"""
+${anchor("my-anchor")}                                       # <1>
+${anchor("other-anchor", link_text="superduper text here")}  # <2>
+
+${cross_document_ref(anchor="my-anchor", link_text="here")}  # <3>
+${cross_document_ref(anchor="other-anchor")}                 # <4>
+"""}
+----
+<1> Insert an anchor named `my-anchor` without a default link text.
+<2> Insert an anchor named `other-anchor` with a default link text.
+<3> Insert a reference to the first anchor and override the text for the link.
+<4> Insert a reference to the second anchor and use the default link text from the
+anchor.
+
+
 == Reference
 
-${insert("Api", members=["insert$", "filter", "link", "cross_document_ref", "include",
-"language", "namespace"], leveloffset="+2")}
-
+${insert("Api", members=["insert$", "filter", "link$", "cross_document_ref", "include",
+"language", "namespace", "require_version", "multipage_toc", "anchor"], leveloffset="+2")}

@@ -18,6 +18,28 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.7.4 (25 Mar 2021)
+
+=== Added
+
+  - Flexible anchors: With multi-page documents it can be hard to keep cross document references
+    working, especially when moving them between files. Using the new `anchor` command you can
+    create a flexible anchor that will be resolved by AsciiDoxy. Use `cross_document_ref` with only
+    an `anchor` to refer to flexible anchors.
+
+
+=== Fixed
+
+  - Remove invalid downloaded packages from the cache. This solves an issue where a failed download
+    was never retried and required a manual purge of the build directory.
+  - Verify the contents of downloaded packages with `contents.toml`. Delete invalid packages from
+    the cache.
+  - Copying image files to an existing output directory no longer results in a file collision
+    error. File collision errors now contain more details about the packages causing the collision
+    and also report about files in the output directory that are not part of any package.
+  - Provide correct image directory to AsciiDoctor.
+
+
 == 0.7.3 (25 Feb 2021)
 
 === Fixed

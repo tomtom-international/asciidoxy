@@ -29,7 +29,7 @@ from asciidoxy.generator.errors import (AmbiguousReferenceError, ConsistencyErro
                                         IncludeFileNotFoundError, IncompatibleVersionError,
                                         InvalidApiCallError, MissingPackageError,
                                         MissingPackageFileError, ReferenceNotFoundError,
-                                        TemplateMissingError)
+                                        TemplateMissingError, UnknownAnchorError)
 from asciidoxy.packaging import Package, PackageManager
 
 from asciidoxy import __version__
@@ -494,24 +494,24 @@ def test_cross_document_ref__with_absolute_path(test_data_builder, tdb_single_an
             api.cross_document_ref(target_file, anchor="anchor")
 
 
-def test_cross_document_ref__requires_filename_or_packagename(test_data_builder,
-                                                              tdb_single_and_multipage):
+def test_cross_document_ref__requires_filename_packagename_or_anchor(test_data_builder,
+                                                                     tdb_single_and_multipage):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/other_file.adoc")
 
     for api in test_data_builder.apis():
         with pytest.raises(InvalidApiCallError):
-            api.cross_document_ref(anchor="anchor")
+            api.cross_document_ref(link_text="text")
 
 
-def test_cross_document_ref__requires_filename_or_packagename_not_empty(
+def test_cross_document_ref__requires_filename_packagename_or_anchor_not_empty(
         test_data_builder, tdb_single_and_multipage):
     test_data_builder.add_input_file("input.adoc")
     test_data_builder.add_include_file("includes/other_file.adoc")
 
     for api in test_data_builder.apis():
         with pytest.raises(InvalidApiCallError):
-            api.cross_document_ref("", package_name="", anchor="anchor")
+            api.cross_document_ref("", package_name="", anchor="", link_text="text")
 
 
 def test_cross_document_ref__file_not_in_workdirectory(test_data_builder, tdb_single_and_multipage,
@@ -708,6 +708,7 @@ def test_cross_document_ref__document_not_in_tree(test_data_builder, tdb_single_
             result = api.cross_document_ref("other_dir/include.adoc",
                                             package_name="package",
                                             link_text="bla")
+            # TODO: Fix this!
             if isinstance(api, GeneratingApi):
                 assert result == "<<../other_dir/include.adoc#,bla>>"
         else:
@@ -715,6 +716,130 @@ def test_cross_document_ref__document_not_in_tree(test_data_builder, tdb_single_
                 api.cross_document_ref("other_dir/include.adoc",
                                        package_name="package",
                                        link_text="bla")
+
+
+def test_anchor(test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+
+    for api in test_data_builder.apis():
+        result = api.anchor("my-anchor", link_text="anchor text")
+        if isinstance(api, PreprocessingApi):
+            assert result == ""
+        else:
+            assert result == "[[my-anchor,anchor text]]"
+
+
+def test_anchor__no_link_text(test_data_builder, tdb_single_and_multipage):
+    test_data_builder.add_input_file("input.adoc")
+
+    for api in test_data_builder.apis():
+        result = api.anchor("my-anchor")
+        if isinstance(api, PreprocessingApi):
+            assert result == ""
+        else:
+            assert result == "[[my-anchor]]"
+
+
+def test_cross_document_ref__flexible_anchor__same_package(test_data_builder,
+                                                           tdb_single_and_multipage):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    include_file = test_data_builder.add_include_file("include.adoc")
+
+    for api in test_data_builder.apis():
+        api._current_file = include_file
+        api.anchor("my-anchor", link_text="my anchor link text")
+
+        api._current_file = input_file
+        result = api.cross_document_ref(anchor="my-anchor")
+        if isinstance(api, PreprocessingApi):
+            assert result == ""
+        else:
+            if tdb_single_and_multipage:
+                assert result == "<<include.adoc#my-anchor,my anchor link text>>"
+            else:
+                assert result == "<<.asciidoxy.include.adoc#my-anchor,my anchor link text>>"
+
+
+def test_cross_document_ref__flexible_anchor__other_package(test_data_builder,
+                                                            tdb_single_and_multipage):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    include_file = test_data_builder.add_package_file("pacA", "include.adoc")
+
+    for api in test_data_builder.apis():
+        api._current_file = include_file
+        api.anchor("my-anchor", link_text="my anchor link text")
+
+        api._current_file = input_file
+        result = api.cross_document_ref(anchor="my-anchor")
+        if isinstance(api, PreprocessingApi):
+            assert result == ""
+        else:
+            if tdb_single_and_multipage:
+                assert result == "<<include.adoc#my-anchor,my anchor link text>>"
+            else:
+                assert result == "<<.asciidoxy.include.adoc#my-anchor,my anchor link text>>"
+
+
+def test_cross_document_ref__flexible_anchor__link_text(test_data_builder,
+                                                        tdb_single_and_multipage):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    include_file = test_data_builder.add_include_file("include.adoc")
+
+    for api in test_data_builder.apis():
+        api._current_file = include_file
+        api.anchor("my-anchor", link_text="my anchor link text")
+
+        api._current_file = input_file
+        result = api.cross_document_ref(anchor="my-anchor", link_text="other text")
+        if isinstance(api, PreprocessingApi):
+            assert result == ""
+        else:
+            if tdb_single_and_multipage:
+                assert result == "<<include.adoc#my-anchor,other text>>"
+            else:
+                assert result == "<<.asciidoxy.include.adoc#my-anchor,other text>>"
+
+
+def test_cross_document_ref__flexible_anchor__no_link_text(test_data_builder,
+                                                           tdb_single_and_multipage):
+    input_file = test_data_builder.add_input_file("input.adoc")
+    include_file = test_data_builder.add_include_file("include.adoc")
+
+    for api in test_data_builder.apis():
+        api._current_file = include_file
+        api.anchor("my-anchor")
+
+        api._current_file = input_file
+        result = api.cross_document_ref(anchor="my-anchor")
+        if isinstance(api, PreprocessingApi):
+            assert result == ""
+        else:
+            if tdb_single_and_multipage:
+                assert result == "<<include.adoc#my-anchor,my-anchor>>"
+            else:
+                assert result == "<<.asciidoxy.include.adoc#my-anchor,my-anchor>>"
+
+
+def test_cross_document_ref__flexible_anchor__missing_anchor(test_data_builder,
+                                                             tdb_single_and_multipage,
+                                                             tdb_warnings_are_and_are_not_errors):
+    test_data_builder.add_input_file("input.adoc")
+    test_data_builder.add_include_file("include.adoc")
+
+    for api in test_data_builder.apis():
+        if tdb_warnings_are_and_are_not_errors and isinstance(api, GeneratingApi):
+            with pytest.raises(UnknownAnchorError):
+                api.cross_document_ref(anchor="my-anchor")
+
+        else:
+            result = api.cross_document_ref(anchor="my-anchor")
+            if isinstance(api, PreprocessingApi):
+                assert result == ""
+            else:
+                if tdb_single_and_multipage:
+                    assert result == "<<input.adoc#my-anchor,my-anchor>>"
+                else:
+                    assert result == "<<.asciidoxy.input.adoc#my-anchor,my-anchor>>"
 
 
 def test_include__relative_path(test_data_builder):

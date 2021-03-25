@@ -24,6 +24,7 @@ import csv
 import io
 import logging
 import os
+import shutil
 import tarfile
 import toml
 
@@ -202,6 +203,23 @@ class PackageSpec(ABC):
         if pkg_contents_file.is_file():
             pkg.load_from_toml(package_dir, toml.load(pkg_contents_file))
 
+            if pkg.reference_dir is not None and not pkg.reference_dir.is_dir():
+                raise InvalidPackageError(
+                    self.name, "Packaged `contents.toml` specifies a "
+                    "non-existing reference directory.")
+            if pkg.adoc_src_dir is not None and not pkg.adoc_src_dir.is_dir():
+                raise InvalidPackageError(
+                    self.name, "Packaged `contents.toml` specifies a "
+                    "non-existing adoc source directory.")
+            if pkg.adoc_image_dir is not None and not pkg.adoc_image_dir.is_dir():
+                raise InvalidPackageError(
+                    self.name, "Packaged `contents.toml` specifies a "
+                    "non-existing adoc image directory.")
+            if pkg.adoc_root_doc is not None and not pkg.adoc_root_doc.is_file():
+                raise InvalidPackageError(
+                    self.name, "Packaged `contents.toml` specifies a "
+                    "non-existing adoc root document.")
+
         elif self.xml_subdir or self.include_subdir:
             if self.xml_subdir:
                 xml_dir = package_dir / self.xml_subdir
@@ -279,12 +297,23 @@ class HttpPackageSpec(PackageSpec):
     async def collect(self, download_dir: Path, session: aiohttp.ClientSession) -> Package:
         """See PackageSpec.collect"""
         package_dir = download_dir / self.name / self.version
-        if not package_dir.is_dir():
-            await self._download_files(package_dir, session)
-        else:
-            logger.debug(f"Using cached version of {self.name}:{self.version}")
+        if package_dir.is_dir():
+            try:
+                logger.debug(f"Using cached version of {self.name}:{self.version}")
+                return self._make_package(package_dir)
+            except InvalidPackageError:
+                logger.exception(f"Cached version of {self.name}:{self.version} is invalid."
+                                 "Downloading package again.")
+                shutil.rmtree(package_dir)
 
-        return self._make_package(package_dir)
+        await self._download_files(package_dir, session)
+
+        try:
+            return self._make_package(package_dir)
+        except InvalidPackageError:
+            if package_dir.exists():
+                shutil.rmtree(package_dir)
+            raise
 
     async def _download_files(self, package_dir: Path, session: aiohttp.ClientSession):
         package_dir.mkdir(parents=True, exist_ok=True)
@@ -308,13 +337,17 @@ class HttpPackageSpec(PackageSpec):
         try:
             async with session.get(url) as response:
                 data = await response.read()
-                target_dir.mkdir(parents=True, exist_ok=True)
-                tar_file = tarfile.open(fileobj=io.BytesIO(data))
-                tar_file.extractall(target_dir)
-        except tarfile.ReadError as tar_error:
-            raise DownloadError(self.name, f"Cannot read tar file from {url}.") from tar_error
         except aiohttp.client_exceptions.ClientResponseError as http_error:
             raise DownloadError(self.name, f"Failed to download: {http_error}.") from http_error
+
+        try:
+            target_dir.mkdir(parents=True, exist_ok=True)
+            tar_file = tarfile.open(fileobj=io.BytesIO(data))
+            tar_file.extractall(target_dir)
+        except tarfile.TarError as tar_error:
+            if target_dir.exists():
+                shutil.rmtree(target_dir)
+            raise DownloadError(self.name, f"Cannot read tar file from {url}.") from tar_error
 
     @classmethod
     def from_toml(cls, name: str, raw_spec: Mapping[str, Any], **init_args) -> "HttpPackageSpec":

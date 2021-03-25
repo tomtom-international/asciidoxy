@@ -44,6 +44,10 @@ async def package_file_response(request):
     return web.FileResponse(Path(__file__).parent / "data" / "package.tar.gz")
 
 
+async def currupt_package_file_response(request):
+    return web.FileResponse(Path(__file__).parent / "data" / "corrupt_package.tar.gz")
+
+
 async def error404_response(request):
     return web.Response(status=404)
 
@@ -204,6 +208,54 @@ async def test_http_package__old__xml_and_include(aiohttp_server, tmp_path):
     assert (tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc").is_file()
 
 
+async def test_http_package__contents_toml__corrupt(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/package", currupt_package_file_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.file_names = ["package"]
+
+    with pytest.raises(InvalidPackageError):
+        await collect([spec], tmp_path)
+    assert not (tmp_path / "test" / "1.0.0").exists()
+
+
+async def test_http_package__cache_corrupt(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/package",
+                                                        package_file_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.file_names = ["package"]
+
+    (tmp_path / "test" / "1.0.0").mkdir(parents=True)
+    (tmp_path / "test" / "1.0.0" / "contents.toml").touch()
+
+    packages = await collect([spec], tmp_path)
+
+    assert len(packages) == 1
+    pkg = packages[0]
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+
+    assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
+    assert pkg.reference_dir.is_dir()
+    assert (pkg.reference_dir / "content.xml").is_file()
+
+    assert pkg.adoc_src_dir == tmp_path / "test" / "1.0.0" / "adoc"
+    assert pkg.adoc_src_dir.is_dir()
+    assert (pkg.adoc_src_dir / "content.adoc").is_file()
+
+    assert pkg.adoc_image_dir == tmp_path / "test" / "1.0.0" / "images"
+    assert pkg.adoc_image_dir.is_dir()
+    assert (pkg.adoc_image_dir / "picture.png").is_file()
+
+    assert pkg.adoc_root_doc == tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc"
+    assert pkg.adoc_root_doc.is_file()
+
+
 async def test_http_package__old__subdirs_not_specified(aiohttp_server, tmp_path):
     server = await start_server(
         aiohttp_server,
@@ -217,6 +269,7 @@ async def test_http_package__old__subdirs_not_specified(aiohttp_server, tmp_path
 
     with pytest.raises(InvalidPackageError):
         await collect([spec], tmp_path)
+    assert not (tmp_path / "test" / "1.0.0").exists()
 
 
 async def test_http_package__old__subdirs_not_matched(aiohttp_server, tmp_path):
@@ -234,6 +287,7 @@ async def test_http_package__old__subdirs_not_matched(aiohttp_server, tmp_path):
 
     with pytest.raises(InvalidPackageError):
         await collect([spec], tmp_path)
+    assert not (tmp_path / "test" / "1.0.0").exists()
 
 
 async def test_http_package_error404(aiohttp_server, tmp_path):
@@ -256,6 +310,7 @@ async def test_http_package_not_a_tarfile(aiohttp_server, tmp_path):
 
     with pytest.raises(DownloadError):
         await collect([spec], tmp_path)
+    assert not (tmp_path / "test" / "1.0.0").exists()
 
 
 async def test_http_package_name_interpolation_in_file_names(aiohttp_server, tmp_path):
@@ -427,6 +482,7 @@ async def test_local_package__old__subdirs_not_matched(tmp_path):
 
     with pytest.raises(InvalidPackageError):
         await collect([spec], output_dir)
+    assert input_dir.exists()
 
 
 async def test_progress_report(tmp_path):
