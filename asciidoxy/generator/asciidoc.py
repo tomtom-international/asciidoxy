@@ -33,6 +33,7 @@ from ..api_reference import AmbiguousLookupError, ApiReference
 from ..parser.doxygen import safe_language_tag
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
+from ..path_utils import relative_path
 from ..transcoder import TranscoderBase
 from .._version import __version__
 from .context import Context
@@ -41,7 +42,7 @@ from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFo
                      MissingPackageFileError, ReferenceNotFoundError, TemplateMissingError,
                      UnlinkableError)
 from .filters import FilterSpec, InsertionFilter
-from .navigation import DocumentTreeNode, navigation_bar, relative_path, multipage_toc
+from .navigation import DocumentTreeNode, navigation_bar, multipage_toc
 
 logger = logging.getLogger(__name__)
 

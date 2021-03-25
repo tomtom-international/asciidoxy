@@ -23,6 +23,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import List, Optional, Set, Tuple
 
+from ..path_utils import relative_path
+
 logger = logging.getLogger(__name__)
 
 
@@ -120,21 +122,6 @@ class DocumentTreeNode(object):
         title = re.sub(r"[*_`^~#]", "", title)
         title = title.strip()
         return title
-
-
-def relative_path(from_file: Path, to_file: Path):
-    assert from_file.is_absolute()
-    assert to_file.is_absolute()
-
-    path = Path()
-    for ancestor in from_file.parents:
-        try:
-            path = path / to_file.relative_to(ancestor)
-            break
-        except ValueError:
-            path = path / '..'
-
-    return path
 
 
 def navigation_bar(doc: DocumentTreeNode) -> str:

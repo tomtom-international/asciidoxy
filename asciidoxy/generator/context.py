@@ -25,9 +25,10 @@ from tqdm import tqdm
 from ..api_reference import ApiReference
 from ..model import ReferableElement
 from ..packaging import Package, PackageManager
+from ..path_utils import relative_path
 from .errors import ConsistencyError
 from .filters import InsertionFilter
-from .navigation import DocumentTreeNode, relative_path
+from .navigation import DocumentTreeNode
 
 logger = logging.getLogger(__name__)
 

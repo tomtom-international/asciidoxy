@@ -30,6 +30,7 @@ from .generator import process_adoc, AsciiDocError
 from .model import json_repr
 from .packaging import CollectError, PackageManager, SpecificationError
 from .parser.doxygen import Driver as DoxygenDriver
+from .path_utils import relative_path
 from ._version import __version__
 
 
@@ -239,8 +240,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             desc="Running asciidoctor     ",
             unit="file"):
         out_file = destination_dir / in_adoc_file.relative_to(in_dir).with_suffix(extension)
+        rel_image_dir = relative_path(out_adoc_file, pkg_mgr.image_work_dir)
         asciidoctor(destination_dir, out_file, out_adoc_file, args.multipage, args.backend,
-                    extra_args, pkg_mgr.image_work_dir)
+                    extra_args, rel_image_dir)
         logger.info(f"Generated: {out_file}")
 
     if args.backend != "pdf":
