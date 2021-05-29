@@ -106,7 +106,7 @@ The package specification file is provided to AsciiDoxy using the command-line o
 
 [source]
 ----
-asciidoxy --spec-file packages.spec INPUT_FILE
+asciidoxy --spec-file packages.toml INPUT_FILE
 ----
 
 [TIP]

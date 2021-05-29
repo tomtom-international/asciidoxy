@@ -109,7 +109,7 @@ Doxygen XML output, and make it available for use in AsciiDoc files:
 
 [source]
 ----
-asciidoxy --spec-file packages.spec INPUT_FILE
+asciidoxy --spec-file packages.toml INPUT_FILE
 ----
 
 == Including API reference in AsciiDoc files
