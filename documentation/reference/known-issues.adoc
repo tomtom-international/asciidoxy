@@ -1,0 +1,30 @@
+// Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Known issues
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+
+== Could not fully parse ... Links to known types may be missing.
+
+AsxiiDoxy needs to perform some parsing to create links in compound types. For example for types
+like: `MyContainer<MyType, MyAllocator>`. It will try to create links to `MyContainer`, `MyType`,
+and `MyAllocator`. Sometimes it fails to parse the full type. In that case a warning is shown and
+the generated documentation may not show links to all known types.
+
+When this happens, please open https://github.com/tomtom-international/asciidoxy/issues[an issue on
+GitHub] with the following information:
+
+* A minimal sample of source code that triggers the warning.
+* The Doxygen configuration and version used to create the XML input.
+* The version of AsciiDoxy used.
+* Log output when running AsciiDoxy with `--log DEBUG`.

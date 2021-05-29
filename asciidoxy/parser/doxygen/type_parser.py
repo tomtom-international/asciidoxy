@@ -249,6 +249,10 @@ class TypeParser:
         def fallback():
             return TypeRef(cls.TRAITS.TAG, "".join(t.text for t in original_tokens))
 
+        def log_parse_warning():
+            logger.warning(f"Could not fully parse `{''.join(t.text for t in original_tokens)}`."
+                           " Links to known types may be missing.")
+
         prefixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_PREFIXES)
         cls.remove_leading_whitespace(prefixes)
 
@@ -260,7 +264,8 @@ class TypeParser:
         try:
             nested_types, tokens = cls.nested_types(tokens, driver, namespace)
         except TypeParseError as e:
-            logger.warning(f"Failed to parse nested types: {e}")
+            log_parse_warning()
+            logger.debug(f"Failed to parse nested types: {e}")
             return fallback()
 
         suffixes, tokens = cls.select_tokens(tokens, cls.TRAITS.ALLOWED_SUFFIXES)
@@ -270,16 +275,19 @@ class TypeParser:
         try:
             arg_types, tokens = cls.arg_types(tokens, driver, namespace)
         except TypeParseError as e:
-            logger.warning(f"Failed to parse args: {e}")
+            log_parse_warning()
+            logger.debug(f"Failed to parse args: {e}")
             return fallback()
 
         if not names:
-            logger.warning(f"No name found in `{'`,`'.join(t.text for t in original_tokens)}`")
+            log_parse_warning()
+            logger.debug(f"No name found in `{'`,`'.join(t.text for t in original_tokens)}`")
             return fallback()
 
         if tokens and any(t.category != TokenCategory.WHITESPACE for t in tokens):
-            logger.warning(f"Unexpected trailing token(s) `{'`,`'.join(t.text for t in tokens)}`"
-                           f" in `{'`,`'.join(t.text for t in original_tokens)}`")
+            log_parse_warning()
+            logger.debug(f"Unexpected trailing token(s) `{'`,`'.join(t.text for t in tokens)}`"
+                         f" in `{'`,`'.join(t.text for t in original_tokens)}`")
             suffixes.extend(tokens)
 
         type_ref = TypeRef(cls.TRAITS.TAG)
