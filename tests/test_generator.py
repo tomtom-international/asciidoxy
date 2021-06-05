@@ -23,7 +23,7 @@ from typing import Optional
 
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.generator.asciidoc import ApiProxy, GeneratingApi, PreprocessingApi, process_adoc
-from asciidoxy.generator.context import Context
+from asciidoxy.generator.context import Context, StackFrame
 from asciidoxy.generator.navigation import DocumentTreeNode
 from asciidoxy.generator.errors import (AmbiguousReferenceError, ConsistencyError,
                                         IncludeFileNotFoundError, IncompatibleVersionError,
@@ -374,6 +374,134 @@ def test_insert_tracks_all_references(preprocessing_api, context):
     assert len(context.linked) == 2
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
     assert "cpp-classasciidoxy_1_1traffic_1_1_traffic_event" in context.linked
+
+
+@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
+def test_link_stores_stack_trace(preprocessing_api, context, input_file):
+    preprocessing_api.link("asciidoxy::geometry::Coordinate")
+    assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
+    traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
+
+    assert traces == [[
+        StackFrame("link('asciidoxy::geometry::Coordinate')", file=input_file, internal=False),
+        StackFrame("link('Coordinate')", file=None, internal=True)
+    ]]
+
+
+@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
+def test_link_stores_stack_trace_nested_insert(preprocessing_api, context, input_file):
+    preprocessing_api.insert("asciidoxy::positioning::Positioning")
+    assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
+    traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
+    assert traces == [
+        [
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=input_file,
+                       internal=False),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning::CurrentPosition')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+        ],
+        [
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=input_file,
+                       internal=False),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning::CurrentPosition')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+        ],
+        [
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=input_file,
+                       internal=False),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning::IsNearby')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+        ],
+        [
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=input_file,
+                       internal=False),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning::IsNearby')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+        ],
+        [
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=input_file,
+                       internal=False),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning::Override')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+        ],
+        [
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=input_file,
+                       internal=False),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="insert('asciidoxy::positioning::Positioning::Override')",
+                       file=None,
+                       internal=True),
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+        ]
+    ]
+
+
+@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
+def test_link_in_include_stores_stack_trace_with_correct_file(preprocessing_api, context,
+                                                              input_file):
+    include_file = input_file.parent / "include.adoc"
+    include_file.write_text("""${link("asciidoxy::geometry::Coordinate")}""")
+    preprocessing_api.include(include_file.name)
+
+    assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
+    traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
+
+    assert traces == [[
+        StackFrame("include('include.adoc')", file=input_file, internal=False),
+        StackFrame("link('asciidoxy::geometry::Coordinate')", file=include_file, internal=False),
+        StackFrame("link('Coordinate')", file=None, internal=True)
+    ]]
+
+
+@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
+def test_link_from_proxy_stores_stack_trace_with_proxy_name(preprocessing_api, context, input_file):
+    include_file = input_file.parent / "include.adoc"
+    include_file.write_text("""${api.link_class("asciidoxy::geometry::Coordinate")}""")
+    preprocessing_api.include(include_file.name)
+
+    assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
+    traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
+
+    assert traces == [[
+        StackFrame("include('include.adoc')", file=input_file, internal=False),
+        # Cannot reliably get parameters for proxy class
+        StackFrame("api.link_class()", file=include_file, internal=False),
+        StackFrame("link('asciidoxy::geometry::Coordinate')", file=include_file, internal=False),
+        StackFrame("link('Coordinate')", file=None, internal=True)
+    ]]
 
 
 def test_insert_class__global_filter_members(generating_api):

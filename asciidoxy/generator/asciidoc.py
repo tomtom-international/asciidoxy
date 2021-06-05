@@ -14,17 +14,20 @@
 """Generation of AsciiDoc output."""
 
 import functools
+import inspect
 import logging
 import os
 
 from abc import ABC, abstractmethod
+from functools import wraps
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from pathlib import Path
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
-from typing import MutableMapping, NamedTuple, Optional
+from typing import (Any, Callable, MutableMapping, NamedTuple, Optional, Sequence, TypeVar, Union,
+                    cast)
 
 from tqdm import tqdm
 
@@ -36,7 +39,7 @@ from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
 from ..path_utils import relative_path
 from ..transcoder import TranscoderBase
 from .._version import __version__
-from .context import Context
+from .context import Context, stacktrace
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
                      IncompatibleVersionError, InvalidApiCallError, MissingPackageError,
                      MissingPackageFileError, ReferenceNotFoundError, TemplateMissingError,
@@ -58,6 +61,96 @@ SUPPORTED_COMMANDS = [
     "require_version",
     "anchor",
 ]
+
+_WrappedFunc = TypeVar("_WrappedFunc", bound=Callable[..., Any])
+
+
+def _arg_to_str(arg: Optional[Any]) -> str:
+    if arg is None:
+        return "None"
+    if isinstance(arg, ReferableElement):
+        return f"'{arg.full_name}'"
+    return repr(arg)
+
+
+def _format_action(name: str, args, kwargs, show_args, show_kwargs) -> str:
+    # Using index + 1 because self is removed from args
+    args_parts = [_arg_to_str(value) for index, value in enumerate(args) if index + 1 in show_args]
+    kwargs_parts = [
+        f"{key}={_arg_to_str(value)}" for key, value in kwargs.items() if key in show_kwargs
+    ]
+    return f"{name}({', '.join(args_parts + kwargs_parts)})"
+
+
+def _lookup_args(f: _WrappedFunc, show_args: Sequence[Union[str, int]]):
+    signature = inspect.signature(f)
+    param_names = list(signature.parameters.keys())
+    arg_indices = []
+    kwarg_names = []
+    for arg in show_args:
+        if isinstance(arg, str):
+            arg_indices.append(param_names.index(arg))
+            kwarg_names.append(arg)
+        elif isinstance(arg, int):
+            arg_indices.append(arg)
+            kwarg_names.append(param_names[arg])
+    return arg_indices, kwarg_names
+
+
+def _stackframe(original_function: Optional[_WrappedFunc] = None,
+                *,
+                name: Optional[str] = None,
+                show_args: Sequence[Union[int, str]] = (1, ),
+                internal: bool = False,
+                _name: Callable[..., str],
+                _context: Callable[..., Context],
+                _api: Callable[..., "Api"],
+                _other_self=None):
+    def _decorator(f: _WrappedFunc) -> _WrappedFunc:
+        arg_indices, kwarg_names = _lookup_args(f, show_args)
+
+        @wraps(f)
+        def _wrapper(*args, **kwargs):
+            _self = _other_self or args[0]
+            _context(_self).push_stack(_format_action(_name(f), args[1:], kwargs, arg_indices,
+                                                      kwarg_names),
+                                       file=_api(_self)._current_file if not internal else None,
+                                       internal=internal)
+            ret = f(*args, **kwargs)
+            _context(_self).pop_stack()
+            return ret
+
+        return cast(_WrappedFunc, _wrapper)
+
+    if original_function is not None:
+        return _decorator(original_function)
+    return _decorator
+
+
+def _api_stackframe(*args, name: Optional[str] = None, **kwargs):
+    def _name(f: _WrappedFunc) -> str:
+        return name or f.__name__
+
+    def _context(self) -> Context:
+        return self._context
+
+    def _api(self) -> "Api":
+        return self
+
+    return _stackframe(*args, name=name, _name=_name, _context=_context, _api=_api, **kwargs)
+
+
+def _proxy_stackframe(*args, name: Optional[str] = None, **kwargs):
+    def _name(f: _WrappedFunc) -> str:
+        return name or f"api.{f.__name__}"
+
+    def _context(self) -> Context:
+        return self._api._context
+
+    def _api(self) -> "Api":
+        return self._api
+
+    return _stackframe(*args, name=name, _name=_name, _context=_context, _api=_api, **kwargs)
 
 
 class Api(ABC):
@@ -127,6 +220,7 @@ class Api(ABC):
         self._context.insert_filter = InsertionFilter(members, exceptions)
         return ""
 
+    @_api_stackframe
     def insert(self,
                name: str,
                *,
@@ -173,6 +267,7 @@ class Api(ABC):
             self.find_element(name, kind=kind, lang=lang, allow_overloads=False), insert_filter,
             leveloffset, **asciidoc_options)
 
+    @_api_stackframe
     def link(self,
              name: str,
              *,
@@ -318,6 +413,7 @@ class Api(ABC):
         else:
             logger.warning(str(error))
 
+    @_api_stackframe(show_args=("file_name", ))
     def include(self,
                 file_name: str,
                 *,
@@ -654,6 +750,7 @@ class PreprocessingApi(Api):
 
         return self.__class__(file_path, sub_context)
 
+    @_api_stackframe(name="insert", show_args=("element", ), internal=True)
     def insert_fragment(self,
                         element,
                         insert_filter: InsertionFilter,
@@ -667,6 +764,7 @@ class PreprocessingApi(Api):
         self._context.insert(element)
         return ""
 
+    @_api_stackframe(name="link", show_args=("link_text", ), internal=True)
     def link_to_element(self, element_id: str, link_text: str) -> str:
         self._context.link_to_element(element_id)
         return ""
@@ -783,6 +881,7 @@ class GeneratingApi(Api):
         else:
             return f"[[{name}]]"
 
+    @_api_stackframe(name="insert", show_args=("element", ), internal=True)
     def insert_fragment(self,
                         element,
                         insert_filter: InsertionFilter,
@@ -814,6 +913,7 @@ class GeneratingApi(Api):
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
         return f"include::{fragment_file}[{attributes}]"
 
+    @_api_stackframe(name="link", show_args=("link_text", ), internal=True)
     def link_to_element(self, element_id: str, link_text: str) -> str:
         containing_file = self._context.file_with_element(element_id)
         if containing_file is not None:
@@ -855,12 +955,18 @@ class ApiProxy:
         self._api = api
 
     def __getattr__(self, name: str):
-        if name in SUPPORTED_COMMANDS:
+        if name in ("link", "insert"):
+            return _proxy_stackframe(getattr(self._api, name), name=f"api.{name}", _other_self=self)
+        elif name in SUPPORTED_COMMANDS:
             return getattr(self._api, name)
         elif name.startswith("insert_"):
-            return functools.partial(self._api.insert, kind=name[7:])
+            return _proxy_stackframe(functools.partial(self._api.insert, kind=name[7:]),
+                                     name=f"api.{name}",
+                                     _other_self=self)
         elif name.startswith("link_"):
-            return functools.partial(self._api.link, kind=name[5:])
+            return _proxy_stackframe(functools.partial(self._api.link, kind=name[5:]),
+                                     name=f"api.{name}",
+                                     _other_self=self)
         else:
             raise AttributeError(name)
 
@@ -870,6 +976,7 @@ class ApiProxy:
                            link_text: Optional[str] = None) -> str:
         return self._api.cross_document_ref(file_name, anchor=anchor, link_text=link_text)
 
+    @_proxy_stackframe
     def include(self,
                 file_name: str,
                 leveloffset: str = "+1",
@@ -927,16 +1034,20 @@ def process_adoc(in_file: Path,
 
 
 def _check_links(context: Context):
-    dangling = context.linked - context.inserted.keys()
+    dangling = context.linked.keys() - context.inserted.keys()
     if dangling:
-        dangling_elements = {
-            context.reference.find(target_id=element_id)
-            for element_id in dangling
-        }
-        names = {f"{e.language}: {e.full_name}" for e in dangling_elements if e is not None}
-        msg = ("The following elements are linked to, but not included in the documentation:\n\t" +
-               "\n\t".join(names))
+        messages = []
+        for element_id in dangling:
+            element = context.reference.find(target_id=element_id)
+            if element is None:
+                raise RuntimeError(f"Internal consistency error: unknown element id: {element_id}."
+                                   "Please file a bug report.")
+
+            traces = '\n'.join(stacktrace(t) for t in context.linked[element_id])
+            messages.append(f"{element.language}: {element.full_name} not included in"
+                            f"documentation, but linked here:\n{traces}")
+
         if context.warnings_are_errors:
-            raise ConsistencyError(msg)
+            raise ConsistencyError("\n".join(messages))
         else:
-            logger.warning(msg)
+            logger.warning("\n".join(messages))
