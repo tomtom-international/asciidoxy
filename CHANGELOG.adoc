@@ -27,6 +27,12 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     another element's API reference.
 
 
+=== Changed
+
+  - Provide clearer errors and trace backs for exceptions while parsing AsciiDoc and for internal
+    errors.
+
+
 == 0.7.4 (25 Mar 2021)
 
 === Added

@@ -20,13 +20,13 @@ import subprocess
 import sys
 
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import List, Optional, Sequence
 
 from mako.exceptions import RichTraceback
 from tqdm import tqdm
 
 from .api_reference import ApiReference
-from .generator import process_adoc, AsciiDocError
+from .generator import process_adoc
 from .model import json_repr
 from .packaging import CollectError, PackageManager, SpecificationError
 from .parser.doxygen import Driver as DoxygenDriver
@@ -225,13 +225,8 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                                               multipage=args.multipage,
                                               progress=progress)
 
-    except AsciiDocError as e:
-        logger.error(f"Error while processing AsciiDoc file:\n\t{e}")
-        logger.error("\nTraceback:")
-        traceback = RichTraceback()
-        for filename, lineno, _, line in traceback.traceback:
-            if filename.endswith(".adoc"):
-                logger.error(f"File {filename}, line {lineno}:\n\t{line}\n")
+    except:  # noqa: E722
+        logger.error(human_traceback())
         sys.exit(1)
 
     in_dir = in_file.parent
@@ -248,6 +243,41 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     if args.backend != "pdf":
         with tqdm(desc="Copying images          ", unit="pkg") as progress:
             pkg_mgr.make_image_directory(destination_dir, progress)
+
+
+def human_traceback() -> str:
+    """Generate a human readable traceback the current exception. To be used inside an except
+    clause.
+
+    Exceptions triggered inside AsciiDoc are handled specially:
+     - Lines inside AsciiDoc files are resolved to the original AsciiDoc lines.
+     - AsciiDoxy code loading the AsciiDoc files is skipped.
+     - Additional Mako loading due to includes is skipped.
+    """
+    traceback = RichTraceback()
+
+    message = [""]
+    has_adoc = False
+    pending_traceback: List[str] = []
+    for filename, lineno, function, line in traceback.traceback:
+        if filename.endswith(".adoc"):
+            pending_traceback.clear()
+            message.append(f"  File {filename}, line {lineno}, in AsciiDoc\n    {line}")
+            has_adoc = True
+        elif "/mako/" in filename:
+            continue
+        else:
+            pending_traceback.append(f"  File {filename}, line {lineno}, in "
+                                     f"{function}\n    {line}")
+    if pending_traceback:
+        message.extend(pending_traceback)
+
+    if has_adoc:
+        message[0] = f"Error while processing AsciiDoc files:\n{traceback.error}\nTraceback:"
+    else:
+        message[0] = f"Internal error:\n{traceback.error}\nTraceback:"
+
+    return "\n".join(message)
 
 
 if __name__ == "__main__":
