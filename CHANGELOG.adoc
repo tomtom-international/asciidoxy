@@ -25,6 +25,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Provide detailed stack traces for links to missing elements. It should now be clear what
     commands are causing the links to be inserted, especially when links are inserted as part of
     another element's API reference.
+  - Provide detailed stack traces when inserting the same element multiple times. It should now be
+    clear whether the element was inserted as part of another element.
 
 
 === Changed

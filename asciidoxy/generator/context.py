@@ -71,11 +71,12 @@ class StackFrame(NamedTuple):
     internal: bool
 
 
-def stacktrace(trace: List[StackFrame]) -> str:
+def stacktrace(trace: List[StackFrame], prefix: str = "") -> str:
     """Generate a string representation of a sequence of stack frames.
 
     Args:
-        trace: Sequence of stack frames.
+        trace:  Sequence of stack frames.
+        prefix: Optional prefix for each line. E.g. to add indentation.
 
     Returns:
         String representation of the stack trace.
@@ -87,15 +88,15 @@ def stacktrace(trace: List[StackFrame]) -> str:
     lines = []
 
     if not trace[0].internal:
-        lines.append("Commands in input files:")
+        lines.append(f"{prefix}Commands in input files:")
     while trace and not trace[0].internal:
-        lines.append(f"\t{trace[0].file}:\t{trace[0].command}")
+        lines.append(f"{prefix}  {trace[0].file}:\t{trace[0].command}")
         trace.pop(0)
 
     if trace and trace[0].internal:
-        lines.append("Internal AsciiDoxy commands:")
+        lines.append(f"{prefix}Internal AsciiDoxy commands:")
     while trace:
-        lines.append(f"\tINTERNAL:\t{trace[0].command}")
+        lines.append(f"{prefix}  INTERNAL:\t{trace[0].command}")
         trace.pop(0)
 
     return "\n".join(lines)
@@ -144,7 +145,7 @@ class Context(object):
     progress: Optional[tqdm] = None
 
     linked: Dict[str, List[List[StackFrame]]]
-    inserted: MutableMapping[str, Path]
+    inserted: MutableMapping[str, Tuple[Path, List[StackFrame]]]
     anchors: Dict[str, Tuple[Path, Optional[str]]]
     in_to_out_file_map: Dict[Path, Path]
     embedded_file_map: Dict[Tuple[Path, Path], Path]
@@ -176,12 +177,15 @@ class Context(object):
     def insert(self, element: ReferableElement) -> None:
         assert element.id
         if element.id in self.inserted:
-            msg = f"Duplicate insertion of {element.name}"
+            _, trace = self.inserted[element.id]
+            msg = (f"Duplicate insertion of {element.name}.\nTrying to insert at:\n"
+                   f"{stacktrace(self.call_stack, prefix='  ')}\nPreviously inserted at:\n"
+                   f"{stacktrace(trace, prefix='  ')}")
             if self.warnings_are_errors:
                 raise ConsistencyError(msg)
             else:
                 logger.warning(msg)
-        self.inserted[element.id] = self.current_document.in_file
+        self.inserted[element.id] = (self.current_document.in_file, self.call_stack[:])
 
     def sub_context(self) -> "Context":
         sub = Context(base_dir=self.base_dir,
@@ -216,7 +220,7 @@ class Context(object):
         if not self.multipage or element_id not in self.inserted:
             return None
 
-        containing_file = self.inserted[element_id]
+        containing_file = self.inserted[element_id][0]
         assert containing_file is not None
         if self.current_document.in_file != containing_file:
             return containing_file

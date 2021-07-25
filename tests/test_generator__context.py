@@ -18,7 +18,7 @@ import pytest
 from pathlib import Path
 
 from asciidoxy.generator.context import StackFrame, stacktrace
-from asciidoxy.generator.errors import DuplicateAnchorError, UnknownAnchorError
+from asciidoxy.generator.errors import ConsistencyError, DuplicateAnchorError, UnknownAnchorError
 from asciidoxy.generator.navigation import DocumentTreeNode
 
 from .builders import make_compound
@@ -371,6 +371,45 @@ def test_link_to_element__nested_call_stack(empty_context, input_file):
     ]
 
 
+def test_insert__store_stacktrace(empty_context, input_file):
+    empty_context.push_stack("include(\"other_file.adoc\")", input_file)
+
+    element = make_compound(id="cpp-my_element", name="MyElement")
+    empty_context.insert(element)
+
+    empty_context.pop_stack()
+
+    assert element.id in empty_context.inserted
+    assert empty_context.inserted[element.id] == (input_file, [
+        StackFrame("include(\"other_file.adoc\")", input_file, False),
+    ])
+
+
+def test_insert__duplicate(empty_context, input_file):
+    empty_context.warnings_are_errors = True
+
+    element = make_compound(id="cpp-my_element", name="MyElement")
+    other_file = input_file.parent / "other_file.adoc"
+
+    empty_context.push_stack("include(\"other_file.adoc\")", input_file)
+    empty_context.insert(element)
+    empty_context.pop_stack()
+
+    empty_context.push_stack("insert(\"MyElement\")", other_file)
+    with pytest.raises(ConsistencyError) as exc_info:
+        empty_context.insert(element)
+    empty_context.pop_stack()
+
+    assert exc_info.value.msg == f"""\
+Duplicate insertion of MyElement.
+Trying to insert at:
+  Commands in input files:
+    {other_file}:\tinsert("MyElement")
+Previously inserted at:
+  Commands in input files:
+    {input_file}:\tinclude("other_file.adoc")"""
+
+
 def test_stacktrace__external_only(input_file):
     other_file = input_file.parent / "other_file.adoc"
 
@@ -380,8 +419,8 @@ def test_stacktrace__external_only(input_file):
     ]
     assert stacktrace(trace) == f"""\
 Commands in input files:
-\t{input_file}:\tinclude('other_file.adoc')
-\t{other_file}:\tinsert('MyElement')"""
+  {input_file}:\tinclude('other_file.adoc')
+  {other_file}:\tinsert('MyElement')"""
 
 
 def test_stacktrace__external_and_internal(input_file):
@@ -395,11 +434,11 @@ def test_stacktrace__external_and_internal(input_file):
     ]
     assert stacktrace(trace) == f"""\
 Commands in input files:
-\t{input_file}:\tinclude('other_file.adoc')
-\t{other_file}:\tinsert('MyElement')
+  {input_file}:\tinclude('other_file.adoc')
+  {other_file}:\tinsert('MyElement')
 Internal AsciiDoxy commands:
-\tINTERNAL:\tinsert('OtherElement')
-\tINTERNAL:\tlink('GreatElement')"""
+  INTERNAL:\tinsert('OtherElement')
+  INTERNAL:\tlink('GreatElement')"""
 
 
 def test_stacktrace__internal_only(input_file):
@@ -409,8 +448,8 @@ def test_stacktrace__internal_only(input_file):
     ]
     assert stacktrace(trace) == """\
 Internal AsciiDoxy commands:
-\tINTERNAL:\tinsert('OtherElement')
-\tINTERNAL:\tlink('GreatElement')"""
+  INTERNAL:\tinsert('OtherElement')
+  INTERNAL:\tlink('GreatElement')"""
 
 
 def test_stacktrace__empty(input_file):
