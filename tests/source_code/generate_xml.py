@@ -24,7 +24,7 @@ from subprocess import PIPE
 
 def get_doxygen_version(doxygen: str) -> str:
     proc = subprocess.run([doxygen, "-v"], stdout=PIPE, encoding="utf-8", check=True)
-    return proc.stdout.strip()
+    return proc.stdout.strip().split(" ", 1)[0]
 
 
 def main() -> int:
