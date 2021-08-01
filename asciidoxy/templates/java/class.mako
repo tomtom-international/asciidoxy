@@ -28,7 +28,7 @@ ${api.inserted(element)}
 
 [source,java,subs="-specialchars,macros+"]
 ----
-class ${element.full_name}
+${element.kind} ${element.full_name}
 ----
 ${element.brief}
 

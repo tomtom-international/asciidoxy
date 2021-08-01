@@ -14,7 +14,7 @@ Base class for services.
 
 [cols='h,5a']
 |===
-|*Methods*
+|*Public Methods*
 |
 `<<java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c,++void Start()++>>`::
 Start the service.
@@ -22,6 +22,7 @@ Start the service.
 Stop the service.
 
 |===
+
 
 == Members
 [[java-interfacecom_1_1asciidoxy_1_1system_1_1_service_1a3e0c2738c4bdb3a977da92bd5d66c10c,Start]]
@@ -54,4 +55,6 @@ Stop the service.
 |===
 |===
 '''
+
+
 

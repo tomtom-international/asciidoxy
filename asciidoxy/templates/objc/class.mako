@@ -32,7 +32,7 @@ ${api.inserted(element)}
 #import &lt;${element.include}&gt;
 
 % endif
-@interface ${element.name}
+@${"interface" if element.kind == "class" else element.kind} ${element.name}
 ----
 ${element.brief}
 
