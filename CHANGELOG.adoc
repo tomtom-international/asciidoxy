@@ -27,6 +27,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     another element's API reference.
   - Provide detailed stack traces when inserting the same element multiple times. It should now be
     clear whether the element was inserted as part of another element.
+  - Support preconditions and postconditions for functions and methods.
 
 
 === Changed

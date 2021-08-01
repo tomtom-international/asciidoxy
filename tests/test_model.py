@@ -488,6 +488,8 @@ def test_compound__init__default():
 
     assert compound.brief == ""
     assert compound.description == ""
+    assert compound.precondition == ""
+    assert compound.postcondition == ""
 
     assert compound.static is False
     assert compound.const is False
@@ -519,6 +521,8 @@ def test_compound__init__positional():
 
     assert compound.brief == ""
     assert compound.description == ""
+    assert compound.precondition == ""
+    assert compound.postcondition == ""
 
     assert compound.static is False
     assert compound.const is False
@@ -549,7 +553,9 @@ def test_compound__init__keyword():
                         const=True,
                         deleted=True,
                         default=True,
-                        constexpr=True)
+                        constexpr=True,
+                        precondition="pre",
+                        postcondition="post")
 
     assert compound.id == "id"
     assert compound.name == "name"
@@ -576,6 +582,8 @@ def test_compound__init__keyword():
 
     assert compound.brief == "brief"
     assert compound.description == "description"
+    assert compound.precondition == "pre"
+    assert compound.postcondition == "post"
 
     assert compound.static is True
     assert compound.const is True
@@ -631,7 +639,9 @@ def test_compound__eq__full():
                      const=True,
                      deleted=True,
                      default=True,
-                     constexpr=True)
+                     constexpr=True,
+                     precondition="pre",
+                     postcondition="post")
     second = Compound(id="id",
                       name="name",
                       full_name="full_name",
@@ -653,13 +663,16 @@ def test_compound__eq__full():
                       const=True,
                       deleted=True,
                       default=True,
-                      constexpr=True)
+                      constexpr=True,
+                      precondition="pre",
+                      postcondition="post")
 
     assert first == second
     assert second == first
 
     for attr_name in ("id", "name", "full_name", "language", "kind", "include", "namespace", "prot",
-                      "definition", "args", "initializer", "brief", "description"):
+                      "definition", "args", "initializer", "brief", "description", "precondition",
+                      "postcondition"):
         setattr(second, attr_name, "other")
         assert first != second
         assert second != first

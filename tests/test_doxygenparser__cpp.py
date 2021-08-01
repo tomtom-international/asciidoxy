@@ -15,6 +15,8 @@
 
 import pytest
 
+from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
+
 
 @pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_parse_cpp_class(api_reference):
@@ -483,3 +485,53 @@ def test_parse_cpp__constexpr_constructor(api_reference):
 
     assert member.returns is None
     assert member.constexpr is True
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_parse_cpp_member_function_pre_and_post_condition(api_reference):
+    member = api_reference.find("asciidoxy::geometry::Coordinate::Update(double, double, double)",
+                                kind="function",
+                                lang="cpp")
+    assert member == Compound(
+        id="cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891",
+        name="Update",
+        full_name="asciidoxy::geometry::Coordinate::Update",
+        language="cpp",
+        kind="function",
+        include="coordinate.hpp",
+        namespace="asciidoxy::geometry::Coordinate",
+        prot="public",
+        definition="void asciidoxy::geometry::Coordinate::Update",
+        args="(double latitude, double longitude, double altitude)",
+        brief="Update from separate values.",
+        precondition="The coordinate exists.",
+        postcondition="New values are used for the coordinate.",
+        params=[
+            Parameter(name="latitude",
+                      default_value="",
+                      type=TypeRef(name="double",
+                                   language="cpp",
+                                   namespace="asciidoxy::geometry::Coordinate",
+                                   prefix="",
+                                   suffix="")),
+            Parameter(name="longitude",
+                      default_value="",
+                      type=TypeRef(name="double",
+                                   language="cpp",
+                                   namespace="asciidoxy::geometry::Coordinate",
+                                   prefix="",
+                                   suffix="")),
+            Parameter(name="altitude",
+                      default_value="",
+                      type=TypeRef(name="double",
+                                   language="cpp",
+                                   namespace="asciidoxy::geometry::Coordinate",
+                                   prefix="",
+                                   suffix="")),
+        ],
+        returns=ReturnValue(type=TypeRef(name="void",
+                                         language="cpp",
+                                         namespace="asciidoxy::geometry::Coordinate",
+                                         prefix="",
+                                         suffix="")),
+    )

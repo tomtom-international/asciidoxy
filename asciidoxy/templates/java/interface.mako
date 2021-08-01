@@ -100,9 +100,19 @@ ${method.brief}
 
 ${method.description}
 
-% if method.params or method.exceptions or method.returns:
+% if method.params or method.exceptions or method.returns or method.precondition or method.postcondition:
 [cols='h,5a']
 |===
+% if method.precondition:
+| Precondition
+| ${method.precondition}
+
+% endif
+% if method.postcondition:
+| Postcondition
+| ${method.postcondition}
+
+% endif
 % if method.params:
 | Parameters
 |
@@ -145,9 +155,19 @@ ${method.brief}
 
 ${method.description}
 
-% if method.params or method.exceptions or method.returns:
+% if method.params or method.exceptions or method.returns or method.precondition or method.postcondition:
 [cols='h,5a']
 |===
+% if method.precondition:
+| Precondition
+| ${method.precondition}
+
+% endif
+% if method.postcondition:
+| Postcondition
+| ${method.postcondition}
+
+% endif
 % if method.params:
 | Parameters
 |

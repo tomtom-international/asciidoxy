@@ -101,6 +101,9 @@ class Coordinate {
 
   /**
    * Update from separate values.
+   *
+   * @pre  The coordinate exists.
+   * @post New values are used for the coordinate.
    */
   void Update(double latitude, double longitude, double altitude);
 

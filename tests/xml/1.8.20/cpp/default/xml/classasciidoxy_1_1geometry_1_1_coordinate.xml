@@ -16,7 +16,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="coordinate.hpp" line="108" column="10" bodyfile="coordinate.hpp" bodystart="108" bodyend="-1"/>
+        <location file="coordinate.hpp" line="111" column="10" bodyfile="coordinate.hpp" bodystart="111" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classasciidoxy_1_1geometry_1_1_coordinate_1aa1f1fa30bae57977d397929654496270" prot="private" static="no" mutable="no">
         <type>double</type>
@@ -30,7 +30,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="coordinate.hpp" line="109" column="10" bodyfile="coordinate.hpp" bodystart="109" bodyend="-1"/>
+        <location file="coordinate.hpp" line="112" column="10" bodyfile="coordinate.hpp" bodystart="112" bodyend="-1"/>
       </memberdef>
       <memberdef kind="variable" id="classasciidoxy_1_1geometry_1_1_coordinate_1ac5f3b7b213473d7fedbdc7ccda7816f6" prot="private" static="no" mutable="no">
         <type>double</type>
@@ -44,7 +44,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="coordinate.hpp" line="110" column="10" bodyfile="coordinate.hpp" bodystart="110" bodyend="-1"/>
+        <location file="coordinate.hpp" line="113" column="10" bodyfile="coordinate.hpp" bodystart="113" bodyend="-1"/>
       </memberdef>
       </sectiondef>
       <sectiondef kind="public-func">
@@ -260,11 +260,16 @@
         <briefdescription>
         </briefdescription>
         <detaileddescription>
-<para>Update from separate values. </para>
+<para>Update from separate values.</para>
+<para><simplesect kind="pre"><para>The coordinate exists. </para>
+</simplesect>
+<simplesect kind="post"><para>New values are used for the coordinate. </para>
+</simplesect>
+</para>
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="coordinate.hpp" line="105" column="8"/>
+        <location file="coordinate.hpp" line="108" column="8"/>
       </memberdef>
       </sectiondef>
     <briefdescription>
@@ -273,7 +278,7 @@
 <para>Class to hold information about a coordinate.</para>
 <para>A coordinate has a latitude, longitude, and an altitude. </para>
     </detaileddescription>
-    <location file="coordinate.hpp" line="33" column="1" bodyfile="coordinate.hpp" bodystart="33" bodyend="111"/>
+    <location file="coordinate.hpp" line="33" column="1" bodyfile="coordinate.hpp" bodystart="33" bodyend="114"/>
     <listofallmembers>
       <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483" prot="public" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>Altitude</name></member>
       <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1ac5f3b7b213473d7fedbdc7ccda7816f6" prot="private" virt="non-virtual"><scope>asciidoxy::geometry::Coordinate</scope><name>altitude_</name></member>

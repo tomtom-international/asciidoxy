@@ -9,9 +9,6 @@
       <node id="2">
         <label>functional</label>
       </node>
-      <node id="4">
-        <label>string</label>
-      </node>
       <node id="1">
         <label>relative_namespace.hpp</label>
         <link refid="relative__namespace_8hpp"/>
@@ -21,6 +18,9 @@
         </childnode>
         <childnode refid="4" relation="include">
         </childnode>
+      </node>
+      <node id="4">
+        <label>string</label>
       </node>
       <node id="3">
         <label>memory</label>

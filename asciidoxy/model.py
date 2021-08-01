@@ -210,6 +210,8 @@ class Compound(ReferableElement):
         initializer:   Initial value assignment.
         brief:         Brief description of the compound.
         description:   Full description of the compound.
+        precondition:  Condition that must hold before using the compound.
+        postcondition: Condition that must hold after using the command.
         static:        True if this is marked as static.
         const:         True if this is marked as const.
         deleted:       True if this is marked as deleted.
@@ -232,6 +234,8 @@ class Compound(ReferableElement):
 
     brief: str = ""
     description: str = ""
+    precondition: str = ""
+    postcondition: str = ""
 
     static: bool = False
     const: bool = False
@@ -260,12 +264,12 @@ class Compound(ReferableElement):
         return (super().__eq__(other)
                 and (self.members, self.params, self.exceptions, self.returns, self.include,
                      self.namespace, self.prot, self.definition, self.args, self.initializer,
-                     self.brief, self.description, self.static, self.const, self.deleted,
-                     self.default, self.constexpr)
+                     self.brief, self.description, self.precondition, self.postcondition,
+                     self.static, self.const, self.deleted, self.default, self.constexpr)
                 == (other.members, other.params, other.exceptions, other.returns, other.include,
                     other.namespace, other.prot, other.definition, other.args, other.initializer,
-                    other.brief, other.description, other.static, other.const, other.deleted,
-                    other.default, other.constexpr))
+                    other.brief, other.description, other.precondition, other.postcondition,
+                    other.static, other.const, other.deleted, other.default, other.constexpr))
 
     def __hash__(self):
         return super().__hash__()
