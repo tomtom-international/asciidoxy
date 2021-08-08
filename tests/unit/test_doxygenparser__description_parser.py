@@ -21,7 +21,7 @@ import re
 import xml.etree.ElementTree as ET
 
 from asciidoxy.parser.doxygen.description_parser import DescriptionParser
-from tests.shared import sub_element
+from tests.unit.shared import sub_element
 
 
 def nested_formatting():

@@ -22,7 +22,7 @@ from unittest.mock import MagicMock
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
 from asciidoxy.parser.doxygen.java import JavaTypeParser
 from asciidoxy.parser.doxygen.type_parser import Token
-from tests.shared import assert_equal_or_none_if_empty
+from tests.unit.shared import assert_equal_or_none_if_empty
 
 
 @pytest.fixture(params=["", "final ", "synchronized ", "synchronized final "])

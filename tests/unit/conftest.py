@@ -27,7 +27,7 @@ from asciidoxy.parser.doxygen import Driver as ParserDriver
 
 from .builders import SimpleClassBuilder
 
-_xml_dir = Path(__file__).parent / "xml"
+_xml_dir = Path(__file__).parent / "data" / "generated" / "xml"
 
 
 def pytest_addoption(parser):
@@ -53,7 +53,7 @@ def doxygen_version(request):
 
 @pytest.fixture
 def xml_data(doxygen_version):
-    return Path(__file__).parent / "xml" / doxygen_version
+    return Path(__file__).parent / "data" / "generated" / "xml" / doxygen_version
 
 
 @pytest.fixture
@@ -72,7 +72,7 @@ def parser_driver_factory(xml_data):
 
 @pytest.fixture
 def adoc_data():
-    return Path(__file__).parent / "adoc"
+    return Path(__file__).parent / "data" / "adoc"
 
 
 @pytest.fixture

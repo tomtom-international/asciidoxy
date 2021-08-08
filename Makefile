@@ -78,13 +78,13 @@ clean-docs: ## remove documentation generation artifacts
 	rm -rf build/doc
 
 lint: ## check style with flake8
-	flake8 asciidoxy tests
+	flake8 asciidoxy tests/unit
 
 type-check: ## Check typing with mypy
 	mypy asciidoxy
 
-test: ## run tests quickly with the default Python
-	pytest --numprocesses=auto --maxprocesses=6
+unit-test: ## run tests quickly with the default Python
+	pytest --numprocesses=auto --maxprocesses=6 tests/unit
 
 test-all: ## run tests on every Python version with tox
 	tox -s
@@ -116,7 +116,7 @@ docker: dist ## build the docker image
 	cd docker && ./gradlew build
 
 format: ## format the code
-	yapf -r -i -p setup.py asciidoxy tests
+	yapf -r -i -p setup.py asciidoxy tests/unit
 
 docs: doxygen ## generate documentation
 	cd documentation && $(MAKE)
@@ -132,7 +132,7 @@ doxygen: doxygen-$(LATEST_DOXYGEN_VERSION) ## Install the latest doxygen version
 
 define GENERATE_TEST_XML_template
 generate-test-xml-$(1): doxygen-$(1)
-	. build/doxygen-$(1)/activate_run.sh; cd tests/source_code; python3 generate_xml.py doxygen
+	. build/doxygen-$(1)/activate_run.sh; cd tests/unit/data/source_code; python3 generate_xml.py doxygen
 
 ALL_GENERATE_TEST_XML := $$(ALL_GENERATE_TEST_XML) generate-test-xml-$(1)
 endef
