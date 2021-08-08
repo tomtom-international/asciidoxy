@@ -132,10 +132,30 @@ doxygen: doxygen-$(LATEST_DOXYGEN_VERSION) ## Install the latest doxygen version
 
 define GENERATE_TEST_XML_template
 generate-test-xml-$(1): doxygen-$(1)
-	. build/doxygen-$(1)/activate_run.sh; cd tests/unit/data/source_code; python3 generate_xml.py doxygen
+	. build/doxygen-$(1)/activate_run.sh; cd tests/data/source_code; python3 generate_xml.py doxygen
 
 ALL_GENERATE_TEST_XML := $$(ALL_GENERATE_TEST_XML) generate-test-xml-$(1)
 endef
 $(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call GENERATE_TEST_XML_template,$(version))))
 
 generate-test-xml: $(ALL_GENERATE_TEST_XML) ## generate Doxygen XML files required for test cases
+
+# Generate output for visual inspection tests
+VISUAL_TEST_CASES := $(wildcard tests/visual/*.adoc)
+VISUAL_TEST_CASE_BUILD_DIR := build/visual-test
+
+define VISUAL_TEST_template
+visual-test-$(notdir $(basename $(1))): $(1)
+	asciidoxy $(1) \
+		--build-dir $(VISUAL_TEST_CASE_BUILD_DIR) \
+		--spec-file $(patsubst %.adoc,%.toml,$(1)) \
+		--warnings-are-errors \
+		--debug
+	mv $(VISUAL_TEST_CASE_BUILD_DIR)/debug.json $(VISUAL_TEST_CASE_BUILD_DIR)/$(notdir $(basename $(1))).debug.json
+
+ALL_VISUAL_TEST_CASES := $$(ALL_VISUAL_TEST_CASES) visual-test-$(notdir $(basename $(1)))
+endef
+
+$(foreach visual_test,$(VISUAL_TEST_CASES),$(eval $(call VISUAL_TEST_template,$(visual_test))))
+
+visual-test: $(ALL_VISUAL_TEST_CASES) ## run visual inspection test cases

@@ -350,7 +350,8 @@ def test_insert_error_when_reference_not_found(generating_api):
         generating_api.insert("asciidoxy::geometry::Sphere")
 
 
-@pytest.mark.parametrize("xml_data,api_reference_set", [(Path(__file__).parent / "data", [""])])
+@pytest.mark.parametrize("xml_data,api_reference_set",
+                         [(Path(__file__).parent.parent / "data", [""])])
 def test_insert_error_when_kind_not_supported(generating_api):
     with pytest.raises(TemplateMissingError):
         generating_api.insert("asciidoxy::unsupported_kind::kUnsupportedKindSample")

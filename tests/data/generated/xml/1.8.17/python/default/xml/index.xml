@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.17">
+  <compound refid="namespaceasciidoxy" kind="namespace"><name>asciidoxy</name>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1default__values" kind="namespace"><name>asciidoxy::default_values</name>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
+  </compound>
+  <compound refid="____init_____8py" kind="file"><name>__init__.py</name>
+  </compound>
+  <compound refid="default__values_8py" kind="file"><name>default_values.py</name>
+  </compound>
+  <compound refid="geometry_8py" kind="file"><name>geometry.py</name>
+  </compound>
+  <compound refid="traffic_8py" kind="file"><name>traffic.py</name>
+  </compound>
+  <compound refid="dir_3b16d38c15c00c78b4ed52f839ddcd7a" kind="dir"><name>asciidoxy</name>
+  </compound>
+</doxygenindex>
