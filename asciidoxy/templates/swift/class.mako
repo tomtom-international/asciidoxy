@@ -17,6 +17,7 @@
 from asciidoxy.templates.helpers import has
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 from html import escape
+from itertools import chain
 %>
 <%
 helper = SwiftTemplateHelper(api, element, insert_filter)
