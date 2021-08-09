@@ -43,35 +43,7 @@ Traffic event details.
 
 
 '''
-[[swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,update]]
-
-[source,swift,subs="-specialchars,macros+"]
-----
-func update(withCause: Integer,
-            delay: Integer) -&gt; Any
-----
-
-Update the traffic event data.
-
-Verifies the new information before updating.
-
-[cols='h,5a']
-|===
-| Parameters
-|
-`withCause: Integer`::
-New TPEG cause code.
-
-`delay: Integer`::
-New delay in seconds.
-
-| Returns
-|
-`Any`::
-True if the update is valid.
-
-|===
-
+include::DIRECTORY/swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262.adoc[leveloffset=+1]
 '''
 
 

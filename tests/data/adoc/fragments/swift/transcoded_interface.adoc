@@ -40,18 +40,7 @@ Check if the coordinate is valid.
 == Members
 
 
-[[swift-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22,init]]
-
-[source,swift,subs="-specialchars,macros+"]
-----
-func init()
-----
-
-Default constructor.
-
-
-
-
+include::DIRECTORY/swift-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22.adoc[leveloffset=+1]
 '''
 [[swift-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]
 
@@ -89,26 +78,7 @@ The altitude in meters.
 
 
 '''
-[[swift-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321,isValid]]
-
-[source,swift,subs="-specialchars,macros+"]
-----
-func isValid() -&gt; Any
-----
-
-Check if the coordinate is valid.
-
-A coordinate is valid if its values are within WGS84 bounds.
-
-[cols='h,5a']
-|===
-| Returns
-|
-`Any`::
-True if valid, false if not.
-
-|===
-
+include::DIRECTORY/swift-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321.adoc[leveloffset=+1]
 '''
 
 

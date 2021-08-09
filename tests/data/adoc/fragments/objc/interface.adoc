@@ -73,47 +73,9 @@ The altitude in meters.
 
 
 '''
-[[objc-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321,isValid]]
-
-[source,objectivec,subs="-specialchars,macros+"]
-----
-- (id)isValid;
-----
-
-Check if the coordinate is valid.
-
-A coordinate is valid if its values are within WGS84 bounds.
-
-[cols='h,5a']
-|===
-| Returns
-|
-`id`::
-True if valid, false if not.
-
-|===
-
+include::DIRECTORY/objc-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321.adoc[leveloffset=+1]
 '''
-[[objc-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22,init]]
-
-[source,objectivec,subs="-specialchars,macros+"]
-----
-- (instancetype)init;
-----
-
-Default constructor.
-
-
-
-[cols='h,5a']
-|===
-| Returns
-|
-`instancetype`::
-
-
-|===
-
+include::DIRECTORY/objc-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22.adoc[leveloffset=+1]
 '''
 
 

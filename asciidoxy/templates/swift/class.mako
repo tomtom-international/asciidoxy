@@ -114,41 +114,7 @@ ${api.insert_fragment(enclosed, insert_filter)}
 % for prot in ("open", "public", "internal", "file-private", "private"):
 ################################################################################### Constructors ##
 % for constructor in helper.constructors(prot=prot):
-[[${constructor.id},${constructor.name}]]
-${api.inserted(constructor)}
-[source,swift,subs="-specialchars,macros+"]
-----
-${escape(helper.method_signature(constructor))}
-----
-
-${constructor.brief}
-
-${constructor.description}
-
-% if constructor.params or constructor.exceptions or constructor.returns:
-[cols='h,5a']
-|===
-% if constructor.params:
-| Parameters
-|
-% for param in constructor.params:
-`${helper.parameter(param)}`::
-${param.description}
-
-% endfor
-% endif
-% if constructor.exceptions:
-| Throws
-|
-% for exception in constructor.exceptions:
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
-
+${api.insert_fragment(constructor, insert_filter, kind_override="method")}
 '''
 % endfor
 ##################################################################################### Properties ##
@@ -168,114 +134,12 @@ ${prop.description}
 % endfor
 ################################################################################### Type methods ##
 % for method in helper.type_methods(prot=prot):
-[[${method.id},${method.name}]]
-${api.inserted(method)}
-[source,swift,subs="-specialchars,macros+"]
-----
-${escape(helper.method_signature(method))}
-----
-
-${method.brief}
-
-${method.description}
-
-% if method.params or method.exceptions or method.returns or method.precondition or method.postcondition:
-[cols='h,5a']
-|===
-% if method.precondition:
-| Precondition
-| ${method.precondition}
-
-% endif
-% if method.postcondition:
-| Postcondition
-| ${method.postcondition}
-
-% endif
-% if method.params:
-| Parameters
-|
-% for param in method.params:
-`${helper.parameter(param)}`::
-${param.description}
-
-% endfor
-% endif
-% if method.returns and method.returns.type.name != "void":
-| Returns
-|
-`${helper.print_ref(method.returns.type)}`::
-${method.returns.description}
-
-% endif
-% if method.exceptions:
-| Throws
-|
-% for exception in method.exceptions:
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
-
+${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 ######################################################################################## Methods ##
 % for method in helper.methods(prot=prot):
-[[${method.id},${method.name}]]
-${api.inserted(method)}
-[source,swift,subs="-specialchars,macros+"]
-----
-${escape(helper.method_signature(method))}
-----
-
-${method.brief}
-
-${method.description}
-
-% if method.params or method.exceptions or method.returns or method.precondition or method.postcondition:
-[cols='h,5a']
-|===
-% if method.precondition:
-| Precondition
-| ${method.precondition}
-
-% endif
-% if method.postcondition:
-| Postcondition
-| ${method.postcondition}
-
-% endif
-% if method.params:
-| Parameters
-|
-% for param in method.params:
-`${helper.parameter(param)}`::
-${param.description}
-
-% endfor
-% endif
-% if method.returns and method.returns.type.name != "void":
-| Returns
-|
-`${helper.print_ref(method.returns.type)}`::
-${method.returns.description}
-
-% endif
-% if method.exceptions:
-| Throws
-|
-% for exception in method.exceptions:
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
-
+${api.insert_fragment(method, insert_filter, kind_override="method")}
 '''
 % endfor
 
