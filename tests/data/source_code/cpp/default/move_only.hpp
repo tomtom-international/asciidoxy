@@ -36,12 +36,12 @@ class MoveOnly {
   /**
    * Deleted copy constructor.
    */
-  virtual MoveOnly(const MoveOnly&) = delete;
+  MoveOnly(const MoveOnly&) = delete;
 
   /**
    * Default move constructor.
    */
-  virtual MoveOnly(MoveOnly&&) noexcept = default;
+  MoveOnly(MoveOnly&&) noexcept = default;
 
   /**
    * Deleted copy assignment.

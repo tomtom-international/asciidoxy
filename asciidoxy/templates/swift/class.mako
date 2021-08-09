@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 from html import escape
 from itertools import chain
@@ -34,6 +34,18 @@ ${element.brief}
 
 ${element.description}
 
+<%
+for prot in ("open", "public", "internal", "file-private", "private"):
+    if has_any(helper.simple_enclosed_types(prot=prot),
+               helper.complex_enclosed_types(prot=prot),
+               helper.constructors(prot=prot),
+               helper.properties(prot=prot),
+               helper.type_methods(prot=prot),
+               helper.methods(prot=prot)):
+        break
+else:
+    return STOP_RENDERING
+%>
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===

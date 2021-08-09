@@ -12,6 +12,7 @@ Class to hold information about a coordinate.
 
 A coordinate has a latitude, longitude, and an altitude.
 
+
 [cols='h,5a']
 |===
 

@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has
+from asciidoxy.templates.helpers import has, has_any
 from asciidoxy.templates.python.helpers import PythonTemplateHelper
 from html import escape
 %>
@@ -33,6 +33,14 @@ ${element.brief}
 
 ${element.description}
 
+<%
+if not has_any(helper.complex_enclosed_types(prot="public"),
+               helper.constructors(prot="public"),
+               helper.variables(prot="public"),
+               helper.static_methods(prot="public"),
+               helper.methods(prot="public")):
+    return STOP_RENDERING
+%>
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===

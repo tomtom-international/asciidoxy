@@ -36,6 +36,11 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     errors.
 
 
+=== Fixed
+
+  - Do not generate empty "Members" section if there are no visible members.
+
+
 == 0.7.4 (25 Mar 2021)
 
 === Added

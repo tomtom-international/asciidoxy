@@ -14,6 +14,7 @@ This is an interface for service classes.
 
 Base class for services.
 
+
 [cols='h,5a']
 |===
 |*Public Methods*

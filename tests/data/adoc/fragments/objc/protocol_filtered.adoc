@@ -14,6 +14,7 @@ Information about a traffic event.
 
 
 
+
 [cols='h,5a']
 |===
 |*Public Methods*

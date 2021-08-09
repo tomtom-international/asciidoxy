@@ -41,8 +41,8 @@
   <compound refid="classasciidoxy_1_1system_1_1_move_only" kind="class"><name>asciidoxy::system::MoveOnly</name>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a6dc67ce1f9071ebb2bf144874b589ba1" kind="function"><name>MoveOnly</name></member>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a800467634bfd9a8c1d3e5c14cd97d1fd" kind="function"><name>~MoveOnly</name></member>
-    <member refid="classasciidoxy_1_1system_1_1_move_only_1a5e9079fbfbaa072035069d70e4627747" kind="function"><name>MoveOnly</name></member>
-    <member refid="classasciidoxy_1_1system_1_1_move_only_1a330464b08592a825ef29c34fb27981e8" kind="function"><name>MoveOnly</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_move_only_1a1fbc5a529a65452b87e4b1e964252c70" kind="function"><name>MoveOnly</name></member>
+    <member refid="classasciidoxy_1_1system_1_1_move_only_1a6b26b74f23f5eb4f7d2eb47e1850f2fb" kind="function"><name>MoveOnly</name></member>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a0a96fb07ea0d648c1077a30cab963f6c" kind="function"><name>operator=</name></member>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a52622305a840ea66ccc83df35563a920" kind="function"><name>operator=</name></member>
   </compound>

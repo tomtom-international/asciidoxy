@@ -34,9 +34,9 @@
         </inbodydescription>
         <location file="move_only.hpp" line="34" column="11"/>
       </memberdef>
-      <memberdef kind="function" id="classasciidoxy_1_1system_1_1_move_only_1a5e9079fbfbaa072035069d70e4627747" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+      <memberdef kind="function" id="classasciidoxy_1_1system_1_1_move_only_1a1fbc5a529a65452b87e4b1e964252c70" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <type></type>
-        <definition>virtual asciidoxy::system::MoveOnly::MoveOnly</definition>
+        <definition>asciidoxy::system::MoveOnly::MoveOnly</definition>
         <argsstring>(const MoveOnly &amp;)=delete</argsstring>
         <name>MoveOnly</name>
         <param>
@@ -49,11 +49,11 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="move_only.hpp" line="39" column="11"/>
+        <location file="move_only.hpp" line="39" column="3"/>
       </memberdef>
-      <memberdef kind="function" id="classasciidoxy_1_1system_1_1_move_only_1a330464b08592a825ef29c34fb27981e8" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+      <memberdef kind="function" id="classasciidoxy_1_1system_1_1_move_only_1a6b26b74f23f5eb4f7d2eb47e1850f2fb" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
         <type></type>
-        <definition>virtual asciidoxy::system::MoveOnly::MoveOnly</definition>
+        <definition>asciidoxy::system::MoveOnly::MoveOnly</definition>
         <argsstring>(MoveOnly &amp;&amp;) noexcept=default</argsstring>
         <name>MoveOnly</name>
         <param>
@@ -66,7 +66,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="move_only.hpp" line="44" column="11"/>
+        <location file="move_only.hpp" line="44" column="3"/>
       </memberdef>
       <memberdef kind="function" id="classasciidoxy_1_1system_1_1_move_only_1a0a96fb07ea0d648c1077a30cab963f6c" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
         <type><ref refid="classasciidoxy_1_1system_1_1_move_only" kindref="compound">MoveOnly</ref> &amp;</type>
@@ -111,8 +111,8 @@
     <location file="move_only.hpp" line="23" column="15" bodyfile="move_only.hpp" bodystart="23" bodyend="55"/>
     <listofallmembers>
       <member refid="classasciidoxy_1_1system_1_1_move_only_1a6dc67ce1f9071ebb2bf144874b589ba1" prot="protected" virt="non-virtual"><scope>asciidoxy::system::MoveOnly</scope><name>MoveOnly</name></member>
-      <member refid="classasciidoxy_1_1system_1_1_move_only_1a5e9079fbfbaa072035069d70e4627747" prot="public" virt="virtual"><scope>asciidoxy::system::MoveOnly</scope><name>MoveOnly</name></member>
-      <member refid="classasciidoxy_1_1system_1_1_move_only_1a330464b08592a825ef29c34fb27981e8" prot="public" virt="virtual"><scope>asciidoxy::system::MoveOnly</scope><name>MoveOnly</name></member>
+      <member refid="classasciidoxy_1_1system_1_1_move_only_1a1fbc5a529a65452b87e4b1e964252c70" prot="public" virt="non-virtual"><scope>asciidoxy::system::MoveOnly</scope><name>MoveOnly</name></member>
+      <member refid="classasciidoxy_1_1system_1_1_move_only_1a6b26b74f23f5eb4f7d2eb47e1850f2fb" prot="public" virt="non-virtual"><scope>asciidoxy::system::MoveOnly</scope><name>MoveOnly</name></member>
       <member refid="classasciidoxy_1_1system_1_1_move_only_1a0a96fb07ea0d648c1077a30cab963f6c" prot="public" virt="virtual"><scope>asciidoxy::system::MoveOnly</scope><name>operator=</name></member>
       <member refid="classasciidoxy_1_1system_1_1_move_only_1a52622305a840ea66ccc83df35563a920" prot="public" virt="virtual"><scope>asciidoxy::system::MoveOnly</scope><name>operator=</name></member>
       <member refid="classasciidoxy_1_1system_1_1_move_only_1a800467634bfd9a8c1d3e5c14cd97d1fd" prot="public" virt="virtual"><scope>asciidoxy::system::MoveOnly</scope><name>~MoveOnly</name></member>

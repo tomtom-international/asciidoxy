@@ -36,6 +36,19 @@ ${element.brief}
 
 ${element.description}
 
+<%
+for prot in ("public", "protected", "internal", "private"):
+    if has_any(helper.simple_enclosed_types(prot=prot),
+               helper.complex_enclosed_types(prot=prot),
+               helper.constants(prot=prot),
+               helper.constructors(prot=prot),
+               helper.properties(prot=prot),
+               java_helper.static_methods(prot=prot),
+               helper.methods(prot=prot)):
+        break
+else:
+    return STOP_RENDERING
+%>
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
