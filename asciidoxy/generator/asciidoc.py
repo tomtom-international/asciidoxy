@@ -168,7 +168,6 @@ class Api(ABC):
         assert current_file.is_file()
         assert context.base_dir.is_dir()
         assert context.package_manager.work_dir.is_dir()
-        assert context.fragment_dir.is_dir()
         assert context.reference is not None
 
         self._current_file = current_file
@@ -229,8 +228,7 @@ class Api(ABC):
                members: Optional[FilterSpec] = None,
                exceptions: Optional[FilterSpec] = None,
                ignore_global_filter: bool = False,
-               leveloffset: str = "+1",
-               **asciidoc_options) -> str:
+               leveloffset: str = "+1") -> str:
         """Insert API reference documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
@@ -250,8 +248,6 @@ class Api(ABC):
                                       to apply the filters on top of the global filter.
             leveloffset:          Offset of the top header of the inserted text from the top level
                                       header of the including document.
-            asciidoc_options:     Any additional option is added as an attribute to the include
-                                      directive in single page mode.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -265,7 +261,7 @@ class Api(ABC):
 
         return self.insert_fragment(
             self.find_element(name, kind=kind, lang=lang, allow_overloads=False), insert_filter,
-            leveloffset, **asciidoc_options)
+            leveloffset)
 
     @_api_stackframe
     def link(self,
@@ -631,8 +627,7 @@ class Api(ABC):
                         element,
                         insert_filter: InsertionFilter,
                         leveloffset: str = "+1",
-                        kind_override: Optional[str] = None,
-                        **asciidoc_options) -> str:
+                        kind_override: Optional[str] = None) -> str:
         """Generate and insert a documentation fragment.
 
         Args:
@@ -642,8 +637,6 @@ class Api(ABC):
                                   header of the including document.
             kind_override:    Override the kind of template to use. None to use the kind of
                                   `element`.
-            asciidoc_options: Any additional option is added as an attribute to the include
-                                  directive in single page mode.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -706,7 +699,8 @@ class Api(ABC):
     def _render(self,
                 element,
                 insert_filter: InsertionFilter,
-                kind_override: Optional[str] = None) -> str:
+                kind_override: Optional[str] = None,
+                leveloffset: int = 1) -> str:
         assert element.id
         assert element.language
 
@@ -719,6 +713,7 @@ class Api(ABC):
                                                              insert_filter=insert_filter,
                                                              api_context=self._context,
                                                              api=self,
+                                                             leveloffset=leveloffset,
                                                              **self._commands())
 
     def _file_top_anchor(self, file_name: Path) -> str:
@@ -754,9 +749,8 @@ class PreprocessingApi(Api):
     def insert_fragment(self,
                         element,
                         insert_filter: InsertionFilter,
-                        leveloffset: str = "+1",
-                        kind_override: Optional[str] = None,
-                        **asciidoc_options) -> str:
+                        leveloffset: Union[str, int] = "+1",
+                        kind_override: Optional[str] = None) -> str:
         self._render(element, insert_filter, kind_override)
         return ""
 
@@ -885,33 +879,9 @@ class GeneratingApi(Api):
     def insert_fragment(self,
                         element,
                         insert_filter: InsertionFilter,
-                        leveloffset: str = "+1",
-                        kind_override: Optional[str] = None,
-                        **asciidoc_options) -> str:
-        """Generate and insert a documentation fragment.
-
-        Args:
-            element:          Python representation of the element to insert.
-            insertion_filter: Filter for members to insert.
-            leveloffset:      Offset of the top header of the inserted text from the top level
-                                  header of the including document.
-            kind_override:    Override the kind of template to use. None to use the kind of
-                                  `element`.
-            asciidoc_options: Any additional option is added as an attribute to the include
-                                  directive in single page mode.
-
-        Returns:
-            AsciiDoc text to include in the document.
-        """
-        rendered_doc = self._render(element, insert_filter, kind_override)
-
-        fragment_file = self._context.fragment_dir / f"{element.id}.adoc"
-        with fragment_file.open("w", encoding="utf-8") as f:
-            print(rendered_doc, file=f)
-
-        asciidoc_options["leveloffset"] = leveloffset
-        attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
-        return f"include::{fragment_file}[{attributes}]"
+                        leveloffset: Union[str, int] = "+1",
+                        kind_override: Optional[str] = None) -> str:
+        return self._render(element, insert_filter, kind_override, int(leveloffset))
 
     @_api_stackframe(name="link", show_args=("link_text", ), internal=True)
     def link_to_element(self, element_id: str, link_text: str) -> str:
@@ -1014,14 +984,12 @@ def process_adoc(in_file: Path,
     """
 
     context = Context(base_dir=in_file.parent,
-                      fragment_dir=package_manager.build_dir / "fragments",
                       reference=api_reference,
                       package_manager=package_manager,
                       current_document=DocumentTreeNode(in_file, None),
                       current_package=package_manager.input_package())
 
     context.package_manager.work_dir.mkdir(parents=True, exist_ok=True)
-    context.fragment_dir.mkdir(parents=True, exist_ok=True)
 
     context.warnings_are_errors = warnings_are_errors
     context.multipage = multipage

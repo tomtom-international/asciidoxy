@@ -1,7 +1,7 @@
 
 
 
-= [[python-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy.geometry.Coordinate]]Coordinate
+== [[python-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy.geometry.Coordinate]]Coordinate
 
 
 [source,python,subs="-specialchars,macros+"]
@@ -45,9 +45,23 @@ Create a coordinate from its string representation.
 
 |===
 
-== Members
+=== Members
 
-include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f.adoc[leveloffset=+1]
+
+
+==== [[python-classasciidoxy_1_1geometry_1_1_coordinate_1ae2c5561a335e7d226ae84bd561abb95f,asciidoxy.geometry.Coordinate.__init__]]__init__
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+def __init__(self)
+----
+
+
+
+
+
+
 '''
 [[python-classasciidoxy_1_1geometry_1_1_coordinate_1a79fe5c225f05aa763a2bc48c641255e8,latitude]]
 
@@ -88,15 +102,123 @@ Altitude in meters.
 
 
 '''
-include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d.adoc[leveloffset=+1]
-'''
-include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891.adoc[leveloffset=+1]
-'''
-include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe.adoc[leveloffset=+1]
-'''
-include::DIRECTORY/python-classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa.adoc[leveloffset=+1]
+
+
+==== [[python-classasciidoxy_1_1geometry_1_1_coordinate_1a4b820d9d0bdf81ddd7e22c243a41421d,asciidoxy.geometry.Coordinate.combine]]combine
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+def combine(left: xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++],
+            right: xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]) -&gt; xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]
+----
+
+Combine two coordinates.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`left: xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]`::
+
+
+`right: xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]`::
+
+
+| Returns
+|
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]`::
+
+
+|===
+
 '''
 
+
+==== [[python-classasciidoxy_1_1geometry_1_1_coordinate_1a845c8e9b53e427468fe2372d1e4c0891,asciidoxy.geometry.Coordinate.is_valid]]is_valid
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+def is_valid(self) -&gt; bool
+----
+
+Check if the coordinate is valid.
+
+A coordinate is valid if its values are within WGS84 bounds.
+
+[cols='h,5a']
+|===
+| Returns
+|
+`bool`::
+True if valid, False if not.
+
+|===
+
+'''
+
+
+==== [[python-classasciidoxy_1_1geometry_1_1_coordinate_1a993b41d0a7518e83d751aa90e0d15fbe,asciidoxy.geometry.Coordinate.from_string]]from_string
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+def from_string(cls,
+                value: str) -&gt; xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]
+----
+
+Create a coordinate from its string representation.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`value: str`::
+
+
+| Returns
+|
+`xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]`::
+
+
+|===
+
+'''
+
+
+==== [[python-classasciidoxy_1_1geometry_1_1_coordinate_1a6711de457ebaf61c48358c2d2a37dbfa,asciidoxy.geometry.Coordinate.from_string_safe]]from_string_safe
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+def from_string_safe(cls,
+                     value: Optional[str]) -&gt; Optional[xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]]
+----
+
+Create a coordinate from its string representation.
+
+Accepts None as input.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`value: Optional[str]`::
+
+
+| Returns
+|
+`Optional[xref:python-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]]`::
+
+
+|===
+
+'''
 
 
 

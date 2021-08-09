@@ -1,7 +1,7 @@
 
 
 
-= [[objc-interface_a_d_coordinate,ADCoordinate]]ADCoordinate
+== [[objc-interface_a_d_coordinate,ADCoordinate]]ADCoordinate
 
 
 [source,objectivec,subs="-specialchars,macros+"]
@@ -29,7 +29,7 @@ The altitude in meters.
 |===
 
 
-== Members
+=== Members
 [[objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]
 
 [source,objectivec,subs="-specialchars,macros+"]
@@ -66,6 +66,5 @@ The altitude in meters.
 
 
 '''
-
 
 

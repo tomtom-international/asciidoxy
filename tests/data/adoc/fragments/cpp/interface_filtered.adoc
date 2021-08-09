@@ -1,7 +1,7 @@
 
 
 
-= [[cpp-classasciidoxy_1_1system_1_1_service,asciidoxy::system::Service]]Service
+== [[cpp-classasciidoxy_1_1system_1_1_service,asciidoxy::system::Service]]Service
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -25,10 +25,29 @@ Start the service.
 |===
 
 
-== Members
+=== Members
 
-include::DIRECTORY/cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8.adoc[leveloffset=+1]
+
+
+==== [[cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8,asciidoxy::system::Service::Start]]Start
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Start()
+----
+
+
+Start the service.
+
+
+
+[cols='h,5a']
+|===
+|===
+
+
 '''
-
 
 

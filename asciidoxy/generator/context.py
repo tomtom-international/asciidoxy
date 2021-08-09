@@ -110,8 +110,6 @@ class Context(object):
     Attributes:
         base_dir:           Base directory from which the documentation is generated. Relative
                                 paths are relative to the base directory.
-        fragment_dir:       Directory containing generated fragments to be included in the
-                                documentation.
         namespace:          Current namespace to use when looking up references.
         language:           Default language to use when looking up references.
         insert_filter:      Filter used to select members of elements to insert.
@@ -128,7 +126,6 @@ class Context(object):
         call_stack:         Stack of actions resulting in the current action.
     """
     base_dir: Path
-    fragment_dir: Path
 
     namespace: Optional[str] = None
     language: Optional[str] = None
@@ -153,11 +150,9 @@ class Context(object):
     current_package: Package
     call_stack: List[StackFrame]
 
-    def __init__(self, base_dir: Path, fragment_dir: Path, reference: ApiReference,
-                 package_manager: PackageManager, current_document: DocumentTreeNode,
-                 current_package: Package):
+    def __init__(self, base_dir: Path, reference: ApiReference, package_manager: PackageManager,
+                 current_document: DocumentTreeNode, current_package: Package):
         self.base_dir = base_dir
-        self.fragment_dir = fragment_dir
 
         self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]})
         self.env = Environment()
@@ -189,7 +184,6 @@ class Context(object):
 
     def sub_context(self) -> "Context":
         sub = Context(base_dir=self.base_dir,
-                      fragment_dir=self.fragment_dir,
                       reference=self.reference,
                       package_manager=self.package_manager,
                       current_document=self.current_document,

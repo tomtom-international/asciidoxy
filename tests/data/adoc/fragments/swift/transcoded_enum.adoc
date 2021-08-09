@@ -1,7 +1,7 @@
 
 
 
-= [[swift-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273,ADSeverity]]ADSeverity
+== [[swift-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273,ADSeverity]]ADSeverity
 
 
 [source,swift,subs="-specialchars,macros+"]
@@ -47,5 +47,4 @@ Severity unknown.
 
 
 |===
-
 

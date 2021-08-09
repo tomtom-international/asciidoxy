@@ -1,6 +1,6 @@
 
 
-= [[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity,com.asciidoxy.traffic.TrafficEvent.Severity]]Severity
+== [[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity,com.asciidoxy.traffic.TrafficEvent.Severity]]Severity
 
 
 [source,java,subs="-specialchars,macros+"]
@@ -50,4 +50,3 @@ xref:java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity[Severit
 
 
 |===
-

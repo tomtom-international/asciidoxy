@@ -14,13 +14,14 @@
 
 ################################################################################ Helper includes ##
 <%!
+from asciidoxy.templates.helpers import h1
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 %>
 <%
 helper = SwiftTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-= [[${element.id},${element.full_name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,swift,subs="-specialchars,macros+"]

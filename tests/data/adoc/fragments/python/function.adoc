@@ -1,6 +1,6 @@
 
 
-= [[python-classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e,update]]
+== [[python-classasciidoxy_1_1traffic_1_1_traffic_event_1a3eb310fb6cb4929eabe8eea356e59f2e,asciidoxy.traffic.TrafficEvent.update]]update
 
 
 [source,python,subs="-specialchars,macros+"]
@@ -30,4 +30,3 @@ New delay in seconds.
 True if the update is valid.
 
 |===
-

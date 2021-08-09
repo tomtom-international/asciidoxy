@@ -34,6 +34,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
   - Provide clearer errors and trace backs for exceptions while parsing AsciiDoc and for internal
     errors.
+  - No longer use fragment files to include generated API reference. Instead, the generated
+    AsciiDoc is directly embedded in the processed AsciiDoc file.
+  - Extra AsciiDoc attributes are no longer supported for the `insert` command.
 
 
 === Fixed

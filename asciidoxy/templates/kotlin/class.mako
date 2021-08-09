@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any
+from asciidoxy.templates.helpers import has, has_any, h1, h2
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
 from html import escape
@@ -25,7 +25,7 @@ helper = KotlinTemplateHelper(api, element, insert_filter)
 java_helper = JavaTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-= [[${element.id},${element.name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,kotlin,subs="-specialchars,macros+"]
@@ -123,11 +123,11 @@ ${method.brief}
 ########################################################################## Enclosed simple types ##
 % for prot in ("public", "protected", "internal", "private"):
 % for enclosed in helper.simple_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor
 
-== Members
+${h2(leveloffset, "Members")}
 % for prot in ("public", "protected", "internal", "private"):
 ###################################################################################### Constants ##
 % for constant in helper.constants(prot=prot):
@@ -146,7 +146,7 @@ ${constant.description}
 % endfor
 ################################################################################### Constructors ##
 % for constructor in helper.constructors(prot=prot):
-${api.insert_fragment(constructor, insert_filter, kind_override="method")}
+${api.insert_fragment(constructor, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ##################################################################################### Properties ##
@@ -166,12 +166,12 @@ ${prop.description}
 % endfor
 ################################################################################# Static methods ##
 % for method in java_helper.static_methods(prot=prot):
-${api.insert_fragment(method, insert_filter, kind_override="method")}
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ######################################################################################## Methods ##
 % for method in helper.methods(prot=prot):
-${api.insert_fragment(method, insert_filter, kind_override="method")}
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 % endfor
@@ -180,6 +180,6 @@ ${api.insert_fragment(method, insert_filter, kind_override="method")}
 
 % for prot in ("public", "protected", "internal", "private"):
 % for enclosed in helper.complex_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor

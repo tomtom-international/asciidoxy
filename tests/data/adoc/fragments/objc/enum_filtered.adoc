@@ -1,7 +1,7 @@
 
 
 
-= [[objc-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273,ADSeverity]]ADSeverity
+== [[objc-interface_traffic_event_data_1a2b685c89f864a1bc00a329d00ce0b273,ADSeverity]]ADSeverity
 
 
 [source,objectivec,subs="-specialchars,macros+"]
@@ -19,5 +19,4 @@ The more severe the traffic event, the more likely it is to have a large delay.
 |===
 
 |===
-
 

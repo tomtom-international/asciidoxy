@@ -1,6 +1,6 @@
 
 
-= [[cpp-service_8hpp_1a7c44d1c4b121bf30bf90a517f8ff9fbc,asciidoxy::system::CreateService]]CreateService
+== [[cpp-service_8hpp_1a7c44d1c4b121bf30bf90a517f8ff9fbc,asciidoxy::system::CreateService]]CreateService
 
 
 [%autofit]
@@ -29,5 +29,4 @@ Name of the service to create.
 The new service, or an empty pointer if it could not be created.
 
 |===
-
 

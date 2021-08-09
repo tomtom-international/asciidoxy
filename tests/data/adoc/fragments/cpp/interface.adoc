@@ -1,7 +1,7 @@
 
 
 
-= [[cpp-classasciidoxy_1_1system_1_1_service,asciidoxy::system::Service]]Service
+== [[cpp-classasciidoxy_1_1system_1_1_service,asciidoxy::system::Service]]Service
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -27,12 +27,51 @@ Stop the service.
 |===
 
 
-== Members
+=== Members
 
-include::DIRECTORY/cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8.adoc[leveloffset=+1]
-'''
-include::DIRECTORY/cpp-classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0.adoc[leveloffset=+1]
+
+
+==== [[cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8,asciidoxy::system::Service::Start]]Start
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Start()
+----
+
+
+Start the service.
+
+
+
+[cols='h,5a']
+|===
+|===
+
+
 '''
 
+
+==== [[cpp-classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0,asciidoxy::system::Service::Stop]]Stop
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Stop()
+----
+
+
+Stop the service.
+
+
+
+[cols='h,5a']
+|===
+|===
+
+
+'''
 
 

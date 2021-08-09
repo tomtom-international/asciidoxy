@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any
+from asciidoxy.templates.helpers import has, has_any, h1, h2
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 from html import escape
 from itertools import chain
@@ -23,7 +23,7 @@ from itertools import chain
 helper = ObjcTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-= [[${element.id},${element.name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
@@ -99,11 +99,11 @@ ${method.brief}
 ############################################################################ Simple inner types ##
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.simple_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor
 
-== Members
+${h2(leveloffset, "Members")}
 % for prot in ("public", "protected", "private"):
 ##################################################################################### Properties ##
 % for prop in helper.properties(prot=prot):
@@ -122,12 +122,12 @@ ${prop.description}
 % endfor
 ################################################################################## Class methods ##
 % for method in helper.class_methods(prot=prot):
-${api.insert_fragment(method, insert_filter, kind_override="method")}
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ######################################################################################## Methods ##
 % for method in helper.methods(prot=prot):
-${api.insert_fragment(method, insert_filter, kind_override="method")}
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 % endfor
@@ -136,6 +136,6 @@ ${api.insert_fragment(method, insert_filter, kind_override="method")}
 
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.complex_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor

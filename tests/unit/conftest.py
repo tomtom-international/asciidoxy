@@ -89,13 +89,6 @@ def build_dir(tmp_path):
 
 
 @pytest.fixture
-def fragment_dir(build_dir):
-    d = build_dir / "fragments"
-    d.mkdir(parents=True)
-    return d
-
-
-@pytest.fixture
 def package_manager(build_dir):
     return PackageManager(build_dir)
 
@@ -142,9 +135,8 @@ def api_reference(parser_driver_factory, api_reference_set, forced_language):
 
 
 @pytest.fixture
-def context(input_file, fragment_dir, api_reference, package_manager):
+def context(input_file, api_reference, package_manager):
     c = Context(base_dir=input_file.parent,
-                fragment_dir=fragment_dir,
                 reference=api_reference,
                 package_manager=package_manager,
                 current_document=DocumentTreeNode(input_file),
@@ -228,9 +220,8 @@ def single_and_multipage(request, context):
 
 
 @pytest.fixture
-def empty_context(input_file, fragment_dir, package_manager):
+def empty_context(input_file, package_manager):
     return Context(base_dir=input_file.parent,
-                   fragment_dir=fragment_dir,
                    reference=ApiReference(),
                    package_manager=package_manager,
                    current_document=DocumentTreeNode(input_file),

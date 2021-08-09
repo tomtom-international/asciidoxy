@@ -37,9 +37,8 @@ from .shared import ProgressMock
 
 
 class _TestDataBuilder:
-    def __init__(self, base_dir: Path, build_dir: Path, fragment_dir: Path):
+    def __init__(self, base_dir: Path, build_dir: Path):
         self.package_manager = PackageManager(build_dir)
-        self.fragment_dir = fragment_dir
 
         self.packages_dir = base_dir / "packages"
         self.packages_dir.mkdir(parents=True, exist_ok=True)
@@ -107,7 +106,6 @@ class _TestDataBuilder:
             parent_node = None
 
         c = Context(base_dir=self.work_dir,
-                    fragment_dir=self.fragment_dir,
                     reference=ApiReference(),
                     package_manager=self.package_manager,
                     current_document=DocumentTreeNode(self.input_file, parent_node),
@@ -131,8 +129,8 @@ class _TestDataBuilder:
 
 
 @pytest.fixture
-def test_data_builder(tmp_path, build_dir, fragment_dir):
-    return _TestDataBuilder(tmp_path, build_dir, fragment_dir)
+def test_data_builder(tmp_path, build_dir):
+    return _TestDataBuilder(tmp_path, build_dir)
 
 
 @pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
@@ -156,23 +154,6 @@ def adoc_data_work_file(adoc_data, package_manager):
     return prepare
 
 
-def _check_inserted_file_contains(inserted_adoc, expected):
-    start_attributes = inserted_adoc.find("[")
-    file_name = Path(inserted_adoc[9:start_attributes])
-    assert file_name.is_file()
-
-    content = file_name.read_text(encoding="UTF-8")
-    assert expected in content
-
-
-def _check_inserted_file_does_not_contain(inserted_adoc, expected):
-    file_name = Path(inserted_adoc[9:-16])
-    assert file_name.is_file()
-
-    content = file_name.read_text(encoding="UTF-8")
-    assert expected not in content
-
-
 def test_insert__preprocessing(preprocessing_api):
     result = preprocessing_api.insert("asciidoxy::geometry::Coordinate")
     assert not result
@@ -180,78 +161,53 @@ def test_insert__preprocessing(preprocessing_api):
 
 def test_insert_class(generating_api):
     result = generating_api.insert("asciidoxy::geometry::Coordinate")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_insert_class_explicit_kind(generating_api):
     result = generating_api.insert("asciidoxy::geometry::Coordinate", kind="class")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_insert_class_explicit_language(generating_api):
     result = generating_api.insert("asciidoxy::geometry::Coordinate", lang="cpp")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_insert_class_explicit_all(generating_api):
     result = generating_api.insert("asciidoxy::geometry::Coordinate", lang="cpp", kind="class")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_insert_cpp_class_with_leveloffset(generating_api):
     result = generating_api.insert("asciidoxy::geometry::Coordinate", leveloffset="+3")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+3]")
-
-
-def test_insert_class_with_extra_options(generating_api):
-    result = generating_api.insert("asciidoxy::geometry::Coordinate", indent=2)
-    assert result.startswith("include::")
-    assert result.endswith("[indent=2,leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "==== [[" in result
+    assert "===== Members" in result
 
 
 def test_insert_cpp_enum(generating_api):
     result = generating_api.insert("asciidoxy::traffic::TrafficEvent::Severity", kind="enum")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "enum asciidoxy::traffic::TrafficEvent::Severity")
+    assert "enum asciidoxy::traffic::TrafficEvent::Severity" in result
 
 
 def test_insert_cpp_class_with_alternative_tag(generating_api):
     result = generating_api.insert("asciidoxy::geometry::Coordinate", lang="c++")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_insert_cpp_typedef(generating_api):
     result = generating_api.insert("asciidoxy::traffic::TpegCauseCode")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "TpegCauseCode =")
+    assert "TpegCauseCode =" in result
 
 
 def test_insert_cpp_interface(generating_api):
     result = generating_api.insert("asciidoxy::system::Service", kind="interface")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::system::Service")
+    assert "class asciidoxy::system::Service" in result
 
 
 def test_insert_cpp_function(generating_api):
     result = generating_api.insert("asciidoxy::geometry::Coordinate::IsValid")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "bool IsValid()")
+    assert "bool IsValid()" in result
 
 
 def test_insert_with_default_language(generating_api):
@@ -261,9 +217,7 @@ def test_insert_with_default_language(generating_api):
 
     generating_api.language("java")
     result = generating_api.insert("Logger")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class Logger")
+    assert "class Logger" in result
 
 
 def test_insert_with_default_language_other_languages_are_ignored(generating_api):
@@ -275,37 +229,29 @@ def test_insert_with_default_language_other_languages_are_ignored(generating_api
 def test_insert_with_default_language_can_be_overridden(generating_api):
     generating_api.language("java")
     result = generating_api.insert("asciidoxy::geometry::Coordinate", lang="cpp")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_insert__transcode__explicit(generating_api):
     generating_api.language("kotlin", source="java")
     result = generating_api.insert("com.asciidoxy.geometry.Coordinate", lang="kotlin")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
-    _check_inserted_file_contains(result, "kotlin")
+    assert "class com.asciidoxy.geometry.Coordinate" in result
+    assert "kotlin" in result
 
 
 def test_insert__transcode__implicit(generating_api):
     generating_api.language("kotlin", source="java")
     result = generating_api.insert("com.asciidoxy.geometry.Coordinate")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
-    _check_inserted_file_contains(result, "kotlin")
+    assert "class com.asciidoxy.geometry.Coordinate" in result
+    assert "kotlin" in result
 
 
 def test_insert__transcode__reset(generating_api):
     generating_api.language("kotlin", source="java")
     generating_api.language(None)
     result = generating_api.insert("com.asciidoxy.geometry.Coordinate")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class com.asciidoxy.geometry.Coordinate")
-    _check_inserted_file_does_not_contain(result, "kotlin")
+    assert "class com.asciidoxy.geometry.Coordinate" in result
+    assert "kotlin" not in result
 
 
 def test_language__source_requires_lang(generating_api):
@@ -327,17 +273,13 @@ def test_language__source_cannot_be_the_same_as_lang(generating_api):
 def test_insert_relative_name_with_namespace(generating_api):
     generating_api.namespace("asciidoxy::geometry::")
     result = generating_api.insert("Coordinate", lang="cpp")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_insert_with_namespace_falls_back_to_full_name(generating_api):
     generating_api.namespace("asciidoxy::geometry::")
     result = generating_api.insert("asciidoxy::traffic::TrafficEvent")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::traffic::TrafficEvent")
+    assert "class asciidoxy::traffic::TrafficEvent" in result
 
 
 def test_insert_error_when_lang_not_supported(generating_api):
@@ -508,25 +450,25 @@ def test_link_from_proxy_stores_stack_trace_with_proxy_name(preprocessing_api, c
 def test_insert_class__global_filter_members(generating_api):
     generating_api.filter(members="-SharedData")
     result = generating_api.insert("asciidoxy::traffic::TrafficEvent")
-    _check_inserted_file_does_not_contain(result, "SharedData")
-    _check_inserted_file_contains(result, "Update")
-    _check_inserted_file_contains(result, "CalculateDelay")
+    assert "SharedData" not in result
+    assert "Update" in result
+    assert "CalculateDelay" in result
 
 
 def test_insert_class__global_filter_members__ignore(generating_api):
     generating_api.filter(members="-SharedData")
     result = generating_api.insert("asciidoxy::traffic::TrafficEvent", ignore_global_filter=True)
-    _check_inserted_file_contains(result, "SharedData")
-    _check_inserted_file_contains(result, "Update")
-    _check_inserted_file_contains(result, "CalculateDelay")
+    assert "SharedData" in result
+    assert "Update" in result
+    assert "CalculateDelay" in result
 
 
 def test_insert_class__global_filter_members__extend(generating_api):
     generating_api.filter(members="-SharedData")
     result = generating_api.insert("asciidoxy::traffic::TrafficEvent", members="-Update")
-    _check_inserted_file_does_not_contain(result, "SharedData")
-    _check_inserted_file_does_not_contain(result, "Update")
-    _check_inserted_file_contains(result, "CalculateDelay")
+    assert "SharedData" not in result
+    assert "Update" not in result
+    assert "CalculateDelay" in result
 
 
 def test_link_class(generating_api):
@@ -1303,8 +1245,9 @@ def test_multipage_toc__preprocessing_run(preprocessing_api, input_file, multipa
 @pytest.mark.parametrize("warnings_are_errors", [True, False],
                          ids=["warnings-are-errors", "warnings-are-not-errors"])
 @pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
-def test_process_adoc_single_file(warnings_are_errors, fragment_dir, test_file_name,
-                                  single_and_multipage, adoc_data, api_reference, package_manager):
+def test_process_adoc_single_file(warnings_are_errors, test_file_name, single_and_multipage,
+                                  adoc_data, api_reference, package_manager,
+                                  update_expected_results):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
 
@@ -1317,15 +1260,16 @@ def test_process_adoc_single_file(warnings_are_errors, fragment_dir, test_file_n
     assert output_file.is_file()
 
     content = output_file.read_text()
-    content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
+    if update_expected_results:
+        expected_output_file.write_text(content)
     assert content == expected_output_file.read_text()
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == 2
 
 
-def test_process_adoc_multi_file(fragment_dir, single_and_multipage, api_reference, package_manager,
-                                 adoc_data_work_file):
+def test_process_adoc_multi_file(single_and_multipage, api_reference, package_manager,
+                                 adoc_data_work_file, update_expected_results, adoc_data):
     main_doc_file = adoc_data_work_file("multifile_test.input.adoc")
     sub_doc_file = main_doc_file.parent / "sub_directory" / "multifile_subdoc_test.input.adoc"
     sub_doc_in_table_file = main_doc_file.parent / "sub_directory" \
@@ -1348,17 +1292,21 @@ def test_process_adoc_multi_file(fragment_dir, single_and_multipage, api_referen
         assert output_file.is_file()
         expected_output_file = input_file.with_suffix(
             ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
+        expected_output_file = adoc_data / expected_output_file.relative_to(main_doc_file.parent)
         content = output_file.read_text()
-        content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
         content = content.replace(os.fspath(main_doc_file.parent), "SRC_DIR")
+
+        if update_expected_results:
+            expected_output_file.write_text(content)
+
         assert content == expected_output_file.read_text()
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == 2 * len(output_files)
 
 
-def test_process_adoc_env_variables(fragment_dir, single_and_multipage, api_reference,
-                                    package_manager, adoc_data_work_file):
+def test_process_adoc_env_variables(single_and_multipage, api_reference, package_manager,
+                                    adoc_data_work_file):
     main_doc_file = adoc_data_work_file("env_variables.adoc")
     sub_doc_file = main_doc_file.parent / "env_variables_include.adoc"
 
@@ -1378,7 +1326,6 @@ def test_process_adoc_env_variables(fragment_dir, single_and_multipage, api_refe
         expected_output_file = input_file.with_suffix(
             ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
         content = output_file.read_text()
-        content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
         content = content.replace(os.fspath(main_doc_file.parent), "SRC_DIR")
         assert content == expected_output_file.read_text()
 
@@ -1409,8 +1356,8 @@ def test_process_adoc__embedded_file_not_in_output_map(single_and_multipage, api
 @pytest.mark.parametrize(
     "test_file_name",
     ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
-def test_process_adoc_file_warning(fragment_dir, test_file_name, single_and_multipage, adoc_data,
-                                   api_reference, package_manager):
+def test_process_adoc_file_warning(test_file_name, single_and_multipage, adoc_data, api_reference,
+                                   package_manager, update_expected_results):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
 
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
@@ -1424,9 +1371,9 @@ def test_process_adoc_file_warning(fragment_dir, test_file_name, single_and_mult
                                package_manager,
                                multipage=single_and_multipage)[input_file]
     assert output_file.is_file()
-
     content = output_file.read_text()
-    content = content.replace(os.fspath(fragment_dir), "FRAGMENT_DIR")
+    if update_expected_results:
+        expected_output_file.write_text(content)
     assert content == expected_output_file.read_text()
 
 
@@ -1537,25 +1484,21 @@ def test_api_proxy__filter(generating_api):
     api = ApiProxy(generating_api)
     api.filter(members="-SharedData")
     result = api.insert("asciidoxy::traffic::TrafficEvent")
-    _check_inserted_file_does_not_contain(result, "SharedData")
-    _check_inserted_file_contains(result, "Update")
-    _check_inserted_file_contains(result, "CalculateDelay")
+    assert "SharedData" not in result
+    assert "Update" in result
+    assert "CalculateDelay" in result
 
 
 def test_api_proxy__insert(generating_api):
     api = ApiProxy(generating_api)
     result = api.insert("asciidoxy::geometry::Coordinate")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_api_proxy__insert_class(generating_api):
     api = ApiProxy(generating_api)
     result = api.insert_class("asciidoxy::geometry::Coordinate")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_api_proxy__link(generating_api):
@@ -1648,18 +1591,14 @@ def test_api_proxy__language(generating_api):
     api = ApiProxy(generating_api)
     api.language("java")
     result = generating_api.insert("Logger")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class Logger")
+    assert "class Logger" in result
 
 
 def test_api_proxy__namespace(generating_api):
     api = ApiProxy(generating_api)
     api.namespace("asciidoxy::geometry::")
     result = api.insert("Coordinate", lang="cpp")
-    assert result.startswith("include::")
-    assert result.endswith("[leveloffset=+1]")
-    _check_inserted_file_contains(result, "class asciidoxy::geometry::Coordinate")
+    assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_api_proxy__require_version(preprocessing_api):

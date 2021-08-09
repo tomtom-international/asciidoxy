@@ -13,22 +13,7 @@
 # limitations under the License.
 """Test the templates used for C++ code."""
 
-import os
 import pytest
-
-from pathlib import Path
-
-
-def _read_fragment(include_statement: str) -> str:
-    prefix_end = len("include::")
-    suffix_begin = include_statement.index("[")
-
-    file_name = Path(include_statement[prefix_end:suffix_begin])
-    assert file_name.is_file()
-
-    content = file_name.read_text(encoding="UTF-8")
-    assert content
-    return content
 
 
 @pytest.mark.parametrize("element_name,language,expected_result", [
@@ -55,11 +40,9 @@ def _read_fragment(include_statement: str) -> str:
     ("asciidoxy.default_values.Point.increment", "python",
      "fragments/python/function_default_value.adoc"),
 ])
-def test_fragment(generating_api, adoc_data, fragment_dir, element_name, language, expected_result,
+def test_fragment(generating_api, adoc_data, element_name, language, expected_result,
                   update_expected_results):
-    result = generating_api.insert(element_name, lang=language)
-    content = _read_fragment(result)
-    content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
+    content = generating_api.insert(element_name, lang=language)
 
     if update_expected_results:
         (adoc_data / expected_result).write_text(content, encoding="UTF-8")
@@ -127,12 +110,10 @@ filtered_testdata = [
 
 
 @pytest.mark.parametrize("element_name,language,filter_spec,expected_result", filtered_testdata)
-def test_global_filter(generating_api, adoc_data, fragment_dir, element_name, language, filter_spec,
+def test_global_filter(generating_api, adoc_data, element_name, language, filter_spec,
                        expected_result, update_expected_results):
     generating_api.filter(**filter_spec)
-    result = generating_api.insert(element_name, lang=language)
-    content = _read_fragment(result)
-    content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
+    content = generating_api.insert(element_name, lang=language)
 
     if update_expected_results:
         (adoc_data / expected_result).write_text(content, encoding="UTF-8")
@@ -141,11 +122,9 @@ def test_global_filter(generating_api, adoc_data, fragment_dir, element_name, la
 
 
 @pytest.mark.parametrize("element_name,language,filter_spec,expected_result", filtered_testdata)
-def test_local_filter(generating_api, adoc_data, fragment_dir, element_name, language, filter_spec,
+def test_local_filter(generating_api, adoc_data, element_name, language, filter_spec,
                       expected_result, update_expected_results):
-    result = generating_api.insert(element_name, lang=language, **filter_spec)
-    content = _read_fragment(result)
-    content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
+    content = generating_api.insert(element_name, lang=language, **filter_spec)
 
     if update_expected_results:
         (adoc_data / expected_result).write_text(content, encoding="UTF-8")
@@ -168,12 +147,10 @@ def test_local_filter(generating_api, adoc_data, fragment_dir, element_name, lan
     ("com.asciidoxy.traffic.TrafficEvent", "java", "kotlin",
      "fragments/kotlin/transcoded_nested.adoc"),
 ])
-def test_transcoded_fragment(generating_api, adoc_data, fragment_dir, element_name, source, target,
+def test_transcoded_fragment(generating_api, adoc_data, element_name, source, target,
                              expected_result, update_expected_results):
     generating_api.language(target, source=source)
-    result = generating_api.insert(element_name)
-    content = _read_fragment(result)
-    content = content.replace(os.fspath(fragment_dir), "DIRECTORY")
+    content = generating_api.insert(element_name)
 
     if update_expected_results:
         (adoc_data / expected_result).write_text(content, encoding="UTF-8")

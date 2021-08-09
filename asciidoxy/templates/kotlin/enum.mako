@@ -14,10 +14,11 @@
 
 ################################################################################ Helper includes ##
 <%!
+from asciidoxy.templates.helpers import h1
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 %>
 ######################################################################## Header and introduction ##
-= [[${element.id},${element.full_name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,java,subs="-specialchars,macros+"]

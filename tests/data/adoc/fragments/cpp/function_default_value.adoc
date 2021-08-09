@@ -1,6 +1,6 @@
 
 
-= [[cpp-classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8,asciidoxy::geometry::Point::increment]]increment
+== [[cpp-classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8,asciidoxy::geometry::Point::increment]]increment
 
 
 [%autofit]
@@ -37,5 +37,4 @@ Value to increment the Y coordinate with.
 A new incremented xref:cpp-classasciidoxy_1_1geometry_1_1_point[Point].
 
 |===
-
 
