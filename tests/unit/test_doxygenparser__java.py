@@ -14,119 +14,107 @@
 """Tests for parsing Java from Doxygen XML files."""
 
 import pytest
+from pytest import param
+
+from .matchers import (AtLeast, IsEmpty, IsFalse, SizeIs, Unordered, m_compound, m_parameter,
+                       m_returnvalue, m_typeref)
 
 
-@pytest.mark.parametrize("api_reference_set", [["java/default"]])
-def test_parse_java_class(api_reference):
-    java_class = api_reference.find("com.asciidoxy.geometry.Coordinate", kind="class", lang="java")
-    assert java_class is not None
-    assert java_class.id == "java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate"
-    assert java_class.name == "Coordinate"
-    assert java_class.full_name == "com.asciidoxy.geometry.Coordinate"
-    assert java_class.language == "java"
-    assert java_class.kind == "class"
-    assert java_class.brief == "Class to hold information about a coordinate."
-    assert java_class.description == "A coordinate has a latitude, longitude, and an altitude."
-    assert java_class.namespace == "com.asciidoxy.geometry"
-
-    assert len(java_class.members) == 8
-
-    member_names = sorted(m.name for m in java_class.members)
-    assert member_names == sorted([
-        "Coordinate",
-        "Latitude",
-        "Longitude",
-        "Altitude",
-        "IsValid",
-        "latitude_",
-        "longitude_",
-        "altitude_",
-    ])
-
-
-@pytest.mark.parametrize("api_reference_set", [["java/default"]])
-def test_parse_java_class_with_nested_class(api_reference):
-    java_class = api_reference.find("com.asciidoxy.traffic.TrafficEvent", kind="class", lang="java")
-    assert java_class is not None
-    assert java_class.id == "java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event"
-    assert java_class.namespace == "com.asciidoxy.traffic"
-
-    nested_enums = [m for m in java_class.members if m.kind == "enum"]
-    assert len(nested_enums) == 1
-
-    nested_class = nested_enums[0]
-    assert nested_class.full_name == "com.asciidoxy.traffic.TrafficEvent.Severity"
-    assert nested_class.namespace == "com.asciidoxy.traffic.TrafficEvent"
-    assert nested_class.language == "java"
-    assert nested_class.id == "java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity"
-    assert nested_class.prot == "public"
-
-    nested_classes = [m for m in java_class.members if m.kind == "class"]
-    assert len(nested_classes) == 1
-
-    nested_class = nested_classes[0]
-    assert nested_class.full_name == "com.asciidoxy.traffic.TrafficEvent.TrafficEventData"
-    assert nested_class.namespace == "com.asciidoxy.traffic.TrafficEvent"
-    assert nested_class.id == ("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_"
-                               "traffic_event_data")
-    assert nested_class.language == "java"
-    assert nested_class.prot == "public"
-
-
-@pytest.mark.parametrize("api_reference_set", [["java/default"]])
-def test_parse_java_method(api_reference):
-    member = api_reference.find("com.asciidoxy.traffic.TrafficEvent.Update",
-                                kind="function",
-                                lang="java")
-
-    assert member is not None
-    assert member.id == ("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_"
-                         "1a72847da5fa4e03763f089c5d044085d4")
-    assert member.name == "Update"
-    assert member.full_name == "com.asciidoxy.traffic.TrafficEvent.Update"
-    assert member.language == "java"
-    assert member.kind == "function"
-    assert member.definition == "boolean com.asciidoxy.traffic.TrafficEvent.Update"
-    assert member.args == "(int cause, int delay)"
-    assert member.brief == "Update the traffic event data."
-    assert member.description == "Verifies the new information before updating."
-    assert member.prot == "public"
-    assert member.static is False
-    assert member.namespace == "com.asciidoxy.traffic.TrafficEvent"
-
-    assert len(member.params) == 2
-    assert len(member.exceptions) == 0
-
-    assert member.returns is not None
-    assert member.returns.type is not None
-    assert not member.returns.type.id
-    assert not member.returns.type.kind
-    assert member.returns.type.language == "java"
-    assert member.returns.type.name == "boolean"
-    assert member.returns.type.namespace == "com.asciidoxy.traffic.TrafficEvent"
-    assert not member.returns.type.prefix
-    assert not member.returns.type.suffix
-    assert not member.returns.type.nested
-    assert member.returns.description == "True if the update is valid."
-
-
-@pytest.mark.parametrize("api_reference_set", [["java/default"]])
-def test_parse_java_method__with_return_type_annotation(api_reference):
-    member = api_reference.find("com.asciidoxy.Nullability.getData", kind="function", lang="java")
-
-    assert member is not None
-    assert member.returns
-    assert member.returns.type
-    assert member.returns.type.prefix == "@Nullable "
-    assert member.returns.type.name == "DataClass"
-
-
-@pytest.mark.parametrize("api_reference_set", [["java/default"]])
-def test_parse_java_method__with_parameter_type_annotation(api_reference):
-    member = api_reference.find("com.asciidoxy.Nullability.setData", kind="function", lang="java")
-
-    assert member is not None
-    assert len(member.params) == 1
-    assert member.params[0].type
-    assert member.params[0].type.prefix == "@Nullable "
-    assert member.params[0].type.name == "DataClass"
+@pytest.mark.parametrize("api_reference_set", [["java/default"]], ids=[""])
+@pytest.mark.parametrize("search_params,matcher", [
+    param(dict(name="com.asciidoxy.geometry.Coordinate", kind="class", lang="java"),
+          m_compound(
+              id="java-classcom_1_1asciidoxy_1_1geometry_1_1_coordinate",
+              name="Coordinate",
+              full_name="com.asciidoxy.geometry.Coordinate",
+              language="java",
+              kind="class",
+              brief="Class to hold information about a coordinate.",
+              description="A coordinate has a latitude, longitude, and an altitude.",
+              namespace="com.asciidoxy.geometry",
+              members=Unordered(
+                  m_compound(name="Coordinate"),
+                  m_compound(name="Latitude"),
+                  m_compound(name="Longitude"),
+                  m_compound(name="Altitude"),
+                  m_compound(name="IsValid"),
+                  m_compound(name="latitude_"),
+                  m_compound(name="longitude_"),
+                  m_compound(name="altitude_"),
+              ),
+          ),
+          id="Basic class"),
+    param(dict(name="com.asciidoxy.traffic.TrafficEvent", kind="class", lang="java"),
+          m_compound(
+              id="java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event",
+              namespace="com.asciidoxy.traffic",
+              members=AtLeast(
+                  m_compound(
+                      kind="enum",
+                      full_name="com.asciidoxy.traffic.TrafficEvent.Severity",
+                      namespace="com.asciidoxy.traffic.TrafficEvent",
+                      language="java",
+                      id="java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity",
+                      prot="public",
+                  ),
+                  m_compound(
+                      kind="class",
+                      full_name="com.asciidoxy.traffic.TrafficEvent.TrafficEventData",
+                      namespace="com.asciidoxy.traffic.TrafficEvent",
+                      id=("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_"
+                          "traffic_event_data"),
+                      language="java",
+                      prot="public",
+                  ),
+              ),
+          ),
+          id="Class with nested class and enum"),
+    param(dict(name="com.asciidoxy.traffic.TrafficEvent.Update", kind="function", lang="java"),
+          m_compound(
+              id=("java-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_"
+                  "1a72847da5fa4e03763f089c5d044085d4"),
+              name="Update",
+              full_name="com.asciidoxy.traffic.TrafficEvent.Update",
+              language="java",
+              kind="function",
+              definition="boolean com.asciidoxy.traffic.TrafficEvent.Update",
+              args="(int cause, int delay)",
+              brief="Update the traffic event data.",
+              description="Verifies the new information before updating.",
+              prot="public",
+              static=IsFalse(),
+              namespace="com.asciidoxy.traffic.TrafficEvent",
+              params=SizeIs(2),
+              exceptions=IsEmpty(),
+              returns=m_returnvalue(
+                  description="True if the update is valid.",
+                  type=m_typeref(
+                      id=IsEmpty(),
+                      kind=IsEmpty(),
+                      language="java",
+                      name="boolean",
+                      namespace="com.asciidoxy.traffic.TrafficEvent",
+                      prefix=IsEmpty(),
+                      suffix=IsEmpty(),
+                      nested=IsEmpty(),
+                  ),
+              ),
+          ),
+          id="Method"),
+    param(dict(name="com.asciidoxy.Nullability.getData", kind="function", lang="java"),
+          m_compound(returns=m_returnvalue(type=m_typeref(
+              prefix="@Nullable ",
+              name="DataClass",
+          ), ), ),
+          id="Method with return type annotation"),
+    param(dict(name="com.asciidoxy.Nullability.setData", kind="function", lang="java"),
+          m_compound(params=[
+              m_parameter(type=m_typeref(
+                  prefix="@Nullable ",
+                  name="DataClass",
+              ), ),
+          ], ),
+          id="Method with parameter type annotation"),
+])
+def test_parse_java(api_reference, search_params, matcher):
+    matcher.assert_matches(api_reference.find(**search_params))

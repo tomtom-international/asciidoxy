@@ -14,524 +14,485 @@
 """Tests for parsing C++ from Doxygen XML files."""
 
 import pytest
-
-from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_class(api_reference):
-    cpp_class = api_reference.find("asciidoxy::geometry::Coordinate", kind="class", lang="cpp")
-    assert cpp_class is not None
-    assert cpp_class.id == "cpp-classasciidoxy_1_1geometry_1_1_coordinate"
-    assert cpp_class.name == "Coordinate"
-    assert cpp_class.full_name == "asciidoxy::geometry::Coordinate"
-    assert cpp_class.language == "cpp"
-    assert cpp_class.kind == "class"
-    assert cpp_class.brief == "Class to hold information about a coordinate."
-    assert cpp_class.description == "A coordinate has a latitude, longitude, and an altitude."
-    assert cpp_class.include == "coordinate.hpp"
-    assert cpp_class.namespace == "asciidoxy::geometry"
-
-    assert len(cpp_class.members) == 15
-
-    member_names = sorted(m.name for m in cpp_class.members)
-    assert member_names == sorted([
-        "Coordinate",
-        "~Coordinate",
-        "operator+",
-        "Latitude",
-        "Longitude",
-        "Altitude",
-        "IsValid",
-        "latitude_",
-        "longitude_",
-        "altitude_",
-        "Update",
-        "Update",
-        "Update",
-        "Update",
-        "Update",
-    ])
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_class_with_nested_class(api_reference):
-    cpp_class = api_reference.find("asciidoxy::traffic::TrafficEvent", kind="class", lang="cpp")
-    assert cpp_class is not None
-    assert cpp_class.id == "cpp-classasciidoxy_1_1traffic_1_1_traffic_event"
-    assert cpp_class.namespace == "asciidoxy::traffic"
-
-    inner_classes = [m for m in cpp_class.members if m.kind == "struct"]
-    assert len(inner_classes) == 1
-
-    nested_class = inner_classes[0]
-    assert nested_class.full_name == "asciidoxy::traffic::TrafficEvent::TrafficEventData"
-    assert nested_class.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert nested_class.id == ("cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_"
-                               "event_data")
-    assert nested_class.language == "cpp"
-    assert nested_class.prot == "public"
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_class__ignore_friend_declarations(api_reference):
-    cpp_class = api_reference.find("asciidoxy::system::ServiceStarter", kind="class", lang="cpp")
-    assert cpp_class is not None
-    assert len([member for member in cpp_class.members if member.kind == "friend"]) == 0
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function_no_return_value(api_reference):
-    member = api_reference.find("asciidoxy::geometry::Coordinate::Coordinate",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert member.id == ("cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
-                         "1a69ac21cad618c0c033815f2cbdc86318")
-    assert member.name == "Coordinate"
-    assert member.full_name == "asciidoxy::geometry::Coordinate::Coordinate"
-    assert member.language == "cpp"
-    assert member.kind == "function"
-    assert member.definition == "asciidoxy::geometry::Coordinate::Coordinate"
-    assert member.args == "()"
-    assert member.brief == "Default constructor."
-    assert member.description == ""
-    assert member.prot == "public"
-    assert member.static is False
-    assert member.include == "coordinate.hpp"
-    assert member.namespace == "asciidoxy::geometry::Coordinate"
-    assert member.const is False
-
-    assert len(member.params) == 0
-    assert len(member.exceptions) == 0
-    assert member.returns is None
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function_only_return_value(api_reference):
-    member = api_reference.find("asciidoxy::geometry::Coordinate::IsValid",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert member.id == ("cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
-                         "1a8d7e0eac29549fa4666093e36914deac")
-    assert member.name == "IsValid"
-    assert member.full_name == "asciidoxy::geometry::Coordinate::IsValid"
-    assert member.language == "cpp"
-    assert member.kind == "function"
-    assert member.definition == "bool asciidoxy::geometry::Coordinate::IsValid"
-    assert member.args == "() const"
-    assert member.brief == "Check if the coordinate is valid."
-    assert member.description == "A coordinate is valid if its values are within WGS84 bounds."
-    assert member.prot == "public"
-    assert member.static is False
-    assert member.include == "coordinate.hpp"
-    assert member.namespace == "asciidoxy::geometry::Coordinate"
-    assert member.const is True
-
-    assert len(member.params) == 0
-    assert len(member.exceptions) == 0
-
-    assert member.returns is not None
-    assert member.returns.description == "True if valid, false if not."
-    assert member.returns.type is not None
-    assert member.returns.type.id is None
-    assert member.returns.type.kind is None
-    assert member.returns.type.language == "cpp"
-    assert member.returns.type.name == "bool"
-    assert not member.returns.type.prefix
-    assert not member.returns.type.suffix
-    assert not member.returns.type.nested
-    assert member.returns.type.namespace == "asciidoxy::geometry::Coordinate"
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function_params_and_return_value(api_reference):
-    member = api_reference.find("asciidoxy::traffic::TrafficEvent::Update",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert member.id == ("cpp-classasciidoxy_1_1traffic_1_1_traffic_event_"
-                         "1a829eda83200a17d2d2f8a5fced5f000b")
-    assert member.name == "Update"
-    assert member.full_name == "asciidoxy::traffic::TrafficEvent::Update"
-    assert member.language == "cpp"
-    assert member.kind == "function"
-    assert member.definition == "bool asciidoxy::traffic::TrafficEvent::Update"
-    assert member.args == "(int cause, int delay)"
-    assert member.brief == "Update the traffic event data."
-    assert member.description == "Verifies the new information before updating."
-    assert member.prot == "public"
-    assert member.static is False
-    assert member.include == "traffic_event.hpp"
-    assert member.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert member.const is False
-
-    assert len(member.exceptions) == 0
-
-    assert len(member.params) == 2
-    param1, param2 = member.params
-
-    assert param1.name == "cause"
-    assert param1.description == "New TPEG cause code."
-    assert not param1.default_value
-
-    assert param1.type is not None
-    assert param1.type.id is None
-    assert param1.type.kind is None
-    assert param1.type.language == "cpp"
-    assert param1.type.name == "int"
-    assert param1.type.namespace == "asciidoxy::traffic::TrafficEvent"
-
-    assert not param1.type.prefix
-    assert not param1.type.suffix
-    assert not param1.type.nested
-
-    assert param2.name == "delay"
-    assert param2.description == "New delay in seconds."
-    assert not param2.default_value
-
-    assert param2.type is not None
-    assert param2.type.id is None
-    assert param2.type.kind is None
-    assert param2.type.language == "cpp"
-    assert param2.type.name == "int"
-    assert param2.type.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert not param2.type.prefix
-    assert not param2.type.suffix
-    assert not param2.type.nested
-
-    assert member.returns is not None
-    assert member.returns.description == "True if the update is valid."
-    assert member.returns.type is not None
-    assert member.returns.type.id is None
-    assert member.returns.type.kind is None
-    assert member.returns.type.language == "cpp"
-    assert member.returns.type.name == "bool"
-    assert member.returns.type.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert not member.returns.type.prefix
-    assert not member.returns.type.suffix
-    assert not member.returns.type.nested
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function_with_nested_return_type(api_reference):
-    member = api_reference.find("asciidoxy::traffic::TrafficEvent::SharedData",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert member.name == "SharedData"
-    assert member.namespace == "asciidoxy::traffic::TrafficEvent"
-
-    assert member.returns is not None
-    assert member.returns.description == "The shared pointer."
-    assert member.returns.type is not None
-    assert member.returns.type.id is None
-    assert member.returns.type.kind is None
-    assert member.returns.type.language == "cpp"
-    assert member.returns.type.name == "std::shared_ptr"
-    assert member.include == "traffic_event.hpp"
-    assert member.returns.type.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert not member.returns.type.prefix
-    assert not member.returns.type.suffix
-
-    assert len(member.returns.type.nested) == 1
-    nested_type = member.returns.type.nested[0]
-    assert nested_type.id == ("cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1"
-                              "_traffic_event_data")
-    assert nested_type.kind == "compound"
-    assert nested_type.language == "cpp"
-    assert nested_type.name == "TrafficEventData"
-    assert nested_type.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert not nested_type.prefix
-    assert not nested_type.suffix
-    assert not nested_type.nested
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_enum(api_reference):
-    member = api_reference.find("asciidoxy::traffic::TrafficEvent::Severity",
-                                kind="enum",
-                                lang="cpp")
-    assert member is not None
-    assert member.name == "Severity"
-    assert member.brief == "Severity scale for traffic events."
-    assert (member.description ==
-            "The more severe the traffic event, the more likely it is to have a large delay.")
-    assert member.include == "traffic_event.hpp"
-
-    assert len(member.members) == 4
-    enum_value = [e for e in member.members if e.name == "High"][0]
-    assert enum_value.id == ("cpp-classasciidoxy_1_1traffic_1_1_traffic_event_"
-                             "1a47c51b1f1f014cb943377fb67ad903b9a655d20c1ca69519ca647684edbb2db35")
-    assert enum_value.name == "High"
-    assert enum_value.full_name == "asciidoxy::traffic::TrafficEvent::Severity::High"
-    assert enum_value.language == "cpp"
-    assert enum_value.initializer == "= 3"
-    assert enum_value.brief == "High severity."
-    assert enum_value.description == "Better stay away here."
-    assert enum_value.kind == "enumvalue"
-    assert enum_value.prot == "public"
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function_with_exception(api_reference):
-    member = api_reference.find("asciidoxy::traffic::TrafficEvent::CalculateDelay()",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert member.name == "CalculateDelay"
-    assert member.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert member.include == "traffic_event.hpp"
-
-    assert len(member.exceptions) == 1
-    assert member.exceptions[0].type
-    assert member.exceptions[0].type.name == "std::runtime_exception"
-    assert member.exceptions[0].type.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert member.exceptions[0].description == "Thrown when the update encounters a critical error."
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function_with_std_function_argument(api_reference):
-    member = api_reference.find("asciidoxy::traffic::TrafficEvent::RegisterTrafficCallback",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert member.name == "RegisterTrafficCallback"
-    assert member.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert member.include == "traffic_event.hpp"
-    assert len(member.params) == 1
-
-    param = member.params[0]
-    assert param.type
-    assert param.name == "callback"
-    assert param.description == "A function to call on updates."
-
-    assert not param.type.id
-    assert not param.type.prefix
-    assert param.type.name == "std::function"
-    assert not param.type.suffix
-    assert param.type.language == "cpp"
-    assert param.type.namespace == "asciidoxy::traffic::TrafficEvent"
-    assert len(param.type.nested) == 1
-    assert not param.type.args
-
-    nested = param.type.nested[0]
-    assert nested.kind == "closure"
-    assert not nested.id
-    assert not nested.prefix
-    assert not nested.name
-    assert not nested.suffix
-    assert not nested.nested
-    assert len(nested.args) == 2
-
-    assert nested.returns is not None
-    assert not nested.returns.id
-    assert not nested.returns.prefix
-    assert nested.returns.name == "void"
-    assert not nested.returns.suffix
-    assert not nested.returns.nested
-    assert not nested.returns.args
-    assert not nested.returns.nested
-
-    arg_1 = nested.args[0]
-    assert not arg_1.name
-    assert arg_1.type
-    assert (
-        arg_1.type.id == "cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data")
-    assert arg_1.type.prefix == "const "
-    assert arg_1.type.name == "TrafficEventData"
-    assert arg_1.type.suffix == " &"
-    assert not arg_1.type.nested
-    assert not arg_1.type.args
-
-    arg_2 = nested.args[1]
-    assert arg_2.name == "delay"
-    assert arg_2.type
-    assert not arg_2.type.id
-    assert not arg_2.type.prefix
-    assert arg_2.type.name == "int"
-    assert not arg_2.type.suffix
-    assert not arg_2.type.nested
-    assert not arg_2.type.args
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function_with_complex_std_function_argument(api_reference):
-    member = api_reference.find(
-        "asciidoxy::relative_namespace::InterfaceWithDetailClasses::DoSomething",
-        kind="function",
-        lang="cpp")
-    assert member is not None
-    assert len(member.params) == 3
-
-    param = member.params[0]
-    assert param.name == "text"
-    assert param.type
-
-    param = member.params[1]
-    assert param.name == "success_callback"
-    assert param.type
-    assert param.type.name == "std::function"
-    assert len(param.type.nested) == 1
-    assert param.type.args is None
-
-    nested = param.type.nested[0]
-    assert not nested.name
-    assert nested.returns
-    assert nested.returns.name == "void"
-    assert len(nested.args) == 1
-
-    arg = nested.args[0]
-    assert not arg.name
-    assert arg.type
-    assert arg.type.name == "std::shared_ptr"
-    assert arg.type.prefix == "const "
-    assert arg.type.suffix == " &"
-    assert arg.type.args is None
-    assert len(arg.type.nested) == 1
-
-    nested_again = arg.type.nested[0]
-    assert nested_again.name == "detail::SuccessDescriptor"
-    assert nested_again.id
-    assert nested_again.args is None
-    assert nested_again.nested is None
-
-    param = member.params[2]
-    assert param.name == "error_callback"
-    assert param.type
-    assert param.type.name == "std::function"
-    assert len(param.type.nested) == 1
-    assert param.type.args is None
-
-    nested = param.type.nested[0]
-    assert not nested.name
-    assert nested.returns
-    assert nested.returns.name == "void"
-    assert len(nested.args) == 1
-
-    arg = nested.args[0]
-    assert not arg.name
-    assert arg.type
-    assert arg.type.name == "detail::ErrorDescriptor"
-    assert arg.type.args is None
-    assert arg.type.nested is None
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function__deleted(api_reference):
-    member = api_reference.find("asciidoxy::system::MoveOnly::MoveOnly(const MoveOnly&)",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert member.deleted is True
-    assert member.default is False
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function__default(api_reference):
-    member = api_reference.find("asciidoxy::system::MoveOnly::operator=(MoveOnly&&)",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert member.deleted is False
-    assert member.default is True
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp__include_file_for_free_functions(api_reference):
-    function = api_reference.find("asciidoxy::system::CreateService", kind="function", lang="cpp")
-    assert function is not None
-    assert function.include == "service.hpp"
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp__default_parameter_values__constructor(api_reference):
-    member = api_reference.find("asciidoxy::geometry::Point::Point", kind="function", lang="cpp")
-    assert member is not None
-    assert len(member.params) == 2
-
-    param1 = member.params[0]
-    assert param1.name == "x"
-    assert param1.default_value == "0"
-
-    param2 = member.params[1]
-    assert param2.name == "y"
-    assert param2.default_value == "1"
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp__default_parameter_values__method(api_reference):
-    member = api_reference.find("asciidoxy::geometry::Point::increment",
-                                kind="function",
-                                lang="cpp")
-    assert member is not None
-    assert len(member.params) == 2
-
-    param1 = member.params[0]
-    assert param1.name == "x"
-    assert param1.default_value == "2"
-
-    param2 = member.params[1]
-    assert param2.name == "y"
-    assert param2.default_value == "3"
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp__constexpr_constructor(api_reference):
-    member = api_reference.find("ConstInt::ConstInt", kind="function", lang="cpp")
-    assert member is not None
-    assert len(member.params) == 1
-
-    assert member.returns is None
-    assert member.constexpr is True
-
-
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
-def test_parse_cpp_member_function_pre_and_post_condition(api_reference):
-    member = api_reference.find("asciidoxy::geometry::Coordinate::Update(double, double, double)",
-                                kind="function",
-                                lang="cpp")
-    assert member == Compound(
-        id="cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891",
-        name="Update",
-        full_name="asciidoxy::geometry::Coordinate::Update",
-        language="cpp",
-        kind="function",
-        include="coordinate.hpp",
-        namespace="asciidoxy::geometry::Coordinate",
-        prot="public",
-        definition="void asciidoxy::geometry::Coordinate::Update",
-        args="(double latitude, double longitude, double altitude)",
-        brief="Update from separate values.",
-        precondition="The coordinate exists.",
-        postcondition="New values are used for the coordinate.",
-        params=[
-            Parameter(name="latitude",
-                      default_value="",
-                      type=TypeRef(name="double",
-                                   language="cpp",
-                                   namespace="asciidoxy::geometry::Coordinate",
-                                   prefix="",
-                                   suffix="")),
-            Parameter(name="longitude",
-                      default_value="",
-                      type=TypeRef(name="double",
-                                   language="cpp",
-                                   namespace="asciidoxy::geometry::Coordinate",
-                                   prefix="",
-                                   suffix="")),
-            Parameter(name="altitude",
-                      default_value="",
-                      type=TypeRef(name="double",
-                                   language="cpp",
-                                   namespace="asciidoxy::geometry::Coordinate",
-                                   prefix="",
-                                   suffix="")),
-        ],
-        returns=ReturnValue(type=TypeRef(name="void",
-                                         language="cpp",
-                                         namespace="asciidoxy::geometry::Coordinate",
-                                         prefix="",
-                                         suffix="")),
-    )
+from pytest import param
+
+from .matchers import (AtLeast, HasNot, IsEmpty, IsFalse, IsNone, IsNotEmpty, IsTrue, SizeIs,
+                       Unordered, m_compound, m_parameter, m_returnvalue, m_throwsclause, m_typeref)
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]], ids=[""])
+@pytest.mark.parametrize("search_params,matcher", [
+    param(dict(name="asciidoxy::geometry::Coordinate", kind="class", lang="cpp"),
+          m_compound(
+              id="cpp-classasciidoxy_1_1geometry_1_1_coordinate",
+              name="Coordinate",
+              full_name="asciidoxy::geometry::Coordinate",
+              language="cpp",
+              kind="class",
+              brief="Class to hold information about a coordinate.",
+              description="A coordinate has a latitude, longitude, and an altitude.",
+              include="coordinate.hpp",
+              namespace="asciidoxy::geometry",
+              members=Unordered(
+                  m_compound(name="longitude_"),
+                  m_compound(name="latitude_"),
+                  m_compound(name="altitude_"),
+                  m_compound(name="Coordinate"),
+                  m_compound(name="~Coordinate"),
+                  m_compound(name="operator+"),
+                  m_compound(name="Latitude"),
+                  m_compound(name="Longitude"),
+                  m_compound(name="Altitude"),
+                  m_compound(name="IsValid"),
+                  m_compound(name="Update"),
+                  m_compound(name="Update"),
+                  m_compound(name="Update"),
+                  m_compound(name="Update"),
+                  m_compound(name="Update"),
+              ),
+          ),
+          id="Basic class"),
+    param(dict(name="asciidoxy::traffic::TrafficEvent", kind="class", lang="cpp"),
+          m_compound(
+              id="cpp-classasciidoxy_1_1traffic_1_1_traffic_event",
+              namespace="asciidoxy::traffic",
+              members=AtLeast(
+                  m_compound(
+                      kind="struct",
+                      full_name="asciidoxy::traffic::TrafficEvent::TrafficEventData",
+                      namespace="asciidoxy::traffic::TrafficEvent",
+                      id="cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data",
+                      language="cpp",
+                      prot="public",
+                  )),
+          ),
+          id="Class with nested class"),
+    param(dict(name="asciidoxy::system::ServiceStarter", kind="class", lang="cpp"),
+          m_compound(members=HasNot(m_compound(kind="friend"))),
+          id="Ignore friend declarations"),
+    param(dict(name="asciidoxy::geometry::Coordinate::Coordinate", kind="function", lang="cpp"),
+          m_compound(
+              id=("cpp-classasciidoxy_1_1geometry_1_1_coordinate_"
+                  "1a69ac21cad618c0c033815f2cbdc86318"),
+              name="Coordinate",
+              full_name="asciidoxy::geometry::Coordinate::Coordinate",
+              language="cpp",
+              kind="function",
+              definition="asciidoxy::geometry::Coordinate::Coordinate",
+              args="()",
+              brief="Default constructor.",
+              description=IsEmpty(),
+              prot="public",
+              static=IsFalse(),
+              include="coordinate.hpp",
+              namespace="asciidoxy::geometry::Coordinate",
+              const=IsFalse(),
+              params=IsEmpty(),
+              exceptions=IsEmpty(),
+              returns=IsNone(),
+          ),
+          id="Method without return value"),
+    param(dict(name="asciidoxy::geometry::Coordinate::IsValid", kind="function", lang="cpp"),
+          m_compound(
+              id="cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac",
+              name="IsValid",
+              full_name="asciidoxy::geometry::Coordinate::IsValid",
+              language="cpp",
+              kind="function",
+              definition="bool asciidoxy::geometry::Coordinate::IsValid",
+              args="() const",
+              brief="Check if the coordinate is valid.",
+              description="A coordinate is valid if its values are within WGS84 bounds.",
+              prot="public",
+              static=IsFalse(),
+              include="coordinate.hpp",
+              namespace="asciidoxy::geometry::Coordinate",
+              const=IsTrue(),
+              params=IsEmpty(),
+              exceptions=IsEmpty(),
+              returns=m_returnvalue(
+                  description="True if valid, false if not.",
+                  type=m_typeref(
+                      id=IsNone(),
+                      kind=IsNone(),
+                      language="cpp",
+                      name="bool",
+                      prefix=IsEmpty(),
+                      suffix=IsEmpty(),
+                      nested=IsEmpty(),
+                      namespace="asciidoxy::geometry::Coordinate",
+                  ),
+              ),
+          ),
+          id="Method with only a return value"),
+    param(
+        dict(name="asciidoxy::traffic::TrafficEvent::Update", kind="function", lang="cpp"),
+        m_compound(
+            id="cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b",
+            name="Update",
+            full_name="asciidoxy::traffic::TrafficEvent::Update",
+            language="cpp",
+            kind="function",
+            definition="bool asciidoxy::traffic::TrafficEvent::Update",
+            args="(int cause, int delay)",
+            brief="Update the traffic event data.",
+            description="Verifies the new information before updating.",
+            prot="public",
+            static=IsFalse(),
+            include="traffic_event.hpp",
+            namespace="asciidoxy::traffic::TrafficEvent",
+            const=IsFalse(),
+            exceptions=IsEmpty(),
+            params=[
+                m_parameter(
+                    name="cause",
+                    description="New TPEG cause code.",
+                    default_value=IsEmpty(),
+                    type=m_typeref(
+                        id=IsNone(),
+                        kind=IsNone(),
+                        language="cpp",
+                        name="int",
+                        namespace="asciidoxy::traffic::TrafficEvent",
+                        prefix=IsEmpty(),
+                        suffix=IsEmpty(),
+                        nested=IsEmpty(),
+                    ),
+                ),
+                m_parameter(
+                    name="delay",
+                    description="New delay in seconds.",
+                    default_value=IsEmpty(),
+                    type=m_typeref(
+                        id=IsNone(),
+                        kind=IsNone(),
+                        language="cpp",
+                        name="int",
+                        namespace="asciidoxy::traffic::TrafficEvent",
+                        prefix=IsEmpty(),
+                        suffix=IsEmpty(),
+                        nested=IsEmpty(),
+                    ),
+                ),
+            ],
+            returns=m_returnvalue(
+                description="True if the update is valid.",
+                type=m_typeref(
+                    id=IsNone(),
+                    kind=IsNone(),
+                    language="cpp",
+                    name="bool",
+                    namespace="asciidoxy::traffic::TrafficEvent",
+                    prefix=IsEmpty(),
+                    suffix=IsEmpty(),
+                    nested=IsEmpty(),
+                ),
+            ),
+        ),
+        id="Method with parameters and return value"),
+    param(dict(name="asciidoxy::traffic::TrafficEvent::SharedData", kind="function", lang="cpp"),
+          m_compound(
+              name="SharedData",
+              namespace="asciidoxy::traffic::TrafficEvent",
+              include="traffic_event.hpp",
+              returns=m_returnvalue(
+                  description="The shared pointer.",
+                  type=m_typeref(
+                      id=IsNone(),
+                      kind=IsNone(),
+                      language="cpp",
+                      name="std::shared_ptr",
+                      namespace="asciidoxy::traffic::TrafficEvent",
+                      prefix=IsEmpty(),
+                      suffix=IsEmpty(),
+                      nested=[
+                          m_typeref(
+                              id=("cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1"
+                                  "_traffic_event_data"),
+                              kind="compound",
+                              language="cpp",
+                              name="TrafficEventData",
+                              namespace="asciidoxy::traffic::TrafficEvent",
+                              prefix=IsEmpty(),
+                              suffix=IsEmpty(),
+                              nested=IsEmpty(),
+                          ),
+                      ],
+                  ),
+              ),
+          ),
+          id="Method with nested return type"),
+    param(
+        dict(name="asciidoxy::traffic::TrafficEvent::Severity", kind="enum", lang="cpp"),
+        m_compound(
+            name="Severity",
+            brief="Severity scale for traffic events.",
+            description=("The more severe the traffic event, the more likely it is to have a large "
+                         "delay."),
+            include="traffic_event.hpp",
+            members=[
+                m_compound(kind="enumvalue", name="Low"),
+                m_compound(kind="enumvalue", name="Medium"),
+                m_compound(
+                    id=("cpp-classasciidoxy_1_1traffic_1_1_traffic_event_"
+                        "1a47c51b1f1f014cb943377fb67ad903b9a655d20c1ca69519ca647684edbb2db35"),
+                    name="High",
+                    full_name="asciidoxy::traffic::TrafficEvent::Severity::High",
+                    language="cpp",
+                    initializer="= 3",
+                    brief="High severity.",
+                    description="Better stay away here.",
+                    kind="enumvalue",
+                    prot="public",
+                ),
+                m_compound(kind="enumvalue", name="Unknown"),
+            ],
+        ),
+        id="Member enum"),
+    param(dict(
+        name="asciidoxy::traffic::TrafficEvent::CalculateDelay()", kind="function", lang="cpp"),
+          m_compound(
+              name="CalculateDelay",
+              namespace="asciidoxy::traffic::TrafficEvent",
+              include="traffic_event.hpp",
+              exceptions=[
+                  m_throwsclause(
+                      type=m_typeref(
+                          name="std::runtime_exception",
+                          namespace="asciidoxy::traffic::TrafficEvent",
+                      ),
+                      description="Thrown when the update encounters a critical error.",
+                  ),
+              ],
+          ),
+          id="Method throwing an exception"),
+    param(
+        dict(name="asciidoxy::traffic::TrafficEvent::RegisterTrafficCallback",
+             kind="function",
+             lang="cpp"),
+        m_compound(
+            name="RegisterTrafficCallback",
+            namespace="asciidoxy::traffic::TrafficEvent",
+            include="traffic_event.hpp",
+            params=[
+                m_parameter(
+                    name="callback",
+                    description="A function to call on updates.",
+                    type=m_typeref(
+                        id=IsEmpty(),
+                        prefix=IsEmpty(),
+                        name="std::function",
+                        suffix=IsEmpty(),
+                        language="cpp",
+                        namespace="asciidoxy::traffic::TrafficEvent",
+                        args=IsEmpty(),
+                        nested=[
+                            m_typeref(
+                                kind="closure",
+                                id=IsEmpty(),
+                                prefix=IsEmpty(),
+                                name=IsEmpty(),
+                                suffix=IsEmpty(),
+                                nested=IsEmpty(),
+                                args=[
+                                    m_parameter(
+                                        name=IsEmpty(),
+                                        type=m_typeref(
+                                            id=("cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1"
+                                                "_traffic_event_data"),
+                                            prefix="const ",
+                                            name="TrafficEventData",
+                                            suffix=" &",
+                                            nested=IsEmpty(),
+                                            args=IsEmpty(),
+                                        ),
+                                    ),
+                                    m_parameter(
+                                        name="delay",
+                                        type=m_typeref(
+                                            id=IsEmpty(),
+                                            prefix=IsEmpty(),
+                                            name="int",
+                                            suffix=IsEmpty(),
+                                            nested=IsEmpty(),
+                                            args=IsEmpty(),
+                                        ),
+                                    ),
+                                ],
+                                returns=m_typeref(
+                                    id=IsEmpty(),
+                                    prefix=IsEmpty(),
+                                    name="void",
+                                    suffix=IsEmpty(),
+                                    nested=IsEmpty(),
+                                    args=IsEmpty(),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ],
+        ),
+        id="Method with std::function argument"),
+    param(dict(name="asciidoxy::relative_namespace::InterfaceWithDetailClasses::DoSomething",
+               kind="function",
+               lang="cpp"),
+          m_compound(params=[
+              m_parameter(
+                  name="text",
+                  type=m_typeref(),
+              ),
+              m_parameter(
+                  name="success_callback",
+                  type=m_typeref(
+                      name="std::function",
+                      args=IsEmpty(),
+                      nested=[
+                          m_typeref(
+                              name=IsEmpty(),
+                              returns=m_typeref(name="void", ),
+                              args=[
+                                  m_parameter(
+                                      name=IsEmpty(),
+                                      type=m_typeref(
+                                          name="std::shared_ptr",
+                                          prefix="const ",
+                                          suffix=" &",
+                                          nested=[
+                                              m_typeref(
+                                                  name="detail::SuccessDescriptor",
+                                                  id=IsNotEmpty(),
+                                                  args=IsNone(),
+                                                  nested=IsNone(),
+                                              ),
+                                          ],
+                                      ),
+                                  ),
+                              ],
+                          ),
+                      ],
+                  ),
+              ),
+              m_parameter(
+                  name="error_callback",
+                  type=m_typeref(
+                      name="std::function",
+                      nested=[
+                          m_typeref(
+                              name=IsEmpty(),
+                              returns=m_typeref(name="void", ),
+                              args=[
+                                  m_parameter(
+                                      name=IsEmpty(),
+                                      type=m_typeref(
+                                          name="detail::ErrorDescriptor",
+                                          args=IsNone(),
+                                          nested=IsNone(),
+                                      ),
+                                  ),
+                              ],
+                          ),
+                      ],
+                      args=IsNone(),
+                  ),
+              ),
+          ], ),
+          id="Method with complex std::function argument"),
+    param(dict(
+        name="asciidoxy::system::MoveOnly::MoveOnly(const MoveOnly&)", kind="function", lang="cpp"),
+          m_compound(
+              deleted=IsTrue(),
+              default=IsFalse(),
+          ),
+          id="Deleted method"),
+    param(dict(
+        name="asciidoxy::system::MoveOnly::operator=(MoveOnly&&)", kind="function", lang="cpp"),
+          m_compound(
+              deleted=IsFalse(),
+              default=IsTrue(),
+          ),
+          id="Defaulted method"),
+    param(dict(name="asciidoxy::system::CreateService", kind="function", lang="cpp"),
+          m_compound(include="service.hpp", ),
+          id="Provide correct include file for free functions"),
+    param(dict(name="asciidoxy::geometry::Point::Point", kind="function", lang="cpp"),
+          m_compound(params=[
+              m_parameter(
+                  name="x",
+                  default_value="0",
+              ),
+              m_parameter(
+                  name="y",
+                  default_value="1",
+              ),
+          ], ),
+          id="Constructor with default parameter values"),
+    param(dict(name="asciidoxy::geometry::Point::increment", kind="function", lang="cpp"),
+          m_compound(params=[
+              m_parameter(
+                  name="x",
+                  default_value="2",
+              ),
+              m_parameter(
+                  name="y",
+                  default_value="3",
+              ),
+          ], ),
+          id="Method with default parameter values"),
+    param(dict(name="ConstInt::ConstInt", kind="function", lang="cpp"),
+          m_compound(
+              params=SizeIs(1),
+              returns=IsNone(),
+              constexpr=IsTrue(),
+          ),
+          id="Constexpr constructor"),
+    param(dict(name="asciidoxy::geometry::Coordinate::Update(double, double, double)",
+               kind="function",
+               lang="cpp"),
+          m_compound(
+              id="cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891",
+              name="Update",
+              full_name="asciidoxy::geometry::Coordinate::Update",
+              language="cpp",
+              kind="function",
+              include="coordinate.hpp",
+              namespace="asciidoxy::geometry::Coordinate",
+              prot="public",
+              definition="void asciidoxy::geometry::Coordinate::Update",
+              args="(double latitude, double longitude, double altitude)",
+              brief="Update from separate values.",
+              precondition="The coordinate exists.",
+              postcondition="New values are used for the coordinate.",
+              params=[
+                  m_parameter(name="latitude",
+                              default_value="",
+                              type=m_typeref(name="double",
+                                             language="cpp",
+                                             namespace="asciidoxy::geometry::Coordinate",
+                                             prefix=IsEmpty(),
+                                             suffix=IsEmpty())),
+                  m_parameter(name="longitude",
+                              default_value="",
+                              type=m_typeref(name="double",
+                                             language="cpp",
+                                             namespace="asciidoxy::geometry::Coordinate",
+                                             prefix=IsEmpty(),
+                                             suffix=IsEmpty())),
+                  m_parameter(name="altitude",
+                              default_value="",
+                              type=m_typeref(name="double",
+                                             language="cpp",
+                                             namespace="asciidoxy::geometry::Coordinate",
+                                             prefix=IsEmpty(),
+                                             suffix=IsEmpty())),
+              ],
+              returns=m_returnvalue(type=m_typeref(name="void",
+                                                   language="cpp",
+                                                   namespace="asciidoxy::geometry::Coordinate",
+                                                   prefix=IsEmpty(),
+                                                   suffix=IsEmpty())),
+          ),
+          id="Method with pre and post condition"),
+])
+def test_parse_cpp(api_reference, search_params, matcher):
+    matcher.assert_matches(api_reference.find(**search_params))
