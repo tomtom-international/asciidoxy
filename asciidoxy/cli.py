@@ -16,6 +16,7 @@
 import argparse
 import json
 import logging
+import platform
 import subprocess
 import sys
 
@@ -41,14 +42,27 @@ def error(*args, **kwargs) -> None:
 
 def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, multipage: bool,
                 backend: str, extra_args: Sequence[str], image_dir: Path) -> None:
-    subprocess.run([
-        f"asciidoctor -D {destination_dir} -o {out_file} -b {backend} "
-        f"{'-a multipage ' if multipage else ''}"
-        f"-a imagesdir@={image_dir} "
-        f"{processed_file} {' '.join(extra_args)}"
-    ],
-                   shell=True,
-                   check=True)
+    args = [
+        "asciidoctor",
+        "-D",
+        str(destination_dir),
+        "-o",
+        str(out_file),
+        "-b",
+        backend,
+        "-a",
+        f"imagesdir@={image_dir}",
+        str(processed_file),
+    ]
+    if multipage:
+        args += ["-a", "multipage"]
+    if extra_args:
+        args += extra_args
+
+    if platform.system() == "Windows":
+        subprocess.run(args, shell=True, check=True)
+    else:
+        subprocess.run(" ".join(args), shell=True, check=True)
 
 
 def output_extension(backend: str) -> Optional[str]:
