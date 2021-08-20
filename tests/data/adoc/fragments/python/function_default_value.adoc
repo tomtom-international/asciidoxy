@@ -1,0 +1,36 @@
+
+
+== [[python-classasciidoxy_1_1default-values_1_1_point_1a7afa9cd9fcbec61efa64cb0f3108c17b,asciidoxy.default_values.Point.increment]]increment
+
+
+[source,python,subs="-specialchars,macros+"]
+----
+def increment(self,
+              x: int = 2,
+              y: int = 3) -&gt; xref:python-classasciidoxy_1_1default-values_1_1_point[++Point++]
+----
+
+Create a new incremented point.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`x: int`::
+Value to increment the X coordinate with.
++
+*Default value*: `2`
+
+`y: int`::
+Value to increment the Y coordinate with.
++
+*Default value*: `3`
+
+| Returns
+|
+`xref:python-classasciidoxy_1_1default-values_1_1_point[++Point++]`::
+A new incremented xref:python-classasciidoxy_1_1default__values_1_1_point[Point].
+
+|===

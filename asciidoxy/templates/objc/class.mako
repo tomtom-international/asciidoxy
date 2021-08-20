@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any
+from asciidoxy.templates.helpers import has, has_any, h1, h2
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 from html import escape
 from itertools import chain
@@ -23,7 +23,7 @@ from itertools import chain
 helper = ObjcTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-= [[${element.id},${element.name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
@@ -32,12 +32,23 @@ ${api.inserted(element)}
 #import &lt;${element.include}&gt;
 
 % endif
-@interface ${element.name}
+@${"interface" if element.kind == "class" else element.kind} ${element.name}
 ----
 ${element.brief}
 
 ${element.description}
 
+<%
+for prot in ("public", "protected", "private"):
+    if has_any(helper.simple_enclosed_types(prot=prot),
+               helper.complex_enclosed_types(prot=prot),
+               helper.properties(prot=prot),
+               helper.class_methods(prot=prot),
+               helper.methods(prot=prot)):
+        break
+else:
+    return STOP_RENDERING
+%>
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
@@ -88,11 +99,11 @@ ${method.brief}
 ############################################################################ Simple inner types ##
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.simple_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor
 
-== Members
+${h2(leveloffset, "Members")}
 % for prot in ("public", "protected", "private"):
 ##################################################################################### Properties ##
 % for prop in helper.properties(prot=prot):
@@ -111,94 +122,12 @@ ${prop.description}
 % endfor
 ################################################################################## Class methods ##
 % for method in helper.class_methods(prot=prot):
-[[${method.id},${method.name}]]
-${api.inserted(method)}
-[source,objectivec,subs="-specialchars,macros+"]
-----
-${escape(helper.method_signature(method))};
-----
-
-${method.brief}
-
-${method.description}
-
-% if method.params or method.exceptions or method.returns:
-[cols='h,5a']
-|===
-% if method.params:
-| Parameters
-|
-% for param in method.params:
-`(${helper.print_ref(param.type)})${param.name}`::
-${param.description}
-
-% endfor
-% endif
-% if method.returns and method.returns.type.name != "void":
-| Returns
-|
-`${helper.print_ref(method.returns.type)}`::
-${method.returns.description}
-
-% endif
-% if method.exceptions:
-| Throws
-|
-% for exception in method.exceptions:
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
-
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ######################################################################################## Methods ##
 % for method in helper.methods(prot=prot):
-[[${method.id},${method.name}]]
-${api.inserted(method)}
-[source,objectivec,subs="-specialchars,macros+"]
-----
-${escape(helper.method_signature(method))};
-----
-
-${method.brief}
-
-${method.description}
-
-% if method.params or method.exceptions or method.returns:
-[cols='h,5a']
-|===
-% if method.params:
-| Parameters
-|
-% for param in method.params:
-`(${helper.print_ref(param.type)})${param.name}`::
-${param.description}
-
-% endfor
-% endif
-% if method.returns and method.returns.type.name != "void":
-| Returns
-|
-`${helper.print_ref(method.returns.type)}`::
-${method.returns.description}
-
-% endif
-% if method.exceptions:
-| Throws
-|
-% for exception in method.exceptions:
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
-
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 % endfor
@@ -207,6 +136,6 @@ ${exception.description}
 
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.complex_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor

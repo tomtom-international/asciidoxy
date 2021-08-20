@@ -12,14 +12,14 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import has, has_any
+from asciidoxy.templates.helpers import has, has_any, h1
 from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
 from html import escape
 %>
 <%
 helper = PythonTemplateHelper(api)
 %>
-= [[${element.id},${element.name}]]
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,python,subs="-specialchars,macros+"]
@@ -31,9 +31,19 @@ ${element.brief}
 
 ${element.description}
 
-% if has_any(params(element), insert_filter.exceptions(element)) or element.returns:
+% if has_any(params(element), insert_filter.exceptions(element)) or element.returns or element.postcondition or element.precondition:
 [cols='h,5a']
 |===
+% if element.precondition:
+| Precondition
+| ${element.precondition}
+
+% endif
+% if element.postcondition:
+| Postcondition
+| ${element.postcondition}
+
+% endif
 % if has(params(element)):
 | Parameters
 |

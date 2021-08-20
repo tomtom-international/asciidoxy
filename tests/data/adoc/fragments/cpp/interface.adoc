@@ -1,0 +1,77 @@
+
+
+
+== [[cpp-classasciidoxy_1_1system_1_1_service,asciidoxy::system::Service]]Service
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;service.hpp&gt;
+
+class asciidoxy::system::Service
+----
+This is an interface for service classes.
+
+Base class for services.
+
+
+[cols='h,5a']
+|===
+|*Public Methods*
+|
+`<<cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8,++void Start()++>>`::
+Start the service.
+`<<cpp-classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0,++void Stop()++>>`::
+Stop the service.
+
+|===
+
+
+=== Members
+
+
+
+==== [[cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8,asciidoxy::system::Service::Start]]Start
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Start()
+----
+
+
+Start the service.
+
+
+
+[cols='h,5a']
+|===
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0,asciidoxy::system::Service::Stop]]Stop
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Stop()
+----
+
+
+Stop the service.
+
+
+
+[cols='h,5a']
+|===
+|===
+
+
+'''
+
+

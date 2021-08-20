@@ -1,0 +1,87 @@
+
+
+
+== [[swift-protocol_a_d_traffic_event-p,ADTrafficEvent]]ADTrafficEvent
+
+
+[source,swift,subs="-specialchars,macros+"]
+----
+protocol ADTrafficEvent
+----
+Information about a traffic event.
+
+
+
+
+[cols='h,5a']
+|===
+|*Public Properties*
+|
+`<<swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,++data++>>`::
+Traffic event details.
+
+|*Public Methods*
+|
+`<<swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,++update(Integer, Integer)++>>`::
+Update the traffic event data.
+
+|===
+
+
+=== Members
+
+
+[[swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,data]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+var data: xref:swift-interface_traffic_event_data[++TrafficEventData++]
+----
+
+Traffic event details.
+
+
+
+'''
+
+
+
+
+[[swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,update]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+func update(withCause: Integer,
+            delay: Integer) -&gt; Any
+----
+
+Update the traffic event data.
+
+Verifies the new information before updating.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`withCause: Integer`::
+New TPEG cause code.
+
+`delay: Integer`::
+New delay in seconds.
+
+| Returns
+|
+`Any`::
+True if the update is valid.
+
+|===
+
+'''
+
+
+
+
+
+
+
+

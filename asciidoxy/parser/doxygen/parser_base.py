@@ -132,6 +132,13 @@ class ParserBase(ABC):
         else:
             return None
 
+    def parse_condition(self, memberdef_element: ET.Element, condition: str) -> str:
+        description = memberdef_element.find(
+            f"detaileddescription/para/simplesect[@kind='{condition}']")
+        if description:
+            return self.parse_description(description)
+        return ""
+
     def parse_enumvalues(self, container_element: ET.Element, parent_name: str) -> List[Compound]:
         return [
             self.parse_enumvalue(enumvalue_element, parent_name)
@@ -182,6 +189,8 @@ class ParserBase(ABC):
         member.static = _yes_no_to_bool(memberdef_element.get("static", "no"))
         member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
         member.constexpr = _yes_no_to_bool(memberdef_element.get("constexpr", "no"))
+        member.precondition = self.parse_condition(memberdef_element, "pre")
+        member.postcondition = self.parse_condition(memberdef_element, "post")
 
         self._driver.register(member)
         return member

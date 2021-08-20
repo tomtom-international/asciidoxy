@@ -1,0 +1,128 @@
+
+
+
+== [[swift-interface_a_d_coordinate,ADCoordinate]]ADCoordinate
+
+
+[source,swift,subs="-specialchars,macros+"]
+----
+class ADCoordinate
+----
+Class to hold information about a coordinate.
+
+A coordinate has a latitude, longitude, and an altitude.
+
+
+[cols='h,5a']
+|===
+|*Public Constructors*
+|
+`<<swift-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22,++init()++>>`::
+Default constructor.
+
+|*Public Properties*
+|
+`<<swift-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,++latitude++>>`::
+The latitude in degrees.
+`<<swift-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e,++longitude++>>`::
+The longitude in degrees.
+`<<swift-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2,++altitude++>>`::
+The altitude in meters.
+
+|*Public Methods*
+|
+`<<swift-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321,++isValid()++>>`::
+Check if the coordinate is valid.
+
+|===
+
+
+=== Members
+
+
+
+
+
+
+[[swift-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22,init]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+func init()
+----
+
+Default constructor.
+
+
+
+
+'''
+[[swift-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+var latitude: CLLocationDegrees
+----
+
+The latitude in degrees.
+
+
+
+'''
+[[swift-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e,longitude]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+var longitude: CLLocationDegrees
+----
+
+The longitude in degrees.
+
+
+
+'''
+[[swift-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2,altitude]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+var altitude: CLLocationDistance
+----
+
+The altitude in meters.
+
+
+
+'''
+
+
+
+
+[[swift-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321,isValid]]
+
+[source,swift,subs="-specialchars,macros+"]
+----
+func isValid() -&gt; Any
+----
+
+Check if the coordinate is valid.
+
+A coordinate is valid if its values are within WGS84 bounds.
+
+[cols='h,5a']
+|===
+| Returns
+|
+`Any`::
+True if valid, false if not.
+
+|===
+
+'''
+
+
+
+
+
+
+
+

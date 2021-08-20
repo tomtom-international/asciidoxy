@@ -1,0 +1,191 @@
+
+
+
+== [[kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event,com.asciidoxy.traffic.TrafficEvent]]TrafficEvent
+
+
+[source,kotlin,subs="-specialchars,macros+"]
+----
+class com.asciidoxy.traffic.TrafficEvent
+----
+Information about a traffic event.
+
+
+
+
+[cols='h,5a']
+|===
+|*Public Enclosed Types*
+|
+`<<kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity,++Severity++>>`::
+xref:java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity[Severity] scale for traffic events.
+`<<kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,++TrafficEventData++>>`::
+Details about a traffic event.
+
+|*Public Constructors*
+|
+`<<kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e,++TrafficEvent(TrafficEventData!)++>>`::
+Construct a traffic event from data.
+
+|*Public Methods*
+|
+`<<kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac,++Data(): TrafficEventData!++>>`::
+Get the traffic event details.
+`<<kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a72847da5fa4e03763f089c5d044085d4,++Update(Int, Int): Boolean++>>`::
+Update the traffic event data.
+
+|===
+
+
+
+=== [[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity,com.asciidoxy.traffic.TrafficEvent.Severity]]Severity
+
+
+[source,java,subs="-specialchars,macros+"]
+----
+import TrafficEvent.java
+
+enum com.asciidoxy.traffic.TrafficEvent.Severity
+----
+
+xref:java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity[Severity] scale for traffic events.
+
+The more severe the traffic event, the more likely it is to have a large delay.
+
+[cols='h,5a']
+|===
+
+
+|
+[[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1abb3f4d789ff9e6fdb967133fa1ef1625,Low]]Low
+|
+Low severity.
+
+
+
+
+|
+[[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1aa9555621413c089cc41f0d6a95c1b61b,Medium]]Medium
+|
+Medium severity.
+
+
+
+
+|
+[[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a0761f7236594c0ea634494296ce21510,High]]High
+|
+High severity.
+
+Better stay away here.
+
+
+|
+[[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1a41514643a9ae47d769580925859625f5,Unknown]]Unknown
+|
+xref:java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity[Severity] unknown.
+
+
+
+|===
+
+
+=== Members
+
+
+
+[[kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a2b99e6d20827eb9e86c958333acabb3e,TrafficEvent]]
+
+[source,kotlin,subs="-specialchars,macros+"]
+----
+fun TrafficEvent(data: xref:kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]!)
+----
+
+Construct a traffic event from data.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`data: xref:kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]!`::
+The data to contain.
+
+|===
+
+'''
+
+
+
+[[kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a7a344438ceca76397d7a54bed6cdefac,Data]]
+
+[source,kotlin,subs="-specialchars,macros+"]
+----
+fun Data(): xref:kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]!
+----
+
+Get the traffic event details.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`xref:kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]!`::
+Traffic event details.
+
+|===
+
+'''
+
+
+
+[[kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1a72847da5fa4e03763f089c5d044085d4,Update]]
+
+[source,kotlin,subs="-specialchars,macros+"]
+----
+fun Update(cause: Int,
+           delay: Int): Boolean
+----
+
+Update the traffic event data.
+
+Verifies the new information before updating.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`cause: Int`::
+New TPEG cause code.
+
+`delay: Int`::
+New delay in seconds.
+
+| Returns
+|
+`Boolean`::
+True if the update is valid.
+
+|===
+
+'''
+
+
+
+
+
+=== [[kotlin-classcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,com.asciidoxy.traffic.TrafficEvent.TrafficEventData]]TrafficEventData
+
+
+[source,kotlin,subs="-specialchars,macros+"]
+----
+class com.asciidoxy.traffic.TrafficEvent.TrafficEventData
+----
+Details about a traffic event.
+
+Use the cause and delay to properly inform your users.
+
+

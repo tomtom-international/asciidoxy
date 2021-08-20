@@ -1,0 +1,381 @@
+
+
+
+== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event,asciidoxy::traffic::TrafficEvent]]TrafficEvent
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;traffic_event.hpp&gt;
+
+class asciidoxy::traffic::TrafficEvent
+----
+Information about a traffic event.
+
+
+
+
+[cols='h,5a']
+|===
+|*Public Enclosed Types*
+|
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,++Severity++>>`::
+Severity scale for traffic events.
+`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,++TrafficEventData++>>`::
+Details about a traffic event.
+
+|*Public Constructors*
+|
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41,++TrafficEvent()++>>`::
+Default constructor.
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc,++TrafficEvent(TrafficEventData)++>>`::
+Construct a traffic event from data.
+
+|*Public Methods*
+|
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28,++const TrafficEventData & Data() const++>>`::
+Get the traffic event details.
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b,++bool Update(int, int)++>>`::
+Update the traffic event data.
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,++std::shared_ptr<TrafficEventData> SharedData() const++>>`::
+Get a shared pointer to a copy of the data.
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17,++long CalculateDelay()++>>`::
+Calculate the current delay.
+`<<cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0,++void RegisterTrafficCallback(std::function<void(const TrafficEventData &, int delay)>)++>>`::
+Register a callback to receive updates for the traffic event.
+
+|===
+
+
+
+
+=== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,asciidoxy::traffic::TrafficEvent::Severity]]Severity
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;traffic_event.hpp&gt;
+
+enum asciidoxy::traffic::TrafficEvent::Severity
+----
+
+Severity scale for traffic events.
+
+The more severe the traffic event, the more likely it is to have a large delay.
+
+[cols='h,5a']
+|===
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a28d0edd045e05cf5af64e35ae0c4c6ef,Low]]Low = 1
+|
+Low severity.
+
+
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a87f8a6ab85c9ced3702b4ea641ad4bb5,Medium]]Medium = 2
+|
+Medium severity.
+
+
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a655d20c1ca69519ca647684edbb2db35,High]]High = 3
+|
+High severity.
+
+Better stay away here.
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a88183b946cc5f0e8c96b2e66e1c74a7e,Unknown]]Unknown = 4
+|
+Severity unknown.
+
+
+
+|===
+
+
+=== Members
+
+
+
+==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41,asciidoxy::traffic::TrafficEvent::TrafficEvent]]TrafficEvent
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+TrafficEvent()
+----
+
+
+Default constructor.
+
+
+
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc,asciidoxy::traffic::TrafficEvent::TrafficEvent]]TrafficEvent
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+TrafficEvent(xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] data)
+----
+
+
+Construct a traffic event from data.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] data`::
+The data to contain.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28,asciidoxy::traffic::TrafficEvent::Data]]Data
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+const xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] &amp; Data() const
+----
+
+
+Get the traffic event details.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`const xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] &`::
+Traffic event details.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b,asciidoxy::traffic::TrafficEvent::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+bool Update(int cause,
+            int delay)
+----
+
+
+Update the traffic event data.
+
+Verifies the new information before updating.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`int cause`::
+New TPEG cause code.
+
+`int delay`::
+New delay in seconds.
+
+| Returns
+|
+`bool`::
+True if the update is valid.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,asciidoxy::traffic::TrafficEvent::SharedData]]SharedData
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+std::shared_ptr&lt;xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]&gt; SharedData() const
+----
+
+
+Get a shared pointer to a copy of the data.
+
+Not sure why you want this.
+
+[cols='h,5a']
+|===
+| Returns
+|
+`std::shared_ptr<xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++]>`::
+The shared pointer.
+
+| Throws
+|
+`std::runtime_exception`::
+Thrown if no copy of the data is available.
+
+`InvalidEventError`::
+Thrown when the event data is invalid.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17,asciidoxy::traffic::TrafficEvent::CalculateDelay]]CalculateDelay
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+long CalculateDelay()
+----
+
+
+Calculate the current delay.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`long`::
+The delay in seconds.
+
+| Throws
+|
+`std::runtime_exception`::
+Thrown when the update encounters a critical error.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0,asciidoxy::traffic::TrafficEvent::RegisterTrafficCallback]]RegisterTrafficCallback
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void RegisterTrafficCallback(
+    std::function&lt;void(const xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] &amp;, int delay)&gt; callback)
+----
+
+
+Register a callback to receive updates for the traffic event.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`std::function<void(const xref:cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data[++TrafficEventData++] &, int delay)> callback`::
+A function to call on updates.
+
+|===
+
+
+'''
+
+
+
+
+
+=== [[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,asciidoxy::traffic::TrafficEvent::TrafficEventData]]TrafficEventData
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;traffic_event.hpp&gt;
+
+struct asciidoxy::traffic::TrafficEvent::TrafficEventData
+----
+Details about a traffic event.
+
+Use the cause and delay to properly inform your users.
+
+
+[cols='h,5a']
+|===
+|*Public Variables*
+|
+`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,++cause++>>`::
+TPEG cause code.
+`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af2d0e5eae81af06962dd53271c8dc70d,++delay++>>`::
+Delay caused by the traffic event in seconds.
+`<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,++severity++>>`::
+Severity of the event.
+|===
+
+
+==== Members
+
+[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,cause]]
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-traffic-event_8hpp_1aadd656922dd873c8ab5de7c891b557e1[++TpegCauseCode++] cause
+----
+
+TPEG cause code.
+
+
+
+'''
+[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af2d0e5eae81af06962dd53271c8dc70d,delay]]
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-traffic-event_8hpp_1adb4a21783ecb2c7bf30726a36c61a502[++Delay++] delay
+----
+
+Delay caused by the traffic event in seconds.
+
+
+
+'''
+[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,severity]]
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[++Severity++] severity
+----
+
+Severity of the event.
+
+
+
+'''
+
+
+

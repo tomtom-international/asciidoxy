@@ -236,3 +236,15 @@ def has(elements):
 
 def has_any(*elements):
     return any(has(e) for e in elements)
+
+
+def header(level: int, title: str) -> str:
+    return f"{'=' * level} {title}"
+
+
+def h1(leveloffset: int, title: str) -> str:
+    return header(leveloffset + 1, title)
+
+
+def h2(leveloffset: int, title: str) -> str:
+    return header(leveloffset + 2, title)

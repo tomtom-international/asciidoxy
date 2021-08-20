@@ -13,12 +13,12 @@
 ## limitations under the License.
 
 <%!
+from asciidoxy.templates.helpers import h1
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 from html import escape
 %>
-= [[${element.id},${element.full_name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
-
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----

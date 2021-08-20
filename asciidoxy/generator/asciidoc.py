@@ -14,17 +14,20 @@
 """Generation of AsciiDoc output."""
 
 import functools
+import inspect
 import logging
 import os
 
 from abc import ABC, abstractmethod
+from functools import wraps
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from pathlib import Path
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
-from typing import MutableMapping, NamedTuple, Optional
+from typing import (Any, Callable, MutableMapping, NamedTuple, Optional, Sequence, TypeVar, Union,
+                    cast)
 
 from tqdm import tqdm
 
@@ -36,7 +39,7 @@ from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
 from ..path_utils import relative_path
 from ..transcoder import TranscoderBase
 from .._version import __version__
-from .context import Context
+from .context import Context, stacktrace
 from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
                      IncompatibleVersionError, InvalidApiCallError, MissingPackageError,
                      MissingPackageFileError, ReferenceNotFoundError, TemplateMissingError,
@@ -59,6 +62,97 @@ SUPPORTED_COMMANDS = [
     "anchor",
 ]
 
+_WrappedFunc = TypeVar("_WrappedFunc", bound=Callable[..., Any])
+
+
+def _arg_to_str(arg: Optional[Any]) -> str:
+    if arg is None:
+        return "None"
+    if isinstance(arg, ReferableElement):
+        return f"'{arg.full_name}'"
+    return repr(arg)
+
+
+def _format_action(name: str, args, kwargs, show_args, show_kwargs) -> str:
+    # Using index + 1 because self is removed from args
+    args_parts = [_arg_to_str(value) for index, value in enumerate(args) if index + 1 in show_args]
+    kwargs_parts = [
+        f"{key}={_arg_to_str(value)}" for key, value in kwargs.items() if key in show_kwargs
+    ]
+    return f"{name}({', '.join(args_parts + kwargs_parts)})"
+
+
+def _lookup_args(f: _WrappedFunc, show_args: Sequence[Union[str, int]]):
+    signature = inspect.signature(f)
+    param_names = list(signature.parameters.keys())
+    arg_indices = []
+    kwarg_names = []
+    for arg in show_args:
+        if isinstance(arg, str):
+            arg_indices.append(param_names.index(arg))
+            kwarg_names.append(arg)
+        elif isinstance(arg, int):
+            arg_indices.append(arg)
+            kwarg_names.append(param_names[arg])
+    return arg_indices, kwarg_names
+
+
+def _stackframe(original_function: Optional[_WrappedFunc] = None,
+                *,
+                name: Optional[str] = None,
+                show_args: Sequence[Union[int, str]] = (1, ),
+                internal: bool = False,
+                _name: Callable[..., str],
+                _context: Callable[..., Context],
+                _api: Callable[..., "Api"],
+                _other_self=None):
+    def _decorator(f: _WrappedFunc) -> _WrappedFunc:
+        arg_indices, kwarg_names = _lookup_args(f, show_args)
+
+        @wraps(f)
+        def _wrapper(*args, **kwargs):
+            _self = _other_self or args[0]
+            _context(_self).push_stack(_format_action(_name(f), args[1:], kwargs, arg_indices,
+                                                      kwarg_names),
+                                       file=_api(_self)._original_file if not internal else None,
+                                       package=_api(_self)._context.current_package.name,
+                                       internal=internal)
+            ret = f(*args, **kwargs)
+            _context(_self).pop_stack()
+            return ret
+
+        return cast(_WrappedFunc, _wrapper)
+
+    if original_function is not None:
+        return _decorator(original_function)
+    return _decorator
+
+
+def _api_stackframe(*args, name: Optional[str] = None, **kwargs):
+    def _name(f: _WrappedFunc) -> str:
+        return name or f.__name__
+
+    def _context(self) -> Context:
+        return self._context
+
+    def _api(self) -> "Api":
+        return self
+
+    return _stackframe(*args, name=name, _name=_name, _context=_context, _api=_api, **kwargs)
+
+
+def _proxy_stackframe(*args, name: Optional[str] = None, **kwargs):
+    def _name(f: _WrappedFunc) -> str:
+        return name or f"api.{f.__name__}"
+
+    def _context(self) -> Context:
+        return self._api._context
+
+    def _api(self) -> "Api":
+        return self._api
+
+    return _stackframe(*args, name=name, _name=_name, _context=_context, _api=_api, **kwargs)
+
 
 class Api(ABC):
     """Methods to insert and link to API reference documentation from AsciiDoc files."""
@@ -68,17 +162,21 @@ class Api(ABC):
 
     _template_cache: MutableMapping[TemplateKey, Template] = {}
 
-    _current_file: Path
+    _work_file: Path
+    _original_file: Path
     _context: Context
 
-    def __init__(self, current_file: Path, context: Context):
-        assert current_file.is_file()
+    def __init__(self, work_file: Path, context: Context):
+        assert work_file.is_file()
         assert context.base_dir.is_dir()
         assert context.package_manager.work_dir.is_dir()
-        assert context.fragment_dir.is_dir()
         assert context.reference is not None
 
-        self._current_file = current_file
+        self._work_file = work_file
+        _, self._original_file = context.package_manager.find_original_file(
+            work_file, context.current_package.name)
+        if self._original_file is None:
+            self._original_file = work_file
 
         self._context = context
 
@@ -127,6 +225,7 @@ class Api(ABC):
         self._context.insert_filter = InsertionFilter(members, exceptions)
         return ""
 
+    @_api_stackframe
     def insert(self,
                name: str,
                *,
@@ -135,8 +234,7 @@ class Api(ABC):
                members: Optional[FilterSpec] = None,
                exceptions: Optional[FilterSpec] = None,
                ignore_global_filter: bool = False,
-               leveloffset: str = "+1",
-               **asciidoc_options) -> str:
+               leveloffset: str = "+1") -> str:
         """Insert API reference documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
@@ -156,8 +254,6 @@ class Api(ABC):
                                       to apply the filters on top of the global filter.
             leveloffset:          Offset of the top header of the inserted text from the top level
                                       header of the including document.
-            asciidoc_options:     Any additional option is added as an attribute to the include
-                                      directive in single page mode.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -171,8 +267,9 @@ class Api(ABC):
 
         return self.insert_fragment(
             self.find_element(name, kind=kind, lang=lang, allow_overloads=False), insert_filter,
-            leveloffset, **asciidoc_options)
+            leveloffset)
 
+    @_api_stackframe
     def link(self,
              name: str,
              *,
@@ -289,7 +386,7 @@ class Api(ABC):
         else:
             assert file_name is not None
             package_name = self._context.current_package.name
-            absolute_work_file_path = (self._current_file.parent / file_name).resolve()
+            absolute_work_file_path = (self._work_file.parent / file_name).resolve()
             if not absolute_work_file_path.exists():
                 self._warning_or_error(IncludeFileNotFoundError(file_name))
                 return None
@@ -318,6 +415,7 @@ class Api(ABC):
         else:
             logger.warning(str(error))
 
+    @_api_stackframe(show_args=("file_name", ))
     def include(self,
                 file_name: str,
                 *,
@@ -374,7 +472,7 @@ class Api(ABC):
 
         if self._context.multipage and not always_embed:
             if multipage_link:
-                referenced_file = relative_path(self._current_file, file_path)
+                referenced_file = relative_path(self._work_file, file_path)
 
                 if not link_text:
                     document = next(
@@ -535,8 +633,7 @@ class Api(ABC):
                         element,
                         insert_filter: InsertionFilter,
                         leveloffset: str = "+1",
-                        kind_override: Optional[str] = None,
-                        **asciidoc_options) -> str:
+                        kind_override: Optional[str] = None) -> str:
         """Generate and insert a documentation fragment.
 
         Args:
@@ -546,8 +643,6 @@ class Api(ABC):
                                   header of the including document.
             kind_override:    Override the kind of template to use. None to use the kind of
                                   `element`.
-            asciidoc_options: Any additional option is added as an attribute to the include
-                                  directive in single page mode.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -610,7 +705,8 @@ class Api(ABC):
     def _render(self,
                 element,
                 insert_filter: InsertionFilter,
-                kind_override: Optional[str] = None) -> str:
+                kind_override: Optional[str] = None,
+                leveloffset: int = 1) -> str:
         assert element.id
         assert element.language
 
@@ -623,6 +719,7 @@ class Api(ABC):
                                                              insert_filter=insert_filter,
                                                              api_context=self._context,
                                                              api=self,
+                                                             leveloffset=leveloffset,
                                                              **self._commands())
 
     def _file_top_anchor(self, file_name: Path) -> str:
@@ -654,12 +751,12 @@ class PreprocessingApi(Api):
 
         return self.__class__(file_path, sub_context)
 
+    @_api_stackframe(name="insert", show_args=("element", ), internal=True)
     def insert_fragment(self,
                         element,
                         insert_filter: InsertionFilter,
-                        leveloffset: str = "+1",
-                        kind_override: Optional[str] = None,
-                        **asciidoc_options) -> str:
+                        leveloffset: Union[str, int] = "+1",
+                        kind_override: Optional[str] = None) -> str:
         self._render(element, insert_filter, kind_override)
         return ""
 
@@ -667,21 +764,22 @@ class PreprocessingApi(Api):
         self._context.insert(element)
         return ""
 
+    @_api_stackframe(name="link", show_args=("link_text", ), internal=True)
     def link_to_element(self, element_id: str, link_text: str) -> str:
         self._context.link_to_element(element_id)
         return ""
 
     def process_adoc(self):
-        logger.info(f"Preprocessing {self._current_file}")
+        logger.info(f"Preprocessing {self._original_file}")
 
-        out_file = self._context.register_adoc_file(self._current_file)
+        out_file = self._context.register_adoc_file(self._work_file)
 
         if self._context.progress is not None:
             self._context.progress.total = 2 * (len(self._context.in_to_out_file_map) +
                                                 len(self._context.embedded_file_map))
             self._context.progress.update(0)
 
-        template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
+        template = Template(filename=os.fspath(self._work_file), input_encoding="utf-8")
         template.render(api=ApiProxy(self), env=self._context.env, **self._commands())
 
         if self._context.progress is not None:
@@ -709,7 +807,7 @@ class PreprocessingApi(Api):
     def anchor(self, name: str, *, link_text: Optional[str] = None) -> str:
         if not name:
             raise InvalidApiCallError("`name` cannot be empty.")
-        self._context.register_anchor(name, link_text, self._current_file)
+        self._context.register_anchor(name, link_text, self._work_file)
         return ""
 
 
@@ -741,7 +839,7 @@ class GeneratingApi(Api):
             document = next((d for d in self._context.current_document.all_documents_in_tree()
                              if d.in_file == absolute_file_path), None)
             if document is None:
-                msg = (f"Invalid cross-reference from document '{self._current_file}' "
+                msg = (f"Invalid cross-reference from document '{self._original_file}' "
                        f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
                        f"is not included anywhere across the whole documentation tree.")
                 self._warning_or_error(ConsistencyError(msg))
@@ -766,7 +864,7 @@ class GeneratingApi(Api):
                 link_file_path, default_link_text = self._context.link_to_anchor(anchor)
             except UnknownAnchorError as ex:
                 self._warning_or_error(ex)
-                link_file_path = self._context.link_to_adoc_file(self._current_file)
+                link_file_path = self._context.link_to_adoc_file(self._work_file)
                 default_link_text = None
 
             link_text = link_text or default_link_text or anchor
@@ -783,37 +881,15 @@ class GeneratingApi(Api):
         else:
             return f"[[{name}]]"
 
+    @_api_stackframe(name="insert", show_args=("element", ), internal=True)
     def insert_fragment(self,
                         element,
                         insert_filter: InsertionFilter,
-                        leveloffset: str = "+1",
-                        kind_override: Optional[str] = None,
-                        **asciidoc_options) -> str:
-        """Generate and insert a documentation fragment.
+                        leveloffset: Union[str, int] = "+1",
+                        kind_override: Optional[str] = None) -> str:
+        return self._render(element, insert_filter, kind_override, int(leveloffset))
 
-        Args:
-            element:          Python representation of the element to insert.
-            insertion_filter: Filter for members to insert.
-            leveloffset:      Offset of the top header of the inserted text from the top level
-                                  header of the including document.
-            kind_override:    Override the kind of template to use. None to use the kind of
-                                  `element`.
-            asciidoc_options: Any additional option is added as an attribute to the include
-                                  directive in single page mode.
-
-        Returns:
-            AsciiDoc text to include in the document.
-        """
-        rendered_doc = self._render(element, insert_filter, kind_override)
-
-        fragment_file = self._context.fragment_dir / f"{element.id}.adoc"
-        with fragment_file.open("w", encoding="utf-8") as f:
-            print(rendered_doc, file=f)
-
-        asciidoc_options["leveloffset"] = leveloffset
-        attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
-        return f"include::{fragment_file}[{attributes}]"
-
+    @_api_stackframe(name="link", show_args=("link_text", ), internal=True)
     def link_to_element(self, element_id: str, link_text: str) -> str:
         containing_file = self._context.file_with_element(element_id)
         if containing_file is not None:
@@ -824,12 +900,12 @@ class GeneratingApi(Api):
         return f"xref:{file_part}{element_id}[++{link_text}++]"
 
     def process_adoc(self):
-        logger.info(f"Processing {self._current_file}")
+        logger.info(f"Processing {self._original_file}")
         self._context.linked = []
 
-        out_file = self._context.register_adoc_file(self._current_file)
+        out_file = self._context.register_adoc_file(self._work_file)
 
-        template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
+        template = Template(filename=os.fspath(self._work_file), input_encoding="utf-8")
         rendered_doc = template.render(api=ApiProxy(self),
                                        env=self._context.env,
                                        **self._commands())
@@ -855,12 +931,18 @@ class ApiProxy:
         self._api = api
 
     def __getattr__(self, name: str):
-        if name in SUPPORTED_COMMANDS:
+        if name in ("link", "insert"):
+            return _proxy_stackframe(getattr(self._api, name), name=f"api.{name}", _other_self=self)
+        elif name in SUPPORTED_COMMANDS:
             return getattr(self._api, name)
         elif name.startswith("insert_"):
-            return functools.partial(self._api.insert, kind=name[7:])
+            return _proxy_stackframe(functools.partial(self._api.insert, kind=name[7:]),
+                                     name=f"api.{name}",
+                                     _other_self=self)
         elif name.startswith("link_"):
-            return functools.partial(self._api.link, kind=name[5:])
+            return _proxy_stackframe(functools.partial(self._api.link, kind=name[5:]),
+                                     name=f"api.{name}",
+                                     _other_self=self)
         else:
             raise AttributeError(name)
 
@@ -870,6 +952,7 @@ class ApiProxy:
                            link_text: Optional[str] = None) -> str:
         return self._api.cross_document_ref(file_name, anchor=anchor, link_text=link_text)
 
+    @_proxy_stackframe
     def include(self,
                 file_name: str,
                 leveloffset: str = "+1",
@@ -907,14 +990,10 @@ def process_adoc(in_file: Path,
     """
 
     context = Context(base_dir=in_file.parent,
-                      fragment_dir=package_manager.build_dir / "fragments",
                       reference=api_reference,
                       package_manager=package_manager,
                       current_document=DocumentTreeNode(in_file, None),
                       current_package=package_manager.input_package())
-
-    context.package_manager.work_dir.mkdir(parents=True, exist_ok=True)
-    context.fragment_dir.mkdir(parents=True, exist_ok=True)
 
     context.warnings_are_errors = warnings_are_errors
     context.multipage = multipage
@@ -927,16 +1006,20 @@ def process_adoc(in_file: Path,
 
 
 def _check_links(context: Context):
-    dangling = context.linked - context.inserted.keys()
+    dangling = context.linked.keys() - context.inserted.keys()
     if dangling:
-        dangling_elements = {
-            context.reference.find(target_id=element_id)
-            for element_id in dangling
-        }
-        names = {f"{e.language}: {e.full_name}" for e in dangling_elements if e is not None}
-        msg = ("The following elements are linked to, but not included in the documentation:\n\t" +
-               "\n\t".join(names))
+        messages = []
+        for element_id in dangling:
+            element = context.reference.find(target_id=element_id)
+            if element is None:
+                raise RuntimeError(f"Internal consistency error: unknown element id: {element_id}."
+                                   "Please file a bug report.")
+
+            traces = '\n'.join(stacktrace(t) for t in context.linked[element_id])
+            messages.append(f"{element.language}: {element.full_name} not included in"
+                            f"documentation, but linked here:\n{traces}")
+
         if context.warnings_are_errors:
-            raise ConsistencyError(msg)
+            raise ConsistencyError("\n".join(messages))
         else:
-            logger.warning(msg)
+            logger.warning("\n".join(messages))

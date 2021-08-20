@@ -22,9 +22,19 @@ ${element.brief}
 
 ${element.description}
 
-% if has_any(element.params, insert_filter.exceptions(element)) or element.returns:
+% if has_any(element.params, insert_filter.exceptions(element)) or element.returns or element.precondition or element.postcondition:
 [cols='h,5a']
 |===
+% if element.precondition:
+| Precondition
+| ${element.precondition}
+
+% endif
+% if element.postcondition:
+| Postcondition
+| ${element.postcondition}
+
+% endif
 % if has(element.params):
 | Parameters
 |

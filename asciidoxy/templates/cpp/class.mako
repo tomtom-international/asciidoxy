@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any
+from asciidoxy.templates.helpers import has, has_any, h1, h2
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 from html import escape
 from itertools import chain
@@ -23,7 +23,7 @@ from itertools import chain
 helper = CppTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-= [[${element.id},${element.full_name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -38,6 +38,20 @@ ${element.brief}
 
 ${element.description}
 
+<%
+for prot in ("public", "protected", "private"):
+    if has_any(helper.simple_enclosed_types(prot=prot),
+               helper.complex_enclosed_types(prot=prot),
+               helper.constructors(prot=prot),
+               helper.destructors(prot=prot),
+               helper.operators(prot=prot),
+               helper.variables(prot=prot),
+               helper.static_methods(prot=prot),
+               helper.methods(prot=prot)):
+        break
+else:
+    return STOP_RENDERING
+%>
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
@@ -117,26 +131,26 @@ ${method.brief}
 ##################################################################### Enclosed enums and typedefs ##
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.simple_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset + 1)}
 % endfor
 % endfor
 
-== Members
+${h2(leveloffset, "Members")}
 
 % for prot in ("public", "protected", "private"):
 ################################################################################### Constructors ##
 % for constructor in helper.constructors(prot=prot):
-${api.insert_fragment(constructor, insert_filter, kind_override="method")}
+${api.insert_fragment(constructor, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 #################################################################################### Destructors ##
 % for destructor in helper.destructors(prot=prot):
-${api.insert_fragment(destructor, insert_filter, kind_override="method")}
+${api.insert_fragment(destructor, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ###################################################################################### Operators ##
 % for operator in helper.operators(prot=prot):
-${api.insert_fragment(operator, insert_filter, kind_override="method")}
+${api.insert_fragment(operator, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ###################################################################################### Variables ##
@@ -157,12 +171,12 @@ ${variable.description}
 % endfor
 ################################################################################# Static methods ##
 % for method in helper.static_methods(prot=prot):
-${api.insert_fragment(method, insert_filter, kind_override="method")}
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ######################################################################################## Methods ##
 % for method in helper.methods(prot=prot):
-${api.insert_fragment(method, insert_filter, kind_override="method")}
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 % endfor
@@ -171,6 +185,6 @@ ${api.insert_fragment(method, insert_filter, kind_override="method")}
 
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.complex_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor

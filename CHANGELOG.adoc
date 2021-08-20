@@ -18,6 +18,33 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.7.5 (20 Aug 2021)
+
+=== Added
+
+  - Provide detailed stack traces for links to missing elements. It should now be clear what
+    commands are causing the links to be inserted, especially when links are inserted as part of
+    another element's API reference.
+  - Provide detailed stack traces when inserting the same element multiple times. It should now be
+    clear whether the element was inserted as part of another element.
+  - Support preconditions and postconditions for functions and methods.
+
+
+=== Changed
+
+  - Provide clearer errors and trace backs for exceptions while parsing AsciiDoc and for internal
+    errors.
+  - No longer use fragment files to include generated API reference. Instead, the generated
+    AsciiDoc is directly embedded in the processed AsciiDoc file.
+  - Extra AsciiDoc attributes are no longer supported for the `insert` command.
+
+
+=== Fixed
+
+  - Do not generate empty "Members" section if there are no visible members.
+  - Fix running AsciiDoctor on Windows. Thank you r0ckarong!
+
+
 == 0.7.4 (25 Mar 2021)
 
 === Added

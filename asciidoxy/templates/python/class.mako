@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has
+from asciidoxy.templates.helpers import has, has_any, h1, h2
 from asciidoxy.templates.python.helpers import PythonTemplateHelper
 from html import escape
 %>
@@ -22,7 +22,7 @@ from html import escape
 helper = PythonTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-= [[${element.id},${element.full_name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,python,subs="-specialchars,macros+"]
@@ -33,6 +33,14 @@ ${element.brief}
 
 ${element.description}
 
+<%
+if not has_any(helper.complex_enclosed_types(prot="public"),
+               helper.constructors(prot="public"),
+               helper.variables(prot="public"),
+               helper.static_methods(prot="public"),
+               helper.methods(prot="public")):
+    return STOP_RENDERING
+%>
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
@@ -88,11 +96,11 @@ ${method.brief}
 % endif
 |===
 
-== Members
+${h2(leveloffset, "Members")}
 
 ################################################################################### Constructors ##
 % for constructor in helper.constructors(prot="public"):
-${api.insert_fragment(constructor, insert_filter)}
+${api.insert_fragment(constructor, insert_filter, leveloffset=leveloffset + 2)}
 '''
 % endfor
 ###################################################################################### Variables ##
@@ -117,18 +125,18 @@ ${variable.description}
 % endfor
 ################################################################################# Static methods ##
 % for method in helper.static_methods(prot="public"):
-${api.insert_fragment(method, insert_filter)}
+${api.insert_fragment(method, insert_filter, leveloffset=leveloffset + 2)}
 '''
 % endfor
 ######################################################################################## Methods ##
 % for method in helper.methods(prot="public"):
-${api.insert_fragment(method, insert_filter)}
+${api.insert_fragment(method, insert_filter, leveloffset=leveloffset + 2)}
 '''
 % endfor
 
 ############################################################################# Inner/Nested types ##
 
 % for enclosed in helper.complex_enclosed_types(prot="public"):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 

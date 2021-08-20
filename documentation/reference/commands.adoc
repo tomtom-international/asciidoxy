@@ -27,8 +27,7 @@ ${"""
 ${insert(<name>,
          [kind=<kind>,]
          [lang=<language>,]
-         [leveloffset]),
-         [...]}
+         [leveloffset])}
 """}
 ----
 
@@ -45,10 +44,6 @@ Trying to insert an unknown element will result in an error.
 
 When not specifying the language and kind, AsciiDoxy will try to find the element by name, and
 deduce the kind and language. If there are multiple matching elements, an error is raised.
-
-You can add additional options. These options are added as attributes to the inserted include
-directive for the API reference fragment. For available attributes see
-https://asciidoctor.org/docs/user-manual/#include-directive[the AsciiDoctor manual].
 
 === Examples
 

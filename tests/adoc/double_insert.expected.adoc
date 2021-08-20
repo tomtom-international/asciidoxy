@@ -1,7 +1,0 @@
-= Test document
-
-include::FRAGMENT_DIR/cpp-classasciidoxy_1_1geometry_1_1_coordinate.adoc[leveloffset=+1]
-
-include::FRAGMENT_DIR/cpp-classasciidoxy_1_1geometry_1_1_coordinate.adoc[leveloffset=+1]
-
-

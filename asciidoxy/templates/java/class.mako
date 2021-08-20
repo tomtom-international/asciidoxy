@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any
+from asciidoxy.templates.helpers import has, has_any, h1, h2
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from html import escape
 from itertools import chain
@@ -23,17 +23,29 @@ from itertools import chain
 helper = JavaTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-= [[${element.id},${element.name}]]${element.name}
+${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,java,subs="-specialchars,macros+"]
 ----
-class ${element.full_name}
+${element.kind} ${element.full_name}
 ----
 ${element.brief}
 
 ${element.description}
 
+<%
+for prot in ("public", "protected", "default", "private"):
+    if has_any(helper.simple_enclosed_types(prot=prot),
+               helper.complex_enclosed_types(prot=prot),
+               helper.constants(prot=prot),
+               helper.constructors(prot=prot),
+               helper.static_methods(prot=prot),
+               helper.methods(prot=prot)):
+        break
+else:
+    return STOP_RENDERING
+%>
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
@@ -94,11 +106,11 @@ ${method.brief}
 ########################################################################## Enclosed simple types ##
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.simple_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor
 
-== Members
+${h2(leveloffset, "Members")}
 % for prot in ("public", "protected", "private"):
 ###################################################################################### Constants ##
 % for constant in helper.constants(prot=prot):
@@ -117,130 +129,17 @@ ${constant.description}
 % endfor
 ################################################################################### Constructors ##
 % for constructor in helper.constructors(prot=prot):
-[[${constructor.id},${constructor.name}]]
-${api.inserted(constructor)}
-[source,java,subs="-specialchars,macros+"]
-----
-${escape(helper.method_signature(constructor))}
-----
-
-${constructor.brief}
-
-${constructor.description}
-
-% if constructor.params or constructor.exceptions:
-[cols='h,5a']
-|===
-% if constructor.params:
-| Parameters
-|
-% for param in constructor.params:
-`${helper.print_ref(param.type)} ${param.name}`::
-${param.description}
-
-% endfor
-% endif
-% if constructor.exceptions:
-| Throws
-|
-% for exception in constructor.exceptions:
-`${helper.print_ref(exception.type)}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
+${api.insert_fragment(constructor, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ################################################################################# Static methods ##
 % for method in helper.static_methods(prot=prot):
-[[${method.id},${method.name}]]
-${api.inserted(method)}
-[source,java,subs="-specialchars,macros+"]
-----
-${escape(helper.method_signature(method))}
-----
-
-${method.brief}
-
-${method.description}
-
-% if method.params or method.exceptions or method.returns:
-[cols='h,5a']
-|===
-% if method.params:
-| Parameters
-|
-% for param in method.params:
-`${helper.print_ref(param.type)} ${param.name}`::
-${param.description}
-
-% endfor
-% endif
-% if method.returns and method.returns.type.name != "void":
-| Returns
-|
-`${helper.print_ref(method.returns.type)}`::
-${method.returns.description}
-
-% endif
-% if method.exceptions:
-| Throws
-|
-% for exception in method.exceptions:
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 ######################################################################################## Methods ##
 % for method in helper.methods(prot=prot):
-[[${method.id},${method.name}]]
-${api.inserted(method)}
-[source,java,subs="-specialchars,macros+"]
-----
-${escape(helper.method_signature(method))}
-----
-
-${method.brief}
-
-${method.description}
-
-% if method.params or method.exceptions or method.returns:
-[cols='h,5a']
-|===
-% if method.params:
-| Parameters
-|
-% for param in method.params:
-`${helper.print_ref(param.type)} ${param.name}`::
-${param.description}
-
-% endfor
-% endif
-% if method.returns and method.returns.type.name != "void":
-| Returns
-|
-`${helper.print_ref(method.returns.type)}`::
-${method.returns.description}
-
-% endif
-% if method.exceptions:
-| Throws
-|
-% for exception in method.exceptions:
-`${exception.type.name}`::
-${exception.description}
-
-% endfor
-%endif
-|===
-% endif
+${api.insert_fragment(method, insert_filter, kind_override="method", leveloffset=leveloffset + 2)}
 '''
 % endfor
 % endfor
@@ -249,6 +148,6 @@ ${exception.description}
 
 % for prot in ("public", "protected", "private"):
 % for enclosed in helper.complex_enclosed_types(prot=prot):
-${api.insert_fragment(enclosed, insert_filter)}
+${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 % endfor

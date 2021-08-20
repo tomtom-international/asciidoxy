@@ -1,0 +1,40 @@
+
+
+== [[cpp-classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8,asciidoxy::geometry::Point::increment]]increment
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;default_values.hpp&gt;
+
+xref:cpp-classasciidoxy_1_1geometry_1_1_point[++Point++] increment(int x = 2,
+                int y = 3) const
+----
+
+
+Create a new point that is an increment of this point.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`int x`::
+Value to increment the X coordinate with.
++
+*Default value*: `2`
+
+`int y`::
+Value to increment the Y coordinate with.
++
+*Default value*: `3`
+
+| Returns
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_point[++Point++]`::
+A new incremented xref:cpp-classasciidoxy_1_1geometry_1_1_point[Point].
+
+|===
+
