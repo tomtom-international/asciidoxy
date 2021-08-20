@@ -18,7 +18,7 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
-== Unreleased
+== 0.7.5 (20 Aug 2021)
 
 === Added
 
@@ -42,7 +42,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Fixed
 
   - Do not generate empty "Members" section if there are no visible members.
-  - Fix running AsciiDoctor on Windows.
+  - Fix running AsciiDoctor on Windows. Thank you r0ckarong!
 
 
 == 0.7.4 (25 Mar 2021)
