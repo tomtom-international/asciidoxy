@@ -64,10 +64,12 @@ class StackFrame(NamedTuple):
         command:  Description of the command being executed.
         file:     If applicable, the file from which the command originated. Empty for commands
                       originating from other AsciiDoxy commands.
+        package:  If applicable, the package containing the file.
         internal: True if the stack frame is for an internal method call.
     """
     command: str
     file: Optional[Path]
+    package: Optional[str]
     internal: bool
 
 
@@ -90,13 +92,17 @@ def stacktrace(trace: List[StackFrame], prefix: str = "") -> str:
     if not trace[0].internal:
         lines.append(f"{prefix}Commands in input files:")
     while trace and not trace[0].internal:
-        lines.append(f"{prefix}  {trace[0].file}:\t{trace[0].command}")
+        if trace[0].package and trace[0].package != "INPUT":
+            pkg = f"{trace[0].package}:/"
+        else:
+            pkg = ""
+        lines.append(f"{prefix}  {pkg}{trace[0].file}:\n{prefix}    {trace[0].command}")
         trace.pop(0)
 
     if trace and trace[0].internal:
         lines.append(f"{prefix}Internal AsciiDoxy commands:")
     while trace:
-        lines.append(f"{prefix}  INTERNAL:\t{trace[0].command}")
+        lines.append(f"{prefix}    {trace[0].command}")
         trace.pop(0)
 
     return "\n".join(lines)
@@ -299,8 +305,12 @@ class Context(object):
             raise UnknownAnchorError(name)
         return self.link_to_adoc_file(file_name), link_text
 
-    def push_stack(self, command: str, file: Optional[Path] = None, internal: bool = False) -> None:
-        self.call_stack.append(StackFrame(command, file, internal))
+    def push_stack(self,
+                   command: str,
+                   file: Optional[Path] = None,
+                   package: Optional[str] = None,
+                   internal: bool = False) -> None:
+        self.call_stack.append(StackFrame(command, file, package, internal))
 
     def pop_stack(self) -> None:
         self.call_stack.pop(-1)

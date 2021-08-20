@@ -317,41 +317,41 @@ def test_link_to_anchor__unknown(empty_context, input_file):
 
 
 def test_link_to_element__single_link(empty_context, input_file):
-    empty_context.push_stack("link(\"MyElement\")", input_file)
+    empty_context.push_stack("link(\"MyElement\")", input_file, "INPUT")
     empty_context.link_to_element("my-element-id")
     empty_context.pop_stack()
 
     assert "my-element-id" in empty_context.linked
     assert empty_context.linked["my-element-id"] == [
         [
-            StackFrame("link(\"MyElement\")", input_file, False),
+            StackFrame("link(\"MyElement\")", input_file, "INPUT", False),
         ],
     ]
 
 
 def test_link_to_element__multiple_links(empty_context, input_file):
-    empty_context.push_stack("link(\"MyElement\")", input_file)
+    empty_context.push_stack("link(\"MyElement\")", input_file, "INPUT")
     empty_context.link_to_element("my-element-id")
     empty_context.pop_stack()
 
     other_file = input_file.parent / "other_file.adoc"
-    empty_context.push_stack("link(\"MyElement\")", other_file)
+    empty_context.push_stack("link(\"MyElement\")", other_file, "INPUT")
     empty_context.link_to_element("my-element-id")
     empty_context.pop_stack()
 
     assert "my-element-id" in empty_context.linked
     assert empty_context.linked["my-element-id"] == [
         [
-            StackFrame("link(\"MyElement\")", input_file, False),
+            StackFrame("link(\"MyElement\")", input_file, "INPUT", False),
         ],
         [
-            StackFrame("link(\"MyElement\")", other_file, False),
+            StackFrame("link(\"MyElement\")", other_file, "INPUT", False),
         ],
     ]
 
 
 def test_link_to_element__nested_call_stack(empty_context, input_file):
-    empty_context.push_stack("include(\"other_file.adoc\")", input_file)
+    empty_context.push_stack("include(\"other_file.adoc\")", input_file, "INPUT")
     other_file = input_file.parent / "other_file.adoc"
     empty_context.push_stack("insert(\"MyElement\")", other_file)
     empty_context.push_stack("link(\"OtherElement\")")
@@ -363,15 +363,15 @@ def test_link_to_element__nested_call_stack(empty_context, input_file):
     assert "other-element-id" in empty_context.linked
     assert empty_context.linked["other-element-id"] == [
         [
-            StackFrame("include(\"other_file.adoc\")", input_file, False),
-            StackFrame("insert(\"MyElement\")", other_file, False),
-            StackFrame("link(\"OtherElement\")", None, False),
+            StackFrame("include(\"other_file.adoc\")", input_file, "INPUT", False),
+            StackFrame("insert(\"MyElement\")", other_file, None, False),
+            StackFrame("link(\"OtherElement\")", None, None, False),
         ],
     ]
 
 
 def test_insert__store_stacktrace(empty_context, input_file):
-    empty_context.push_stack("include(\"other_file.adoc\")", input_file)
+    empty_context.push_stack("include(\"other_file.adoc\")", input_file, "INPUT")
 
     element = make_compound(id="cpp-my_element", name="MyElement")
     empty_context.insert(element)
@@ -380,7 +380,7 @@ def test_insert__store_stacktrace(empty_context, input_file):
 
     assert element.id in empty_context.inserted
     assert empty_context.inserted[element.id] == (input_file, [
-        StackFrame("include(\"other_file.adoc\")", input_file, False),
+        StackFrame("include(\"other_file.adoc\")", input_file, "INPUT", False),
     ])
 
 
@@ -403,52 +403,73 @@ def test_insert__duplicate(empty_context, input_file):
 Duplicate insertion of MyElement.
 Trying to insert at:
   Commands in input files:
-    {other_file}:\tinsert("MyElement")
+    {other_file}:
+      insert("MyElement")
 Previously inserted at:
   Commands in input files:
-    {input_file}:\tinclude("other_file.adoc")"""
+    {input_file}:
+      include("other_file.adoc")"""
 
 
 def test_stacktrace__external_only(input_file):
     other_file = input_file.parent / "other_file.adoc"
 
     trace = [
-        StackFrame("include('other_file.adoc')", input_file, False),
-        StackFrame("insert('MyElement')", other_file, False),
+        StackFrame("include('other_file.adoc')", input_file, "INPUT", False),
+        StackFrame("insert('MyElement')", other_file, "INPUT", False),
     ]
     assert stacktrace(trace) == f"""\
 Commands in input files:
-  {input_file}:\tinclude('other_file.adoc')
-  {other_file}:\tinsert('MyElement')"""
+  {input_file}:
+    include('other_file.adoc')
+  {other_file}:
+    insert('MyElement')"""
+
+
+def test_stacktrace__external_only__other_package(input_file):
+    other_file = input_file.parent / "other_file.adoc"
+
+    trace = [
+        StackFrame("include('other_file.adoc')", input_file, "pkga", False),
+        StackFrame("insert('MyElement')", other_file, "pkgb", False),
+    ]
+    assert stacktrace(trace) == f"""\
+Commands in input files:
+  pkga:/{input_file}:
+    include('other_file.adoc')
+  pkgb:/{other_file}:
+    insert('MyElement')"""
 
 
 def test_stacktrace__external_and_internal(input_file):
     other_file = input_file.parent / "other_file.adoc"
 
     trace = [
-        StackFrame("include('other_file.adoc')", input_file, False),
-        StackFrame("insert('MyElement')", other_file, False),
-        StackFrame("insert('OtherElement')", None, True),
-        StackFrame("link('GreatElement')", None, True),
+        StackFrame("include('other_file.adoc')", input_file, "INPUT", False),
+        StackFrame("insert('MyElement')", other_file, "INPUT", False),
+        StackFrame("insert('OtherElement')", None, None, True),
+        StackFrame("link('GreatElement')", None, None, True),
     ]
     assert stacktrace(trace) == f"""\
 Commands in input files:
-  {input_file}:\tinclude('other_file.adoc')
-  {other_file}:\tinsert('MyElement')
+  {input_file}:
+    include('other_file.adoc')
+  {other_file}:
+    insert('MyElement')
 Internal AsciiDoxy commands:
-  INTERNAL:\tinsert('OtherElement')
-  INTERNAL:\tlink('GreatElement')"""
+    insert('OtherElement')
+    link('GreatElement')"""
 
 
 def test_stacktrace__internal_only(input_file):
     trace = [
-        StackFrame("insert('OtherElement')", None, True),
-        StackFrame("link('GreatElement')", None, True),
+        StackFrame("insert('OtherElement')", None, None, True),
+        StackFrame("link('GreatElement')", None, None, True),
     ]
     assert stacktrace(trace) == """\
 Internal AsciiDoxy commands:
-  INTERNAL:\tinsert('OtherElement')
-  INTERNAL:\tlink('GreatElement')"""
+    insert('OtherElement')
+    link('GreatElement')"""
 
 
 def test_stacktrace__empty(input_file):

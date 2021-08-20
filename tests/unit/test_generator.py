@@ -325,9 +325,13 @@ def test_link_stores_stack_trace(preprocessing_api, context, input_file):
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
     traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
 
+    rel_input_file = input_file.relative_to(context.package_manager.work_dir)
     assert traces == [[
-        StackFrame("link('asciidoxy::geometry::Coordinate')", file=input_file, internal=False),
-        StackFrame("link('Coordinate')", file=None, internal=True)
+        StackFrame("link('asciidoxy::geometry::Coordinate')",
+                   file=rel_input_file,
+                   package="INPUT",
+                   internal=False),
+        StackFrame("link('Coordinate')", file=None, package="INPUT", internal=True)
     ]]
 
 
@@ -336,78 +340,116 @@ def test_link_stores_stack_trace_nested_insert(preprocessing_api, context, input
     preprocessing_api.insert("asciidoxy::positioning::Positioning")
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
     traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
+
+    rel_input_file = input_file.relative_to(context.package_manager.work_dir)
     assert traces == [
         [
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
-                       file=input_file,
+                       file=rel_input_file,
+                       package="INPUT",
                        internal=False),
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
                        file=None,
+                       package="INPUT",
                        internal=True),
             StackFrame(command="insert('asciidoxy::positioning::Positioning::CurrentPosition')",
                        file=None,
+                       package="INPUT",
                        internal=True),
-            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')",
+                       file=None,
+                       package="INPUT",
+                       internal=True)
         ],
         [
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
-                       file=input_file,
+                       file=rel_input_file,
+                       package="INPUT",
                        internal=False),
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
                        file=None,
+                       package="INPUT",
                        internal=True),
             StackFrame(command="insert('asciidoxy::positioning::Positioning::CurrentPosition')",
                        file=None,
+                       package="INPUT",
                        internal=True),
-            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')",
+                       file=None,
+                       package="INPUT",
+                       internal=True)
         ],
         [
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
-                       file=input_file,
+                       file=rel_input_file,
+                       package="INPUT",
                        internal=False),
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
                        file=None,
+                       package="INPUT",
                        internal=True),
             StackFrame(command="insert('asciidoxy::positioning::Positioning::IsNearby')",
                        file=None,
+                       package="INPUT",
                        internal=True),
-            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')",
+                       file=None,
+                       package="INPUT",
+                       internal=True)
         ],
         [
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
-                       file=input_file,
+                       file=rel_input_file,
+                       package="INPUT",
                        internal=False),
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
                        file=None,
+                       package="INPUT",
                        internal=True),
             StackFrame(command="insert('asciidoxy::positioning::Positioning::IsNearby')",
                        file=None,
+                       package="INPUT",
                        internal=True),
-            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')",
+                       file=None,
+                       package="INPUT",
+                       internal=True)
         ],
         [
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
-                       file=input_file,
+                       file=rel_input_file,
+                       package="INPUT",
                        internal=False),
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
                        file=None,
+                       package="INPUT",
                        internal=True),
             StackFrame(command="insert('asciidoxy::positioning::Positioning::Override')",
                        file=None,
+                       package="INPUT",
                        internal=True),
-            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')",
+                       file=None,
+                       package="INPUT",
+                       internal=True)
         ],
         [
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
-                       file=input_file,
+                       file=rel_input_file,
+                       package="INPUT",
                        internal=False),
             StackFrame(command="insert('asciidoxy::positioning::Positioning')",
                        file=None,
+                       package="INPUT",
                        internal=True),
             StackFrame(command="insert('asciidoxy::positioning::Positioning::Override')",
                        file=None,
+                       package="INPUT",
                        internal=True),
-            StackFrame(command="link('asciidoxy::geometry::Coordinate')", file=None, internal=True)
+            StackFrame(command="link('asciidoxy::geometry::Coordinate')",
+                       file=None,
+                       package="INPUT",
+                       internal=True)
         ]
     ]
 
@@ -422,10 +464,15 @@ def test_link_in_include_stores_stack_trace_with_correct_file(preprocessing_api,
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
     traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
 
+    rel_input_file = input_file.relative_to(context.package_manager.work_dir)
+    rel_include_file = include_file.relative_to(context.package_manager.work_dir)
     assert traces == [[
-        StackFrame("include('include.adoc')", file=input_file, internal=False),
-        StackFrame("link('asciidoxy::geometry::Coordinate')", file=include_file, internal=False),
-        StackFrame("link('Coordinate')", file=None, internal=True)
+        StackFrame("include('include.adoc')", file=rel_input_file, package="INPUT", internal=False),
+        StackFrame("link('asciidoxy::geometry::Coordinate')",
+                   file=rel_include_file,
+                   package="INPUT",
+                   internal=False),
+        StackFrame("link('Coordinate')", file=None, package="INPUT", internal=True)
     ]]
 
 
@@ -438,12 +485,17 @@ def test_link_from_proxy_stores_stack_trace_with_proxy_name(preprocessing_api, c
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
     traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
 
+    rel_input_file = input_file.relative_to(context.package_manager.work_dir)
+    rel_include_file = include_file.relative_to(context.package_manager.work_dir)
     assert traces == [[
-        StackFrame("include('include.adoc')", file=input_file, internal=False),
+        StackFrame("include('include.adoc')", file=rel_input_file, package="INPUT", internal=False),
         # Cannot reliably get parameters for proxy class
-        StackFrame("api.link_class()", file=include_file, internal=False),
-        StackFrame("link('asciidoxy::geometry::Coordinate')", file=include_file, internal=False),
-        StackFrame("link('Coordinate')", file=None, internal=True)
+        StackFrame("api.link_class()", file=rel_include_file, package="INPUT", internal=False),
+        StackFrame("link('asciidoxy::geometry::Coordinate')",
+                   file=rel_include_file,
+                   package="INPUT",
+                   internal=False),
+        StackFrame("link('Coordinate')", file=None, package="INPUT", internal=True)
     ]]
 
 
@@ -817,10 +869,10 @@ def test_cross_document_ref__flexible_anchor__same_package(test_data_builder,
     include_file = test_data_builder.add_include_file("include.adoc")
 
     for api in test_data_builder.apis():
-        api._current_file = include_file
+        api._work_file = include_file
         api.anchor("my-anchor", link_text="my anchor link text")
 
-        api._current_file = input_file
+        api._work_file = input_file
         result = api.cross_document_ref(anchor="my-anchor")
         if isinstance(api, PreprocessingApi):
             assert result == ""
@@ -837,10 +889,10 @@ def test_cross_document_ref__flexible_anchor__other_package(test_data_builder,
     include_file = test_data_builder.add_package_file("pacA", "include.adoc")
 
     for api in test_data_builder.apis():
-        api._current_file = include_file
+        api._work_file = include_file
         api.anchor("my-anchor", link_text="my anchor link text")
 
-        api._current_file = input_file
+        api._work_file = input_file
         result = api.cross_document_ref(anchor="my-anchor")
         if isinstance(api, PreprocessingApi):
             assert result == ""
@@ -857,10 +909,10 @@ def test_cross_document_ref__flexible_anchor__link_text(test_data_builder,
     include_file = test_data_builder.add_include_file("include.adoc")
 
     for api in test_data_builder.apis():
-        api._current_file = include_file
+        api._work_file = include_file
         api.anchor("my-anchor", link_text="my anchor link text")
 
-        api._current_file = input_file
+        api._work_file = input_file
         result = api.cross_document_ref(anchor="my-anchor", link_text="other text")
         if isinstance(api, PreprocessingApi):
             assert result == ""
@@ -877,10 +929,10 @@ def test_cross_document_ref__flexible_anchor__no_link_text(test_data_builder,
     include_file = test_data_builder.add_include_file("include.adoc")
 
     for api in test_data_builder.apis():
-        api._current_file = include_file
+        api._work_file = include_file
         api.anchor("my-anchor")
 
-        api._current_file = input_file
+        api._work_file = input_file
         result = api.cross_document_ref(anchor="my-anchor")
         if isinstance(api, PreprocessingApi):
             assert result == ""
@@ -1251,6 +1303,9 @@ def test_process_adoc_single_file(warnings_are_errors, test_file_name, single_an
     input_file = adoc_data / f"{test_file_name}.input.adoc"
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
 
+    package_manager.set_input_files(input_file)
+    package_manager.work_dir = adoc_data
+
     progress_mock = ProgressMock()
     output_file = process_adoc(input_file,
                                api_reference,
@@ -1359,6 +1414,8 @@ def test_process_adoc__embedded_file_not_in_output_map(single_and_multipage, api
 def test_process_adoc_file_warning(test_file_name, single_and_multipage, adoc_data, api_reference,
                                    package_manager, update_expected_results):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
+    package_manager.set_input_files(input_file)
+    package_manager.work_dir = adoc_data
 
     expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
     if single_and_multipage:
@@ -1386,6 +1443,8 @@ def test_process_adoc_file_warning(test_file_name, single_and_multipage, adoc_da
 def test_process_adoc_file_warning_as_error(test_file_name, error, single_and_multipage, adoc_data,
                                             api_reference, package_manager):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
+    package_manager.set_input_files(input_file)
+    package_manager.work_dir = adoc_data
 
     with pytest.raises(error):
         process_adoc(input_file, api_reference, package_manager, warnings_are_errors=True)

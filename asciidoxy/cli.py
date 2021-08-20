@@ -240,7 +240,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                                               progress=progress)
 
     except:  # noqa: E722
-        logger.error(human_traceback())
+        logger.error(human_traceback(pkg_mgr))
         sys.exit(1)
 
     in_dir = in_file.parent
@@ -259,7 +259,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             pkg_mgr.make_image_directory(destination_dir, progress)
 
 
-def human_traceback() -> str:
+def human_traceback(pkg_mgr: PackageManager) -> str:
     """Generate a human readable traceback the current exception. To be used inside an except
     clause.
 
@@ -276,6 +276,12 @@ def human_traceback() -> str:
     for filename, lineno, function, line in traceback.traceback:
         if filename.endswith(".adoc"):
             pending_traceback.clear()
+
+            package_name, original_file = pkg_mgr.find_original_file(Path(filename))
+            if package_name and package_name != "INPUT":
+                filename = f"{package_name}:/{original_file}"
+            elif original_file is not None:
+                filename = str(original_file)
             message.append(f"  File {filename}, line {lineno}, in AsciiDoc\n    {line}")
             has_adoc = True
         elif "/mako/" in filename:

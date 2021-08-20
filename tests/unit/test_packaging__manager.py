@@ -504,11 +504,46 @@ def test_file_in_work_directory__present(package_manager, event_loop, tmp_path, 
     src_dir.mkdir()
     in_file = src_dir / "index.adoc"
     in_file.touch()
+    package_manager.set_input_files(in_file)
     work_file = package_manager.prepare_work_directory(in_file)
     work_dir = work_file.parent
 
+    assert package_manager.file_in_work_directory("INPUT", "index.adoc") == work_dir / "index.adoc"
     assert package_manager.file_in_work_directory("a", "a.adoc") == work_dir / "a.adoc"
     assert package_manager.file_in_work_directory("b", "b.adoc") == work_dir / "b.adoc"
+
+
+def test_file_in_work_directory__input_file_no_include_dir(package_manager, event_loop, tmp_path,
+                                                           build_dir):
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    package_manager.set_input_files(in_file)
+    work_file = package_manager.prepare_work_directory(in_file)
+    work_dir = work_file.parent
+
+    assert package_manager.file_in_work_directory("INPUT", "index.adoc") == work_dir / "index.adoc"
+
+
+def test_file_in_work_directory__file_from_input_include_dir(package_manager, event_loop, tmp_path,
+                                                             build_dir):
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "chapter.adoc").touch()
+    (src_dir / "other").mkdir()
+    (src_dir / "other" / "another.adoc").touch()
+    package_manager.set_input_files(in_file, in_file.parent)
+    work_file = package_manager.prepare_work_directory(in_file)
+    work_dir = work_file.parent
+
+    assert package_manager.file_in_work_directory("INPUT", "index.adoc") == work_dir / "index.adoc"
+    assert package_manager.file_in_work_directory("INPUT",
+                                                  "chapter.adoc") == work_dir / "chapter.adoc"
+    assert package_manager.file_in_work_directory(
+        "INPUT", "other/another.adoc") == work_dir / "other" / "another.adoc"
 
 
 def test_file_in_work_directory__default_root_doc(package_manager, event_loop, tmp_path, build_dir):
@@ -611,3 +646,62 @@ def test_file_in_work_directory__package_without_include_files(package_manager, 
 
     with pytest.raises(UnknownFileError):
         package_manager.file_in_work_directory("a", "a.adoc")
+
+
+@pytest.mark.parametrize("package_hint", [None, "", "a", "b", "INPUT"])
+def test_find_original_file__with_include_dir(package_hint, package_manager, event_loop, tmp_path,
+                                              build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "chapter.adoc").touch()
+    (src_dir / "other").mkdir()
+    (src_dir / "other" / "another.adoc").touch()
+
+    package_manager.set_input_files(in_file, src_dir)
+    package_manager.prepare_work_directory(in_file)
+
+    assert package_manager.find_original_file(
+        package_manager.file_in_work_directory("INPUT", "index.adoc"),
+        package_hint) == ("INPUT", Path("index.adoc"))
+    assert package_manager.find_original_file(
+        package_manager.file_in_work_directory("INPUT", "chapter.adoc"),
+        package_hint) == ("INPUT", Path("chapter.adoc"))
+    assert package_manager.find_original_file(
+        package_manager.file_in_work_directory("INPUT", "other/another.adoc"),
+        package_hint) == ("INPUT", Path("other/another.adoc"))
+    assert package_manager.find_original_file(package_manager.file_in_work_directory("a", "a.adoc"),
+                                              package_hint) == ("a", Path("a.adoc"))
+    assert package_manager.find_original_file(package_manager.file_in_work_directory("b", "b.adoc"),
+                                              package_hint) == ("b", Path("b.adoc"))
+
+
+@pytest.mark.parametrize("package_hint", [None, "", "a", "b", "INPUT"])
+def test_find_original_file__without_include_dir(package_hint, package_manager, event_loop,
+                                                 tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+
+    package_manager.set_input_files(in_file)
+    package_manager.prepare_work_directory(in_file)
+
+    assert package_manager.find_original_file(
+        package_manager.file_in_work_directory("INPUT", "index.adoc"),
+        package_hint) == ("INPUT", Path("index.adoc"))
+    assert package_manager.find_original_file(package_manager.file_in_work_directory("a", "a.adoc"),
+                                              package_hint) == ("a", Path("a.adoc"))
+    assert package_manager.find_original_file(package_manager.file_in_work_directory("b", "b.adoc"),
+                                              package_hint) == ("b", Path("b.adoc"))

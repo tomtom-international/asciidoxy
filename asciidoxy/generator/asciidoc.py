@@ -114,7 +114,8 @@ def _stackframe(original_function: Optional[_WrappedFunc] = None,
             _self = _other_self or args[0]
             _context(_self).push_stack(_format_action(_name(f), args[1:], kwargs, arg_indices,
                                                       kwarg_names),
-                                       file=_api(_self)._current_file if not internal else None,
+                                       file=_api(_self)._original_file if not internal else None,
+                                       package=_api(_self)._context.current_package.name,
                                        internal=internal)
             ret = f(*args, **kwargs)
             _context(_self).pop_stack()
@@ -161,16 +162,21 @@ class Api(ABC):
 
     _template_cache: MutableMapping[TemplateKey, Template] = {}
 
-    _current_file: Path
+    _work_file: Path
+    _original_file: Path
     _context: Context
 
-    def __init__(self, current_file: Path, context: Context):
-        assert current_file.is_file()
+    def __init__(self, work_file: Path, context: Context):
+        assert work_file.is_file()
         assert context.base_dir.is_dir()
         assert context.package_manager.work_dir.is_dir()
         assert context.reference is not None
 
-        self._current_file = current_file
+        self._work_file = work_file
+        _, self._original_file = context.package_manager.find_original_file(
+            work_file, context.current_package.name)
+        if self._original_file is None:
+            self._original_file = work_file
 
         self._context = context
 
@@ -380,7 +386,7 @@ class Api(ABC):
         else:
             assert file_name is not None
             package_name = self._context.current_package.name
-            absolute_work_file_path = (self._current_file.parent / file_name).resolve()
+            absolute_work_file_path = (self._work_file.parent / file_name).resolve()
             if not absolute_work_file_path.exists():
                 self._warning_or_error(IncludeFileNotFoundError(file_name))
                 return None
@@ -466,7 +472,7 @@ class Api(ABC):
 
         if self._context.multipage and not always_embed:
             if multipage_link:
-                referenced_file = relative_path(self._current_file, file_path)
+                referenced_file = relative_path(self._work_file, file_path)
 
                 if not link_text:
                     document = next(
@@ -764,16 +770,16 @@ class PreprocessingApi(Api):
         return ""
 
     def process_adoc(self):
-        logger.info(f"Preprocessing {self._current_file}")
+        logger.info(f"Preprocessing {self._original_file}")
 
-        out_file = self._context.register_adoc_file(self._current_file)
+        out_file = self._context.register_adoc_file(self._work_file)
 
         if self._context.progress is not None:
             self._context.progress.total = 2 * (len(self._context.in_to_out_file_map) +
                                                 len(self._context.embedded_file_map))
             self._context.progress.update(0)
 
-        template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
+        template = Template(filename=os.fspath(self._work_file), input_encoding="utf-8")
         template.render(api=ApiProxy(self), env=self._context.env, **self._commands())
 
         if self._context.progress is not None:
@@ -801,7 +807,7 @@ class PreprocessingApi(Api):
     def anchor(self, name: str, *, link_text: Optional[str] = None) -> str:
         if not name:
             raise InvalidApiCallError("`name` cannot be empty.")
-        self._context.register_anchor(name, link_text, self._current_file)
+        self._context.register_anchor(name, link_text, self._work_file)
         return ""
 
 
@@ -833,7 +839,7 @@ class GeneratingApi(Api):
             document = next((d for d in self._context.current_document.all_documents_in_tree()
                              if d.in_file == absolute_file_path), None)
             if document is None:
-                msg = (f"Invalid cross-reference from document '{self._current_file}' "
+                msg = (f"Invalid cross-reference from document '{self._original_file}' "
                        f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
                        f"is not included anywhere across the whole documentation tree.")
                 self._warning_or_error(ConsistencyError(msg))
@@ -858,7 +864,7 @@ class GeneratingApi(Api):
                 link_file_path, default_link_text = self._context.link_to_anchor(anchor)
             except UnknownAnchorError as ex:
                 self._warning_or_error(ex)
-                link_file_path = self._context.link_to_adoc_file(self._current_file)
+                link_file_path = self._context.link_to_adoc_file(self._work_file)
                 default_link_text = None
 
             link_text = link_text or default_link_text or anchor
@@ -894,12 +900,12 @@ class GeneratingApi(Api):
         return f"xref:{file_part}{element_id}[++{link_text}++]"
 
     def process_adoc(self):
-        logger.info(f"Processing {self._current_file}")
+        logger.info(f"Processing {self._original_file}")
         self._context.linked = []
 
-        out_file = self._context.register_adoc_file(self._current_file)
+        out_file = self._context.register_adoc_file(self._work_file)
 
-        template = Template(filename=os.fspath(self._current_file), input_encoding="utf-8")
+        template = Template(filename=os.fspath(self._work_file), input_encoding="utf-8")
         rendered_doc = template.render(api=ApiProxy(self),
                                        env=self._context.env,
                                        **self._commands())
@@ -988,8 +994,6 @@ def process_adoc(in_file: Path,
                       package_manager=package_manager,
                       current_document=DocumentTreeNode(in_file, None),
                       current_package=package_manager.input_package())
-
-    context.package_manager.work_dir.mkdir(parents=True, exist_ok=True)
 
     context.warnings_are_errors = warnings_are_errors
     context.multipage = multipage

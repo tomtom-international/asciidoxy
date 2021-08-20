@@ -19,7 +19,7 @@ import shutil
 
 from pathlib import Path
 from tqdm import tqdm
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 from ..parser.doxygen import Driver
 from .collect import CollectError, Package, collect, specs_from_file
@@ -223,6 +223,9 @@ class PackageManager:
         if pkg is None:
             raise UnknownPackageError(package_name)
 
+        if file_name is not None and pkg.name == self.INPUT_FILES and pkg.adoc_src_dir is None:
+            return self.work_dir / file_name
+
         if pkg.adoc_src_dir is None:
             raise UnknownFileError(package_name, file_name)
 
@@ -245,6 +248,28 @@ class PackageManager:
         """Get the meta-package representing the input and include files."""
         assert self.INPUT_FILES in self.packages
         return self.packages[self.INPUT_FILES]
+
+    def find_original_file(self,
+                           work_file: Path,
+                           package_hint: Optional[str] = None) -> Tuple[str, Path]:
+        """Find the original relative file name for a file in the working directory."""
+        rel_path = work_file.relative_to(self.work_dir)
+
+        if package_hint and package_hint in self.packages:
+            pkg = self.packages[package_hint]
+            if pkg.adoc_src_dir is not None and (pkg.adoc_src_dir / rel_path).is_file():
+                return pkg.name, rel_path
+
+        input_pkg = self.input_package()
+        assert input_pkg.adoc_root_doc is not None
+        if input_pkg.adoc_src_dir is None and work_file.name == input_pkg.adoc_root_doc.name:
+            return self.INPUT_FILES, Path(work_file.name)
+
+        for pkg in self.packages.values():
+            if pkg.adoc_src_dir is not None and (pkg.adoc_src_dir / rel_path).is_file():
+                return pkg.name, rel_path
+
+        assert False, "Cannot locate original file"
 
     def _warning_or_error(self, error: Exception):
         if self.warnings_are_errors:
