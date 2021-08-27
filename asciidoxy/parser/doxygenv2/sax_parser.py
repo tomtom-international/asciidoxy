@@ -46,95 +46,105 @@ class LoggingContentHandler(ContentHandler):
         print(f"{self.__class__.__name__}: Unhandled skippedEntity({name})")
 
 
-class DocumentContentHandler(LoggingContentHandler):
-    def __init__(self, parser):
-        self._parser = parser
-
-    def endDocument(self):
-        self._parser.pop_handler()
-
-    def startElement(self, name, attrs):
+class DocumentHandler:
+    @staticmethod
+    def start_element(parser, name, attrs):
         if name == "compounddef":
-            self._parser.push_handler(CompoundContentHandler(self._parser, attrs))
+            CompoundHandler.activate(parser, name, attrs)
 
-        elif name == "doxygen":
-            self._doxygen_version = attrs.get("version")
+    @staticmethod
+    def end_element(parser, name):
+        ...
 
-        else:
-            super().startElement(name, attrs)
+    @staticmethod
+    def characters(parser, content):
+        ...
 
 
-class CompoundContentHandler(LoggingContentHandler):
-    def __init__(self, parser, attrs):
-        self._parser = parser
-        self._compound = Compound(id=attrs.get("id"), kind=attrs.get("kind"),
-                                  language=attrs.get("language"), prot=attrs.get("prot"))
+class CompoundHandler:
+    @staticmethod
+    def activate(parser, name, attrs):
+        parser.push_handler(CompoundHandler)
+        parser.push_model(Compound())
 
-    def startElement(self, name, attrs):
-        if name == "compoundname":
-            self._parser.push_handler(StringAttributeContentHandler(self._parser,
-                                                                    self._compound,
-                                                                    "full_name"))
-        else:
-            super().startElement(name, attrs)
+    @staticmethod
+    def start_element(parser, name, attrs):
+        ...
 
-    def endElement(self, name):
+    @staticmethod
+    def end_element(parser, name):
         if name == "compounddef":
-            self._parser.pop_handler()
-            print(self._compound)
-        else:
-            super().endElement(name)
+            parser.pop_handler()
+            print(parser.current_model())
+            parser.pop_model()
 
-
-class StringAttributeContentHandler(LoggingContentHandler):
-    def __init__(self, parser, parent, attribute_name):
-        self._parser = parser
-        self._parent = parent
-        self._attribute_name = attribute_name
-        self._data = ""
-
-    def startElement(self, name, attrs):
-        assert False, "Cannot handle this"
-
-    def endElement(self, name):
-        setattr(self._parent, self._attribute_name, self._data.strip())
-        self._parser.pop_handler()
-
-    def characters(self, content):
-        self._data += content
+    @staticmethod
+    def characters(parser, content):
+        ...
 
 
 class DoxygenParser(LoggingContentHandler):
     def __init__(self):
+        self._element_stack = []
+        self._model_stack = []
         self._handler_stack = []
+
         self._locator = None
 
     def parse_file(self, path: Path):
         xml.sax.parse(str(path), self)
 
-    def pop_handler(self):
-        self._handler_stack.pop(-1)
+    def push_element(self, name):
+        self._element_stack.append(name)
+
+    def pop_element(self, name):
+        assert self._element_stack[-1] == name
+        self._element_stack.pop(-1)
+
+    def current_element(self):
+        return self._element_stack[-1]
+
+    def push_model(self, model):
+        self._model_stack.append(model)
+
+    def pop_model(self):
+        self._model_stack.pop(-1)
+
+    def current_model(self):
+        return self._model_stack[-1]
 
     def push_handler(self, handler):
         self._handler_stack.append(handler)
+
+    def pop_handler(self):
+        self._handler_stack.pop(-1)
+
+    def current_handler(self):
+        return self._handler_stack[-1]
 
     def setDocumentLocator(self, locator):
         self._locator = locator
 
     def startDocument(self):
-        self._handler_stack.append(DocumentContentHandler(self))
+        self.push_element("document")
+        self.push_handler(DocumentHandler)
 
     def endDocument(self):
-        self._handler_stack[-1].endDocument()
+        self.pop_element("document")
+        self.pop_handler()
 
     def startElement(self, name, attrs):
-        self._handler_stack[-1].startElement(name, attrs)
+        self.push_element(name)
+        print("::".join(self._element_stack), attrs.items())
+        self.current_handler().start_element(self, name, attrs)
 
     def endElement(self, name):
-        self._handler_stack[-1].endElement(name)
+        self.pop_element(name)
+        self.current_handler().end_element(self, name)
 
     def characters(self, content):
-        self._handler_stack[-1].characters(content)
+        print("::".join(self._element_stack), repr(content))
+        self.current_handler().characters(self, content)
 
 
 if __name__ == "__main__":
