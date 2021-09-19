@@ -37,7 +37,11 @@ ${element.description}
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text}
 
+% endfor
 % for enum in JavaTemplateHelper(api, element, insert_filter).variables(prot="public"):
 ${api.inserted(enum)}
 |

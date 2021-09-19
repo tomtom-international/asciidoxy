@@ -18,7 +18,7 @@ import logging
 import xml.etree.ElementTree as ET
 
 from abc import ABC
-from typing import List, Optional, Type
+from typing import Dict, List, Optional, Type
 
 from .description_parser import (parse_description, select_descriptions, NamedSection,
                                  NestedDescriptionElement, ParaContainer, ParameterDescription,
@@ -43,6 +43,28 @@ def _to_asciidoc_or_empty(description: Optional[NestedDescriptionElement]) -> st
         # TODO: make this more clean
         return ParaContainer(description.language_tag, *description.contents).to_asciidoc()
     return ""
+
+
+def _pop_sections(description: Optional[ParaContainer]) -> Dict[str, str]:
+    if description is None:
+        return {}
+
+    sections = {}
+    for section_name, section_title in {
+            "author": "Author",
+            "bug": "Bug",
+            "copyright": "Copyright",
+            "date": "Date",
+            "deprecated": "Deprecated",
+            "pre": "Precondition",
+            "post": "Postcondition",
+            "since": "Since",
+            "todo": "Todo",
+    }.items():
+        section = description.pop_section(NamedSection, section_name)
+        if section is not None:
+            sections[section_title] = _to_asciidoc_or_empty(section)
+    return sections
 
 
 class ParserBase(ABC):
@@ -177,8 +199,7 @@ class ParserBase(ABC):
                                               detailed.pop_section(ParameterList, "param"))
         member.exceptions = self.parse_exceptions(memberdef_element, member,
                                                   detailed.pop_section(ParameterList, "exception"))
-        member.precondition = _to_asciidoc_or_empty(detailed.pop_section(NamedSection, "pre"))
-        member.postcondition = _to_asciidoc_or_empty(detailed.pop_section(NamedSection, "post"))
+        member.sections = _pop_sections(detailed)
 
         # Then generate description with unused sections
         member.brief, member.description = select_descriptions(brief, detailed)
@@ -222,9 +243,15 @@ class ParserBase(ABC):
             if member is not None
         ] + self.parse_enumvalues(compounddef_element, compound.full_name)
 
-        compound.brief, compound.description = select_descriptions(
-            parse_description(compounddef_element.find("briefdescription"), self.TRAITS.TAG),
-            parse_description(compounddef_element.find("detaileddescription"), self.TRAITS.TAG))
+        brief = parse_description(compounddef_element.find("briefdescription"), self.TRAITS.TAG)
+        detailed = parse_description(compounddef_element.find("detaileddescription"),
+                                     self.TRAITS.TAG)
+
+        # First extract other descriptions
+        compound.sections = _pop_sections(detailed)
+
+        # Then generate description with unused sections
+        compound.brief, compound.description = select_descriptions(brief, detailed)
 
         for innerclass_element in compounddef_element.iterfind("innerclass"):
             self.parse_innerclass(compound, innerclass_element)

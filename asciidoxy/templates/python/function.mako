@@ -31,19 +31,14 @@ ${element.brief}
 
 ${element.description}
 
-% if has_any(params(element), insert_filter.exceptions(element)) or element.returns or element.postcondition or element.precondition:
+% if has_any(params(element), insert_filter.exceptions(element), element.sections) or element.returns:
 [cols='h,5a']
 |===
-% if element.precondition:
-| Precondition
-| ${element.precondition}
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text}
 
-% endif
-% if element.postcondition:
-| Postcondition
-| ${element.postcondition}
-
-% endif
+% endfor
 % if has(params(element)):
 | Parameters
 |

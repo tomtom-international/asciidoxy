@@ -97,6 +97,7 @@ Severity unknown.
 |===
 
 
+
 === Members
 
 
@@ -333,6 +334,7 @@ Delay caused by the traffic event in seconds.
 `<<cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,++severity++>>`::
 Severity of the event.
 |===
+
 
 
 ==== Members

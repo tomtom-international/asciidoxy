@@ -17,6 +17,5 @@ The more severe the traffic event, the more likely it is to have a large delay.
 
 [cols='h,5a']
 |===
-
 |===
 

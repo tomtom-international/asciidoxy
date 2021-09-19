@@ -488,8 +488,7 @@ def test_compound__init__default():
 
     assert compound.brief == ""
     assert compound.description == ""
-    assert compound.precondition == ""
-    assert compound.postcondition == ""
+    assert compound.sections == {}
 
     assert compound.static is False
     assert compound.const is False
@@ -521,8 +520,7 @@ def test_compound__init__positional():
 
     assert compound.brief == ""
     assert compound.description == ""
-    assert compound.precondition == ""
-    assert compound.postcondition == ""
+    assert compound.sections == {}
 
     assert compound.static is False
     assert compound.const is False
@@ -549,13 +547,12 @@ def test_compound__init__keyword():
                         initializer=" = 2",
                         brief="brief",
                         description="description",
+                        sections={"section_name": "section_text"},
                         static=True,
                         const=True,
                         deleted=True,
                         default=True,
-                        constexpr=True,
-                        precondition="pre",
-                        postcondition="post")
+                        constexpr=True)
 
     assert compound.id == "id"
     assert compound.name == "name"
@@ -582,8 +579,7 @@ def test_compound__init__keyword():
 
     assert compound.brief == "brief"
     assert compound.description == "description"
-    assert compound.precondition == "pre"
-    assert compound.postcondition == "post"
+    assert compound.sections == {"section_name": "section_text"}
 
     assert compound.static is True
     assert compound.const is True
@@ -635,13 +631,12 @@ def test_compound__eq__full():
                      initializer=" = 2",
                      brief="brief",
                      description="description",
+                     sections={"section_name": "section_text"},
                      static=True,
                      const=True,
                      deleted=True,
                      default=True,
-                     constexpr=True,
-                     precondition="pre",
-                     postcondition="post")
+                     constexpr=True)
     second = Compound(id="id",
                       name="name",
                       full_name="full_name",
@@ -659,20 +654,18 @@ def test_compound__eq__full():
                       initializer=" = 2",
                       brief="brief",
                       description="description",
+                      sections={"section_name": "section_text"},
                       static=True,
                       const=True,
                       deleted=True,
                       default=True,
-                      constexpr=True,
-                      precondition="pre",
-                      postcondition="post")
+                      constexpr=True)
 
     assert first == second
     assert second == first
 
     for attr_name in ("id", "name", "full_name", "language", "kind", "include", "namespace", "prot",
-                      "definition", "args", "initializer", "brief", "description", "precondition",
-                      "postcondition"):
+                      "definition", "args", "initializer", "brief", "description"):
         setattr(second, attr_name, "other")
         assert first != second
         assert second != first
@@ -703,3 +696,13 @@ def test_compound__eq__full():
     assert first != second
     assert second != first
     second.returns.description = first.returns.description
+
+    second.sections["section_name"] = "other"
+    assert first != second
+    assert second != first
+    second.sections = first.sections.copy()
+
+    second.sections["other_section_name"] = "other"
+    assert first != second
+    assert second != first
+    second.sections = first.sections.copy()

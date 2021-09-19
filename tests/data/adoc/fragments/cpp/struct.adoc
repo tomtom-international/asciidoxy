@@ -28,6 +28,7 @@ Severity of the event.
 |===
 
 
+
 === Members
 
 [[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,cause]]

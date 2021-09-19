@@ -13,7 +13,7 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import h1
+from asciidoxy.templates.helpers import h1, has
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 from html import escape
 %>
@@ -27,3 +27,14 @@ using ${element.name} = ${escape(CppTemplateHelper(api).print_ref(element.return
 ${element.brief}
 
 ${element.description}
+
+%if has(element.sections):
+[cols='h,5a']
+|===
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text}
+
+% endfor
+|===
+% endif

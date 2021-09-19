@@ -40,7 +40,11 @@ ${element.description}
 
 [cols='h,5a']
 |===
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text}
 
+% endfor
 % for value in helper.enum_values(prot="public"):
 ${api.inserted(value)}
 | [[${value.id},${value.name}]]${value.name}

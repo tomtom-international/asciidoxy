@@ -41,7 +41,8 @@ for prot in ("open", "public", "internal", "file-private", "private"):
                helper.constructors(prot=prot),
                helper.properties(prot=prot),
                helper.type_methods(prot=prot),
-               helper.methods(prot=prot)):
+               helper.methods(prot=prot),
+               element.sections):
         break
 else:
     return STOP_RENDERING
@@ -49,6 +50,11 @@ else:
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text}
+
+% endfor
 % for prot in ("open", "public", "internal", "file-private", "private"):
 ###################################################################################################
 % if has(helper.simple_enclosed_types(prot=prot)) or has(helper.complex_enclosed_types(prot=prot)):
@@ -110,6 +116,18 @@ ${api.insert_fragment(enclosed, insert_filter, leveloffset=leveloffset + 1)}
 % endfor
 %endfor
 
+<%
+for prot in ("open", "public", "internal", "file-private", "private"):
+    if has_any(helper.simple_enclosed_types(prot=prot),
+               helper.complex_enclosed_types(prot=prot),
+               helper.constructors(prot=prot),
+               helper.properties(prot=prot),
+               helper.type_methods(prot=prot),
+               helper.methods(prot=prot)):
+        break
+else:
+    return STOP_RENDERING
+%>
 ${h2(leveloffset, "Members")}
 % for prot in ("open", "public", "internal", "file-private", "private"):
 ################################################################################### Constructors ##

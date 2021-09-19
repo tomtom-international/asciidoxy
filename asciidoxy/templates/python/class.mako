@@ -38,13 +38,19 @@ if not has_any(helper.complex_enclosed_types(prot="public"),
                helper.constructors(prot="public"),
                helper.variables(prot="public"),
                helper.static_methods(prot="public"),
-               helper.methods(prot="public")):
+               helper.methods(prot="public"),
+               element.sections):
     return STOP_RENDERING
 %>
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
 
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text}
+
+% endfor
 ###################################################################################################
 % if has(helper.complex_enclosed_types(prot="public")):
 |*Enclosed types*
@@ -96,6 +102,14 @@ ${method.brief}
 % endif
 |===
 
+<%
+if not has_any(helper.complex_enclosed_types(prot="public"),
+               helper.constructors(prot="public"),
+               helper.variables(prot="public"),
+               helper.static_methods(prot="public"),
+               helper.methods(prot="public")):
+    return STOP_RENDERING
+%>
 ${h2(leveloffset, "Members")}
 
 ################################################################################### Constructors ##

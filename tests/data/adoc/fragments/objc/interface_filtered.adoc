@@ -29,6 +29,7 @@ The altitude in meters.
 |===
 
 
+
 === Members
 [[objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]
 

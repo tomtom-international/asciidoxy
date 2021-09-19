@@ -55,7 +55,6 @@ The more severe the traffic event, the more likely it is to have a large delay.
 [cols='h,5a']
 |===
 
-
 |
 [[kotlin-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity_1abb3f4d789ff9e6fdb967133fa1ef1625,Low]]Low
 |
@@ -88,6 +87,7 @@ Better stay away here.
 
 
 |===
+
 
 
 === Members
