@@ -20,7 +20,7 @@ digraph example {
   Receiver--&gt;Sender : Ack()</plantuml>
  </para>
     </detaileddescription>
-    <location file="descriptions.hpp" line="101" column="15" bodyfile="descriptions.hpp" bodystart="101" bodyend="102"/>
+    <location file="descriptions.hpp" line="107" column="15" bodyfile="descriptions.hpp" bodystart="107" bodyend="108"/>
     <listofallmembers>
     </listofallmembers>
   </compounddef>

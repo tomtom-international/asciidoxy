@@ -72,6 +72,12 @@ class DoxygenList {
  * Show this as-is please
  * \endcode
  *
+ * Using the default language, C++ in this case:
+ *
+ * \code
+ * class AlsoCpp {};
+ * \endcode
+ *
  * That's all folks!
  */
 class CodeBlock {

@@ -337,9 +337,32 @@ class ListItem(ParaContainer):
 
 class CodeBlock(NestedDescriptionElement):
     """A block of code."""
+    EXTENSION_MAPPING = {
+        "py": "python",
+        "kt": "kotlin",
+        "mm": "objc",
+        "unparsed": "",
+    }
+
+    filename: str
+
+    def __init__(self, language_tag: str, filename: str, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.filename = filename
+
     def to_asciidoc(self) -> str:
         code = "\n".join(element.to_asciidoc() for element in self.contents)
-        return f"[source,{self.language_tag}]\n----\n{code}\n----"
+
+        if self.filename:
+            _, _, extension = self.filename.partition(".")
+            language = self.EXTENSION_MAPPING.get(extension, extension)
+        else:
+            language = self.language_tag
+        return f"[source,{language}]\n----\n{code}\n----"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "CodeBlock":
+        return cls(language_tag, xml_element.get("filename", ""))
 
 
 class CodeLine(NestedDescriptionElement):

@@ -40,23 +40,23 @@
 <codeline lineno="50" refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" kindref="compound">DoxygenList</ref><sp/>{</highlight></codeline>
 <codeline lineno="51"><highlight class="normal">};</highlight></codeline>
 <codeline lineno="52"><highlight class="normal"></highlight></codeline>
-<codeline lineno="77" refid="classasciidoxy_1_1descriptions_1_1_code_block" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_code_block" kindref="compound">CodeBlock</ref><sp/>{</highlight></codeline>
-<codeline lineno="78"><highlight class="normal">};</highlight></codeline>
-<codeline lineno="79"><highlight class="normal"></highlight></codeline>
-<codeline lineno="101" refid="classasciidoxy_1_1descriptions_1_1_diagrams" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_diagrams" kindref="compound">Diagrams</ref><sp/>{</highlight></codeline>
-<codeline lineno="102"><highlight class="normal">};</highlight></codeline>
-<codeline lineno="103"><highlight class="normal"></highlight></codeline>
-<codeline lineno="121" refid="classasciidoxy_1_1descriptions_1_1_sections" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_sections" kindref="compound">Sections</ref><sp/>{</highlight></codeline>
-<codeline lineno="122"><highlight class="normal">};</highlight></codeline>
-<codeline lineno="123"><highlight class="normal"></highlight></codeline>
-<codeline lineno="136"><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>Type&gt;</highlight></codeline>
-<codeline lineno="137"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kindref="member">FunctionDocumentation</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>first,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>second,<sp/>Type*<sp/>third);</highlight></codeline>
-<codeline lineno="138"><highlight class="normal"></highlight></codeline>
-<codeline lineno="149" refid="classasciidoxy_1_1descriptions_1_1_links" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_links" kindref="compound">Links</ref><sp/>{</highlight></codeline>
-<codeline lineno="150"><highlight class="normal">};</highlight></codeline>
-<codeline lineno="151"><highlight class="normal"></highlight></codeline>
-<codeline lineno="152"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="153"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="83" refid="classasciidoxy_1_1descriptions_1_1_code_block" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_code_block" kindref="compound">CodeBlock</ref><sp/>{</highlight></codeline>
+<codeline lineno="84"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"></highlight></codeline>
+<codeline lineno="107" refid="classasciidoxy_1_1descriptions_1_1_diagrams" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_diagrams" kindref="compound">Diagrams</ref><sp/>{</highlight></codeline>
+<codeline lineno="108"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"></highlight></codeline>
+<codeline lineno="127" refid="classasciidoxy_1_1descriptions_1_1_sections" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_sections" kindref="compound">Sections</ref><sp/>{</highlight></codeline>
+<codeline lineno="128"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="129"><highlight class="normal"></highlight></codeline>
+<codeline lineno="142"><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>Type&gt;</highlight></codeline>
+<codeline lineno="143"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kindref="member">FunctionDocumentation</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>first,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>second,<sp/>Type*<sp/>third);</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"></highlight></codeline>
+<codeline lineno="155" refid="classasciidoxy_1_1descriptions_1_1_links" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_links" kindref="compound">Links</ref><sp/>{</highlight></codeline>
+<codeline lineno="156"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="157"><highlight class="normal"></highlight></codeline>
+<codeline lineno="158"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="159"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="descriptions.hpp"/>
   </compounddef>

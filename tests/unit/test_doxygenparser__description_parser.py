@@ -110,6 +110,9 @@ def test_parse_code_blocks():
 <para>Unparsed code:</para>
 <para><programlisting filename=".unparsed"><codeline><highlight class="normal">Show<sp/>this<sp/>as-is<sp/>please</highlight></codeline>
 </programlisting></para>
+<para>Using the default language, C++ in this case:</para>
+<para><programlisting><codeline><highlight class="normal">class<sp/>AlsoCpp<sp/>{};</highlight></codeline>
+</programlisting></para>
 <para>That&apos;s all folks! </para>
     </detaileddescription>
 """
@@ -119,7 +122,7 @@ Description with some code blocks.
 
 Python example:
 
-[source,lang]
+[source,python]
 ----
 class Python:
     pass
@@ -127,16 +130,23 @@ class Python:
 
 C++ example:
 
-[source,lang]
+[source,cpp]
 ----
 class Cpp {};
 ----
 
 Unparsed code:
 
-[source,lang]
+[source,]
 ----
 Show this as-is please
+----
+
+Using the default language, C++ in this case:
+
+[source,lang]
+----
+class AlsoCpp {};
 ----
 
 That's all folks!"""
