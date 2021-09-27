@@ -18,6 +18,37 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== UNRELEASED
+
+=== Added
+
+  - Completely rewritten description parser for Doxygen. It supports more kinds of tags and inserts
+    much less whitespace in the resulting AsciiDoc. It more closely follows the way Doxygen intends
+    to format the descriptions.
+  - Support `dot` and `plantuml` diagrams in Doxygen descriptions. They require AsciiDoctor-Diagram
+    to be rendered. In the Doxyfile the option `PLANTUML_JAR_PATH` is required, even though Doxygen 
+    is not really rendering the plantuml diagrams. Without the option, plantuml diagrams are 
+    ignored by Doxygen.
+  - Verbatim text in Doxygen descriptions is supported.
+  - Support special Doxygen paragraphs that are similar to AsciiDoc admonitions: `\attention`,
+    `\note`, `\remark`, and `\warning`.
+  - Support special Doxygen paragraphs that contain metadata: `\author`, `\bug`, `\copyright`,
+    `\date`, `\deprecated`, `\since`, and `\todo`. They are added to the overview table of 
+    class-like elements, or the parameter table of functions/methods.
+
+
+=== Changed
+
+  - Code blocks in descriptions try to respect the language specified in the original code. This
+    includes "unparsed" code blocks. Only if no language is specified, the language of the 
+    described element is used.
+
+
+=== Fixed
+
+  - Spaces in code blocks, present as `<sp />`, are no longer ignored.
+
+
 == 0.7.5 (20 Aug 2021)
 
 === Added
