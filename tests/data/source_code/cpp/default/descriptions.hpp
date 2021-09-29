@@ -219,5 +219,27 @@ class ComplexHtmlTable {
 class Formulae {
 };
 
+/**
+ * Include images in the documentation.
+ *
+ * A simple image:
+ *
+ * \image html Check-256.png
+ *
+ * We can have inline
+ * \image{inline} html User-Group-256.png
+ * images as well.
+ *
+ * For accessibility we should always provide a caption:
+ *
+ * \image html User-Profile-256.png "Image of a user"
+ *
+ * Size can be set:
+ *
+ * \image html User-Group-256.png "Image of a user group" width=50 height=100
+ */
+class Images {
+};
+
 }  // namespace descriptions
 }  // namespace asciidoxy

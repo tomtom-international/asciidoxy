@@ -36,3 +36,5 @@ ${insert("asciidoxy::descriptions::ExternalLinks")}
 ${insert("asciidoxy::descriptions::ComplexHtmlTable")}
 
 ${insert("asciidoxy::descriptions::Formulae")}
+
+${insert("asciidoxy::descriptions::Images")}

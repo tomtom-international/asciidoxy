@@ -40,6 +40,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Support explicit line breaks in paragraphs.
   - Support LatexMath formulae in Doxygen descriptions. It is required to enable `:stem:` in the
     AsciiDoc header to render the formulae.
+  - Support images in Doxygen descriptions. Only `html` type images are shown, also for PDF output.
+    Make sure to include all images in the package containing the xml and specify the 
+    `asciidoc.image_dir` option in `contents.toml`.
 
 
 === Changed

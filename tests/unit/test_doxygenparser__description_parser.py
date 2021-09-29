@@ -601,6 +601,42 @@ latexmath:[|I_2|=\left| \int_{0}^T \psi(t) \left\{ u(a,t)- \int_{\gamma(t)}^a \f
 latexmath:[\begin{eqnarray*} g &=& \frac{Gm_2}{r^2} \\ &=& \frac{(6.673 \times 10^{-11}\,\mbox{m}^3\,\mbox{kg}^{-1}\, \mbox{s}^{-2})(5.9736 \times 10^{24}\,\mbox{kg})}{(6371.01\,\mbox{km})^2} \\ &=& 9.82066032\,\mbox{m/s}^2 \end{eqnarray*}]"""
 
 
+def test_parse_image():
+    input_xml = """\
+    <detaileddescription>
+<para>Include images in the documentation.</para>
+<para>A simple image:</para>
+<para><image type="html" name="Check-256.png"></image>
+</para>
+<para>We can have inline <image type="html" name="User-Group-256.png" inline="yes"></image>
+ images as well.</para>
+<para>For accessibility we should always provide a caption:</para>
+<para><image type="html" name="User-Profile-256.png">Image of a user</image>
+</para>
+<para>Size can be set:</para>
+<para><image type="html" name="User-Group-256.png" width="50" height="100">Image of a user group</image>
+ </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Include images in the documentation.
+
+A simple image:
+
+image::Check-256.png[]
+
+We can have inline image:User-Group-256.png[] images as well.
+
+For accessibility we should always provide a caption:
+
+image::User-Profile-256.png["Image of a user"]
+
+Size can be set:
+
+image::User-Group-256.png["Image of a user group",50,100]"""
+
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

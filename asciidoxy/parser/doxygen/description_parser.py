@@ -701,6 +701,70 @@ class Formula(DescriptionElement):
         parent.append(PlainText(self.language_tag, text))
 
 
+class Image(DescriptionElement):
+    """Insert an image.
+
+    Args:
+        output_type: Output document type the image is meant for. For now we only support `html`.
+        file_name:   Name if the image file. Must be available in the images of the package.
+        alt_text:    Alternative text when the image cannot be loaded, or for accessibility.
+        width:       Optional width to show the image with.
+        height:      Optional height to show the image with.
+        inline:      Yes if the image needs to be inlined in the text.
+    """
+    output_type: str
+    file_name: str
+    alt_text: str
+    width: str
+    height: str
+    inline: str
+
+    def __init__(self, language_tag: str, output_type: str, file_name: str, width: str, height: str,
+                 inline: str):
+        super().__init__(language_tag)
+        self.output_type = output_type
+        self.file_name = file_name
+        self.alt_text = ""
+        self.width = width
+        self.height = height
+        self.inline = inline
+
+    def to_asciidoc(self) -> str:
+        if self.output_type != "html":
+            return ""
+
+        if self.width or self.height:
+            options = f'"{self.alt_text}",{self.width},{self.height}'
+        elif self.alt_text:
+            options = f'"{self.alt_text}"'
+        else:
+            options = ""
+
+        if self.inline == "yes":
+            separator = ":"
+        else:
+            separator = "::"
+
+        return f"image{separator}{self.file_name}[{options}]"
+
+    def __repr__(self) -> str:
+        return (f"{self.__class__.__name__}: {self.output_type}->{self.file_name}, "
+                f"{repr(self.alt_text)}, width={self.width}, height={self.height}, "
+                f"inline={self.inline}")
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Image":
+        return cls(language_tag, xml_element.get("type", ""), xml_element.get("name", ""),
+                   xml_element.get("width", ""), xml_element.get("height", ""),
+                   xml_element.get("inline", "no"))
+
+    def add_text(self, text: str) -> None:
+        self.alt_text += text
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        parent.append(PlainText(self.language_tag, text))
+
+
 def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement,
                        language_tag: str):
     element = None
@@ -715,6 +779,7 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "entry": Entry,
         "formula": Formula,
         "highlight": Style,
+        "image": Image,
         "itemizedlist": ItemizedList,
         "linebreak": LineBreak,
         "listitem": ListItem,
