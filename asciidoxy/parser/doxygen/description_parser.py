@@ -40,7 +40,37 @@ def parse_description(xml_root: Optional[ET.Element], language_tag: str) -> "Par
         for xml_element in xml_root:
             _parse_description(xml_element, contents, language_tag)
         contents.normalize()
+        _flag_nested_tables(contents)
     return contents
+
+
+def _flag_nested_tables(contents: "ParaContainer") -> None:
+    """Detect tables that are nested inside other tables and flag them."""
+    for top_level_table in _shallow_find_tables(contents):
+        for nested_table in _shallow_find_tables(*top_level_table.contents):
+            nested_table.separator = "!"
+            _flag_nested_table_contents(nested_table)
+
+
+def _flag_nested_table_contents(table: "Table") -> None:
+    for row in table.contents:
+        assert isinstance(row, Row)
+        for entry in row.contents:
+            assert isinstance(entry, Entry)
+            entry.separator = "!"
+
+
+def _shallow_find_tables(*contents: "DescriptionElement") -> List["Table"]:
+    tables = []
+    queue = list(contents)
+    while queue:
+        current = queue.pop(0)
+        if isinstance(current, Table):
+            tables.append(current)
+        elif isinstance(current, NestedDescriptionElement):
+            queue.extend(current.contents)
+
+    return tables
 
 
 def select_descriptions(brief: "ParaContainer", detailed: "ParaContainer") -> Tuple[str, str]:
@@ -131,6 +161,11 @@ class NestedDescriptionElement(DescriptionElement):
     def to_asciidoc(self) -> str:
         return "".join(element.to_asciidoc() for element in self.contents)
 
+    def normalize(self) -> None:
+        for child in self.contents:
+            if isinstance(child, NestedDescriptionElement):
+                child.normalize()
+
 
 class ParaContainer(NestedDescriptionElement):
     """Element that contains a sequence of paragraphes."""
@@ -148,6 +183,9 @@ class ParaContainer(NestedDescriptionElement):
             child = self.contents.pop(0)
 
             # Normalize ParaContainers and add them if not empty
+            if isinstance(child, (Para, ParaContainer)):
+                child.normalize()
+
             if isinstance(child, ParaContainer):
                 child.normalize()
                 if child.contents:
@@ -160,8 +198,7 @@ class ParaContainer(NestedDescriptionElement):
             # ParaContainer. Split the existing content in separate Paras around other Paras and
             # ParaContainers
 
-            # Para for non-Para content
-            # Original para
+            # Clone the original Para for the initial non-Para content
             new_para = child.clone_without_contents()
             while child.contents and not isinstance(child.contents[0], (Para, ParaContainer)):
                 new_para.append(child.contents.pop(0))
@@ -173,7 +210,8 @@ class ParaContainer(NestedDescriptionElement):
                 while child.contents and isinstance(child.contents[0], (Para, ParaContainer)):
                     reassess.append(child.contents.pop(0))
 
-                # Para for non-Para content
+                # Use the last Para to reasses, or clone the original Para for following non-Para
+                # content
                 if isinstance(reassess[-1], Para):
                     new_para = reassess.pop(-1)
                 else:
@@ -230,6 +268,15 @@ class PlainText(DescriptionElement):
 
     def add_text(self, text: str) -> None:
         self.text += text
+
+
+class LineBreak(DescriptionElement):
+    """Line break.
+
+    This breaks the current line, but not the paragraph.
+    """
+    def to_asciidoc(self) -> str:
+        return " +\n"
 
 
 class NamedSection(ParaContainer):
@@ -332,7 +379,10 @@ class ListItem(ParaContainer):
         return f"* {super().to_asciidoc()}"
 
     def add_text(self, text: str) -> None:
-        self.append(PlainText(self.language_tag, text))
+        """Ignore text outside paras."""
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        """Ignore text outside paras."""
 
 
 class CodeBlock(NestedDescriptionElement):
@@ -475,6 +525,154 @@ class Ref(NestedDescriptionElement):
         parent.append(PlainText(self.language_tag, text))
 
 
+class Ulink(NestedDescriptionElement):
+    """Link to an external URL. This appears as a hyperlink.
+
+    All nested elements will be part of the link.
+
+    Args:
+        url: URL to link to.
+
+    """
+    url: str
+
+    def __init__(self, language_tag: str, url: str, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.url = url
+
+    def to_asciidoc(self) -> str:
+        return f"{self.url}[{super().to_asciidoc()}]"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.url}"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Ulink":
+        return cls(language_tag, xml_element.get("url", ""))
+
+    def add_text(self, text: str) -> None:
+        self.append(PlainText(self.language_tag, text))
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        parent.append(PlainText(self.language_tag, text))
+
+
+class Table(NestedDescriptionElement):
+    """A table.
+
+    Args:
+        caption:   Optional caption for the table.
+        separator: AsciiDoc table separator. In case of nested tables, an alternative table separtor
+                       is required.
+        cols:      The number of columns in the table.
+    """
+    caption: Optional[str]
+    separator: str
+    cols: str
+
+    def __init__(self,
+                 language_tag: str,
+                 caption: Optional[str] = None,
+                 separator: str = "|",
+                 cols: str = "1",
+                 *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.caption = caption
+        self.separator = separator
+        self.cols = cols
+
+    def to_asciidoc(self) -> str:
+        if self.caption:
+            caption = f".{self.caption}\n"
+        else:
+            caption = ""
+
+        options = f"[cols=\"{self.cols}*\", options=\"autowidth\"]"
+
+        rows = "\n\n".join(element.to_asciidoc() for element in self.contents)
+
+        return f"{caption}{options}\n{self.separator}===\n\n{rows}\n\n{self.separator}==="
+
+    def __repr__(self) -> str:
+        return (f"{self.__class__.__name__}: separator={self.separator}, cols={self.cols}, "
+                f"{self.caption}")
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Table":
+        return cls(language_tag, cols=xml_element.get("cols", "1"))
+
+    def update_from_xml(self, xml_element: ET.Element) -> None:
+        if xml_element.tag == "caption":
+            self.caption = xml_element.text
+
+
+class Row(NestedDescriptionElement):
+    """A single row in a table."""
+    def to_asciidoc(self) -> str:
+        return "\n".join(element.to_asciidoc() for element in self.contents)
+
+
+class Entry(ParaContainer):
+    """A single cell/entry in a table.
+
+    Args:
+        header:    Is this cell part of a header.
+        rowspan:   The number of rows the cell spans. Not specified means 1.
+        colspan:   The number of columns the cell spans. Not specified means 1.
+        separator: AsciiDoc table separator. In case of nested tables, an alternative table separtor
+                       is required.
+    """
+    header: Optional[str]
+    rowspan: Optional[str]
+    colspan: Optional[str]
+    separator: str
+
+    def __init__(self,
+                 language_tag: str,
+                 header: Optional[str] = None,
+                 rowspan: Optional[str] = None,
+                 colspan: Optional[str] = None,
+                 separator: str = "|",
+                 *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.header = header
+        self.rowspan = rowspan
+        self.colspan = colspan
+        self.separator = separator
+
+    def add_text(self, text: str) -> None:
+        """Ignore text outside paras."""
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        """Ignore text outside paras."""
+
+    def to_asciidoc(self) -> str:
+        if self.header == "yes":
+            style_operator = "h"
+        else:
+            style_operator = "a"
+
+        if self.rowspan and self.colspan:
+            span_operator = f"{self.colspan}.{self.rowspan}+"
+        elif self.rowspan:
+            span_operator = f".{self.rowspan}+"
+        elif self.colspan:
+            span_operator = f"{self.colspan}+"
+        else:
+            span_operator = ""
+
+        return f"{span_operator}{style_operator}{self.separator} {super().to_asciidoc()}"
+
+    def __repr__(self) -> str:
+        return (f"{self.__class__.__name__}: header={self.header}, rowspan={self.rowspan}, "
+                f"colspan={self.colspan}")
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Entry":
+        return cls(language_tag, xml_element.get("thead", None), xml_element.get("rowspan", None),
+                   xml_element.get("colspan", None))
+
+
 def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement,
                        language_tag: str):
     element = None
@@ -486,8 +684,10 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "computeroutput": Style,
         "dot": Diagram,
         "emphasis": Style,
+        "entry": Entry,
         "highlight": Style,
         "itemizedlist": ItemizedList,
+        "linebreak": LineBreak,
         "listitem": ListItem,
         "para": Para,
         "parameteritem": ParameterDescription,
@@ -495,13 +695,17 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "plantuml": Diagram,
         "programlisting": CodeBlock,
         "ref": Ref,
+        "row": Row,
         "simplesect": Section,
+        "table": Table,
+        "ulink": Ulink,
         "verbatim": Style,
         "xrefsect": Section,
     }
 
     # Map of element tags that update the parent element.
     UPDATE_PARENT = {
+        "caption": Table,
         "parametername": ParameterDescription,
         "xreftitle": Section,
     }

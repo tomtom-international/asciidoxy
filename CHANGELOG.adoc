@@ -35,6 +35,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Support special Doxygen paragraphs that contain metadata: `\author`, `\bug`, `\copyright`,
     `\date`, `\deprecated`, `\since`, and `\todo`. They are added to the overview table of 
     class-like elements, or the parameter table of functions/methods.
+  - Complex tables with cells spanning multiple columns and/or rows and nested tables (1 level) are
+    now supported.
+  - Support explicit line breaks in paragraphs.
 
 
 === Changed

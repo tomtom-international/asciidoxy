@@ -459,6 +459,133 @@ Some other test classes are:
 Of course there is also <<lang-descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24,FunctionDocumentation()>>."""
 
 
+def test_parse_external_links():
+    input_xml = """\
+    <detaileddescription>
+<para>Our website is <ulink url="https://asciidoxy.org">https://asciidoxy.org</ulink>. You can use <ulink url="mailto:info@example.com">info@example.com</ulink> for fake e-mail address examples.</para>
+<para>Don&apos;t forget to read our <ulink url="https://asciidoxy.org">documentation</ulink>. </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Our website is https://asciidoxy.org[https://asciidoxy.org]. You can use mailto:info@example.com[info@example.com] for fake e-mail address examples.
+
+Don't forget to read our https://asciidoxy.org[documentation]."""
+
+
+def test_parse_complex_html_table():
+    input_xml = """\
+    <detaileddescription>
+<para><table rows="9" cols="3"><caption>Complex table</caption>
+<row>
+<entry thead="yes"><para>Column 1 </para>
+</entry><entry thead="yes"><para>Column 2 </para>
+</entry><entry thead="yes"><para>Column 3 </para>
+</entry></row>
+<row>
+<entry thead="no" rowspan="2"><para>cell row=1+2,col=1</para>
+</entry><entry thead="no"><para>cell row=1,col=2</para>
+</entry><entry thead="no"><para>cell row=1,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no" rowspan="2"><para>cell row=2+3,col=2 </para>
+</entry><entry thead="no"><para>cell row=2,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=3,col=1 </para>
+</entry><entry thead="no" rowspan="2"><para>cell row=3+4,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no" colspan="2"><para>cell row=4,col=1+2 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=5,col=1 </para>
+</entry><entry thead="no" colspan="2"><para>cell row=5,col=2+3 </para>
+</entry></row>
+<row>
+<entry thead="no" colspan="2" rowspan="2"><para>cell row=6+7,col=1+2 </para>
+</entry><entry thead="no"><para>cell row=6,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=7,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=8,col=1 </para>
+</entry><entry thead="no"><para>cell row=8,col=2<linebreak/>
+ <table rows="2" cols="2"><row>
+<entry thead="no"><para>Inner cell row=1,col=1</para>
+</entry><entry thead="no"><para>Inner cell row=1,col=2 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>Inner cell row=2,col=1</para>
+</entry><entry thead="no"><para>Inner cell row=2,col=2 </para>
+</entry></row>
+</table>
+</para>
+</entry><entry thead="no"><para>cell row=8,col=3 <itemizedlist>
+<listitem>
+<para>Item 1 </para>
+</listitem>
+<listitem>
+<para>Item 2 </para>
+</listitem>
+</itemizedlist>
+</para>
+</entry></row>
+</table>
+</para>
+    </detaileddescription>"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+.Complex table
+[cols="3*", options="autowidth"]
+|===
+
+h| Column 1
+h| Column 2
+h| Column 3
+
+.2+a| cell row=1+2,col=1
+a| cell row=1,col=2
+a| cell row=1,col=3
+
+.2+a| cell row=2+3,col=2
+a| cell row=2,col=3
+
+a| cell row=3,col=1
+.2+a| cell row=3+4,col=3
+
+2+a| cell row=4,col=1+2
+
+a| cell row=5,col=1
+2+a| cell row=5,col=2+3
+
+2.2+a| cell row=6+7,col=1+2
+a| cell row=6,col=3
+
+a| cell row=7,col=3
+
+a| cell row=8,col=1
+a| cell row=8,col=2 +
+[cols="2*", options="autowidth"]
+!===
+
+a! Inner cell row=1,col=1
+a! Inner cell row=1,col=2
+
+a! Inner cell row=2,col=1
+a! Inner cell row=2,col=2
+
+!===
+a| cell row=8,col=3
+
+* Item 1
+
+* Item 2
+
+|==="""
+
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

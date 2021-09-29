@@ -2,6 +2,8 @@
 <doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.18">
   <compound refid="classasciidoxy_1_1descriptions_1_1_code_block" kind="class"><name>asciidoxy::descriptions::CodeBlock</name>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" kind="class"><name>asciidoxy::descriptions::ComplexHtmlTable</name>
+  </compound>
   <compound refid="class_const_int" kind="class"><name>ConstInt</name>
     <member refid="class_const_int_1aa068b95529ad462c527edb8af85323e8" kind="variable"><name>value_</name></member>
     <member refid="class_const_int_1a80d34fa86fe64d30733534924fda5483" kind="function"><name>ConstInt</name></member>
@@ -36,6 +38,8 @@
   <compound refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" kind="class"><name>asciidoxy::descriptions::DoxygenVisualStyle</name>
   </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1detail_1_1_error_descriptor" kind="class"><name>asciidoxy::relative_namespace::detail::ErrorDescriptor</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_external_links" kind="class"><name>asciidoxy::descriptions::ExternalLinks</name>
   </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes" kind="class"><name>asciidoxy::relative_namespace::InterfaceWithDetailClasses</name>
     <member refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes_1a8c43ece59b1a2ab96463b44396f70ecf" kind="function"><name>DoSomething</name></member>
