@@ -41,6 +41,8 @@
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_external_links" kind="class"><name>asciidoxy::descriptions::ExternalLinks</name>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_formulae" kind="class"><name>asciidoxy::descriptions::Formulae</name>
+  </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes" kind="class"><name>asciidoxy::relative_namespace::InterfaceWithDetailClasses</name>
     <member refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes_1a8c43ece59b1a2ab96463b44396f70ecf" kind="function"><name>DoSomething</name></member>
   </compound>

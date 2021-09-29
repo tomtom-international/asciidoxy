@@ -38,6 +38,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Complex tables with cells spanning multiple columns and/or rows and nested tables (1 level) are
     now supported.
   - Support explicit line breaks in paragraphs.
+  - Support LatexMath formulae in Doxygen descriptions. It is required to enable `:stem:` in the
+    AsciiDoc header to render the formulae.
 
 
 === Changed

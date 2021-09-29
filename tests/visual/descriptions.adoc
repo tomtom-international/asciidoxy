@@ -15,6 +15,7 @@
 :toc: left
 :icons: font
 :source-highlighter: highlightjs
+:stem:
 
 ${insert("asciidoxy::descriptions::DoxygenVisualStyle")}
 
@@ -33,3 +34,5 @@ ${insert("asciidoxy::descriptions::Links")}
 ${insert("asciidoxy::descriptions::ExternalLinks")}
 
 ${insert("asciidoxy::descriptions::ComplexHtmlTable")}
+
+${insert("asciidoxy::descriptions::Formulae")}

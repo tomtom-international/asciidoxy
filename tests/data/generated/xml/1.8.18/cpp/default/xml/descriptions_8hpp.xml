@@ -10,6 +10,7 @@
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_links" prot="public">asciidoxy::descriptions::Links</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_external_links" prot="public">asciidoxy::descriptions::ExternalLinks</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" prot="public">asciidoxy::descriptions::ComplexHtmlTable</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_formulae" prot="public">asciidoxy::descriptions::Formulae</innerclass>
     <innernamespace refid="namespaceasciidoxy">asciidoxy</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1descriptions">asciidoxy::descriptions</innernamespace>
     <briefdescription>
@@ -63,8 +64,11 @@
 <codeline lineno="194" refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" kindref="compound">ComplexHtmlTable</ref><sp/>{</highlight></codeline>
 <codeline lineno="195"><highlight class="normal">};</highlight></codeline>
 <codeline lineno="196"><highlight class="normal"></highlight></codeline>
-<codeline lineno="197"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="198"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="219" refid="classasciidoxy_1_1descriptions_1_1_formulae" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_formulae" kindref="compound">Formulae</ref><sp/>{</highlight></codeline>
+<codeline lineno="220"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="221"><highlight class="normal"></highlight></codeline>
+<codeline lineno="222"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="223"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="descriptions.hpp"/>
   </compounddef>

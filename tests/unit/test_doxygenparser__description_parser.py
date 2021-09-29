@@ -586,6 +586,21 @@ a| cell row=8,col=3
 |==="""
 
 
+def test_parse_formulae():
+    input_xml = r"""<detaileddescription>
+<para>The distance between <formula id="0">$(x_1,y_1)$</formula> and <formula id="1">$(x_2,y_2)$</formula> is <formula id="2">$\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}$</formula>.</para>
+<para><formula id="3">\[ |I_2|=\left| \int_{0}^T \psi(t) \left\{ u(a,t)- \int_{\gamma(t)}^a \frac{d\theta}{k(\theta,t)} \int_{a}^\theta c(\xi)u_t(\xi,t)\,d\xi \right\} dt \right| \]</formula></para>
+<para><formula id="4">\begin{eqnarray*} g &amp;=&amp; \frac{Gm_2}{r^2} \\ &amp;=&amp; \frac{(6.673 \times 10^{-11}\,\mbox{m}^3\,\mbox{kg}^{-1}\, \mbox{s}^{-2})(5.9736 \times 10^{24}\,\mbox{kg})}{(6371.01\,\mbox{km})^2} \\ &amp;=&amp; 9.82066032\,\mbox{m/s}^2 \end{eqnarray*}</formula> </para>
+    </detaileddescription>"""
+    output = parse(input_xml)
+    assert output.to_asciidoc(
+    ) == r"""The distance between latexmath:[$(x_1,y_1)$] and latexmath:[$(x_2,y_2)$] is latexmath:[$\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}$].
+
+latexmath:[|I_2|=\left| \int_{0}^T \psi(t) \left\{ u(a,t)- \int_{\gamma(t)}^a \frac{d\theta}{k(\theta,t)} \int_{a}^\theta c(\xi)u_t(\xi,t)\,d\xi \right\} dt \right|]
+
+latexmath:[\begin{eqnarray*} g &=& \frac{Gm_2}{r^2} \\ &=& \frac{(6.673 \times 10^{-11}\,\mbox{m}^3\,\mbox{kg}^{-1}\, \mbox{s}^{-2})(5.9736 \times 10^{24}\,\mbox{kg})}{(6371.01\,\mbox{km})^2} \\ &=& 9.82066032\,\mbox{m/s}^2 \end{eqnarray*}]"""
+
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

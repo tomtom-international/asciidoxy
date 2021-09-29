@@ -673,6 +673,34 @@ class Entry(ParaContainer):
                    xml_element.get("colspan", None))
 
 
+class Formula(DescriptionElement):
+    """Formula in LatexMath format.
+
+    Attributes:
+        text: Contents of the formula.
+    """
+    text: str
+
+    def __init__(self, language_tag: str, text: str = ""):
+        super().__init__(language_tag)
+        self.text = text
+
+    def to_asciidoc(self) -> str:
+        stripped_text = self.text.strip("\r\n")
+        if stripped_text.startswith(r"\[") and stripped_text.endswith(r"\]"):
+            stripped_text = stripped_text[3:-3].strip()
+        return f"latexmath:[{stripped_text}]"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {repr(self.text)}"
+
+    def add_text(self, text: str) -> None:
+        self.text += text
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        parent.append(PlainText(self.language_tag, text))
+
+
 def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement,
                        language_tag: str):
     element = None
@@ -685,6 +713,7 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "dot": Diagram,
         "emphasis": Style,
         "entry": Entry,
+        "formula": Formula,
         "highlight": Style,
         "itemizedlist": ItemizedList,
         "linebreak": LineBreak,
