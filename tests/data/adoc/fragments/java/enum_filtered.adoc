@@ -10,7 +10,7 @@ import TrafficEvent.java
 enum com.asciidoxy.traffic.TrafficEvent.Severity
 ----
 
-xref:java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity[Severity] scale for traffic events.
+<<java-enumcom_1_1asciidoxy_1_1traffic_1_1_traffic_event_1_1_severity,Severity>> scale for traffic events.
 
 The more severe the traffic event, the more likely it is to have a large delay.
 

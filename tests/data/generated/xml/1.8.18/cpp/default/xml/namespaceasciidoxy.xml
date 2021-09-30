@@ -3,6 +3,7 @@
   <compounddef id="namespaceasciidoxy" kind="namespace" language="C++">
     <compoundname>asciidoxy</compoundname>
     <innerclass refid="classasciidoxy_1_1_convertor" prot="public">asciidoxy::Convertor</innerclass>
+    <innernamespace refid="namespaceasciidoxy_1_1descriptions">asciidoxy::descriptions</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1geometry">asciidoxy::geometry</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1relative__namespace">asciidoxy::relative_namespace</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1system">asciidoxy::system</innernamespace>

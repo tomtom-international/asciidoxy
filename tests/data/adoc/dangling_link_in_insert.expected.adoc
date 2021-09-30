@@ -14,7 +14,7 @@ The class reference:
 
 class asciidoxy::positioning::Positioning
 ----
-xref:cpp-classasciidoxy_1_1positioning_1_1_positioning[Positioning] engine.
+<<cpp-classasciidoxy_1_1positioning_1_1_positioning,Positioning>> engine.
 
 
 

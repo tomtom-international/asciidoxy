@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.18">
+  <compound refid="classasciidoxy_1_1descriptions_1_1_code_block" kind="class"><name>asciidoxy::descriptions::CodeBlock</name>
+  </compound>
   <compound refid="class_const_int" kind="class"><name>ConstInt</name>
     <member refid="class_const_int_1aa068b95529ad462c527edb8af85323e8" kind="variable"><name>value_</name></member>
     <member refid="class_const_int_1a80d34fa86fe64d30733534924fda5483" kind="function"><name>ConstInt</name></member>
@@ -27,6 +29,12 @@
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3" kind="function"><name>Update</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891" kind="function"><name>Update</name></member>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_diagrams" kind="class"><name>asciidoxy::descriptions::Diagrams</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" kind="class"><name>asciidoxy::descriptions::DoxygenList</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" kind="class"><name>asciidoxy::descriptions::DoxygenVisualStyle</name>
+  </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1detail_1_1_error_descriptor" kind="class"><name>asciidoxy::relative_namespace::detail::ErrorDescriptor</name>
   </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes" kind="class"><name>asciidoxy::relative_namespace::InterfaceWithDetailClasses</name>
@@ -34,6 +42,8 @@
   </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate" kind="class"><name>asciidoxy::geometry::InvalidCoordinate</name>
     <member refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate_1a3b0057e2237f2ecfe3ebc94ca2ba6a12" kind="function"><name>what</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_links" kind="class"><name>asciidoxy::descriptions::Links</name>
   </compound>
   <compound refid="class_logger" kind="class"><name>Logger</name>
     <member refid="class_logger_1adfed6b5c5cb7fab63527144e705c1fa8" kind="function"><name>Log</name></member>
@@ -49,6 +59,8 @@
   <compound refid="classasciidoxy_1_1geometry_1_1_point" kind="class"><name>asciidoxy::geometry::Point</name>
     <member refid="classasciidoxy_1_1geometry_1_1_point_1aabf939f4746751aeb2f1e9e3553eecb4" kind="function"><name>Point</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8" kind="function"><name>increment</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_sections" kind="class"><name>asciidoxy::descriptions::Sections</name>
   </compound>
   <compound refid="classasciidoxy_1_1system_1_1_service" kind="interface"><name>asciidoxy::system::Service</name>
     <member refid="classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8" kind="function"><name>Start</name></member>
@@ -84,6 +96,9 @@
     <member refid="overloads_8hpp_1afbbb1c0274b5a0d90b2d1d39f1269027" kind="function"><name>to_string</name></member>
     <member refid="overloads_8hpp_1a8eebbc44a7bed882754da89a49139680" kind="function"><name>to_string</name></member>
   </compound>
+  <compound refid="namespaceasciidoxy_1_1descriptions" kind="namespace"><name>asciidoxy::descriptions</name>
+    <member refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kind="function"><name>FunctionDocumentation</name></member>
+  </compound>
   <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
   </compound>
   <compound refid="namespaceasciidoxy_1_1relative__namespace" kind="namespace"><name>asciidoxy::relative_namespace</name>
@@ -104,6 +119,8 @@
   </compound>
   <compound refid="default__values_8hpp" kind="file"><name>default_values.hpp</name>
   </compound>
+  <compound refid="descriptions_8hpp" kind="file"><name>descriptions.hpp</name>
+  </compound>
   <compound refid="logger_8hpp" kind="file"><name>logger.hpp</name>
   </compound>
   <compound refid="move__only_8hpp" kind="file"><name>move_only.hpp</name>
@@ -117,5 +134,11 @@
   <compound refid="service_8hpp" kind="file"><name>service.hpp</name>
   </compound>
   <compound refid="traffic__event_8hpp" kind="file"><name>traffic_event.hpp</name>
+  </compound>
+  <compound refid="bug" kind="page"><name>bug</name>
+  </compound>
+  <compound refid="deprecated" kind="page"><name>deprecated</name>
+  </compound>
+  <compound refid="todo" kind="page"><name>todo</name>
   </compound>
 </doxygenindex>

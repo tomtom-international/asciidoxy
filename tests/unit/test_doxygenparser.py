@@ -246,7 +246,7 @@ def test_resolve_references__report_progress(parser_driver_factory):
     parser.resolve_references(progress=progress_mock)
 
     assert progress_mock.ready == progress_mock.total
-    assert progress_mock.total == 49
+    assert progress_mock.total == 63
 
 
 def test_force_language_java(parser_driver_factory):

@@ -11,17 +11,39 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Parser for descriptions in Doxygen XML output."""
+"""Parse brief and detailed descriptions from Doxygen XML."""
 
-import functools
-import re
+import logging
 
 import xml.etree.ElementTree as ET
 
-from typing import List, Optional, Tuple
+from abc import ABC, abstractmethod
+from typing import List, Mapping, Optional, Tuple, Type, TypeVar, cast
+
+logger = logging.getLogger(__name__)
 
 
-def select_descriptions(brief: str, detailed: str) -> Tuple[str, str]:
+def parse_description(xml_root: Optional[ET.Element], language_tag: str) -> "ParaContainer":
+    """Parse a description from Doxygen XML.
+
+    Expects either `briefdescription` or `detaileddescription`. In case of `detaileddescription` it
+    can contain additional sections documenting parameters and return types.
+
+    Args:
+        xml_root: Element to start processing from.
+        language_tag: Tag indicating the programming language.
+    Returns:
+        A container with description paragraphs and sections.
+    """
+    contents = ParaContainer(language_tag)
+    if xml_root is not None:
+        for xml_element in xml_root:
+            _parse_description(xml_element, contents, language_tag)
+        contents.normalize()
+    return contents
+
+
+def select_descriptions(brief: "ParaContainer", detailed: "ParaContainer") -> Tuple[str, str]:
     """Select the approprate brief and detailed descriptions.
 
     Sometimes one of the descriptions is missing. This method makes sure there is always at least
@@ -35,128 +57,469 @@ def select_descriptions(brief: str, detailed: str) -> Tuple[str, str]:
         brief: Brief description to use.
         detailed: Detailed description to use.
     """
-    if not brief and detailed:
-        if "\n" in detailed:
-            brief, detailed = detailed.split("\n", maxsplit=1)
-            return brief, detailed.strip()
-        return detailed, ""
+    brief_adoc = brief.to_asciidoc()
+    if brief_adoc:
+        return brief_adoc, detailed.to_asciidoc()
 
-    return brief, detailed
+    if detailed.contents:
+        brief.contents.append(detailed.contents.pop(0))
+    return brief.to_asciidoc(), detailed.to_asciidoc()
 
 
-class DescriptionParser(object):
-    """Parse a description from XML and convert it to AsciiDoc.
+class DescriptionElement(ABC):
+    """A description in Doxygen XML is made up of several different XML elements. Each element
+    requires its own conversion into AsciiDoc format.
+    """
+    language_tag: str
+
+    def __init__(self, language_tag: str):
+        self.language_tag = language_tag
+
+    @abstractmethod
+    def to_asciidoc(self) -> str:
+        """Convert the element, and all contained elements, to AsciiDoc format."""
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "DescriptionElement":
+        """Generate a description element from its XML counterpart.
+
+        Information and attributes from XML can be used, but the contained text and the tail text
+        are handled separately.
+        """
+        return cls(language_tag)
+
+    def update_from_xml(self, xml_element: ET.Element):
+        """Update the current element with information from another XML element.
+
+        By default this method does nothing. To be implemented only by subclasses that support or
+        require information from some if its children, without adding a new element for the child.
+        """
+
+    def add_text(self, text: str) -> None:
+        """Add the text inside the XML element.
+
+        By default the text is ignored. To be implemented only by subclasses that use the text.
+        """
+
+    def add_tail(self, parent: "NestedDescriptionElement", text: str) -> None:
+        """Add the text after the closing tag of the element.
+
+        By default the tail is ignored. To be used by subclasses that support tail text. The parent
+        can be used to create additional elements for the tail text after the current element.
+        """
+
+
+class NestedDescriptionElement(DescriptionElement):
+    """A description element that contains additional description elements.
 
     Attributes:
-        language: Language to parse and return.
+        contents: Additional description elements inside this element.
     """
+    contents: List[DescriptionElement]
 
-    language: str
-    _parts: List[str]
+    def __init__(self, language_tag: str, *contents: DescriptionElement):
+        super().__init__(language_tag)
+        self.contents = list(contents)
 
-    def __init__(self, language: str):
-        self.language = language
-        self._parts = []
+    def append(self, content: DescriptionElement) -> None:
+        if content:
+            self.contents.append(content)
 
-    def parse(self, element: ET.Element) -> str:
-        """Parse a description from XML and convert it to AsciiDoc.
+    def to_asciidoc(self) -> str:
+        return "".join(element.to_asciidoc() for element in self.contents)
 
-        Args:
-            element: XML element to convert to AsciiDoc text.
 
-        Returns:
-            AsciiDoc text representation of the element.
-        """
-        self._parts = []
-        self.parse_children(element)
-        text = "".join(self._parts).strip()
+class ParaContainer(NestedDescriptionElement):
+    """Element that contains a sequence of paragraphes."""
+    def append(self, content: DescriptionElement) -> None:
+        assert isinstance(content, (Para, ParaContainer))
+        super().append(content)
 
-        # Remove spaces before a line break
-        text = re.sub(" *$", "", text, flags=re.MULTILINE)
+    def to_asciidoc(self) -> str:
+        return "\n\n".join(element.to_asciidoc() for element in self.contents
+                           if element.to_asciidoc().strip())
 
-        # Remove single space on new line
-        text = re.sub(r"^ (\S)", r"\1", text, flags=re.MULTILINE)
+    def normalize(self) -> None:
+        new_contents: List[DescriptionElement] = []
+        while self.contents:
+            child = self.contents.pop(0)
 
-        # No more than 2 consecutive line breaks
-        text = re.sub("\n{3,}", "\n\n", text)
+            # Normalize ParaContainers and add them if not empty
+            if isinstance(child, ParaContainer):
+                child.normalize()
+                if child.contents:
+                    new_contents.append(child)
+                continue
 
-        return text
+            assert isinstance(child, Para)
 
-    def parse_children(self, element: ET.Element) -> None:
-        for sub_element in element:
-            method = getattr(self, f"parse_{sub_element.tag}")
-            method(sub_element)
+            # Paras and ParaContainers inside a Para need to be promoted to the current
+            # ParaContainer. Split the existing content in separate Paras around other Paras and
+            # ParaContainers
 
-    def _default_parse(self, element: ET.Element, prefix=None, suffix=None) -> None:
-        self.append(prefix)
-        self.append(DescriptionParser._strip_line_ends(element.text))
-        self.parse_children(element)
-        self.append(suffix)
-        self.append(DescriptionParser._strip_line_ends(element.tail))
+            # Para for non-Para content
+            # Original para
+            new_para = child.clone_without_contents()
+            while child.contents and not isinstance(child.contents[0], (Para, ParaContainer)):
+                new_para.append(child.contents.pop(0))
+            new_contents.append(new_para)
 
-    @staticmethod
-    def _strip_line_ends(text: Optional[str]) -> Optional[str]:
-        if text is None:
-            return None
-        return re.sub("\n$", " ", text, flags=re.MULTILINE)
+            reassess = []
+            while child.contents:
+                # Promote Paras and ParaContainers
+                while child.contents and isinstance(child.contents[0], (Para, ParaContainer)):
+                    reassess.append(child.contents.pop(0))
 
-    parse_para = functools.partialmethod(_default_parse, suffix="\n\n")
-    parse_itemizedlist = functools.partialmethod(_default_parse, prefix="\n\n", suffix="\n")
-    parse_listitem = functools.partialmethod(_default_parse, prefix="* ")
-    parse_bold = functools.partialmethod(_default_parse, prefix="**", suffix="**")
-    parse_computeroutput = functools.partialmethod(_default_parse, prefix="`", suffix="`")
-    parse_codeline = functools.partialmethod(_default_parse, suffix="\n")
-    parse_sp = functools.partialmethod(_default_parse, prefix=" ")
-    parse_row = functools.partialmethod(_default_parse, prefix="\n\n", suffix="\n")
-    parse_entry = functools.partialmethod(_default_parse, prefix="|")
+                # Para for non-Para content
+                if isinstance(reassess[-1], Para):
+                    new_para = reassess.pop(-1)
+                else:
+                    new_para = child.clone_without_contents()
+                while child.contents and not isinstance(child.contents[0], (Para, ParaContainer)):
+                    new_para.append(child.contents.pop(0))
+                reassess.append(new_para)
+            self.contents = reassess + self.contents
 
-    def parse_ulink(self, element: ET.Element) -> None:
-        self._default_parse(element, prefix=f"{element.get('url')}[", suffix="]")
+        self.contents = new_contents
 
-    def parse_ref(self, element: ET.Element) -> None:
-        self._default_parse(element,
-                            prefix=f"xref:{self.language}-{element.get('refid')}[",
-                            suffix="]")
+    SectionT = TypeVar("SectionT", bound="NamedSection")
 
-    def parse_parameterlist(self, element) -> None:
-        pass
+    def pop_section(self, section_type: Type[SectionT], name: str) -> Optional[SectionT]:
+        for i, child in enumerate(self.contents):
+            # Mypy has some issues understanding that child is an instance of NamedSection,
+            # requiring the explicit casts below
+            if isinstance(child, section_type) and cast(ParaContainer.SectionT, child).name == name:
+                return cast(ParaContainer.SectionT, self.contents.pop(i))
+        return None
 
-    def parse_simplesect(self, element: ET.Element) -> None:
-        kind = element.get("kind")
-        if kind in ["note", "tip", "important", "caution", "warning"]:
-            self._default_parse(element, prefix=f"\n[{kind.upper()}]\n====\n", suffix="====\n")
 
-    def parse_programlisting(self, element: ET.Element) -> None:
-        self._default_parse(element, prefix=f"\n[source,{self.language}]\n----\n", suffix="----\n")
+class Para(NestedDescriptionElement):
+    """A single paragraph of text."""
+    def to_asciidoc(self) -> str:
+        return super().to_asciidoc().strip()
 
-    def parse_highlight(self, element: ET.Element) -> None:
-        if element.get("class") == "normal":
-            self._default_parse(element)
+    def clone_without_contents(self):
+        return self.__class__(self.language_tag)
+
+    def add_text(self, text: str) -> None:
+        self.append(PlainText(self.language_tag, text))
+
+
+class PlainText(DescriptionElement):
+    """Plain text.
+
+    Formatting may be applied by parent elements.
+
+    Attributes:
+        text: The plain text.
+    """
+    text: str
+
+    def __init__(self, language_tag: str, text: str):
+        super().__init__(language_tag)
+        self.text = text
+
+    def to_asciidoc(self) -> str:
+        return self.text.strip("\r\n")
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {repr(self.text)}"
+
+    def add_text(self, text: str) -> None:
+        self.text += text
+
+
+class NamedSection(ParaContainer):
+    """Special paragraph indicating a section that can be retrieved by name.
+
+    Attributes:
+        name: Name of the section.
+    """
+    name: str
+
+    def __init__(self, language_tag: str, name: str = "", *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.name = name
+
+
+class Section(NamedSection):
+    """Special paragraph indicating a text section that is either an admonition or has a caption."""
+    ADMONITION_MAP = {
+        "ATTENTION": "CAUTION",
+        "NOTE": "NOTE",
+        "REMARK": "NOTE",
+        "WARNING": "WARNING",
+    }
+
+    def __init__(self, language_tag: str, name: str = "", *contents: DescriptionElement):
+        super().__init__(language_tag, name, *contents)
+
+    def to_asciidoc(self) -> str:
+        admonition = self.ADMONITION_MAP.get(self.name.upper())
+        if admonition is None:
+            return f".{self.name.capitalize()}\n[NOTE]\n====\n{super().to_asciidoc()}\n===="
         else:
-            self._default_parse(element, prefix="__", suffix="__")
+            return f"[{admonition}]\n====\n{super().to_asciidoc()}\n===="
 
-    def parse_table(self, element: ET.Element) -> None:
-        caption_prefix = ""
-        caption = element.find('caption')
-        if caption is not None:
-            caption_prefix = f".{caption.text}\n"
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.name}"
 
-        header_option = ""
-        first_row = element.find('row')
-        if first_row is not None:
-            first_entry = first_row.find('entry')
-            if first_entry is not None and first_entry.get('thead') == 'yes':
-                header_option = "%header,"
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str):
+        return cls(language_tag=language_tag, name=xml_element.get("kind", "").lower())
 
-        prefix = f"\n\n{caption_prefix}[{header_option}cols={element.get('cols')}*]\n|===\n"
-        self._default_parse(element, prefix=prefix, suffix="|===\n")
+    def update_from_xml(self, xml_element: ET.Element):
+        if xml_element.tag == "xreftitle":
+            assert xml_element.text
+            self.name = xml_element.text.lower()
 
-    def parse_caption(self, element: ET.Element) -> None:
-        pass
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
 
-    def __getattr__(self, name):
-        return self._default_parse
 
-    def append(self, text: Optional[str]) -> None:
-        if text:
-            self._parts.append(text)
+class Style(NestedDescriptionElement):
+    """Apply a text style to contained elements.
+
+    Attributes:
+        kind: The kind of style to apply.
+    """
+    STYLE_MAP = {
+        "emphasis": "__",
+        "bold": "**",
+        "computeroutput": "``",
+        "verbatim": "``",
+    }
+
+    kind: str
+
+    def __init__(self, language_tag: str, kind: str, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.kind = kind
+
+    def to_asciidoc(self) -> str:
+        asciidoc_style = self.STYLE_MAP.get(self.kind, "")
+        return f"{asciidoc_style}{super().to_asciidoc()}{asciidoc_style}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.kind}"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Style":
+        return cls(language_tag=language_tag, kind=xml_element.tag)
+
+    def add_text(self, text: str) -> None:
+        self.append(PlainText(self.language_tag, text))
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        parent.append(PlainText(self.language_tag, text))
+
+
+class ItemizedList(ParaContainer):
+    """Paragraph that contains a bullet list."""
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
+
+
+class ListItem(ParaContainer):
+    """A single item in a bullet list.
+
+    The item itself can contain multiple paragraphs.
+    """
+    def to_asciidoc(self) -> str:
+        return f"* {super().to_asciidoc()}"
+
+    def add_text(self, text: str) -> None:
+        self.append(PlainText(self.language_tag, text))
+
+
+class CodeBlock(NestedDescriptionElement):
+    """A block of code."""
+    def to_asciidoc(self) -> str:
+        code = "\n".join(element.to_asciidoc() for element in self.contents)
+        return f"[source,{self.language_tag}]\n----\n{code}\n----"
+
+
+class CodeLine(NestedDescriptionElement):
+    """A single line in a block of code."""
+
+
+class Diagram(Para):
+    """Textual description of a diagram that can be used to generate a picture.
+
+    Attributes:
+        generator: The generator required to create the diagram.
+    """
+    GENERATOR_MAP = {
+        "dot": "graphviz",
+    }
+    generator: str
+
+    def __init__(self, language_tag: str, generator: str, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.generator = generator
+
+    def to_asciidoc(self) -> str:
+        # Not using Para.to_asciidoc() due to extra stripping that needs to be avoided here
+        generator = self.GENERATOR_MAP.get(self.generator, self.generator)
+        return f"[{generator}]\n....\n{NestedDescriptionElement.to_asciidoc(self)}\n...."
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.generator}"
+
+    def clone_without_contents(self) -> "Diagram":
+        return self.__class__(self.language_tag, self.generator)
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Diagram":
+        return cls(language_tag, xml_element.tag)
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
+
+
+class ParameterList(NamedSection):
+    """Special section containing a list of parameter descriptions."""
+    def __init__(self, language_tag: str, name: str, *contents: NestedDescriptionElement):
+        super().__init__(language_tag, name, *contents)
+
+    def to_asciidoc(self) -> str:
+        return ""
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.name}"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ParameterList":
+        return cls(language_tag, xml_element.get("kind", ""))
+
+
+class ParameterDescription(ParaContainer):
+    """Description of a single parameter.
+
+    Attributes:
+        name: Name of the parameter.
+        direction: If supported, whether this is an in-parameter, out-parameter, or both.
+    """
+    name: Optional[str]
+    direction: Optional[str]
+
+    def __init__(self, language_tag: str, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.name = None
+        self.direction = None
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.name or ''} [{self.direction or ''}]"
+
+    def update_from_xml(self, xml_element: ET.Element) -> None:
+        if xml_element.tag == "parametername":
+            self.name = xml_element.text
+            self.direction = xml_element.get("direction")
+
+
+class Ref(NestedDescriptionElement):
+    """Reference to an API element. This appears as a hyperlink.
+
+    Attributes:
+        refid: Unique identifier of the API element.
+        kindref: The kind of API element referred to.
+    """
+    refid: str
+    kindref: str
+
+    def __init__(self, language_tag: str, refid: str, kindref: str, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.refid = refid
+        self.kindref = kindref
+
+    def to_asciidoc(self) -> str:
+        return f"<<{self.language_tag}-{self.refid},{super().to_asciidoc()}>>"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.kindref}[{self.refid}]"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Ref":
+        return cls(language_tag, xml_element.get("refid", ""), xml_element.get("kindref", ""))
+
+    def add_text(self, text: str) -> None:
+        self.append(PlainText(self.language_tag, text))
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        parent.append(PlainText(self.language_tag, text))
+
+
+def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement,
+                       language_tag: str):
+    element = None
+
+    # Map of element tags for which a new element is to be constructed and added the the parent.
+    NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
+        "bold": Style,
+        "codeline": CodeLine,
+        "computeroutput": Style,
+        "dot": Diagram,
+        "emphasis": Style,
+        "highlight": Style,
+        "itemizedlist": ItemizedList,
+        "listitem": ListItem,
+        "para": Para,
+        "parameteritem": ParameterDescription,
+        "parameterlist": ParameterList,
+        "plantuml": Diagram,
+        "programlisting": CodeBlock,
+        "ref": Ref,
+        "simplesect": Section,
+        "verbatim": Style,
+        "xrefsect": Section,
+    }
+
+    # Map of element tags that update the parent element.
+    UPDATE_PARENT = {
+        "parametername": ParameterDescription,
+        "xreftitle": Section,
+    }
+
+    # Map of element tags for which the children update its parent.
+    USE_PARENT = {
+        "parameterdescription": ParameterDescription,
+        "parameternamelist": ParameterDescription,
+        "xrefdescription": Section,
+    }
+
+    if xml_element.tag in NEW_ELEMENT:
+        element = NEW_ELEMENT[xml_element.tag].from_xml(xml_element, language_tag)
+
+    elif xml_element.tag in UPDATE_PARENT:
+        assert isinstance(parent, UPDATE_PARENT[xml_element.tag])
+        parent.update_from_xml(xml_element)
+        element = parent
+
+    elif xml_element.tag in USE_PARENT:
+        assert isinstance(parent, USE_PARENT[xml_element.tag])
+        element = parent
+
+    elif xml_element.tag == "sp":
+        element = PlainText(language_tag, f" {xml_element.tail or ''}")
+
+    else:
+        logger.warning(f"Unsupported XML tag <{xml_element.tag}>. Please report an issue on GitHub"
+                       " with example code.")
+
+    if element is None:
+        return
+    if element is not parent:
+        parent.append(element)
+
+    if xml_element.text:
+        element.add_text(xml_element.text)
+
+    if xml_element.tail:
+        element.add_tail(parent, xml_element.tail)
+
+    for child in xml_element:
+        assert isinstance(element, NestedDescriptionElement)
+        _parse_description(child, element, language_tag)

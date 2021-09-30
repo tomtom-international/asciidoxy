@@ -34,7 +34,7 @@ Value to increment the Y coordinate with.
 | Returns
 |
 `xref:cpp-classasciidoxy_1_1geometry_1_1_point[++Point++]`::
-A new incremented xref:cpp-classasciidoxy_1_1geometry_1_1_point[Point].
+A new incremented <<cpp-classasciidoxy_1_1geometry_1_1_point,Point>>.
 
 |===
 

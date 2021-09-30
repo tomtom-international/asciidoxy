@@ -12,7 +12,7 @@ def update(self,
 
 Update the traffic event data.
 
-Verifies the new information before updating.
+``   Verifies the new information before updating.``
 
 [cols='h,5a']
 |===
