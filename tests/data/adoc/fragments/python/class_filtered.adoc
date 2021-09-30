@@ -133,7 +133,10 @@ def is_valid(self) -&gt; bool
 
 Check if the coordinate is valid.
 
-``   A coordinate is valid if its values are within WGS84 bounds.``
+[source]
+----
+   A coordinate is valid if its values are within WGS84 bounds.
+----
 
 [cols='h,5a']
 |===
@@ -188,7 +191,10 @@ def from_string_safe(cls,
 
 Create a coordinate from its string representation.
 
-``   Accepts None as input.``
+[source]
+----
+   Accepts None as input.
+----
 
 [cols='h,5a']
 |===

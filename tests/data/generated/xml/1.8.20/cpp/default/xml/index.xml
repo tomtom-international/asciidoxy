@@ -43,6 +43,8 @@
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_formulae" kind="class"><name>asciidoxy::descriptions::Formulae</name>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" kind="class"><name>asciidoxy::descriptions::HybridList</name>
+  </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_images" kind="class"><name>asciidoxy::descriptions::Images</name>
   </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes" kind="class"><name>asciidoxy::relative_namespace::InterfaceWithDetailClasses</name>
@@ -55,6 +57,8 @@
   </compound>
   <compound refid="class_logger" kind="class"><name>Logger</name>
     <member refid="class_logger_1adfed6b5c5cb7fab63527144e705c1fa8" kind="function"><name>Log</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_mark_down" kind="class"><name>asciidoxy::descriptions::MarkDown</name>
   </compound>
   <compound refid="classasciidoxy_1_1system_1_1_move_only" kind="class"><name>asciidoxy::system::MoveOnly</name>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a6dc67ce1f9071ebb2bf144874b589ba1" kind="function"><name>MoveOnly</name></member>

@@ -38,3 +38,7 @@ ${insert("asciidoxy::descriptions::ComplexHtmlTable")}
 ${insert("asciidoxy::descriptions::Formulae")}
 
 ${insert("asciidoxy::descriptions::Images")}
+
+${insert("asciidoxy::descriptions::MarkDown")}
+
+${insert("asciidoxy::descriptions::HybridList")}

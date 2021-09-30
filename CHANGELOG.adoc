@@ -43,6 +43,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Support images in Doxygen descriptions. Only `html` type images are shown, also for PDF output.
     Make sure to include all images in the package containing the xml and specify the 
     `asciidoc.image_dir` option in `contents.toml`.
+  - Support MarkDown (preprocessed by Doxygen) in Doxygen descriptions. This adds support for:
+    headers, strikethrough, numbered and nested lists, horizontal rulers, and block quotes.
 
 
 === Changed

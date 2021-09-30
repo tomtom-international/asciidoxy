@@ -84,7 +84,11 @@ from .matchers import (AtLeast, IsEmpty, IsFalse, IsNone, IsTrue, Unordered, m_c
                 args="(self, int cause, int delay)",
                 brief="Update the traffic event data.",
                 # TODO: See if we can improve here, even though it is already in Doxygen.
-                description="``   Verifies the new information before updating.``",
+                description="""\
+[source]
+----
+   Verifies the new information before updating.
+----""",
                 prot="public",
                 static=IsFalse(),
                 namespace="asciidoxy.traffic.TrafficEvent",

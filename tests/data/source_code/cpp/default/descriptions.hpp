@@ -241,5 +241,65 @@ class Formulae {
 class Images {
 };
 
+/**
+ * Doxygen supports MarkDown.
+ *
+ * A simple paragraph.
+ *
+ * And another paragraph.
+ *
+ * Header
+ * ======
+ *
+ * > Perfection is achieved, not when there is nothing more to add, but when there is nothing left
+ * > to take away.
+ *
+ * - List can be made with different bullets
+ *   + And can be nested
+ *   + Multiple levels
+ *     * Even this deep
+ *     * Do we really need that?
+ *   + I guess we do
+ * - We should support this.
+ *
+ * Subheader
+ * ---------
+ *
+ * 1. First item
+ * 2. Second item
+ * 3. Third item
+ *
+ * ---
+ *
+ * Some example code:
+ *
+ *     int answer = 42;
+ *
+ *
+ * ~~This is not right~~
+ *
+ * | Right | Center | Left  |
+ * | ----: | :----: | :---- |
+ * | 10    | 10     | 10    |
+ * | 1000  | 1000   | 1000  |
+ *
+ */
+class MarkDown {
+};
+
+/**
+ * Combining ordered and unordered lists.
+ *
+ * 1. Linux
+ *    - ArchLinux
+ *    - Ubuntu
+ *    - Fedora
+ * 2. BSD
+ *    - FreeBSD
+ *    - NetBSD
+ */
+class HybridList {
+};
+
 }  // namespace descriptions
 }  // namespace asciidoxy

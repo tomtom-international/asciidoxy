@@ -637,6 +637,169 @@ Size can be set:
 image::User-Group-256.png["Image of a user group",50,100]"""
 
 
+def test_parse_markdown():
+    input_xml = """\
+    <detaileddescription>
+<para>Doxygen supports <ref refid="classasciidoxy_1_1descriptions_1_1_mark_down" kindref="compound">MarkDown</ref>.</para>
+<para>A simple paragraph.</para>
+<para>And another paragraph.</para>
+<sect1 id="classasciidoxy_1_1descriptions_1_1_mark_down_1autotoc_md0">
+<title>Header</title>
+<para><blockquote><para>Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away. </para>
+</blockquote></para>
+<para><itemizedlist>
+<listitem><para>List can be made with different bullets<itemizedlist>
+<listitem><para>And can be nested</para>
+</listitem><listitem><para>Multiple levels<itemizedlist>
+<listitem><para>Even this deep</para>
+</listitem><listitem><para>Do we really need that?</para>
+</listitem></itemizedlist>
+</para>
+</listitem><listitem><para>I guess we do</para>
+</listitem></itemizedlist>
+</para>
+</listitem><listitem><para>We should support this.</para>
+</listitem></itemizedlist>
+</para>
+<sect2 id="classasciidoxy_1_1descriptions_1_1_mark_down_1autotoc_md1">
+<title>Subheader</title>
+<para><orderedlist>
+<listitem><para>First item</para>
+</listitem><listitem><para>Second item</para>
+</listitem><listitem><para>Third item</para>
+</listitem></orderedlist>
+</para>
+<para><hruler/>
+</para>
+<para>Some example code: <verbatim>int answer = 42;
+</verbatim></para>
+<para><strike>This is not right</strike></para>
+<para><table rows="3" cols="3"><row>
+<entry thead="yes" align='right'><para>Right  </para>
+</entry><entry thead="yes" align='center'><para>Center  </para>
+</entry><entry thead="yes" align='left'><para>Left   </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>10  </para>
+</entry><entry thead="no" align='center'><para>10  </para>
+</entry><entry thead="no" align='left'><para>10   </para>
+</entry></row>
+<row>
+<entry thead="no" align='right'><para>1000  </para>
+</entry><entry thead="no" align='center'><para>1000  </para>
+</entry><entry thead="no" align='left'><para>1000   </para>
+</entry></row>
+</table>
+</para>
+</sect2>
+</sect1>
+    </detaileddescription>"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Doxygen supports <<lang-classasciidoxy_1_1descriptions_1_1_mark_down,MarkDown>>.
+
+A simple paragraph.
+
+And another paragraph.
+
+[discrete]
+= Header
+
+[quote]
+____
+Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.
+____
+
+* List can be made with different bullets
+
+** And can be nested
+
+** Multiple levels
+
+*** Even this deep
+
+*** Do we really need that?
+
+** I guess we do
+
+* We should support this.
+
+[discrete]
+== Subheader
+
+. First item
+
+. Second item
+
+. Third item
+
+'''
+
+Some example code:
+
+[source]
+----
+int answer = 42;
+----
+
++++<del>+++This is not right+++</del>+++
+
+[cols="3*", options="autowidth"]
+|===
+
+>h| Right
+^h| Center
+h| Left
+
+>a| 10
+^a| 10
+a| 10
+
+>a| 1000
+^a| 1000
+a| 1000
+
+|==="""
+
+
+def test_parse_hybrid_list():
+    input_xml = """\
+    <detaileddescription>
+<para>Combining ordered and unordered lists.</para>
+<para><orderedlist>
+<listitem><para>Linux<itemizedlist>
+<listitem><para>ArchLinux</para>
+</listitem><listitem><para>Ubuntu</para>
+</listitem><listitem><para>Fedora</para>
+</listitem></itemizedlist>
+</para>
+</listitem><listitem><para>BSD<itemizedlist>
+<listitem><para>FreeBSD</para>
+</listitem><listitem><para>NetBSD </para>
+</listitem></itemizedlist>
+</para>
+</listitem></orderedlist>
+</para>
+    </detaileddescription>"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Combining ordered and unordered lists.
+
+. Linux
+
+* ArchLinux
+
+* Ubuntu
+
+* Fedora
+
+. BSD
+
+* FreeBSD
+
+* NetBSD"""
+
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

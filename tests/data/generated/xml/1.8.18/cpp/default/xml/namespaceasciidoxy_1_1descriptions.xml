@@ -9,8 +9,10 @@
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" prot="public">asciidoxy::descriptions::DoxygenVisualStyle</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_external_links" prot="public">asciidoxy::descriptions::ExternalLinks</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_formulae" prot="public">asciidoxy::descriptions::Formulae</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" prot="public">asciidoxy::descriptions::HybridList</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_images" prot="public">asciidoxy::descriptions::Images</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_links" prot="public">asciidoxy::descriptions::Links</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_mark_down" prot="public">asciidoxy::descriptions::MarkDown</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_sections" prot="public">asciidoxy::descriptions::Sections</innerclass>
       <sectiondef kind="func">
       <memberdef kind="function" id="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
