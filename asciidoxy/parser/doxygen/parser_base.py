@@ -20,9 +20,9 @@ import xml.etree.ElementTree as ET
 from abc import ABC
 from typing import Dict, List, Optional, Type
 
-from .description_parser import (parse_description, select_descriptions, NamedSection,
-                                 NestedDescriptionElement, ParaContainer, ParameterDescription,
-                                 ParameterList)
+from .description_parser import (parse_description, select_descriptions, Admonition,
+                                 NestedDescriptionElement, ParaContainer, ParameterItem,
+                                 ParameterList, Ref)
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
 from .type_parser import TypeParser, TypeParseError
@@ -61,10 +61,20 @@ def _pop_sections(description: Optional[ParaContainer]) -> Dict[str, str]:
             "since": "Since",
             "todo": "Todo",
     }.items():
-        section = description.pop_section(NamedSection, section_name)
+        section = description.pop_section(Admonition, section_name)
         if section is not None:
             sections[section_title] = _to_asciidoc_or_empty(section)
     return sections
+
+
+def _find_parameter_documentation(descriptions: ParameterList,
+                                  name: str) -> Optional[ParameterItem]:
+    for param_item in descriptions.contents:
+        assert isinstance(param_item, ParameterItem)
+        for param_name in param_item.names():
+            if param_name.name == name:
+                return param_item
+    return None
 
 
 class ParserBase(ABC):
@@ -96,14 +106,9 @@ class ParserBase(ABC):
             param.default_value = param_element.findtext("defval", "")
 
             if descriptions:
-                matching_descriptions = [
-                    desc for desc in descriptions.contents
-                    if isinstance(desc, ParameterDescription) and desc.name == param.name
-                ]
-                if matching_descriptions:
-                    if len(matching_descriptions) > 1:
-                        logger.debug(f"Multiple descriptions for parameter {param.name}")
-                    param.description = matching_descriptions[0].to_asciidoc()
+                documentation = _find_parameter_documentation(descriptions, param.name)
+                if documentation:
+                    param.description = _to_asciidoc_or_empty(documentation.description())
 
             params.append(param)
         return params
@@ -130,18 +135,38 @@ class ParserBase(ABC):
         exceptions = []
         if descriptions:
             for desc in descriptions.contents:
-                assert isinstance(desc, ParameterDescription)
-                assert desc.name
+                assert isinstance(desc, ParameterItem)
+
                 exception = ThrowsClause(self.TRAITS.TAG)
-                exception.type = TypeRef(name=desc.name, language=self.TRAITS.TAG)
+
+                names = desc.names()
+                assert desc.names
+                name = names[0]
+
+                if name.contents and isinstance(name.contents[0], Ref):
+                    ref = name.contents[0]
+                    refid = None
+                    if ref.refid:
+                        refid = f"{self.TRAITS.TAG}-{ref.refid}"
+                    exception.type = TypeRef(id=refid,
+                                             kind=ref.kindref,
+                                             name=_to_asciidoc_or_empty(ref),
+                                             language=self.TRAITS.TAG)
+                elif name.name:
+                    exception.type = TypeRef(name=name.name, language=self.TRAITS.TAG)
+                else:
+                    assert False, "Expected either type ref or name"
+
                 exception.type.namespace = parent.namespace
-                exception.description = desc.to_asciidoc()
+                exception.description = _to_asciidoc_or_empty(desc.description())
+
                 exceptions.append(exception)
-                self._driver.unresolved_ref(exception.type)
+                if not exception.type.id:
+                    self._driver.unresolved_ref(exception.type)
         return exceptions
 
     def parse_returns(self, memberdef_element: ET.Element, parent: Compound,
-                      description: Optional[NamedSection]) -> Optional[ReturnValue]:
+                      description: Optional[Admonition]) -> Optional[ReturnValue]:
         returns = ReturnValue()
         returns.type = self.parse_type(memberdef_element.find("type"), namespace=parent.namespace)
         returns.description = _to_asciidoc_or_empty(description)
@@ -194,7 +219,7 @@ class ParserBase(ABC):
 
         # First extract other descriptions
         member.returns = self.parse_returns(memberdef_element, member,
-                                            detailed.pop_section(NamedSection, "return"))
+                                            detailed.pop_section(Admonition, "return"))
         member.params = self.parse_parameters(memberdef_element, member,
                                               detailed.pop_section(ParameterList, "param"))
         member.exceptions = self.parse_exceptions(memberdef_element, member,

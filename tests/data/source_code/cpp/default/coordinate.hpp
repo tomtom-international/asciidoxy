@@ -79,6 +79,8 @@ class Coordinate {
 
   /**
    * Update from another coordinate.
+   *
+   * @throws InvalidCoordinate The input coordinate is invalid.
    */
   void Update(const Coordinate& coordinate);
 

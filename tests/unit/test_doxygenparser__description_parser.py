@@ -15,9 +15,10 @@
 
 import xml.etree.ElementTree as ET
 
-from asciidoxy.parser.doxygen.description_parser import (DescriptionElement, NamedSection,
+from asciidoxy.parser.doxygen.description_parser import (Admonition, DescriptionElement,
                                                          NestedDescriptionElement, ParameterList,
-                                                         parse_description, select_descriptions)
+                                                         Ref, parse_description,
+                                                         select_descriptions)
 
 
 def debug_print(element: DescriptionElement, prefix: str = "") -> None:
@@ -382,30 +383,44 @@ def test_parse_function():
     assert templateparam_section is not None
     assert templateparam_section.name == "templateparam"
     assert len(templateparam_section.contents) == 1
-    assert templateparam_section.contents[0].name == "Type"
-    assert not templateparam_section.contents[0].direction
-    assert templateparam_section.contents[0].to_asciidoc() == "The type to do something with."
+    names = templateparam_section.contents[0].names()
+    assert len(names) == 1
+    assert names[0].name == "Type"
+    assert not names[0].direction
+    description = templateparam_section.contents[0].description()
+    assert description is not None
+    assert description.to_asciidoc() == "The type to do something with."
 
     exception_section = output.pop_section(ParameterList, "exception")
     assert exception_section is not None
     assert exception_section.name == "exception"
     assert len(exception_section.contents) == 1
-    assert exception_section.contents[0].name == "std::logic_error"
-    assert not exception_section.contents[0].direction
-    assert exception_section.contents[0].to_asciidoc() == "Something is wrong with the logic."
+    names = exception_section.contents[0].names()
+    assert len(names) == 1
+    assert names[0].name == "std::logic_error"
+    assert not names[0].direction
+    description = exception_section.contents[0].description()
+    assert description.to_asciidoc() == "Something is wrong with the logic."
 
     retval_section = output.pop_section(ParameterList, "retval")
     assert retval_section is not None
     assert retval_section.name == "retval"
     assert len(retval_section.contents) == 2
-    assert retval_section.contents[0].name == "0"
-    assert not retval_section.contents[0].direction
-    assert retval_section.contents[0].to_asciidoc() == "All is ok."
-    assert retval_section.contents[1].name == "1"
-    assert not retval_section.contents[1].direction
-    assert retval_section.contents[1].to_asciidoc() == "Something went wrong."
+    names = retval_section.contents[0].names()
+    assert len(names) == 1
+    assert names[0].name == "0"
+    assert not names[0].direction
+    description = retval_section.contents[0].description()
+    assert description is not None
+    assert description.to_asciidoc() == "All is ok."
+    names = retval_section.contents[1].names()
+    assert len(names) == 1
+    assert names[0].name == "1"
+    assert not names[0].direction
+    description = retval_section.contents[1].description()
+    assert description.to_asciidoc() == "Something went wrong."
 
-    return_section = output.pop_section(NamedSection, "return")
+    return_section = output.pop_section(Admonition, "return")
     assert return_section is not None
     assert return_section.name == "return"
     assert len(return_section.contents) == 1
@@ -415,15 +430,27 @@ def test_parse_function():
     assert param_section is not None
     assert param_section.name == "param"
     assert len(param_section.contents) == 3
-    assert param_section.contents[0].name == "first"
-    assert param_section.contents[0].direction == "in"
-    assert param_section.contents[0].to_asciidoc() == "The first parameter."
-    assert param_section.contents[1].name == "second"
-    assert param_section.contents[1].direction == "out"
-    assert param_section.contents[1].to_asciidoc() == "The second parameter."
-    assert param_section.contents[2].name == "third"
-    assert param_section.contents[2].direction == "inout"
-    assert param_section.contents[2].to_asciidoc() == "The third parameter."
+    names = param_section.contents[0].names()
+    assert len(names) == 1
+    assert names[0].name == "first"
+    assert names[0].direction == "in"
+    description = param_section.contents[0].description()
+    assert description is not None
+    assert description.to_asciidoc() == "The first parameter."
+    names = param_section.contents[1].names()
+    assert len(names) == 1
+    assert names[0].name == "second"
+    assert names[0].direction == "out"
+    description = param_section.contents[1].description()
+    assert description is not None
+    assert description.to_asciidoc() == "The second parameter."
+    names = param_section.contents[2].names()
+    assert len(names) == 1
+    assert names[0].name == "third"
+    assert names[0].direction == "inout"
+    description = param_section.contents[2].description()
+    assert description is not None
+    assert description.to_asciidoc() == "The third parameter."
 
     assert output.to_asciidoc() == """\
 Complete documentation for a function or method."""
@@ -798,6 +825,70 @@ Combining ordered and unordered lists.
 * FreeBSD
 
 * NetBSD"""
+
+
+def test_parse_failure():
+    input_xml = """\
+<detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Name of the specification entry in TOML. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>raw_spec</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Specification entry from TOML. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>init_args</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Internal.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A package specification based on the TOML contents.</para>
+</simplesect>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername><ref refid="classasciidoxy_1_1packaging_1_1collect_1_1SpecificationError" kindref="compound">SpecificationError</ref></parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The specification in TOML is invalid. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>"""
+    output = parse(input_xml)
+
+    param_section = output.pop_section(ParameterList, "param")
+    assert param_section is not None
+
+    return_section = output.pop_section(Admonition, "return")
+    assert return_section is not None
+
+    exception_section = output.pop_section(ParameterList, "exception")
+    assert exception_section is not None
+    assert len(exception_section.contents) == 1
+    names = exception_section.contents[0].names()
+    assert len(names) == 1
+    assert not names[0].name
+    assert not names[0].direction
+    assert len(names[0].contents) == 1
+    assert isinstance(names[0].contents[0], Ref)
+    assert (names[0].contents[0].refid ==
+            "classasciidoxy_1_1packaging_1_1collect_1_1SpecificationError")
+
+    assert not output.to_asciidoc()
 
 
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():

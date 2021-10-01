@@ -18,7 +18,7 @@ import logging
 import xml.etree.ElementTree as ET
 
 from abc import ABC, abstractmethod
-from typing import List, Mapping, Optional, Tuple, Type, TypeVar, cast
+from typing import List, Mapping, Optional, Tuple, Type, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -207,11 +207,14 @@ class ParaContainer(NestedDescriptionElement):
     SectionT = TypeVar("SectionT", bound="NamedSection")
 
     def pop_section(self, section_type: Type[SectionT], name: str) -> Optional[SectionT]:
-        for i, child in enumerate(self.contents):
-            # Mypy has some issues understanding that child is an instance of NamedSection,
-            # requiring the explicit casts below
-            if isinstance(child, section_type) and cast(ParaContainer.SectionT, child).name == name:
-                return cast(ParaContainer.SectionT, self.contents.pop(i))
+        queue: List[NestedDescriptionElement] = [self]
+        while queue:
+            current = queue.pop(0)
+            for i, child in enumerate(current.contents):
+                if isinstance(child, section_type) and child.name == name:
+                    return current.contents.pop(i)
+                elif isinstance(child, NestedDescriptionElement):
+                    queue.append(child)
         return None
 
 
@@ -297,7 +300,7 @@ class Section(ParaContainer):
             self.title = xml_element.text.strip()
 
 
-class NamedSection(ParaContainer):
+class NamedSection:
     """Special paragraph indicating a section that can be retrieved by name.
 
     Attributes:
@@ -305,12 +308,11 @@ class NamedSection(ParaContainer):
     """
     name: str
 
-    def __init__(self, language_tag: str, name: str = "", *contents: DescriptionElement):
-        super().__init__(language_tag, *contents)
+    def __init__(self, name: str = ""):
         self.name = name
 
 
-class Admonition(NamedSection):
+class Admonition(ParaContainer, NamedSection):
     """Special paragraph indicating a text section that is either an admonition or sidebar."""
     ADMONITION_MAP = {
         "ATTENTION": "CAUTION",
@@ -320,7 +322,8 @@ class Admonition(NamedSection):
     }
 
     def __init__(self, language_tag: str, name: str = "", *contents: DescriptionElement):
-        super().__init__(language_tag, name, *contents)
+        ParaContainer.__init__(self, language_tag, *contents)
+        NamedSection.__init__(self, name)
 
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
         admonition = self.ADMONITION_MAP.get(self.name.upper())
@@ -537,10 +540,11 @@ class Diagram(Para):
         parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
 
 
-class ParameterList(NamedSection):
+class ParameterList(NestedDescriptionElement, NamedSection):
     """Special section containing a list of parameter descriptions."""
     def __init__(self, language_tag: str, name: str, *contents: NestedDescriptionElement):
-        super().__init__(language_tag, name, *contents)
+        NestedDescriptionElement.__init__(self, language_tag, *contents)
+        NamedSection.__init__(self, name)
 
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
         return ""
@@ -553,8 +557,22 @@ class ParameterList(NamedSection):
         return cls(language_tag, xml_element.get("kind", ""))
 
 
-class ParameterDescription(ParaContainer):
-    """Description of a single parameter.
+class ParameterItem(NestedDescriptionElement):
+    """Combination of name, type and description of a parameter."""
+    def names(self) -> List["ParameterName"]:
+        return [c for c in self.contents if isinstance(c, ParameterName)]
+
+    def description(self) -> Optional["ParameterDescription"]:
+        for child in self.contents:
+            if isinstance(child, ParameterDescription):
+                return child
+        return None
+
+
+class ParameterName(NestedDescriptionElement):
+    """Name or type of a single parameter.
+
+    Some parameters only have a name, while others can contain references to types.
 
     Attributes:
         name: Name of the parameter.
@@ -563,18 +581,24 @@ class ParameterDescription(ParaContainer):
     name: Optional[str]
     direction: Optional[str]
 
-    def __init__(self, language_tag: str, *contents: DescriptionElement):
+    def __init__(self, language_tag: str, name=None, direction=None, *contents: DescriptionElement):
         super().__init__(language_tag, *contents)
-        self.name = None
-        self.direction = None
+        self.name = name
+        self.direction = direction
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}: {self.name or ''} [{self.direction or ''}]"
 
-    def update_from_xml(self, xml_element: ET.Element) -> None:
-        if xml_element.tag == "parametername":
-            self.name = xml_element.text
-            self.direction = xml_element.get("direction")
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ParameterName":
+        return cls(language_tag, direction=xml_element.get("direction", None))
+
+    def add_text(self, text: str) -> None:
+        self.name = text
+
+
+class ParameterDescription(ParaContainer):
+    """Description of a single parameter."""
 
 
 class Ref(NestedDescriptionElement):
@@ -893,8 +917,6 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "listitem": ListItem,
         "orderedlist": ListContainer,
         "para": Para,
-        "parameteritem": ParameterDescription,
-        "parameterlist": ParameterList,
         "plantuml": Diagram,
         "programlisting": ProgramListing,
         "ref": Ref,
@@ -914,20 +936,22 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "ulink": Ulink,
         "verbatim": Verbatim,
         "xrefsect": Admonition,
+        "parameterlist": ParameterList,
+        "parameteritem": ParameterItem,
+        "parametername": ParameterName,
+        "parameterdescription": ParameterDescription,
     }
 
     # Map of element tags that update the parent element.
     UPDATE_PARENT = {
         "caption": Table,
-        "parametername": ParameterDescription,
         "title": Section,
         "xreftitle": Admonition,
     }
 
     # Map of element tags for which the children update its parent.
     USE_PARENT = {
-        "parameterdescription": ParameterDescription,
-        "parameternamelist": ParameterDescription,
+        "parameternamelist": ParameterItem,
         "xrefdescription": Admonition,
     }
 

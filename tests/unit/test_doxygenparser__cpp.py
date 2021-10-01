@@ -534,6 +534,16 @@ Do not use this class ever!
               },
           ),
           id="Class with sections in the description"),
+    param(dict(name="asciidoxy::geometry::Coordinate::Update(const Coordinate&)",
+               kind="function",
+               lang="cpp"),
+          m_compound(exceptions=[
+              m_throwsclause(type=m_typeref(
+                  id="cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate",
+                  kind="compound",
+                  name="InvalidCoordinate"), ),
+          ], ),
+          id="Exception with explicit id in XML"),
 ])
 def test_parse_cpp(api_reference, search_params, matcher):
     matcher.assert_matches(api_reference.find(**search_params))
