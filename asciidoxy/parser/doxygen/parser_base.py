@@ -39,9 +39,11 @@ def _yes_no_to_bool(yes_no: str) -> bool:
 
 def _to_asciidoc_or_empty(description: Optional[NestedDescriptionElement]) -> str:
     if description is not None:
-        # Use a clean Para container to prevent creating a "sidebar".
-        # TODO: make this more clean
-        return ParaContainer(description.language_tag, *description.contents).to_asciidoc()
+        if isinstance(description, (Admonition, Ref)):
+            # Use a clean Para container to prevent creating a "sidebar" or link.
+            return ParaContainer(description.language_tag, *description.contents).to_asciidoc()
+        else:
+            return description.to_asciidoc()
     return ""
 
 
@@ -69,8 +71,7 @@ def _pop_sections(description: Optional[ParaContainer]) -> Dict[str, str]:
 
 def _find_parameter_documentation(descriptions: ParameterList,
                                   name: str) -> Optional[ParameterItem]:
-    for param_item in descriptions.contents:
-        assert isinstance(param_item, ParameterItem)
+    for param_item in descriptions.children_of_type(ParameterItem):
         for param_name in param_item.names():
             if param_name.name == name:
                 return param_item
@@ -134,17 +135,13 @@ class ParserBase(ABC):
                          descriptions: Optional[ParameterList]) -> List[ThrowsClause]:
         exceptions = []
         if descriptions:
-            for desc in descriptions.contents:
-                assert isinstance(desc, ParameterItem)
-
+            for desc in descriptions.children_of_type(ParameterItem):
                 exception = ThrowsClause(self.TRAITS.TAG)
 
-                names = desc.names()
-                assert desc.names
-                name = names[0]
-
-                if name.contents and isinstance(name.contents[0], Ref):
-                    ref = name.contents[0]
+                name = desc.first_name()
+                assert name is not None
+                ref = name.first_child_of_type(Ref)
+                if name.contents and ref is not None:
                     refid = None
                     if ref.refid:
                         refid = f"{self.TRAITS.TAG}-{ref.refid}"

@@ -18,7 +18,7 @@ import logging
 import xml.etree.ElementTree as ET
 
 from abc import ABC, abstractmethod
-from typing import List, Mapping, Optional, Tuple, Type, TypeVar, Union
+from typing import Iterator, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 logger = logging.getLogger(__name__)
 
@@ -152,9 +152,16 @@ class NestedDescriptionElement(DescriptionElement):
         return "".join(element.to_asciidoc(context) for element in self.contents)
 
     def normalize(self) -> None:
-        for child in self.contents:
-            if isinstance(child, NestedDescriptionElement):
-                child.normalize()
+        for child in self.children_of_type(NestedDescriptionElement):
+            child.normalize()
+
+    ChildT = TypeVar("ChildT", bound="DescriptionElement")
+
+    def children_of_type(self, child_type: Type[ChildT]) -> Iterator[ChildT]:
+        return (child for child in self.contents if isinstance(child, child_type))
+
+    def first_child_of_type(self, child_type: Type[ChildT]) -> Optional[ChildT]:
+        return next(self.children_of_type(child_type), None)
 
 
 class NamedSection:
@@ -916,14 +923,14 @@ class ParameterList(NestedDescriptionElement, NamedSection):
 
 class ParameterItem(NestedDescriptionElement):
     """Combination of name, type and description of a parameter."""
-    def names(self) -> List["ParameterName"]:
-        return [c for c in self.contents if isinstance(c, ParameterName)]
+    def first_name(self) -> Optional["ParameterName"]:
+        return self.first_child_of_type(ParameterName)
+
+    def names(self) -> Iterator["ParameterName"]:
+        return self.children_of_type(ParameterName)
 
     def description(self) -> Optional["ParameterDescription"]:
-        for child in self.contents:
-            if isinstance(child, ParameterDescription):
-                return child
-        return None
+        return self.first_child_of_type(ParameterDescription)
 
 
 class ParameterName(NestedDescriptionElement):

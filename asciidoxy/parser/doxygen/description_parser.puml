@@ -40,7 +40,7 @@ NamedSection <|-- Admonition
 NestedDescriptionElement <|-- Style
 ParaContainer <|-- ListContainer
 ParaContainer <|-- ListItem
-NestedDescriptionElement <|-- ProgramListing
+Para <|-- ProgramListing
 NestedDescriptionElement <|-- CodeLine
 Para <|-- Verbatim
 Para <|-- Diagram
@@ -67,6 +67,5 @@ Table *-- Row
 Row *-- Entry
 ListContainer *-- ListItem
 ProgramListing *-- CodeLine
-
 
 @enduml

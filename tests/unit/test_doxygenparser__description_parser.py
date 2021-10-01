@@ -383,10 +383,10 @@ def test_parse_function():
     assert templateparam_section is not None
     assert templateparam_section.name == "templateparam"
     assert len(templateparam_section.contents) == 1
-    names = templateparam_section.contents[0].names()
-    assert len(names) == 1
-    assert names[0].name == "Type"
-    assert not names[0].direction
+    assert len(list(templateparam_section.contents[0].names())) == 1
+    name = templateparam_section.contents[0].first_name()
+    assert name.name == "Type"
+    assert not name.direction
     description = templateparam_section.contents[0].description()
     assert description is not None
     assert description.to_asciidoc() == "The type to do something with."
@@ -395,10 +395,10 @@ def test_parse_function():
     assert exception_section is not None
     assert exception_section.name == "exception"
     assert len(exception_section.contents) == 1
-    names = exception_section.contents[0].names()
-    assert len(names) == 1
-    assert names[0].name == "std::logic_error"
-    assert not names[0].direction
+    assert len(list(exception_section.contents[0].names())) == 1
+    name = exception_section.contents[0].first_name()
+    assert name.name == "std::logic_error"
+    assert not name.direction
     description = exception_section.contents[0].description()
     assert description.to_asciidoc() == "Something is wrong with the logic."
 
@@ -406,17 +406,17 @@ def test_parse_function():
     assert retval_section is not None
     assert retval_section.name == "retval"
     assert len(retval_section.contents) == 2
-    names = retval_section.contents[0].names()
-    assert len(names) == 1
-    assert names[0].name == "0"
-    assert not names[0].direction
+    assert len(list(retval_section.contents[0].names())) == 1
+    name = retval_section.contents[0].first_name()
+    assert name.name == "0"
+    assert not name.direction
     description = retval_section.contents[0].description()
     assert description is not None
     assert description.to_asciidoc() == "All is ok."
-    names = retval_section.contents[1].names()
-    assert len(names) == 1
-    assert names[0].name == "1"
-    assert not names[0].direction
+    assert len(list(retval_section.contents[1].names())) == 1
+    name = retval_section.contents[1].first_name()
+    assert name.name == "1"
+    assert not name.direction
     description = retval_section.contents[1].description()
     assert description.to_asciidoc() == "Something went wrong."
 
@@ -430,24 +430,24 @@ def test_parse_function():
     assert param_section is not None
     assert param_section.name == "param"
     assert len(param_section.contents) == 3
-    names = param_section.contents[0].names()
-    assert len(names) == 1
-    assert names[0].name == "first"
-    assert names[0].direction == "in"
+    assert len(list(param_section.contents[0].names())) == 1
+    name = param_section.contents[0].first_name()
+    assert name.name == "first"
+    assert name.direction == "in"
     description = param_section.contents[0].description()
     assert description is not None
     assert description.to_asciidoc() == "The first parameter."
-    names = param_section.contents[1].names()
-    assert len(names) == 1
-    assert names[0].name == "second"
-    assert names[0].direction == "out"
+    assert len(list(param_section.contents[1].names())) == 1
+    name = param_section.contents[1].first_name()
+    assert name.name == "second"
+    assert name.direction == "out"
     description = param_section.contents[1].description()
     assert description is not None
     assert description.to_asciidoc() == "The second parameter."
-    names = param_section.contents[2].names()
-    assert len(names) == 1
-    assert names[0].name == "third"
-    assert names[0].direction == "inout"
+    assert len(list(param_section.contents[2].names())) == 1
+    name = param_section.contents[2].first_name()
+    assert name.name == "third"
+    assert name.direction == "inout"
     description = param_section.contents[2].description()
     assert description is not None
     assert description.to_asciidoc() == "The third parameter."
@@ -879,14 +879,14 @@ def test_parse_failure():
     exception_section = output.pop_section(ParameterList, "exception")
     assert exception_section is not None
     assert len(exception_section.contents) == 1
-    names = exception_section.contents[0].names()
-    assert len(names) == 1
-    assert not names[0].name
-    assert not names[0].direction
-    assert len(names[0].contents) == 1
-    assert isinstance(names[0].contents[0], Ref)
-    assert (names[0].contents[0].refid ==
-            "classasciidoxy_1_1packaging_1_1collect_1_1SpecificationError")
+    assert len(list(exception_section.contents[0].names())) == 1
+    name = exception_section.contents[0].first_name()
+    assert not name.name
+    assert not name.direction
+    assert len(name.contents) == 1
+    assert isinstance(name.contents[0], Ref)
+    assert (
+        name.contents[0].refid == "classasciidoxy_1_1packaging_1_1collect_1_1SpecificationError")
 
     assert not output.to_asciidoc()
 
