@@ -852,7 +852,7 @@ class ListItem(ParaContainer):
 ###################################################################################################
 
 
-class ProgramListing(NestedDescriptionElement):
+class ProgramListing(Para):
     """A block of code."""
     EXTENSION_MAPPING = {
         "py": "python",
@@ -880,6 +880,12 @@ class ProgramListing(NestedDescriptionElement):
     @classmethod
     def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ProgramListing":
         return cls(language_tag, xml_element.get("filename", ""))
+
+    def clone_without_contents(self):
+        return self.__class__(self.language_tag, self.filename)
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
 
 
 class CodeLine(NestedDescriptionElement):

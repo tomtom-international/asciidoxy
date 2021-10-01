@@ -84,6 +84,24 @@ class CodeBlock {
 };
 
 /**
+ * For Doxygen no new line is needed between a paragraph and a code block.
+ *
+ * Python example:
+ * \code{.py}
+ * class Python:
+ *     pass
+ * \endcode
+ *
+ * C++ example:
+ * \code{.cpp}
+ * class Cpp {};
+ * \endcode
+ * That's it!
+ */
+class CodeBlockNoNewLine {
+};
+
+/**
  * Description with several diagrams.
  *
  * Class relations expressed via an inline dot graph:

@@ -10,7 +10,7 @@
 <para>Our website is <ulink url="https://asciidoxy.org">https://asciidoxy.org</ulink>. You can use <ulink url="mailto:info@example.com">info@example.com</ulink> for fake e-mail address examples.</para>
 <para>Don&apos;t forget to read our <ulink url="https://asciidoxy.org">documentation</ulink>. </para>
     </detaileddescription>
-    <location file="descriptions.hpp" line="166" column="20" bodyfile="descriptions.hpp" bodystart="166" bodyend="167"/>
+    <location file="descriptions.hpp" line="184" column="20" bodyfile="descriptions.hpp" bodystart="184" bodyend="185"/>
     <listofallmembers>
     </listofallmembers>
   </compounddef>

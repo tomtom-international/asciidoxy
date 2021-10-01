@@ -2,6 +2,8 @@
 <doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.18">
   <compound refid="classasciidoxy_1_1descriptions_1_1_code_block" kind="class"><name>asciidoxy::descriptions::CodeBlock</name>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_code_block_no_new_line" kind="class"><name>asciidoxy::descriptions::CodeBlockNoNewLine</name>
+  </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" kind="class"><name>asciidoxy::descriptions::ComplexHtmlTable</name>
   </compound>
   <compound refid="class_const_int" kind="class"><name>ConstInt</name>

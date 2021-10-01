@@ -11,7 +11,7 @@
 <para><formula id="3">\[ |I_2|=\left| \int_{0}^T \psi(t) \left\{ u(a,t)- \int_{\gamma(t)}^a \frac{d\theta}{k(\theta,t)} \int_{a}^\theta c(\xi)u_t(\xi,t)\,d\xi \right\} dt \right| \]</formula></para>
 <para><formula id="4">\begin{eqnarray*} g &amp;=&amp; \frac{Gm_2}{r^2} \\ &amp;=&amp; \frac{(6.673 \times 10^{-11}\,\mbox{m}^3\,\mbox{kg}^{-1}\, \mbox{s}^{-2})(5.9736 \times 10^{24}\,\mbox{kg})}{(6371.01\,\mbox{km})^2} \\ &amp;=&amp; 9.82066032\,\mbox{m/s}^2 \end{eqnarray*}</formula> </para>
     </detaileddescription>
-    <location file="descriptions.hpp" line="219" column="15" bodyfile="descriptions.hpp" bodystart="219" bodyend="220"/>
+    <location file="descriptions.hpp" line="237" column="15" bodyfile="descriptions.hpp" bodystart="237" bodyend="238"/>
     <listofallmembers>
     </listofallmembers>
   </compounddef>

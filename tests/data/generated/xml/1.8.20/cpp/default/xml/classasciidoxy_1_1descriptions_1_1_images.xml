@@ -19,7 +19,7 @@
 <para><image type="html" name="User-Group-256.png" width="50" height="100">Image of a user group</image>
  </para>
     </detaileddescription>
-    <location file="descriptions.hpp" line="241" column="1" bodyfile="descriptions.hpp" bodystart="241" bodyend="242"/>
+    <location file="descriptions.hpp" line="259" column="1" bodyfile="descriptions.hpp" bodystart="259" bodyend="260"/>
     <listofallmembers>
     </listofallmembers>
   </compounddef>

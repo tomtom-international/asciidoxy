@@ -891,6 +891,39 @@ def test_parse_failure():
     assert not output.to_asciidoc()
 
 
+def test_parse_code_blocks_no_newlines():
+    input_xml = """\
+    <detaileddescription>
+<para>For Doxygen no new line is needed between a paragraph and a code block.</para>
+<para>Python example: <programlisting filename=".py"><codeline><highlight class="keyword">class<sp/></highlight><highlight class="normal">Python:</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">pass</highlight></codeline>
+</programlisting></para>
+<para>C++ example: <programlisting filename=".cpp"><codeline><highlight class="keyword">class<sp/></highlight><highlight class="normal">Cpp<sp/>{};</highlight></codeline>
+</programlisting> That&apos;s it! </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+For Doxygen no new line is needed between a paragraph and a code block.
+
+Python example:
+
+[source,python]
+----
+class Python:
+    pass
+----
+
+C++ example:
+
+[source,cpp]
+----
+class Cpp {};
+----
+
+That's it!"""
+
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>
