@@ -71,6 +71,11 @@ def select_descriptions(brief: "ParaContainer", detailed: "ParaContainer") -> Tu
     return brief.to_asciidoc(), detailed.to_asciidoc()
 
 
+###################################################################################################
+# Core elements and interfaces
+###################################################################################################
+
+
 class AsciiDocContext:
     """Context for generating AsciiDoc.
 
@@ -150,6 +155,165 @@ class NestedDescriptionElement(DescriptionElement):
         for child in self.contents:
             if isinstance(child, NestedDescriptionElement):
                 child.normalize()
+
+
+class NamedSection:
+    """Special paragraph indicating a section that can be retrieved by name.
+
+    Attributes:
+        name: Name of the section.
+    """
+    name: str
+
+    def __init__(self, name: str = ""):
+        self.name = name
+
+
+###################################################################################################
+# Simple elements without nested content
+###################################################################################################
+
+
+class PlainText(DescriptionElement):
+    """Plain text.
+
+    Formatting may be applied by parent elements.
+
+    Attributes:
+        text: The plain text.
+    """
+    text: str
+
+    def __init__(self, language_tag: str, text: str = ""):
+        super().__init__(language_tag)
+        self.text = text
+
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        return self.text.strip("\r\n")
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {repr(self.text)}"
+
+    def add_text(self, text: str) -> None:
+        self.text += text
+
+
+class Space(PlainText):
+    """Single space as XML element.
+
+    In some places <sp/> is used to indicate explicit spaces.
+    """
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        return f" {super().to_asciidoc()}"
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        self.text += text
+
+
+class Formula(DescriptionElement):
+    """Formula in LatexMath format.
+
+    Attributes:
+        text: Contents of the formula.
+    """
+    text: str
+
+    def __init__(self, language_tag: str, text: str = ""):
+        super().__init__(language_tag)
+        self.text = text
+
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        stripped_text = self.text.strip("\r\n")
+        if stripped_text.startswith(r"\[") and stripped_text.endswith(r"\]"):
+            stripped_text = stripped_text[3:-3].strip()
+        return f"latexmath:[{stripped_text}]"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {repr(self.text)}"
+
+    def add_text(self, text: str) -> None:
+        self.text += text
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        parent.append(PlainText(self.language_tag, text))
+
+
+class Image(DescriptionElement):
+    """Insert an image.
+
+    Attributes:
+        output_type: Output document type the image is meant for. For now we only support `html`.
+        file_name:   Name if the image file. Must be available in the images of the package.
+        alt_text:    Alternative text when the image cannot be loaded, or for accessibility.
+        width:       Optional width to show the image with.
+        height:      Optional height to show the image with.
+        inline:      Yes if the image needs to be inlined in the text.
+    """
+    output_type: str
+    file_name: str
+    alt_text: str
+    width: str
+    height: str
+    inline: str
+
+    def __init__(self, language_tag: str, output_type: str, file_name: str, width: str, height: str,
+                 inline: str):
+        super().__init__(language_tag)
+        self.output_type = output_type
+        self.file_name = file_name
+        self.alt_text = ""
+        self.width = width
+        self.height = height
+        self.inline = inline
+
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        if self.output_type != "html":
+            return ""
+
+        if self.width or self.height:
+            options = f'"{self.alt_text}",{self.width},{self.height}'
+        elif self.alt_text:
+            options = f'"{self.alt_text}"'
+        else:
+            options = ""
+
+        if self.inline == "yes":
+            separator = ":"
+        else:
+            separator = "::"
+
+        return f"image{separator}{self.file_name}[{options}]"
+
+    def __repr__(self) -> str:
+        return (f"{self.__class__.__name__}: {self.output_type}->{self.file_name}, "
+                f"{repr(self.alt_text)}, width={self.width}, height={self.height}, "
+                f"inline={self.inline}")
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Image":
+        return cls(language_tag, xml_element.get("type", ""), xml_element.get("name", ""),
+                   xml_element.get("width", ""), xml_element.get("height", ""),
+                   xml_element.get("inline", "no"))
+
+    def add_text(self, text: str) -> None:
+        self.alt_text += text
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        parent.append(PlainText(self.language_tag, text))
+
+
+class LineBreak(DescriptionElement):
+    """Line break.
+
+    This breaks the current line, but not the paragraph.
+    """
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        return " +\n"
+
+
+###################################################################################################
+# Paragraphs and collections of paragraphs
+###################################################################################################
 
 
 class ParaContainer(NestedDescriptionElement):
@@ -235,39 +399,6 @@ class Para(NestedDescriptionElement):
         self.append(PlainText(self.language_tag, text))
 
 
-class PlainText(DescriptionElement):
-    """Plain text.
-
-    Formatting may be applied by parent elements.
-
-    Attributes:
-        text: The plain text.
-    """
-    text: str
-
-    def __init__(self, language_tag: str, text: str):
-        super().__init__(language_tag)
-        self.text = text
-
-    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        return self.text.strip("\r\n")
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}: {repr(self.text)}"
-
-    def add_text(self, text: str) -> None:
-        self.text += text
-
-
-class LineBreak(DescriptionElement):
-    """Line break.
-
-    This breaks the current line, but not the paragraph.
-    """
-    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        return " +\n"
-
-
 class Section(ParaContainer):
     """Collection of paragraphs with a title or header.
 
@@ -305,18 +436,6 @@ class Section(ParaContainer):
             self.title = xml_element.text.strip()
 
 
-class NamedSection:
-    """Special paragraph indicating a section that can be retrieved by name.
-
-    Attributes:
-        name: Name of the section.
-    """
-    name: str
-
-    def __init__(self, name: str = ""):
-        self.name = name
-
-
 class Admonition(ParaContainer, NamedSection):
     """Special paragraph indicating a text section that is either an admonition or sidebar."""
     ADMONITION_MAP = {
@@ -351,138 +470,6 @@ class Admonition(ParaContainer, NamedSection):
 
     def add_tail(self, parent: NestedDescriptionElement, text: str):
         parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
-
-
-class Style(NestedDescriptionElement):
-    """Apply a text style to contained elements.
-
-    Attributes:
-        kind: The kind of style to apply.
-    """
-    STYLE_MAP = {
-        "emphasis": ("__", "__"),
-        "bold": ("**", "**"),
-        "computeroutput": ("``", "``"),
-        "strike": ("+++<del>+++", "+++</del>+++"),
-    }
-
-    kind: str
-
-    def __init__(self, language_tag: str, kind: str, *contents: DescriptionElement):
-        super().__init__(language_tag, *contents)
-        self.kind = kind
-
-    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        style_start, style_end = self.STYLE_MAP.get(self.kind, ("", ""))
-        return f"{style_start}{super().to_asciidoc(context)}{style_end}"
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}: {self.kind}"
-
-    @classmethod
-    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Style":
-        return cls(language_tag=language_tag, kind=xml_element.tag)
-
-    def add_text(self, text: str) -> None:
-        self.append(PlainText(self.language_tag, text))
-
-    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
-        parent.append(PlainText(self.language_tag, text))
-
-
-class ListContainer(ParaContainer):
-    """Paragraph that contains a list (bullet or ordered).
-
-    Attributes:
-        marker: Marker used for each list item.
-    """
-
-    marker: str
-
-    def __init__(self, language_tag: str, marker: str, *contents: DescriptionElement):
-        super().__init__(language_tag, *contents)
-        self.marker = marker
-
-    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        context = context or AsciiDocContext()
-
-        if context.list_markers:
-            if context.list_markers[-1].startswith(self.marker):
-                marker = f"{context.list_markers[-1]}{self.marker}"
-            else:
-                marker = self.marker
-        else:
-            marker = self.marker
-
-        context.list_markers.append(marker)
-        ret = super().to_asciidoc(context)
-        context.list_markers.pop(-1)
-
-        return ret
-
-    @classmethod
-    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ListContainer":
-        if xml_element.tag == "orderedlist":
-            marker = "."
-        else:
-            marker = "*"
-
-        return cls(language_tag=language_tag, marker=marker)
-
-    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
-        parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
-
-
-class ListItem(ParaContainer):
-    """A single item in a bullet list.
-
-    The item itself can contain multiple paragraphs.
-    """
-    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        assert context is not None
-        assert context.list_markers
-        marker = context.list_markers[-1]
-        return f"{marker} {super().to_asciidoc(context)}"
-
-    def add_text(self, text: str) -> None:
-        """Ignore text outside paras."""
-
-    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
-        """Ignore text outside paras."""
-
-
-class ProgramListing(NestedDescriptionElement):
-    """A block of code."""
-    EXTENSION_MAPPING = {
-        "py": "python",
-        "kt": "kotlin",
-        "mm": "objc",
-        "unparsed": "",
-    }
-
-    filename: str
-
-    def __init__(self, language_tag: str, filename: str, *contents: DescriptionElement):
-        super().__init__(language_tag, *contents)
-        self.filename = filename
-
-    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        code = "\n".join(element.to_asciidoc(context) for element in self.contents)
-
-        if self.filename:
-            _, _, extension = self.filename.partition(".")
-            language = self.EXTENSION_MAPPING.get(extension, extension)
-        else:
-            language = self.language_tag
-        return f"[source,{language}]\n----\n{code}\n----"
-
-    @classmethod
-    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ProgramListing":
-        return cls(language_tag, xml_element.get("filename", ""))
-
-
-class CodeLine(NestedDescriptionElement):
-    """A single line in a block of code."""
 
 
 class Verbatim(Para):
@@ -545,65 +532,58 @@ class Diagram(Para):
         parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
 
 
-class ParameterList(NestedDescriptionElement, NamedSection):
-    """Special section containing a list of parameter descriptions."""
-    def __init__(self, language_tag: str, name: str, *contents: NestedDescriptionElement):
-        NestedDescriptionElement.__init__(self, language_tag, *contents)
-        NamedSection.__init__(self, name)
-
+class BlockQuote(ParaContainer):
+    """One or more paragraphs forming a quote."""
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        return ""
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}: {self.name}"
-
-    @classmethod
-    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ParameterList":
-        return cls(language_tag, xml_element.get("kind", ""))
+        return f"[quote]\n____\n{super().to_asciidoc(context)}\n____"
 
 
-class ParameterItem(NestedDescriptionElement):
-    """Combination of name, type and description of a parameter."""
-    def names(self) -> List["ParameterName"]:
-        return [c for c in self.contents if isinstance(c, ParameterName)]
-
-    def description(self) -> Optional["ParameterDescription"]:
-        for child in self.contents:
-            if isinstance(child, ParameterDescription):
-                return child
-        return None
+class HorizontalRuler(Para):
+    """Horizontal ruler."""
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        return "'''"
 
 
-class ParameterName(NestedDescriptionElement):
-    """Name or type of a single parameter.
+###################################################################################################
+# Formatting
+###################################################################################################
 
-    Some parameters only have a name, while others can contain references to types.
+
+class Style(NestedDescriptionElement):
+    """Apply a text style to contained elements.
 
     Attributes:
-        name: Name of the parameter.
-        direction: If supported, whether this is an in-parameter, out-parameter, or both.
+        kind: The kind of style to apply.
     """
-    name: Optional[str]
-    direction: Optional[str]
+    STYLE_MAP = {
+        "emphasis": ("__", "__"),
+        "bold": ("**", "**"),
+        "computeroutput": ("``", "``"),
+        "strike": ("+++<del>+++", "+++</del>+++"),
+    }
 
-    def __init__(self, language_tag: str, name=None, direction=None, *contents: DescriptionElement):
+    kind: str
+
+    def __init__(self, language_tag: str, kind: str, *contents: DescriptionElement):
         super().__init__(language_tag, *contents)
-        self.name = name
-        self.direction = direction
+        self.kind = kind
+
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        style_start, style_end = self.STYLE_MAP.get(self.kind, ("", ""))
+        return f"{style_start}{super().to_asciidoc(context)}{style_end}"
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}: {self.name or ''} [{self.direction or ''}]"
+        return f"{self.__class__.__name__}: {self.kind}"
 
     @classmethod
-    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ParameterName":
-        return cls(language_tag, direction=xml_element.get("direction", None))
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Style":
+        return cls(language_tag=language_tag, kind=xml_element.tag)
 
     def add_text(self, text: str) -> None:
-        self.name = text
+        self.append(PlainText(self.language_tag, text))
 
-
-class ParameterDescription(ParaContainer):
-    """Description of a single parameter."""
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        parent.append(PlainText(self.language_tag, text))
 
 
 class Ref(NestedDescriptionElement):
@@ -668,6 +648,11 @@ class Ulink(NestedDescriptionElement):
 
     def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
         parent.append(PlainText(self.language_tag, text))
+
+
+###################################################################################################
+# Tables
+###################################################################################################
 
 
 class Table(NestedDescriptionElement):
@@ -796,108 +781,175 @@ class Entry(ParaContainer):
                    xml_element.get("colspan", None), xml_element.get("align", None))
 
 
-class Formula(DescriptionElement):
-    """Formula in LatexMath format.
+###################################################################################################
+# Lists
+###################################################################################################
+
+
+class ListContainer(ParaContainer):
+    """Paragraph that contains a list (bullet or ordered).
 
     Attributes:
-        text: Contents of the formula.
+        marker: Marker used for each list item.
     """
-    text: str
 
-    def __init__(self, language_tag: str, text: str = ""):
-        super().__init__(language_tag)
-        self.text = text
+    marker: str
+
+    def __init__(self, language_tag: str, marker: str, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.marker = marker
 
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        stripped_text = self.text.strip("\r\n")
-        if stripped_text.startswith(r"\[") and stripped_text.endswith(r"\]"):
-            stripped_text = stripped_text[3:-3].strip()
-        return f"latexmath:[{stripped_text}]"
+        context = context or AsciiDocContext()
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}: {repr(self.text)}"
-
-    def add_text(self, text: str) -> None:
-        self.text += text
-
-    def add_tail(self, parent: NestedDescriptionElement, text: str):
-        parent.append(PlainText(self.language_tag, text))
-
-
-class Image(DescriptionElement):
-    """Insert an image.
-
-    Attributes:
-        output_type: Output document type the image is meant for. For now we only support `html`.
-        file_name:   Name if the image file. Must be available in the images of the package.
-        alt_text:    Alternative text when the image cannot be loaded, or for accessibility.
-        width:       Optional width to show the image with.
-        height:      Optional height to show the image with.
-        inline:      Yes if the image needs to be inlined in the text.
-    """
-    output_type: str
-    file_name: str
-    alt_text: str
-    width: str
-    height: str
-    inline: str
-
-    def __init__(self, language_tag: str, output_type: str, file_name: str, width: str, height: str,
-                 inline: str):
-        super().__init__(language_tag)
-        self.output_type = output_type
-        self.file_name = file_name
-        self.alt_text = ""
-        self.width = width
-        self.height = height
-        self.inline = inline
-
-    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        if self.output_type != "html":
-            return ""
-
-        if self.width or self.height:
-            options = f'"{self.alt_text}",{self.width},{self.height}'
-        elif self.alt_text:
-            options = f'"{self.alt_text}"'
+        if context.list_markers:
+            if context.list_markers[-1].startswith(self.marker):
+                marker = f"{context.list_markers[-1]}{self.marker}"
+            else:
+                marker = self.marker
         else:
-            options = ""
+            marker = self.marker
 
-        if self.inline == "yes":
-            separator = ":"
-        else:
-            separator = "::"
+        context.list_markers.append(marker)
+        ret = super().to_asciidoc(context)
+        context.list_markers.pop(-1)
 
-        return f"image{separator}{self.file_name}[{options}]"
-
-    def __repr__(self) -> str:
-        return (f"{self.__class__.__name__}: {self.output_type}->{self.file_name}, "
-                f"{repr(self.alt_text)}, width={self.width}, height={self.height}, "
-                f"inline={self.inline}")
+        return ret
 
     @classmethod
-    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Image":
-        return cls(language_tag, xml_element.get("type", ""), xml_element.get("name", ""),
-                   xml_element.get("width", ""), xml_element.get("height", ""),
-                   xml_element.get("inline", "no"))
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ListContainer":
+        if xml_element.tag == "orderedlist":
+            marker = "."
+        else:
+            marker = "*"
+
+        return cls(language_tag=language_tag, marker=marker)
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        parent.append(Para(self.language_tag, PlainText(self.language_tag, text.lstrip())))
+
+
+class ListItem(ParaContainer):
+    """A single item in a bullet list.
+
+    The item itself can contain multiple paragraphs.
+    """
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        assert context is not None
+        assert context.list_markers
+        marker = context.list_markers[-1]
+        return f"{marker} {super().to_asciidoc(context)}"
 
     def add_text(self, text: str) -> None:
-        self.alt_text += text
+        """Ignore text outside paras."""
 
-    def add_tail(self, parent: NestedDescriptionElement, text: str):
-        parent.append(PlainText(self.language_tag, text))
+    def add_tail(self, parent: NestedDescriptionElement, text: str) -> None:
+        """Ignore text outside paras."""
 
 
-class BlockQuote(ParaContainer):
-    """One or more paragraphs forming a quote."""
+###################################################################################################
+# Code blocks
+###################################################################################################
+
+
+class ProgramListing(NestedDescriptionElement):
+    """A block of code."""
+    EXTENSION_MAPPING = {
+        "py": "python",
+        "kt": "kotlin",
+        "mm": "objc",
+        "unparsed": "",
+    }
+
+    filename: str
+
+    def __init__(self, language_tag: str, filename: str, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.filename = filename
+
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        return f"[quote]\n____\n{super().to_asciidoc(context)}\n____"
+        code = "\n".join(element.to_asciidoc(context) for element in self.contents)
+
+        if self.filename:
+            _, _, extension = self.filename.partition(".")
+            language = self.EXTENSION_MAPPING.get(extension, extension)
+        else:
+            language = self.language_tag
+        return f"[source,{language}]\n----\n{code}\n----"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ProgramListing":
+        return cls(language_tag, xml_element.get("filename", ""))
 
 
-class HorizontalRuler(Para):
-    """Horizontal ruler."""
+class CodeLine(NestedDescriptionElement):
+    """A single line in a block of code."""
+
+
+###################################################################################################
+# Parameter description lists
+###################################################################################################
+
+
+class ParameterList(NestedDescriptionElement, NamedSection):
+    """Special section containing a list of parameter descriptions."""
+    def __init__(self, language_tag: str, name: str, *contents: NestedDescriptionElement):
+        NestedDescriptionElement.__init__(self, language_tag, *contents)
+        NamedSection.__init__(self, name)
+
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        return "'''"
+        return ""
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.name}"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ParameterList":
+        return cls(language_tag, xml_element.get("kind", ""))
+
+
+class ParameterItem(NestedDescriptionElement):
+    """Combination of name, type and description of a parameter."""
+    def names(self) -> List["ParameterName"]:
+        return [c for c in self.contents if isinstance(c, ParameterName)]
+
+    def description(self) -> Optional["ParameterDescription"]:
+        for child in self.contents:
+            if isinstance(child, ParameterDescription):
+                return child
+        return None
+
+
+class ParameterName(NestedDescriptionElement):
+    """Name or type of a single parameter.
+
+    Some parameters only have a name, while others can contain references to types.
+
+    Attributes:
+        name: Name of the parameter.
+        direction: If supported, whether this is an in-parameter, out-parameter, or both.
+    """
+    name: Optional[str]
+    direction: Optional[str]
+
+    def __init__(self, language_tag: str, name=None, direction=None, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.name = name
+        self.direction = direction
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.name or ''} [{self.direction or ''}]"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "ParameterName":
+        return cls(language_tag, direction=xml_element.get("direction", None))
+
+    def add_text(self, text: str) -> None:
+        self.name = text
+
+
+class ParameterDescription(ParaContainer):
+    """Description of a single parameter."""
 
 
 def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement,
@@ -922,6 +974,10 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "listitem": ListItem,
         "orderedlist": ListContainer,
         "para": Para,
+        "parameterdescription": ParameterDescription,
+        "parameteritem": ParameterItem,
+        "parameterlist": ParameterList,
+        "parametername": ParameterName,
         "plantuml": Diagram,
         "programlisting": ProgramListing,
         "ref": Ref,
@@ -936,15 +992,12 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "sect8": Section,
         "sect9": Section,
         "simplesect": Admonition,
+        "sp": Space,
         "strike": Style,
         "table": Table,
         "ulink": Ulink,
         "verbatim": Verbatim,
         "xrefsect": Admonition,
-        "parameterlist": ParameterList,
-        "parameteritem": ParameterItem,
-        "parametername": ParameterName,
-        "parameterdescription": ParameterDescription,
     }
 
     # Map of element tags that update the parent element.
@@ -971,9 +1024,6 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
     elif xml_element.tag in USE_PARENT:
         assert isinstance(parent, USE_PARENT[xml_element.tag])
         element = parent
-
-    elif xml_element.tag == "sp":
-        element = PlainText(language_tag, f" {xml_element.tail or ''}")
 
     else:
         logger.warning(f"Unsupported XML tag <{xml_element.tag}>. Please report an issue on GitHub"
