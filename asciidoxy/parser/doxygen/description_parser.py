@@ -18,7 +18,7 @@ import logging
 import xml.etree.ElementTree as ET
 
 from abc import ABC, abstractmethod
-from typing import List, Mapping, Optional, Tuple, Type, TypeVar
+from typing import List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 logger = logging.getLogger(__name__)
 
@@ -35,12 +35,17 @@ def parse_description(xml_root: Optional[ET.Element], language_tag: str) -> "Par
     Returns:
         A container with description paragraphs and sections.
     """
-    contents = ParaContainer(language_tag)
-    if xml_root is not None:
-        for xml_element in xml_root:
-            _parse_description(xml_element, contents, language_tag)
-        contents.normalize()
-    return contents
+    try:
+        contents = ParaContainer(language_tag)
+        if xml_root is not None:
+            for xml_element in xml_root:
+                _parse_description(xml_element, contents, language_tag)
+            contents.normalize()
+        return contents
+    except AssertionError:
+        if xml_root is not None:
+            ET.dump(xml_root)
+        raise
 
 
 def select_descriptions(brief: "ParaContainer", detailed: "ParaContainer") -> Tuple[str, str]:
@@ -340,7 +345,7 @@ class Admonition(ParaContainer, NamedSection):
         return cls(language_tag=language_tag, name=xml_element.get("kind", "").lower())
 
     def update_from_xml(self, xml_element: ET.Element):
-        if xml_element.tag == "xreftitle":
+        if xml_element.tag in ("xreftitle", "title"):
             assert xml_element.text
             self.name = xml_element.text.lower()
 
@@ -943,9 +948,9 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
     }
 
     # Map of element tags that update the parent element.
-    UPDATE_PARENT = {
+    UPDATE_PARENT: Mapping[str, Union[Type, Tuple[Type, ...]]] = {
         "caption": Table,
-        "title": Section,
+        "title": (Admonition, Section),
         "xreftitle": Admonition,
     }
 
