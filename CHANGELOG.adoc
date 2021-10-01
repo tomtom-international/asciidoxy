@@ -57,6 +57,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Fixed
 
   - Spaces in code blocks, present as `<sp />`, are no longer ignored.
+  - Actually create links to known exceptions from method/function documentation.
 
 
 == 0.7.5 (20 Aug 2021)

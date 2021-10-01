@@ -268,7 +268,7 @@ Update from another coordinate.
 
 | Throws
 |
-`InvalidCoordinate`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate[++InvalidCoordinate++]`::
 The input coordinate is invalid.
 
 |===
@@ -395,6 +395,67 @@ Update from separate values.
 
 
 `double altitude`::
+
+
+|===
+
+
+'''
+
+
+
+
+
+
+
+== [[cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate,asciidoxy::geometry::InvalidCoordinate]]InvalidCoordinate
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;coordinate.hpp&gt;
+
+class asciidoxy::geometry::InvalidCoordinate
+----
+
+
+
+
+
+[cols='h,5a']
+|===
+|*Public Methods*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate_1a3b0057e2237f2ecfe3ebc94ca2ba6a12,++const char * what() const++>>`::
+
+
+|===
+
+
+
+=== Members
+
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate_1a3b0057e2237f2ecfe3ebc94ca2ba6a12,asciidoxy::geometry::InvalidCoordinate::what]]what
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+const char * what() const
+----
+
+
+
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`const char *`::
 
 
 |===

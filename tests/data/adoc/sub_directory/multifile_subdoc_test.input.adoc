@@ -6,6 +6,8 @@ Sub-document document text.
 
 ${insert("asciidoxy::geometry::Coordinate")}
 
+${insert("asciidoxy::geometry::InvalidCoordinate")}
+
 Reference to main-document:
 ${cross_document_ref("../multifile_test.input.adoc", anchor="main-document-chapter",
                      link_text="Reference to main-document")}

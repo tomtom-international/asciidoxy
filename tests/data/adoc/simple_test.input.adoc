@@ -7,3 +7,5 @@ A link: ${link("asciidoxy::geometry::Coordinate")}
 The class reference:
 
 ${insert("asciidoxy::geometry::Coordinate")}
+
+${insert("asciidoxy::geometry::InvalidCoordinate")}

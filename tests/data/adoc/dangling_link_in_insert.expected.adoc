@@ -124,7 +124,7 @@ Coordinate to use for the current position.
 
 | Throws
 |
-`asciidoxy::geometry::InvalidCoordinate`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate[++asciidoxy::geometry::InvalidCoordinate++]`::
 Thrown if the given coordinates are not valid.
 
 |===
@@ -156,7 +156,7 @@ Get nearby traffic.
 
 | Throws
 |
-`geometry::InvalidCoordinate`::
+`xref:cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate[++geometry::InvalidCoordinate++]`::
 Thrown if the current position is not valid.
 
 |===

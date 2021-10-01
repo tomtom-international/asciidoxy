@@ -63,7 +63,7 @@ ${element.returns.description}
 | Throws
 |
 % for exception in insert_filter.exceptions(element):
-`${exception.type.name}`::
+`${helper.print_ref(exception.type)}`::
 ${exception.description}
 
 % endfor

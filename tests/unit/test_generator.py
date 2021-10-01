@@ -314,9 +314,10 @@ def test_insert_error_when_ambiguous(generating_api):
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 def test_insert_tracks_all_references(preprocessing_api, context):
     preprocessing_api.insert("asciidoxy::positioning::Positioning")
-    assert len(context.linked) == 2
+    assert len(context.linked) == 3
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
     assert "cpp-classasciidoxy_1_1traffic_1_1_traffic_event" in context.linked
+    assert "cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate" in context.linked
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
