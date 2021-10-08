@@ -319,5 +319,78 @@ class MarkDown {
 class HybridList {
 };
 
+/**
+ * Dashes are sometimes handled specially.
+ *
+ * This is a long dash: ---
+ *
+ * Some shorter dashes: ...--road1--road2--...
+ */
+class Dashes {
+};
+
+/**
+ * Developers can get creative with Ascii art in comments.
+ *
+ * <pre>
+ * Arcs:    O---------------->O--------->O----------------------->O
+ * Stretch: |            ^======================^
+ * Route:   |       ^-------------------------------------^
+ *          |     Origin                             Destination
+ *          |<---------->|               |<---->|
+ * Offsets:  front_offset               back_offset
+ * </pre>
+ */
+class AsciiArt {
+};
+
+
+/**
+ * Some special characters have specific XML representations.
+ *
+ * An angle between -90&deg; and +90&deg;.
+ *
+ * This is&nbsp;a non breaking&nbsp;space.
+ */
+class SpecialCharacters {
+};
+
+/**
+ * HTML headings are supported as well.
+ *
+ * <h1>The top level heading.</h1>
+ * An introduction to the topic.
+ *
+ * <h2>First subheading.</h2>
+ * More text.
+ *
+ * <h2>Another subheading.</h2>
+ * Even more text.
+ */
+class HtmlHeadings {
+};
+
+/**
+ * Manual anchors can be inserted in the code.
+ *
+ * @anchor MANUAL_ANCHOR
+ *
+ * You can refer back to the \ref MANUAL_ANCHOR "anchor".
+ */
+class Anchor {
+};
+
+/**
+ * Parblocks are used to add multiple paragraphs to commands that only accept a single parameter.
+ *
+ * @param parameter
+ * @parblock
+ * First paragraph about the parameter.
+ *
+ * Second paragraph about the parameter.
+ * @endparblock
+ */
+void ParBlock(int parameter);
+
 }  // namespace descriptions
 }  // namespace asciidoxy
