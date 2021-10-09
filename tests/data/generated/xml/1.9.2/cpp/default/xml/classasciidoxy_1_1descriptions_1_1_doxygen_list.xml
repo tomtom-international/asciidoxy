@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_doxygen_list" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::DoxygenList</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Description with some Doxygen lists.</para>
+<para><itemizedlist>
+<listitem><para><computeroutput>AlignLeft</computeroutput> left alignment. </para>
+</listitem>
+<listitem><para><computeroutput>AlignCenter</computeroutput> center alignment. </para>
+</listitem>
+<listitem><para><computeroutput>AlignRight</computeroutput> right alignment</para>
+</listitem>
+</itemizedlist>
+Another list:</para>
+<para><itemizedlist>
+<listitem><para><bold>Bold</bold>. </para>
+</listitem>
+<listitem><para><emphasis>Italic</emphasis>. </para>
+</listitem>
+<listitem><para><computeroutput>Monotype</computeroutput>. </para>
+</listitem>
+</itemizedlist>
+</para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="50" column="1" bodyfile="descriptions.hpp" bodystart="50" bodyend="51"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

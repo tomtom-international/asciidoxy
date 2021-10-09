@@ -2,6 +2,7 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
   <compounddef id="default__values_8py" kind="file" language="Python">
     <compoundname>default_values.py</compoundname>
+    <innerclass refid="classasciidoxy_1_1default__values_1_1_point" prot="public">asciidoxy::default_values::Point</innerclass>
     <innernamespace refid="namespaceasciidoxy_1_1default__values">asciidoxy::default_values</innernamespace>
     <briefdescription>
     </briefdescription>
@@ -24,8 +25,8 @@
 <codeline lineno="14"><highlight class="normal"></highlight></codeline>
 <codeline lineno="15"><highlight class="normal"></highlight></codeline>
 <codeline lineno="16"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Point:</highlight></codeline>
-<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Class<sp/>representing<sp/>a<sp/>simple<sp/>point.&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal">__init__(self,<sp/>x:<sp/>int<sp/>=<sp/>0,<sp/>y:<sp/>int<sp/>=<sp/>1):</highlight></codeline>
+<codeline lineno="17" refid="classasciidoxy_1_1default__values_1_1_point" refkind="compound"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Class<sp/>representing<sp/>a<sp/>simple<sp/>point.&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1default__values_1_1_point_1ae2454dfa3e6bcf10d9c36975f310b781" kindref="member">__init__</ref>(self,<sp/>x:<sp/>int<sp/>=<sp/>0,<sp/>y:<sp/>int<sp/>=<sp/>1):</highlight></codeline>
 <codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Construct<sp/>a<sp/>point.</highlight></codeline>
 <codeline lineno="20"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="21"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Args:</highlight></codeline>
@@ -34,7 +35,7 @@
 <codeline lineno="24"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>&quot;&quot;&quot;</highlight><highlight class="normal"></highlight></codeline>
 <codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>...</highlight></codeline>
 <codeline lineno="26"><highlight class="normal"></highlight></codeline>
-<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal">increment(self,<sp/>x:<sp/>int<sp/>=<sp/>2,<sp/>y:<sp/>int<sp/>=<sp/>3)<sp/>-&gt;<sp/></highlight><highlight class="stringliteral">&quot;Point&quot;</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">def<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1default__values_1_1_point_1a7afa9cd9fcbec61efa64cb0f3108c17b" kindref="member">increment</ref>(self,<sp/>x:<sp/>int<sp/>=<sp/>2,<sp/>y:<sp/>int<sp/>=<sp/>3)<sp/>-&gt;<sp/></highlight><highlight class="stringliteral">&quot;Point&quot;</highlight><highlight class="normal">:</highlight></codeline>
 <codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;&quot;&quot;Create<sp/>a<sp/>new<sp/>incremented<sp/>point.</highlight></codeline>
 <codeline lineno="29"><highlight class="stringliteral"></highlight></codeline>
 <codeline lineno="30"><highlight class="stringliteral"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Args:</highlight></codeline>

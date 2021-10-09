@@ -27,4 +27,4 @@ AsciiDoxy has been tested with:
 
 - python: 3.6, 3.7, 3.8, 3.9
 - AsciiDoctor: 2.0.10
-- Doxygen: 1.8.16, 1.8.18, 1.8.20
+- Doxygen: 1.8.16, 1.8.18, 1.8.20, 1.9.1, 1.9.2

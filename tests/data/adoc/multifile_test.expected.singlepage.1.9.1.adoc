@@ -1,0 +1,80 @@
+= Test document
+
+Main document text.
+
+== Main document chapter [[main-document-chapter]]
+
+
+
+
+== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,asciidoxy::traffic::TrafficEvent::Severity]]Severity
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;traffic_event.hpp&gt;
+
+enum asciidoxy::traffic::TrafficEvent::Severity
+----
+
+Severity scale for traffic events.
+
+The more severe the traffic event, the more likely it is to have a large delay.
+
+[cols='h,5a']
+|===
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a28d0edd045e05cf5af64e35ae0c4c6ef,Low]]Low = 1
+|
+Low severity.
+
+
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a87f8a6ab85c9ced3702b4ea641ad4bb5,Medium]]Medium = 2
+|
+Medium severity.
+
+
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a655d20c1ca69519ca647684edbb2db35,High]]High = 3
+|
+High severity.
+
+Better stay away here.
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a88183b946cc5f0e8c96b2e66e1c74a7e,Unknown]]Unknown = 4
+|
+Severity unknown.
+
+
+
+|===
+
+
+Reference to sub-document:
+<<sub_directory/.asciidoxy.multifile_subdoc_test.input.adoc#sub-document-chapter,Reference to sub-document>>
+
+Link to sub-document API:
+xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]
+
+Link to sub-document API member:
+xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[++IsValid++]
+
+[[top-sub_directory-multifile_subdoc_test.input-top]]
+include::SRC_DIR/sub_directory/.asciidoxy.multifile_subdoc_test.input.adoc[leveloffset=+1]
+
+Reference in a table to a sub-document:
+|---
+| Sub-document ID | Title
+| <<sub_directory/.asciidoxy.multifile_subdoc_in_table_test.input.adoc#sub-document-in-table,Sub-document in table>>
+| Sub document in a table
+|---
+
+Hidden link in multi-page, embedded in single-page:
+[[top-sub_directory-multifile_subdoc_in_table_test.input-top]]
+include::SRC_DIR/sub_directory/.asciidoxy.multifile_subdoc_in_table_test.input.adoc[leveloffset=+1]
+

@@ -1,0 +1,201 @@
+= Test document
+
+The class reference:
+
+
+
+
+== [[cpp-classasciidoxy_1_1positioning_1_1_positioning,asciidoxy::positioning::Positioning]]Positioning
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;positioning.hpp&gt;
+
+class asciidoxy::positioning::Positioning
+----
+<<cpp-classasciidoxy_1_1positioning_1_1_positioning,Positioning>> engine.
+
+
+
+
+[cols='h,5a']
+|===
+|*Public Methods*
+|
+`<<cpp-classasciidoxy_1_1positioning_1_1_positioning_1a247800ba0e71099b54c958f764f29917,++asciidoxy::geometry::Coordinate CurrentPosition() const++>>`::
+Retrieve the current position.
+`<<cpp-classasciidoxy_1_1positioning_1_1_positioning_1a8f374afbae18da9cbb1198f99d9f0cc8,++bool IsNearby(asciidoxy::geometry::Coordinate) const++>>`::
+Check if the given coordinates are nearby.
+`<<cpp-classasciidoxy_1_1positioning_1_1_positioning_1af0fb232aa368c066236edf2bab3fa323,++void Override(asciidoxy::geometry::Coordinate)++>>`::
+Override the current position.
+`<<cpp-classasciidoxy_1_1positioning_1_1_positioning_1aeb978fa087b26c153150d3e5a93c5121,++std::vector<traffic::TrafficEvent> TrafficNearby() const++>>`::
+Get nearby traffic.
+`<<cpp-classasciidoxy_1_1positioning_1_1_positioning_1af799f1baf9c2ea33f106a9484d2ce2ea,++bool InTraffic(const traffic::TrafficEvent &) const++>>`::
+Are we currently in the given traffic event?
+
+|===
+
+
+
+=== Members
+
+
+
+==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1a247800ba0e71099b54c958f764f29917,asciidoxy::positioning::Positioning::CurrentPosition]]CurrentPosition
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++asciidoxy::geometry::Coordinate++] CurrentPosition() const
+----
+
+
+Retrieve the current position.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++asciidoxy::geometry::Coordinate++]`::
+Coordinates of the current position.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1a8f374afbae18da9cbb1198f99d9f0cc8,asciidoxy::positioning::Positioning::IsNearby]]IsNearby
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+bool IsNearby(xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++asciidoxy::geometry::Coordinate++] coord) const
+----
+
+
+Check if the given coordinates are nearby.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++asciidoxy::geometry::Coordinate++] coord`::
+Coordinates to check.
+
+| Returns
+|
+`bool`::
+True if the coordinates are nearby.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1af0fb232aa368c066236edf2bab3fa323,asciidoxy::positioning::Positioning::Override]]Override
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Override(xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++asciidoxy::geometry::Coordinate++] coord)
+----
+
+
+Override the current position.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++asciidoxy::geometry::Coordinate++] coord`::
+Coordinate to use for the current position.
+
+| Throws
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate[++asciidoxy::geometry::InvalidCoordinate++]`::
+Thrown if the given coordinates are not valid.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1aeb978fa087b26c153150d3e5a93c5121,asciidoxy::positioning::Positioning::TrafficNearby]]TrafficNearby
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+std::vector&lt;xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event[++traffic::TrafficEvent++]&gt; TrafficNearby() const
+----
+
+
+Get nearby traffic.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`std::vector<xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event[++traffic::TrafficEvent++]>`::
+
+
+| Throws
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate[++geometry::InvalidCoordinate++]`::
+Thrown if the current position is not valid.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1af799f1baf9c2ea33f106a9484d2ce2ea,asciidoxy::positioning::Positioning::InTraffic]]InTraffic
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+bool InTraffic(const xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event[++traffic::TrafficEvent++] &amp; event) const
+----
+
+
+Are we currently in the given traffic event?
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`const xref:cpp-classasciidoxy_1_1traffic_1_1_traffic_event[++traffic::TrafficEvent++] & event`::
+The traffic event to check.
+
+| Returns
+|
+`bool`::
+True if we are in the traffic event.
+
+|===
+
+
+'''
+
+
+
+

@@ -1,0 +1,9 @@
+= Test sub-document in table
+
+Sub-document document text.
+
+== Sub-document in table [[sub-document-in-table]]
+
+Reference to main-document:
+<<.asciidoxy.multifile_test.input.adoc#main-document-chapter,Reference to main-document>>
+

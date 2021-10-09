@@ -41,13 +41,14 @@ import pytest
      "fragments/python/function_default_value.adoc"),
 ])
 def test_fragment(generating_api, adoc_data, element_name, language, expected_result,
-                  update_expected_results):
+                  update_expected_results, doxygen_version):
     content = generating_api.insert(element_name, lang=language)
 
+    expected_result_file = (adoc_data / expected_result).with_suffix(f".{doxygen_version}.adoc")
     if update_expected_results:
-        (adoc_data / expected_result).write_text(content, encoding="UTF-8")
+        expected_result_file.write_text(content, encoding="UTF-8")
 
-    assert content == (adoc_data / expected_result).read_text(encoding="UTF-8")
+    assert content == expected_result_file.read_text(encoding="UTF-8")
 
 
 filtered_testdata = [
@@ -111,25 +112,27 @@ filtered_testdata = [
 
 @pytest.mark.parametrize("element_name,language,filter_spec,expected_result", filtered_testdata)
 def test_global_filter(generating_api, adoc_data, element_name, language, filter_spec,
-                       expected_result, update_expected_results):
+                       expected_result, update_expected_results, doxygen_version):
     generating_api.filter(**filter_spec)
     content = generating_api.insert(element_name, lang=language)
 
+    expected_result_file = (adoc_data / expected_result).with_suffix(f".{doxygen_version}.adoc")
     if update_expected_results:
-        (adoc_data / expected_result).write_text(content, encoding="UTF-8")
+        expected_result_file.write_text(content, encoding="UTF-8")
 
-    assert content == (adoc_data / expected_result).read_text(encoding="UTF-8")
+    assert content == expected_result_file.read_text(encoding="UTF-8")
 
 
 @pytest.mark.parametrize("element_name,language,filter_spec,expected_result", filtered_testdata)
 def test_local_filter(generating_api, adoc_data, element_name, language, filter_spec,
-                      expected_result, update_expected_results):
+                      expected_result, update_expected_results, doxygen_version):
     content = generating_api.insert(element_name, lang=language, **filter_spec)
 
+    expected_result_file = (adoc_data / expected_result).with_suffix(f".{doxygen_version}.adoc")
     if update_expected_results:
-        (adoc_data / expected_result).write_text(content, encoding="UTF-8")
+        expected_result_file.write_text(content, encoding="UTF-8")
 
-    assert content == (adoc_data / expected_result).read_text(encoding="UTF-8")
+    assert content == expected_result_file.read_text(encoding="UTF-8")
 
 
 @pytest.mark.parametrize("element_name,source,target,expected_result", [
@@ -148,11 +151,12 @@ def test_local_filter(generating_api, adoc_data, element_name, language, filter_
      "fragments/kotlin/transcoded_nested.adoc"),
 ])
 def test_transcoded_fragment(generating_api, adoc_data, element_name, source, target,
-                             expected_result, update_expected_results):
+                             expected_result, update_expected_results, doxygen_version):
     generating_api.language(target, source=source)
     content = generating_api.insert(element_name)
 
+    expected_result_file = (adoc_data / expected_result).with_suffix(f".{doxygen_version}.adoc")
     if update_expected_results:
-        (adoc_data / expected_result).write_text(content, encoding="UTF-8")
+        expected_result_file.write_text(content, encoding="UTF-8")
 
-    assert content == (adoc_data / expected_result).read_text(encoding="UTF-8")
+    assert content == expected_result_file.read_text(encoding="UTF-8")

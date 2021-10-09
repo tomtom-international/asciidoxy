@@ -38,7 +38,7 @@ RECURSIVE              = YES
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-FILTER_PATTERNS        = *.py="python ../../../../documentation/doxypypy.py -a -c"
+FILTER_PATTERNS        = *.py="python ../../../../../documentation/doxypypy.py -a -c"
 
 # With the correct setting of option CASE_SENSE_NAMES doxygen will better be
 # able to match the capabilities of the underlying filesystem. In case the

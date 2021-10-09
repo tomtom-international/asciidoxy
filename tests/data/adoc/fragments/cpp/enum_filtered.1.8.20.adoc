@@ -1,0 +1,35 @@
+
+
+
+== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,asciidoxy::traffic::TrafficEvent::Severity]]Severity
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;traffic_event.hpp&gt;
+
+enum asciidoxy::traffic::TrafficEvent::Severity
+----
+
+Severity scale for traffic events.
+
+The more severe the traffic event, the more likely it is to have a large delay.
+
+[cols='h,5a']
+|===
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a87f8a6ab85c9ced3702b4ea641ad4bb5,Medium]]Medium = 2
+|
+Medium severity.
+
+
+
+
+| [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9a655d20c1ca69519ca647684edbb2db35,High]]High = 3
+|
+High severity.
+
+Better stay away here.
+
+|===

@@ -1,0 +1,805 @@
+= Test document
+
+
+
+
+== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy::geometry::Coordinate]]Coordinate
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;coordinate.hpp&gt;
+
+class asciidoxy::geometry::Coordinate
+----
+Class to hold information about a coordinate.
+
+A coordinate has a latitude, longitude, and an altitude.
+
+
+[cols='h,5a']
+|===
+|*Public Constructors*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,++Coordinate()++>>`::
+Default constructor.
+
+|*Public Destructors*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,++~Coordinate()++>>`::
+Destructor.
+
+|*Public Operators*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,++operator+(const Coordinate &)++>>`::
+Coordinates can be added.
+
+|*Public Methods*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,++double Latitude() const++>>`::
+Latitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,++double Longitude() const++>>`::
+Longitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483,++double Altitude() const++>>`::
+Altitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,++bool IsValid() const++>>`::
+Check if the coordinate is valid.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,++void Update(const Coordinate &)++>>`::
+Update from another coordinate.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,++void Update(std::tuple<double, double, double>)++>>`::
+Update from a tuple of latitude, longitude and altitue.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,++void Update(std::tuple<double, double>)++>>`::
+Update from a tuple of only latitude and longitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,++void Update(double, double)++>>`::
+Update latitude and longitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,++void Update(double, double, double)++>>`::
+Update from separate values.
+
+|===
+
+
+
+=== Members
+
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,asciidoxy::geometry::Coordinate::Coordinate]]Coordinate
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+Coordinate()
+----
+
+
+Default constructor.
+
+
+
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,asciidoxy::geometry::Coordinate::~Coordinate]]~Coordinate
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+~Coordinate()
+----
+
+
+Destructor.
+
+
+
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,asciidoxy::geometry::Coordinate::operator+]]operator+
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] operator+(const xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] &amp; other) const
+----
+
+
+Coordinates can be added.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`const xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] & other`::
+
+
+| Returns
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]`::
+
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,asciidoxy::geometry::Coordinate::Latitude]]Latitude
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+double Latitude() const
+----
+
+
+Latitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The latitude in degrees.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,asciidoxy::geometry::Coordinate::Longitude]]Longitude
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+double Longitude() const
+----
+
+
+Longitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The longitude in degrees.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483,asciidoxy::geometry::Coordinate::Altitude]]Altitude
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+double Altitude() const
+----
+
+
+Altitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The altitude in meters.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,asciidoxy::geometry::Coordinate::IsValid]]IsValid
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+bool IsValid() const
+----
+
+
+Check if the coordinate is valid.
+
+A coordinate is valid if its values are within WGS84 bounds.
+
+[cols='h,5a']
+|===
+| Returns
+|
+`bool`::
+True if valid, false if not.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(const xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] &amp; coordinate)
+----
+
+
+Update from another coordinate.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`const xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] & coordinate`::
+
+
+| Throws
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate[++InvalidCoordinate++]`::
+The input coordinate is invalid.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(std::tuple&lt;double, double, double&gt; coordinate)
+----
+
+
+Update from a tuple of latitude, longitude and altitue.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`std::tuple<double, double, double> coordinate`::
+
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(std::tuple&lt;double, double&gt; coordinate)
+----
+
+
+Update from a tuple of only latitude and longitude.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`std::tuple<double, double> coordinate`::
+
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(double latitude,
+            double longitude)
+----
+
+
+Update latitude and longitude.
+
+Altitude remains unchanged.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`double latitude`::
+
+
+`double longitude`::
+
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(double latitude,
+            double longitude,
+            double altitude)
+----
+
+
+Update from separate values.
+
+
+
+[cols='h,5a']
+|===
+| Precondition
+| The coordinate exists.
+
+| Postcondition
+| New values are used for the coordinate.
+
+| Parameters
+|
+`double latitude`::
+
+
+`double longitude`::
+
+
+`double altitude`::
+
+
+|===
+
+
+'''
+
+
+
+
+
+
+
+== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy::geometry::Coordinate]]Coordinate
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;coordinate.hpp&gt;
+
+class asciidoxy::geometry::Coordinate
+----
+Class to hold information about a coordinate.
+
+A coordinate has a latitude, longitude, and an altitude.
+
+
+[cols='h,5a']
+|===
+|*Public Constructors*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,++Coordinate()++>>`::
+Default constructor.
+
+|*Public Destructors*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,++~Coordinate()++>>`::
+Destructor.
+
+|*Public Operators*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,++operator+(const Coordinate &)++>>`::
+Coordinates can be added.
+
+|*Public Methods*
+|
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,++double Latitude() const++>>`::
+Latitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,++double Longitude() const++>>`::
+Longitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483,++double Altitude() const++>>`::
+Altitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,++bool IsValid() const++>>`::
+Check if the coordinate is valid.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,++void Update(const Coordinate &)++>>`::
+Update from another coordinate.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,++void Update(std::tuple<double, double, double>)++>>`::
+Update from a tuple of latitude, longitude and altitue.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,++void Update(std::tuple<double, double>)++>>`::
+Update from a tuple of only latitude and longitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,++void Update(double, double)++>>`::
+Update latitude and longitude.
+`<<cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,++void Update(double, double, double)++>>`::
+Update from separate values.
+
+|===
+
+
+
+=== Members
+
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,asciidoxy::geometry::Coordinate::Coordinate]]Coordinate
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+Coordinate()
+----
+
+
+Default constructor.
+
+
+
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,asciidoxy::geometry::Coordinate::~Coordinate]]~Coordinate
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+~Coordinate()
+----
+
+
+Destructor.
+
+
+
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,asciidoxy::geometry::Coordinate::operator+]]operator+
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] operator+(const xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] &amp; other) const
+----
+
+
+Coordinates can be added.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`const xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] & other`::
+
+
+| Returns
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]`::
+
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,asciidoxy::geometry::Coordinate::Latitude]]Latitude
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+double Latitude() const
+----
+
+
+Latitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The latitude in degrees.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,asciidoxy::geometry::Coordinate::Longitude]]Longitude
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+double Longitude() const
+----
+
+
+Longitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The longitude in degrees.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483,asciidoxy::geometry::Coordinate::Altitude]]Altitude
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+double Altitude() const
+----
+
+
+Altitude.
+
+
+
+[cols='h,5a']
+|===
+| Returns
+|
+`double`::
+The altitude in meters.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,asciidoxy::geometry::Coordinate::IsValid]]IsValid
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+bool IsValid() const
+----
+
+
+Check if the coordinate is valid.
+
+A coordinate is valid if its values are within WGS84 bounds.
+
+[cols='h,5a']
+|===
+| Returns
+|
+`bool`::
+True if valid, false if not.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(const xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] &amp; coordinate)
+----
+
+
+Update from another coordinate.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`const xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++] & coordinate`::
+
+
+| Throws
+|
+`xref:cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate[++InvalidCoordinate++]`::
+The input coordinate is invalid.
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(std::tuple&lt;double, double, double&gt; coordinate)
+----
+
+
+Update from a tuple of latitude, longitude and altitue.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`std::tuple<double, double, double> coordinate`::
+
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(std::tuple&lt;double, double&gt; coordinate)
+----
+
+
+Update from a tuple of only latitude and longitude.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`std::tuple<double, double> coordinate`::
+
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(double latitude,
+            double longitude)
+----
+
+
+Update latitude and longitude.
+
+Altitude remains unchanged.
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`double latitude`::
+
+
+`double longitude`::
+
+
+|===
+
+
+'''
+
+
+==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,asciidoxy::geometry::Coordinate::Update]]Update
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Update(double latitude,
+            double longitude,
+            double altitude)
+----
+
+
+Update from separate values.
+
+
+
+[cols='h,5a']
+|===
+| Precondition
+| The coordinate exists.
+
+| Postcondition
+| New values are used for the coordinate.
+
+| Parameters
+|
+`double latitude`::
+
+
+`double longitude`::
+
+
+`double altitude`::
+
+
+|===
+
+
+'''
+
+
+
+
+
