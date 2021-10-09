@@ -351,6 +351,8 @@ class AsciiArt {
  * An angle between -90&deg; and +90&deg;.
  *
  * This is&nbsp;a non breaking&nbsp;space.
+ *
+ * There are a lot of special characters, &plusmn;250: &alpha;&beta;&frac14;
  */
 class SpecialCharacters {
 };

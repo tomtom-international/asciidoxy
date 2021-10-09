@@ -2,19 +2,24 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
   <compounddef id="namespaceasciidoxy_1_1descriptions" kind="namespace" language="C++">
     <compoundname>asciidoxy::descriptions</compoundname>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_anchor" prot="public">asciidoxy::descriptions::Anchor</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_ascii_art" prot="public">asciidoxy::descriptions::AsciiArt</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_code_block" prot="public">asciidoxy::descriptions::CodeBlock</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_code_block_no_new_line" prot="public">asciidoxy::descriptions::CodeBlockNoNewLine</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" prot="public">asciidoxy::descriptions::ComplexHtmlTable</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_dashes" prot="public">asciidoxy::descriptions::Dashes</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_diagrams" prot="public">asciidoxy::descriptions::Diagrams</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" prot="public">asciidoxy::descriptions::DoxygenList</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" prot="public">asciidoxy::descriptions::DoxygenVisualStyle</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_external_links" prot="public">asciidoxy::descriptions::ExternalLinks</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_formulae" prot="public">asciidoxy::descriptions::Formulae</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_headings" prot="public">asciidoxy::descriptions::HtmlHeadings</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" prot="public">asciidoxy::descriptions::HybridList</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_images" prot="public">asciidoxy::descriptions::Images</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_links" prot="public">asciidoxy::descriptions::Links</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_mark_down" prot="public">asciidoxy::descriptions::MarkDown</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_sections" prot="public">asciidoxy::descriptions::Sections</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_special_characters" prot="public">asciidoxy::descriptions::SpecialCharacters</innerclass>
       <sectiondef kind="func">
       <memberdef kind="function" id="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <templateparamlist>
@@ -109,6 +114,36 @@
         <inbodydescription>
         </inbodydescription>
         <location file="descriptions.hpp" line="161" column="5" declfile="descriptions.hpp" declline="161" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::descriptions::ParBlock</definition>
+        <argsstring>(int parameter)</argsstring>
+        <name>ParBlock</name>
+        <param>
+          <type>int</type>
+          <declname>parameter</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Parblocks are used to add multiple paragraphs to commands that only accept a single parameter.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>parameter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><parblock><para>First paragraph about the parameter.</para>
+<para>Second paragraph about the parameter. </para>
+</parblock></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="descriptions.hpp" line="395" column="6" declfile="descriptions.hpp" declline="395" declcolumn="6"/>
       </memberdef>
       </sectiondef>
     <briefdescription>

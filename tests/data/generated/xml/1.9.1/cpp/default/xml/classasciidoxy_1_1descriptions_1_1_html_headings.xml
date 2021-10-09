@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_html_headings" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::HtmlHeadings</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>HTML headings are supported as well.</para>
+<para><heading level="1">The top level heading.</heading>
+</para>
+<para>An introduction to the topic.</para>
+<para><heading level="2">First subheading.</heading>
+</para>
+<para>More text.</para>
+<para><heading level="2">Another subheading.</heading>
+</para>
+<para>Even more text. </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="372" column="1" bodyfile="descriptions.hpp" bodystart="372" bodyend="373"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

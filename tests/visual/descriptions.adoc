@@ -42,3 +42,7 @@ ${insert("asciidoxy::descriptions::Images")}
 ${insert("asciidoxy::descriptions::MarkDown")}
 
 ${insert("asciidoxy::descriptions::HybridList")}
+
+${insert("asciidoxy::descriptions::Dashes")}
+
+${insert("asciidoxy::descriptions::SpecialCharacters")}

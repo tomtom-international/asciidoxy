@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_dashes" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::Dashes</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1descriptions_1_1_dashes" kindref="compound">Dashes</ref> are sometimes handled specially.</para>
+<para>This is a long dash: <mdash/></para>
+<para>Some shorter dashes: ...<ndash/>road1<ndash/>road2<ndash/>... </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="329" column="1" bodyfile="descriptions.hpp" bodystart="329" bodyend="330"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

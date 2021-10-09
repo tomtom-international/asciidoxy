@@ -33,7 +33,7 @@ DescriptionElement <|-- NestedDescriptionElement
 NestedDescriptionElement <|-- ParaContainer
 NestedDescriptionElement <|-- Para
 DescriptionElement <|-- PlainText
-DescriptionElement <|-- LineBreak
+PlainText <|-- SpecialCharacter
 ParaContainer <|-- Section
 ParaContainer <|-- Admonition
 NamedSection <|-- Admonition

@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 
 from asciidoxy.parser.doxygen.description_parser import (Admonition, DescriptionElement,
                                                          NestedDescriptionElement, ParameterList,
-                                                         Ref, parse_description,
+                                                         Ref, SpecialCharacter, parse_description,
                                                          select_descriptions)
 
 
@@ -539,7 +539,7 @@ def test_parse_complex_html_table():
 <row>
 <entry thead="no"><para>cell row=8,col=1 </para>
 </entry><entry thead="no"><para>cell row=8,col=2<linebreak/>
- <table rows="2" cols="2"><row>
+<table rows="2" cols="2"><row>
 <entry thead="no"><para>Inner cell row=1,col=1</para>
 </entry><entry thead="no"><para>Inner cell row=1,col=2 </para>
 </entry></row>
@@ -922,6 +922,59 @@ class Cpp {};
 ----
 
 That's it!"""
+
+
+def test_parse_dashes():
+    input_xml = """\
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1descriptions_1_1_dashes" kindref="compound">Dashes</ref> are sometimes handled specially.</para>
+<para>This is a long dash: <mdash/></para>
+<para>Some shorter dashes: ...<ndash/>road1<ndash/>road2<ndash/>... </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+<<lang-classasciidoxy_1_1descriptions_1_1_dashes,Dashes>> are sometimes handled specially.
+
+This is a long dash: &mdash;
+
+Some shorter dashes: ...&ndash;road1&ndash;road2&ndash;..."""
+
+
+def test_parse_special_characters():
+    input_xml = """\
+    <detaileddescription>
+<para>Some special characters have specific XML representations.</para>
+<para>An angle between -90<deg/> and +90<deg/>.</para>
+<para>This is<nonbreakablespace/>a non breaking<nonbreakablespace/>space.</para>
+<para>There are a lot of special characters, <plusmn/>250: <alpha/><beta/><frac14/> </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Some special characters have specific XML representations.
+
+An angle between -90&deg; and +90&deg;.
+
+This is&nbsp;a non breaking&nbsp;space.
+
+There are a lot of special characters, &plusmn;250: &alpha;&beta;&frac14;"""
+
+
+def test_parse_special_characters__all_named():
+    input_characters = "".join(f"<{name}/>"
+                               for name, adoc_repr in SpecialCharacter.SPECIAL_CHARACTERS.items()
+                               if not adoc_repr)
+    output_characters = "".join(f"&{name};"
+                                for name, adoc_repr in SpecialCharacter.SPECIAL_CHARACTERS.items()
+                                if not adoc_repr)
+    input_xml = f"""\
+    <detaileddescription>
+    <para>{input_characters}</para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == output_characters
 
 
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():

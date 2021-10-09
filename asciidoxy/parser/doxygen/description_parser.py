@@ -205,18 +205,6 @@ class PlainText(DescriptionElement):
         self.text += text
 
 
-class Space(PlainText):
-    """Single space as XML element.
-
-    In some places <sp/> is used to indicate explicit spaces.
-    """
-    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        return f" {super().to_asciidoc()}"
-
-    def add_tail(self, parent: NestedDescriptionElement, text: str):
-        self.text += text
-
-
 class Formula(DescriptionElement):
     """Formula in LatexMath format.
 
@@ -309,13 +297,286 @@ class Image(DescriptionElement):
         parent.append(PlainText(self.language_tag, text))
 
 
-class LineBreak(DescriptionElement):
-    """Line break.
+class SpecialCharacter(PlainText):
+    """Special character represented by an XML tag.
 
-    This breaks the current line, but not the paragraph.
+    Attributes:
+        tag: Original XML tag.
     """
+    tag: str
+
+    SPECIAL_CHARACTERS = {
+        "sp": " ",
+        "linebreak": " +\n",
+        "nonbreakablespace": "&nbsp;",
+        "iexcl": "",
+        "cent": "",
+        "pound": "",
+        "curren": "",
+        "yen": "",
+        "brvbar": "",
+        "sect": "",
+        "umlaut": "",
+        "copy": "",
+        "ordf": "",
+        "laquo": "",
+        "not": "",
+        "shy": "",
+        "registered": "",
+        "macr": "",
+        "deg": "",
+        "plusmn": "",
+        "sup2": "",
+        "sup3": "",
+        "acute": "",
+        "micro": "",
+        "middot": "",
+        "cedil": "",
+        "sup1": "",
+        "ordm": "",
+        "raquo": "",
+        "frac14": "",
+        "frac12": "",
+        "frac34": "",
+        "iquest": "",
+        "Agrave": "",
+        "Aacute": "",
+        "Acirc": "",
+        "Atilde": "",
+        "Aumlaut": "",
+        "Aring": "",
+        "AElig": "",
+        "Ccedil": "",
+        "Egrave": "",
+        "Eacute": "",
+        "Ecirc": "",
+        "Eumlaut": "",
+        "Igrave": "",
+        "Iacute": "",
+        "Icirc": "",
+        "Iumlaut": "",
+        "ETH": "",
+        "Ntilde": "",
+        "Ograve": "",
+        "Oacute": "",
+        "Ocirc": "",
+        "Otilde": "",
+        "Oumlaut": "",
+        "times": "",
+        "Oslash": "",
+        "Ugrave": "",
+        "Uacute": "",
+        "Ucirc": "",
+        "Uumlaut": "",
+        "Yacute": "",
+        "THORN": "",
+        "szlig": "",
+        "agrave": "",
+        "aacute": "",
+        "acirc": "",
+        "atilde": "",
+        "aumlaut": "",
+        "aring": "",
+        "aelig": "",
+        "ccedil": "",
+        "egrave": "",
+        "eacute": "",
+        "ecirc": "",
+        "eumlaut": "",
+        "igrave": "",
+        "iacute": "",
+        "icirc": "",
+        "iumlaut": "",
+        "eth": "",
+        "ntilde": "",
+        "ograve": "",
+        "oacute": "",
+        "ocirc": "",
+        "otilde": "",
+        "oumlaut": "",
+        "divide": "",
+        "oslash": "",
+        "ugrave": "",
+        "uacute": "",
+        "ucirc": "",
+        "uumlaut": "",
+        "yacute": "",
+        "thorn": "",
+        "yumlaut": "",
+        "fnof": "",
+        "Alpha": "",
+        "Beta": "",
+        "Gamma": "",
+        "Delta": "",
+        "Epsilon": "",
+        "Zeta": "",
+        "Eta": "",
+        "Theta": "",
+        "Iota": "",
+        "Kappa": "",
+        "Lambda": "",
+        "Mu": "",
+        "Nu": "",
+        "Xi": "",
+        "Omicron": "",
+        "Pi": "",
+        "Rho": "",
+        "Sigma": "",
+        "Tau": "",
+        "Upsilon": "",
+        "Phi": "",
+        "Chi": "",
+        "Psi": "",
+        "Omega": "",
+        "alpha": "",
+        "beta": "",
+        "gamma": "",
+        "delta": "",
+        "epsilon": "",
+        "zeta": "",
+        "eta": "",
+        "theta": "",
+        "iota": "",
+        "kappa": "",
+        "lambda": "",
+        "mu": "",
+        "nu": "",
+        "xi": "",
+        "omicron": "",
+        "pi": "",
+        "rho": "",
+        "sigmaf": "",
+        "sigma": "",
+        "tau": "",
+        "upsilon": "",
+        "phi": "",
+        "chi": "",
+        "psi": "",
+        "omega": "",
+        "thetasym": "",
+        "upsih": "",
+        "piv": "",
+        "bull": "",
+        "hellip": "",
+        "prime": "",
+        "Prime": "",
+        "oline": "",
+        "frasl": "",
+        "weierp": "",
+        "imaginary": "",
+        "real": "",
+        "trademark": "",
+        "alefsym": "",
+        "larr": "",
+        "uarr": "",
+        "rarr": "",
+        "darr": "",
+        "harr": "",
+        "crarr": "",
+        "lArr": "",
+        "uArr": "",
+        "rArr": "",
+        "dArr": "",
+        "hArr": "",
+        "forall": "",
+        "part": "",
+        "exist": "",
+        "empty": "",
+        "nabla": "",
+        "isin": "",
+        "notin": "",
+        "ni": "",
+        "prod": "",
+        "sum": "",
+        "minus": "",
+        "lowast": "",
+        "radic": "",
+        "prop": "",
+        "infin": "",
+        "ang": "",
+        "and": "",
+        "or": "",
+        "cap": "",
+        "cup": "",
+        "int": "",
+        "there4": "",
+        "sim": "",
+        "cong": "",
+        "asymp": "",
+        "ne": "",
+        "equiv": "",
+        "le": "",
+        "ge": "",
+        "sub": "",
+        "sup": "",
+        "nsub": "",
+        "sube": "",
+        "supe": "",
+        "oplus": "",
+        "otimes": "",
+        "perp": "",
+        "sdot": "",
+        "lceil": "",
+        "rceil": "",
+        "lfloor": "",
+        "rfloor": "",
+        "lang": "",
+        "rang": "",
+        "loz": "",
+        "spades": "",
+        "clubs": "",
+        "hearts": "",
+        "diams": "",
+        "OElig": "",
+        "oelig": "",
+        "Scaron": "",
+        "scaron": "",
+        "Yumlaut": "",
+        "circ": "",
+        "tilde": "",
+        "ensp": "",
+        "emsp": "",
+        "thinsp": "",
+        "zwnj": "",
+        "zwj": "",
+        "lrm": "",
+        "rlm": "",
+        "ndash": "",
+        "mdash": "",
+        "lsquo": "",
+        "rsquo": "",
+        "sbquo": "",
+        "ldquo": "",
+        "rdquo": "",
+        "bdquo": "",
+        "dagger": "",
+        "Dagger": "",
+        "permil": "",
+        "lsaquo": "",
+        "rsaquo": "",
+        "euro": "",
+        "tm": "",
+    }
+
+    def __init__(self, language_tag: str, text: str = "", tag: str = ""):
+        super().__init__(language_tag, text)
+        self.tag = tag
+
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        return " +\n"
+        adoc_repr = self.SPECIAL_CHARACTERS.get(self.tag, "")
+        if not adoc_repr:
+            adoc_repr = f"&{self.tag};"
+        return f"{adoc_repr}{super().to_asciidoc()}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.tag} {self.text}"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "SpecialCharacter":
+        return cls(language_tag, tag=xml_element.tag)
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        self.text += text
 
 
 ###################################################################################################
@@ -983,7 +1244,6 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "hruler": HorizontalRuler,
         "image": Image,
         "itemizedlist": ListContainer,
-        "linebreak": LineBreak,
         "listitem": ListItem,
         "orderedlist": ListContainer,
         "para": Para,
@@ -1005,7 +1265,6 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "sect8": Section,
         "sect9": Section,
         "simplesect": Admonition,
-        "sp": Space,
         "strike": Style,
         "table": Table,
         "ulink": Ulink,
@@ -1037,6 +1296,9 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
     elif xml_element.tag in USE_PARENT:
         assert isinstance(parent, USE_PARENT[xml_element.tag])
         element = parent
+
+    elif xml_element.tag in SpecialCharacter.SPECIAL_CHARACTERS:
+        element = SpecialCharacter.from_xml(xml_element, language_tag)
 
     else:
         logger.warning(f"Unsupported XML tag <{xml_element.tag}>. Please report an issue on GitHub"

@@ -45,6 +45,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     `asciidoc.image_dir` option in `contents.toml`.
   - Support MarkDown (preprocessed by Doxygen) in Doxygen descriptions. This adds support for:
     headers, strikethrough, numbered and nested lists, horizontal rulers, and block quotes.
+  - Support special characters. This includes 250 characters that Doxygen represents with a
+    separate XML tag.
 
 
 === Changed
