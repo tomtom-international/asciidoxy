@@ -133,7 +133,6 @@ def is_valid(self) -&gt; bool
 
 Check if the coordinate is valid.
 
-[source]
 ----
    A coordinate is valid if its values are within WGS84 bounds.
 ----
@@ -191,7 +190,6 @@ def from_string_safe(cls,
 
 Create a coordinate from its string representation.
 
-[source]
 ----
    Accepts None as input.
 ----

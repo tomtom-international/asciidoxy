@@ -764,7 +764,6 @@ ____
 
 Some example code:
 
-[source]
 ----
 int answer = 42;
 ----
@@ -975,6 +974,69 @@ def test_parse_special_characters__all_named():
 """
     output = parse(input_xml)
     assert output.to_asciidoc() == output_characters
+
+
+def test_parse_preformatted():
+    input_xml = """\
+    <detaileddescription>
+<para>Developers can get creative with Ascii art in comments.</para>
+<para><preformatted>
+Arcs:    O----------------&gt;O---------&gt;O-----------------------&gt;O
+Stretch: |            ^======================^
+Route:   |       ^-------------------------------------^
+         |     Origin                             Destination
+         |&lt;----------&gt;|               |&lt;----&gt;|
+Offsets:  front_offset               back_offset
+</preformatted> </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Developers can get creative with Ascii art in comments.
+
+----
+Arcs:    O---------------->O--------->O----------------------->O
+Stretch: |            ^======================^
+Route:   |       ^-------------------------------------^
+         |     Origin                             Destination
+         |<---------->|               |<---->|
+Offsets:  front_offset               back_offset
+----"""
+
+
+def test_parse_html_headings():
+    input_xml = """\
+    <detaileddescription>
+<para>HTML headings are supported as well.</para>
+<para><heading level="1">The top level heading.</heading>
+</para>
+<para>An introduction to the topic.</para>
+<para><heading level="2">First subheading.</heading>
+</para>
+<para>More text.</para>
+<para><heading level="2">Another subheading.</heading>
+</para>
+<para>Even more text. </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+HTML headings are supported as well.
+
+[discrete]
+= The top level heading.
+
+An introduction to the topic.
+
+[discrete]
+== First subheading.
+
+More text.
+
+[discrete]
+== Another subheading.
+
+Even more text."""
 
 
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():

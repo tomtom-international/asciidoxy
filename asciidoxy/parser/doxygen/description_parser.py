@@ -670,7 +670,7 @@ class Para(NestedDescriptionElement):
 class Section(ParaContainer):
     """Collection of paragraphs with a title or header.
 
-    Args:
+    Attributes:
         title: Title of the section. Shown as a discrete header before the paragraphs.
         level: Level of the header used for the section.
     """
@@ -702,6 +702,32 @@ class Section(ParaContainer):
         if xml_element.tag == "title":
             assert xml_element.text
             self.title = xml_element.text.strip()
+
+
+class Heading(Para):
+    """Heading where the nested content is the heading itself.
+
+    Attributes:
+        level: Level of the heading.
+    """
+    level: int
+
+    def __init__(self, language_tag: str, level: int = 1, *contents: DescriptionElement):
+        super().__init__(language_tag, *contents)
+        self.level = level
+
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        return f"[discrete]\n{'=' * self.level} {super().to_asciidoc(context)}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: level={self.level}"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Heading":
+        return cls(language_tag=language_tag, level=int(xml_element.get("level", "1")))
+
+    def clone_without_contents(self):
+        return self.__class__(self.language_tag, level=self.level)
 
 
 class Admonition(ParaContainer, NamedSection):
@@ -754,7 +780,7 @@ class Verbatim(Para):
 
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
         stripped_text = self.text.strip("\r\n")
-        return f"[source]\n----\n{stripped_text}\n----"
+        return f"----\n{stripped_text}\n----"
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}: {repr(self.text)}"
@@ -1240,6 +1266,7 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "emphasis": Style,
         "entry": Entry,
         "formula": Formula,
+        "heading": Heading,
         "highlight": Style,
         "hruler": HorizontalRuler,
         "image": Image,
@@ -1252,6 +1279,7 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "parameterlist": ParameterList,
         "parametername": ParameterName,
         "plantuml": Diagram,
+        "preformatted": Verbatim,
         "programlisting": ProgramListing,
         "ref": Ref,
         "row": Row,

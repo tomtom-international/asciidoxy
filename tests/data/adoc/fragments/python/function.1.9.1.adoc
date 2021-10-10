@@ -12,7 +12,6 @@ def update(self,
 
 Update the traffic event data.
 
-[source]
 ----
    Verifies the new information before updating.
 ----

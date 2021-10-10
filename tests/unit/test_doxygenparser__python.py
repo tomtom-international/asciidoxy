@@ -85,7 +85,6 @@ from .matchers import (AtLeast, IsEmpty, IsFalse, IsNone, IsTrue, Unordered, m_c
                 brief="Update the traffic event data.",
                 # TODO: See if we can improve here, even though it is already in Doxygen.
                 description="""\
-[source]
 ----
    Verifies the new information before updating.
 ----""",

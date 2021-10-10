@@ -46,3 +46,7 @@ ${insert("asciidoxy::descriptions::HybridList")}
 ${insert("asciidoxy::descriptions::Dashes")}
 
 ${insert("asciidoxy::descriptions::SpecialCharacters")}
+
+${insert("asciidoxy::descriptions::AsciiArt")}
+
+${insert("asciidoxy::descriptions::HtmlHeadings")}
