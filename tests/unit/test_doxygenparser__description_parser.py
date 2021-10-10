@@ -1039,6 +1039,21 @@ More text.
 Even more text."""
 
 
+def test_parse_anchor():
+    input_xml = """\
+    <detaileddescription>
+<para>Manual anchors can be inserted in the code.</para>
+<para><anchor id="classasciidoxy_1_1descriptions_1_1_anchor_1MANUAL_ANCHOR"/> You can refer back to the <ref refid="classasciidoxy_1_1descriptions_1_1_anchor_1MANUAL_ANCHOR" kindref="member">anchor</ref>. </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Manual anchors can be inserted in the code.
+
+[#lang-classasciidoxy_1_1descriptions_1_1_anchor_1MANUAL_ANCHOR]
+You can refer back to the <<lang-classasciidoxy_1_1descriptions_1_1_anchor_1MANUAL_ANCHOR,anchor>>."""
+
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

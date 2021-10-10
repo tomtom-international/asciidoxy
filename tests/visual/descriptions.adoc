@@ -50,3 +50,5 @@ ${insert("asciidoxy::descriptions::SpecialCharacters")}
 ${insert("asciidoxy::descriptions::AsciiArt")}
 
 ${insert("asciidoxy::descriptions::HtmlHeadings")}
+
+${insert("asciidoxy::descriptions::Anchor")}

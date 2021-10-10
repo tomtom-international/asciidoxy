@@ -944,6 +944,32 @@ class Ulink(NestedDescriptionElement):
         parent.append(PlainText(self.language_tag, text))
 
 
+class Anchor(PlainText):
+    """Anchor that can be referenced in hyperlinks.
+
+    Attributes:
+        id: Identifier of the anchor.
+    """
+    id: str
+
+    def __init__(self, language_tag: str, text: str = "", id: str = ""):
+        super().__init__(language_tag, text)
+        self.id = id
+
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        return f"[#{self.language_tag}-{self.id}]\n{super().to_asciidoc().lstrip()}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.id} {repr(self.text)}"
+
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Anchor":
+        return cls(language_tag, id=xml_element.get("id", ""))
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        self.text += text
+
+
 ###################################################################################################
 # Tables
 ###################################################################################################
@@ -1258,6 +1284,7 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
 
     # Map of element tags for which a new element is to be constructed and added the the parent.
     NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
+        "anchor": Anchor,
         "blockquote": BlockQuote,
         "bold": Style,
         "codeline": CodeLine,
