@@ -58,6 +58,7 @@ ParaContainer <|-- Entry
 DescriptionElement <|-- Formula
 DescriptionElement <|-- Image
 ParaContainer <|-- BlockQuote
+ParaContainer <|-- ParBlock
 Para <|-- HorizontalRuler
 
 ParaContainer *-- Para

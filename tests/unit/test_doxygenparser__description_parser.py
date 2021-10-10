@@ -1054,6 +1054,45 @@ Manual anchors can be inserted in the code.
 You can refer back to the <<lang-classasciidoxy_1_1descriptions_1_1_anchor_1MANUAL_ANCHOR,anchor>>."""
 
 
+def test_parse_parblock():
+    input_xml = """\
+        <detaileddescription>
+<para>Parblocks are used to add multiple paragraphs to commands that only accept a single parameter.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>parameter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><parblock><para>First paragraph about the parameter.</para>
+<para>Second paragraph about the parameter. </para>
+</parblock></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+"""
+    output = parse(input_xml)
+
+    param_section = output.pop_section(ParameterList, "param")
+    assert param_section is not None
+    assert param_section.name == "param"
+    assert len(param_section.contents) == 1
+    assert len(list(param_section.contents[0].names())) == 1
+    name = param_section.contents[0].first_name()
+    assert name.name == "parameter"
+    assert not name.direction
+    description = param_section.contents[0].description()
+    assert description is not None
+    assert description.to_asciidoc() == """\
+First paragraph about the parameter.
++
+Second paragraph about the parameter."""
+
+    assert output.to_asciidoc() == """\
+Parblocks are used to add multiple paragraphs to commands that only accept a single parameter."""
+
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

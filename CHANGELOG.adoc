@@ -49,6 +49,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     separate XML tag.
   - Support HTML headings and preformatted text.
   - Support custom anchors.
+  - Support parameter descriptions consisting of multiple paragraphs.
 
 
 === Changed

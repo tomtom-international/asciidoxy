@@ -838,6 +838,18 @@ class HorizontalRuler(Para):
         return "'''"
 
 
+class ParBlock(ParaContainer):
+    """One or more paragraphs that form a block together.
+
+    This differs from a normal ParaContainer as `+` is used to make sure paragraphs remain together
+    in blocks like definitions or lists.
+    """
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        return "\n+\n".join(
+            element.to_asciidoc(context) for element in self.contents
+            if element.to_asciidoc(context).strip())
+
+
 ###################################################################################################
 # Formatting
 ###################################################################################################
@@ -1305,6 +1317,7 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         "parameteritem": ParameterItem,
         "parameterlist": ParameterList,
         "parametername": ParameterName,
+        "parblock": ParBlock,
         "plantuml": Diagram,
         "preformatted": Verbatim,
         "programlisting": ProgramListing,
