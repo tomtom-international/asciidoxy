@@ -1290,68 +1290,77 @@ class ParameterDescription(ParaContainer):
     """Description of a single parameter."""
 
 
+# Map of element tags for which a new element is to be constructed and added the the parent.
+NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
+    "anchor": Anchor,
+    "blockquote": BlockQuote,
+    "bold": Style,
+    "codeline": CodeLine,
+    "computeroutput": Style,
+    "dot": Diagram,
+    "emphasis": Style,
+    "entry": Entry,
+    "formula": Formula,
+    "heading": Heading,
+    "highlight": Style,
+    "hruler": HorizontalRuler,
+    "image": Image,
+    "itemizedlist": ListContainer,
+    "listitem": ListItem,
+    "orderedlist": ListContainer,
+    "para": Para,
+    "parameterdescription": ParameterDescription,
+    "parameteritem": ParameterItem,
+    "parameterlist": ParameterList,
+    "parametername": ParameterName,
+    "parblock": ParBlock,
+    "plantuml": Diagram,
+    "preformatted": Verbatim,
+    "programlisting": ProgramListing,
+    "ref": Ref,
+    "row": Row,
+    "sect1": Section,
+    "sect2": Section,
+    "sect3": Section,
+    "sect4": Section,
+    "sect5": Section,
+    "sect6": Section,
+    "sect7": Section,
+    "sect8": Section,
+    "sect9": Section,
+    "simplesect": Admonition,
+    "strike": Style,
+    "table": Table,
+    "ulink": Ulink,
+    "verbatim": Verbatim,
+    "xrefsect": Admonition,
+}
+
+# Map of element tags that update the parent element.
+UPDATE_PARENT: Mapping[str, Union[Type, Tuple[Type, ...]]] = {
+    "caption": Table,
+    "title": (Admonition, Section),
+    "xreftitle": Admonition,
+}
+
+# Map of element tags for which the children update its parent.
+USE_PARENT = {
+    "parameternamelist": ParameterItem,
+    "xrefdescription": Admonition,
+}
+
+# Tags known to be unsupported for now.
+UNSUPPORTED = {
+    "diafile", "docbookonly", "center", "secondaryie", "indexentry", "dotfile", "tocitem",
+    "internal", "toclist", "manonly", "htmlonly", "rtfonly", "latexonly", "mscfile", "copydoc", "s",
+    "emoji", "variablelist", "msc", "language", "ins", "subscript", "underline", "superscript",
+    "parametertype", "primaryie", "xmlonly", "small", "del"
+}
+
+
 def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement,
                        language_tag: str):
     element = None
-
-    # Map of element tags for which a new element is to be constructed and added the the parent.
-    NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
-        "anchor": Anchor,
-        "blockquote": BlockQuote,
-        "bold": Style,
-        "codeline": CodeLine,
-        "computeroutput": Style,
-        "dot": Diagram,
-        "emphasis": Style,
-        "entry": Entry,
-        "formula": Formula,
-        "heading": Heading,
-        "highlight": Style,
-        "hruler": HorizontalRuler,
-        "image": Image,
-        "itemizedlist": ListContainer,
-        "listitem": ListItem,
-        "orderedlist": ListContainer,
-        "para": Para,
-        "parameterdescription": ParameterDescription,
-        "parameteritem": ParameterItem,
-        "parameterlist": ParameterList,
-        "parametername": ParameterName,
-        "parblock": ParBlock,
-        "plantuml": Diagram,
-        "preformatted": Verbatim,
-        "programlisting": ProgramListing,
-        "ref": Ref,
-        "row": Row,
-        "sect1": Section,
-        "sect2": Section,
-        "sect3": Section,
-        "sect4": Section,
-        "sect5": Section,
-        "sect6": Section,
-        "sect7": Section,
-        "sect8": Section,
-        "sect9": Section,
-        "simplesect": Admonition,
-        "strike": Style,
-        "table": Table,
-        "ulink": Ulink,
-        "verbatim": Verbatim,
-        "xrefsect": Admonition,
-    }
-
-    # Map of element tags that update the parent element.
-    UPDATE_PARENT: Mapping[str, Union[Type, Tuple[Type, ...]]] = {
-        "caption": Table,
-        "title": (Admonition, Section),
-        "xreftitle": Admonition,
-    }
-
-    # Map of element tags for which the children update its parent.
-    USE_PARENT = {
-        "parameternamelist": ParameterItem,
-        "xrefdescription": Admonition,
-    }
 
     if xml_element.tag in NEW_ELEMENT:
         element = NEW_ELEMENT[xml_element.tag].from_xml(xml_element, language_tag)
