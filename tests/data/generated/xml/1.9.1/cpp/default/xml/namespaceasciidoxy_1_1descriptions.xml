@@ -20,6 +20,7 @@
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_special_characters" prot="public">asciidoxy::descriptions::SpecialCharacters</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_headings" prot="public">asciidoxy::descriptions::HtmlHeadings</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_anchor" prot="public">asciidoxy::descriptions::Anchor</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" prot="public">asciidoxy::descriptions::OutputSpecificBlocks</innerclass>
       <sectiondef kind="func">
       <memberdef kind="function" id="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <templateparamlist>

@@ -78,6 +78,8 @@
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a0a96fb07ea0d648c1077a30cab963f6c" kind="function"><name>operator=</name></member>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a52622305a840ea66ccc83df35563a920" kind="function"><name>operator=</name></member>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" kind="class"><name>asciidoxy::descriptions::OutputSpecificBlocks</name>
+  </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_point" kind="class"><name>asciidoxy::geometry::Point</name>
     <member refid="classasciidoxy_1_1geometry_1_1_point_1aabf939f4746751aeb2f1e9e3553eecb4" kind="function"><name>Point</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8" kind="function"><name>increment</name></member>

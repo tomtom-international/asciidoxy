@@ -20,6 +20,7 @@
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_special_characters" prot="public">asciidoxy::descriptions::SpecialCharacters</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_headings" prot="public">asciidoxy::descriptions::HtmlHeadings</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_anchor" prot="public">asciidoxy::descriptions::Anchor</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" prot="public">asciidoxy::descriptions::OutputSpecificBlocks</innerclass>
     <innernamespace refid="namespaceasciidoxy">asciidoxy</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1descriptions">asciidoxy::descriptions</innernamespace>
     <briefdescription>
@@ -106,8 +107,11 @@
 <codeline lineno="384"><highlight class="normal"></highlight></codeline>
 <codeline lineno="395"><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" kindref="member">ParBlock</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>parameter);</highlight></codeline>
 <codeline lineno="396"><highlight class="normal"></highlight></codeline>
-<codeline lineno="397"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="398"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="424" refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" kindref="compound">OutputSpecificBlocks</ref><sp/>{</highlight></codeline>
+<codeline lineno="425"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="426"><highlight class="normal"></highlight></codeline>
+<codeline lineno="427"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="428"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="descriptions.hpp"/>
   </compounddef>

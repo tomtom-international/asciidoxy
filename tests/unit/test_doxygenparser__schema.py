@@ -18,8 +18,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Dict, List, Set
 
-from asciidoxy.parser.doxygen.description_parser import (NEW_ELEMENT, UPDATE_PARENT, USE_PARENT,
-                                                         UNSUPPORTED, SpecialCharacter)
+from asciidoxy.parser.doxygen.description_parser import (IGNORE, NEW_ELEMENT, UPDATE_PARENT,
+                                                         USE_PARENT, UNSUPPORTED, SpecialCharacter)
 
 
 def _xsd(tag: str) -> str:
@@ -161,6 +161,6 @@ def test_doxygen_schema__description_parser(xml_data):
     all_elements = schema.find_all_elements(compounddef_type.elements["briefdescription"].type)
 
     unsupported_elements = (all_elements - NEW_ELEMENT.keys() - UPDATE_PARENT.keys() -
-                            USE_PARENT.keys() - SpecialCharacter.SPECIAL_CHARACTERS.keys())
+                            USE_PARENT.keys() - IGNORE - SpecialCharacter.SPECIAL_CHARACTERS.keys())
 
     assert not unsupported_elements - UNSUPPORTED

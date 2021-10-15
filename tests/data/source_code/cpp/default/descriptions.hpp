@@ -394,5 +394,35 @@ class Anchor {
  */
 void ParBlock(int parameter);
 
+/**
+ * Some blocks are only to be included in specific output types.
+ *
+ * @docbookonly
+ * Don't include docbook stuff.
+ * @enddocbookonly
+ *
+ * @manonly
+ * Don't include man stuff.
+ * @endmanonly
+ *
+ * @htmlonly
+ * Include HTML only text.
+ * @endhtmlonly
+ *
+ * @latexonly
+ * Do not include Latex here.
+ * @endlatexonly
+ *
+ * @rtfonly
+ * RTF is not welcome either.
+ * @endrtfonly
+ *
+ * @xmlonly
+ * XML text should be included.
+ * @endxmlonly
+ */
+class OutputSpecificBlocks {
+};
+
 }  // namespace descriptions
 }  // namespace asciidoxy

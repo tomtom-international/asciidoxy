@@ -50,6 +50,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Support HTML headings and preformatted text.
   - Support custom anchors.
   - Support parameter descriptions consisting of multiple paragraphs.
+  - Respect output type specific content. Only content for XML and HTML output is used.
 
 
 === Changed

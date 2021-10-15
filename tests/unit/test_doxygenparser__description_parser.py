@@ -1093,6 +1093,39 @@ Second paragraph about the parameter."""
 Parblocks are used to add multiple paragraphs to commands that only accept a single parameter."""
 
 
+def test_parse_output_specific_blocks():
+    input_xml = """\
+    <detaileddescription>
+<para>Some blocks are only to be included in specific output types.</para>
+<para><docbookonly>
+Don&apos;t include docbook stuff.
+</docbookonly></para>
+<para><manonly>
+Don&apos;t include man stuff.
+</manonly></para>
+<para><htmlonly>
+Include HTML only text.
+</htmlonly></para>
+<para><latexonly>
+Do not include Latex here.
+</latexonly></para>
+<para><rtfonly>
+RTF is not welcome either.
+</rtfonly></para>
+<para>
+XML text should be included.
+ </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Some blocks are only to be included in specific output types.
+
+Include HTML only text.
+
+XML text should be included."""
+
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

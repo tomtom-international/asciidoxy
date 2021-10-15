@@ -1347,14 +1347,24 @@ UPDATE_PARENT: Mapping[str, Union[Type, Tuple[Type, ...]]] = {
 USE_PARENT = {
     "parameternamelist": ParameterItem,
     "xrefdescription": Admonition,
+    "htmlonly": object,
+    "xmlonly": object,
+}
+
+# Element tags to ignore, including their nested content.
+IGNORE = {
+    "docbookonly",
+    "manonly",
+    "rtfonly",
+    "latexonly",
+    "internal",
 }
 
 # Tags known to be unsupported for now.
 UNSUPPORTED = {
-    "diafile", "docbookonly", "center", "secondaryie", "indexentry", "dotfile", "tocitem",
-    "internal", "toclist", "manonly", "htmlonly", "rtfonly", "latexonly", "mscfile", "copydoc", "s",
-    "emoji", "variablelist", "msc", "language", "ins", "subscript", "underline", "superscript",
-    "parametertype", "primaryie", "xmlonly", "small", "del"
+    "diafile", "center", "secondaryie", "indexentry", "dotfile", "tocitem", "toclist", "mscfile",
+    "copydoc", "s", "emoji", "variablelist", "msc", "language", "ins", "subscript", "underline",
+    "superscript", "parametertype", "primaryie", "small", "del"
 }
 
 
@@ -1376,6 +1386,9 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
 
     elif xml_element.tag in SpecialCharacter.SPECIAL_CHARACTERS:
         element = SpecialCharacter.from_xml(xml_element, language_tag)
+
+    elif xml_element.tag in IGNORE:
+        return
 
     else:
         logger.warning(f"Unsupported XML tag <{xml_element.tag}>. Please report an issue on GitHub"
