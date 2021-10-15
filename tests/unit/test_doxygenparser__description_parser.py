@@ -1162,6 +1162,25 @@ Some centered paragraphs.
 Nice in the center here."""
 
 
+def test_parse_emoji():
+    input_xml = """\
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1descriptions_1_1_emoji" kindref="compound">Emoji</ref> can be used in Doxygen.</para>
+<para><emoji name="smile" unicode="&amp;#x1f604;"/> I am happy</para>
+<para><emoji name="cry" unicode="&amp;#x1f622;"/> I am sad</para>
+<para><emoji name="star" unicode="&amp;#x2b50;"/> </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+<<lang-classasciidoxy_1_1descriptions_1_1_emoji,Emoji>> can be used in Doxygen.
+
+&#x1f604; I am happy
+
+&#x1f622; I am sad
+
+&#x2b50;"""
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

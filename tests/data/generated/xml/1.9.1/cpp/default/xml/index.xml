@@ -45,6 +45,8 @@
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" kind="class"><name>asciidoxy::descriptions::DoxygenVisualStyle</name>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_emoji" kind="class"><name>asciidoxy::descriptions::Emoji</name>
+  </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1detail_1_1_error_descriptor" kind="class"><name>asciidoxy::relative_namespace::detail::ErrorDescriptor</name>
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_external_links" kind="class"><name>asciidoxy::descriptions::ExternalLinks</name>

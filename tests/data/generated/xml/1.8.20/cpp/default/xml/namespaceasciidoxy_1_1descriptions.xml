@@ -11,6 +11,7 @@
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_diagrams" prot="public">asciidoxy::descriptions::Diagrams</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" prot="public">asciidoxy::descriptions::DoxygenList</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" prot="public">asciidoxy::descriptions::DoxygenVisualStyle</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_emoji" prot="public">asciidoxy::descriptions::Emoji</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_external_links" prot="public">asciidoxy::descriptions::ExternalLinks</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_formulae" prot="public">asciidoxy::descriptions::Formulae</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_headings" prot="public">asciidoxy::descriptions::HtmlHeadings</innerclass>

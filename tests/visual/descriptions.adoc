@@ -58,3 +58,5 @@ ${insert("asciidoxy::descriptions::Anchor")}
 ${insert("asciidoxy::descriptions::ParBlock")}
 
 ${insert("asciidoxy::descriptions::OutputSpecificBlocks")}
+
+${insert("asciidoxy::descriptions::Emoji")}

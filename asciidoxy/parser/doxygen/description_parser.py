@@ -579,6 +579,16 @@ class SpecialCharacter(PlainText):
         self.text += text
 
 
+class Emoji(PlainText):
+    """A Unicode emoji."""
+    @classmethod
+    def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Emoji":
+        return cls(language_tag, text=xml_element.get("unicode", ""))
+
+    def add_tail(self, parent: NestedDescriptionElement, text: str):
+        self.text += text
+
+
 ###################################################################################################
 # Paragraphs and collections of paragraphs
 ###################################################################################################
@@ -1313,6 +1323,7 @@ NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
     "computeroutput": Style,
     "del": Style,
     "dot": Diagram,
+    "emoji": Emoji,
     "emphasis": Style,
     "entry": Entry,
     "formula": Formula,
@@ -1396,14 +1407,15 @@ UNSUPPORTED = {
     "tocitem",
     "toclist",
 
-    # Diagrams not supported by AsciiDoctor Diagram
+    # Diagram types not supported by AsciiDoctor Diagram
     "msc",
     "mscfile",
-    "copydoc",
-    "emoji",
+
+    # Other
     "variablelist",
-    "language",
     "parametertype",
+    "copydoc",  # Not seen when using @copydoc. Content is already duplicated in the XML output.
+    "language",  # Support needed to select the right language.
 }
 
 

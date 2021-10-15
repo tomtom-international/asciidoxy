@@ -22,6 +22,7 @@
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_styles" prot="public">asciidoxy::descriptions::HtmlStyles</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_anchor" prot="public">asciidoxy::descriptions::Anchor</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" prot="public">asciidoxy::descriptions::OutputSpecificBlocks</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_emoji" prot="public">asciidoxy::descriptions::Emoji</innerclass>
       <sectiondef kind="func">
       <memberdef kind="function" id="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
         <templateparamlist>

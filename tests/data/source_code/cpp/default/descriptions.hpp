@@ -453,5 +453,17 @@ class OutputSpecificBlocks {
 template<class Type>
 int CopyDoc(int first, double second, Type* third);
 
+/**
+ * Emoji can be used in Doxygen.
+ *
+ * \emoji smile I am happy
+ *
+ * \emoji cry I am sad
+ *
+ * \emoji star
+ */
+class Emoji {
+};
+
 }  // namespace descriptions
 }  // namespace asciidoxy
