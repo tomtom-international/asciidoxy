@@ -9,7 +9,7 @@
 <para>Manual anchors can be inserted in the code.</para>
 <para><anchor id="classasciidoxy_1_1descriptions_1_1_anchor_1MANUAL_ANCHOR"/> You can refer back to the <ref refid="classasciidoxy_1_1descriptions_1_1_anchor_1MANUAL_ANCHOR" kindref="member">anchor</ref>. </para>
     </detaileddescription>
-    <location file="descriptions.hpp" line="382" column="13" bodyfile="descriptions.hpp" bodystart="382" bodyend="383"/>
+    <location file="descriptions.hpp" line="405" column="13" bodyfile="descriptions.hpp" bodystart="405" bodyend="406"/>
     <listofallmembers>
     </listofallmembers>
   </compounddef>

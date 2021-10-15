@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_html_styles" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::HtmlStyles</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Some extra visual styles are possible with HTML.</para>
+<para>CO<subscript>2</subscript> and X<superscript>2</superscript>.</para>
+<para><ins>Inserted text</ins><linebreak/>
+ <del>Deleted test</del></para>
+<para><underline>Underlined text</underline></para>
+<para><s>Put a line through this</s></para>
+<para><small>Small text</small></para>
+<para><center> Some centered paragraphs.</center></para>
+<para><center>Nice in the center here. </center> </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="395" column="1" bodyfile="descriptions.hpp" bodystart="395" bodyend="396"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

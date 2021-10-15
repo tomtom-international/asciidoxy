@@ -19,6 +19,7 @@
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_ascii_art" prot="public">asciidoxy::descriptions::AsciiArt</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_special_characters" prot="public">asciidoxy::descriptions::SpecialCharacters</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_headings" prot="public">asciidoxy::descriptions::HtmlHeadings</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_styles" prot="public">asciidoxy::descriptions::HtmlStyles</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_anchor" prot="public">asciidoxy::descriptions::Anchor</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" prot="public">asciidoxy::descriptions::OutputSpecificBlocks</innerclass>
       <sectiondef kind="func">
@@ -144,7 +145,7 @@
         </detaileddescription>
         <inbodydescription>
         </inbodydescription>
-        <location file="descriptions.hpp" line="395" column="6" declfile="descriptions.hpp" declline="395" declcolumn="6"/>
+        <location file="descriptions.hpp" line="418" column="6" declfile="descriptions.hpp" declline="418" declcolumn="6"/>
       </memberdef>
       </sectiondef>
     <briefdescription>

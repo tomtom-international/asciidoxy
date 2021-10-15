@@ -19,6 +19,7 @@
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_ascii_art" prot="public">asciidoxy::descriptions::AsciiArt</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_special_characters" prot="public">asciidoxy::descriptions::SpecialCharacters</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_headings" prot="public">asciidoxy::descriptions::HtmlHeadings</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_styles" prot="public">asciidoxy::descriptions::HtmlStyles</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_anchor" prot="public">asciidoxy::descriptions::Anchor</innerclass>
     <innerclass refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" prot="public">asciidoxy::descriptions::OutputSpecificBlocks</innerclass>
     <innernamespace refid="namespaceasciidoxy">asciidoxy</innernamespace>
@@ -102,16 +103,19 @@
 <codeline lineno="372" refid="classasciidoxy_1_1descriptions_1_1_html_headings" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_html_headings" kindref="compound">HtmlHeadings</ref><sp/>{</highlight></codeline>
 <codeline lineno="373"><highlight class="normal">};</highlight></codeline>
 <codeline lineno="374"><highlight class="normal"></highlight></codeline>
-<codeline lineno="382" refid="classasciidoxy_1_1descriptions_1_1_anchor" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_anchor" kindref="compound">Anchor</ref><sp/>{</highlight></codeline>
-<codeline lineno="383"><highlight class="normal">};</highlight></codeline>
-<codeline lineno="384"><highlight class="normal"></highlight></codeline>
-<codeline lineno="395" refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" refkind="member"><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" kindref="member">ParBlock</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>parameter);</highlight></codeline>
-<codeline lineno="396"><highlight class="normal"></highlight></codeline>
-<codeline lineno="424" refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" kindref="compound">OutputSpecificBlocks</ref><sp/>{</highlight></codeline>
-<codeline lineno="425"><highlight class="normal">};</highlight></codeline>
-<codeline lineno="426"><highlight class="normal"></highlight></codeline>
-<codeline lineno="427"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="428"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="395" refid="classasciidoxy_1_1descriptions_1_1_html_styles" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_html_styles" kindref="compound">HtmlStyles</ref><sp/>{</highlight></codeline>
+<codeline lineno="396"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="397"><highlight class="normal"></highlight></codeline>
+<codeline lineno="405" refid="classasciidoxy_1_1descriptions_1_1_anchor" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_anchor" kindref="compound">Anchor</ref><sp/>{</highlight></codeline>
+<codeline lineno="406"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="407"><highlight class="normal"></highlight></codeline>
+<codeline lineno="418" refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" refkind="member"><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" kindref="member">ParBlock</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>parameter);</highlight></codeline>
+<codeline lineno="419"><highlight class="normal"></highlight></codeline>
+<codeline lineno="447" refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" kindref="compound">OutputSpecificBlocks</ref><sp/>{</highlight></codeline>
+<codeline lineno="448"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="449"><highlight class="normal"></highlight></codeline>
+<codeline lineno="450"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="451"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="descriptions.hpp"/>
   </compounddef>

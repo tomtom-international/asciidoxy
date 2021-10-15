@@ -47,7 +47,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     headers, strikethrough, numbered and nested lists, horizontal rulers, and block quotes.
   - Support special characters. This includes 250 characters that Doxygen represents with a
     separate XML tag.
-  - Support HTML headings and preformatted text.
+  - Support HTML headings, preformatted text and other HTML specific styles.
   - Support custom anchors.
   - Support parameter descriptions consisting of multiple paragraphs.
   - Respect output type specific content. Only content for XML and HTML output is used.

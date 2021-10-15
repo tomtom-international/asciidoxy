@@ -51,6 +51,10 @@ ${insert("asciidoxy::descriptions::AsciiArt")}
 
 ${insert("asciidoxy::descriptions::HtmlHeadings")}
 
+${insert("asciidoxy::descriptions::HtmlStyles")}
+
 ${insert("asciidoxy::descriptions::Anchor")}
 
 ${insert("asciidoxy::descriptions::ParBlock")}
+
+${insert("asciidoxy::descriptions::OutputSpecificBlocks")}

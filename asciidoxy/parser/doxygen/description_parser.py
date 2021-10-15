@@ -838,6 +838,12 @@ class HorizontalRuler(Para):
         return "'''"
 
 
+class Center(Para):
+    """Center a paragraph of text."""
+    def to_asciidoc(self, context: AsciiDocContext = None) -> str:
+        return f"[.text-center]\n{super().to_asciidoc(context)}"
+
+
 class ParBlock(ParaContainer):
     """One or more paragraphs that form a block together.
 
@@ -865,7 +871,14 @@ class Style(NestedDescriptionElement):
         "emphasis": ("__", "__"),
         "bold": ("**", "**"),
         "computeroutput": ("``", "``"),
-        "strike": ("+++<del>+++", "+++</del>+++"),
+        "strike": ("[.line-through]#", "#"),
+        "subscript": ("~", "~"),
+        "underline": ("[.underline]#", "#"),
+        "small": ("[.small]#", "#"),
+        "superscript": ("^", "^"),
+        "ins": ("+++<ins>+++", "+++</ins>+++"),
+        "del": ("+++<del>+++", "+++</del>+++"),
+        "s": ("[.line-through]#", "#"),
     }
 
     kind: str
@@ -1295,8 +1308,10 @@ NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
     "anchor": Anchor,
     "blockquote": BlockQuote,
     "bold": Style,
+    "center": Center,
     "codeline": CodeLine,
     "computeroutput": Style,
+    "del": Style,
     "dot": Diagram,
     "emphasis": Style,
     "entry": Entry,
@@ -1305,6 +1320,7 @@ NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
     "highlight": Style,
     "hruler": HorizontalRuler,
     "image": Image,
+    "ins": Style,
     "itemizedlist": ListContainer,
     "listitem": ListItem,
     "orderedlist": ListContainer,
@@ -1319,6 +1335,7 @@ NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
     "programlisting": ProgramListing,
     "ref": Ref,
     "row": Row,
+    "s": Style,
     "sect1": Section,
     "sect2": Section,
     "sect3": Section,
@@ -1329,9 +1346,13 @@ NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
     "sect8": Section,
     "sect9": Section,
     "simplesect": Admonition,
+    "small": Style,
     "strike": Style,
+    "subscript": Style,
+    "superscript": Style,
     "table": Table,
     "ulink": Ulink,
+    "underline": Style,
     "verbatim": Verbatim,
     "xrefsect": Admonition,
 }
@@ -1362,9 +1383,27 @@ IGNORE = {
 
 # Tags known to be unsupported for now.
 UNSUPPORTED = {
-    "diafile", "center", "secondaryie", "indexentry", "dotfile", "tocitem", "toclist", "mscfile",
-    "copydoc", "s", "emoji", "variablelist", "msc", "language", "ins", "subscript", "underline",
-    "superscript", "parametertype", "primaryie", "small", "del"
+    # External files
+    "diafile",
+    "dotfile",
+
+    # Index entries
+    "secondaryie",
+    "indexentry",
+    "primaryie",
+
+    # TOC
+    "tocitem",
+    "toclist",
+
+    # Diagrams not supported by AsciiDoctor Diagram
+    "msc",
+    "mscfile",
+    "copydoc",
+    "emoji",
+    "variablelist",
+    "language",
+    "parametertype",
 }
 
 
@@ -1393,6 +1432,8 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
     else:
         logger.warning(f"Unsupported XML tag <{xml_element.tag}>. Please report an issue on GitHub"
                        " with example code.")
+
+    # TODO: Add tail of unsupported elements as plain text
 
     if element is None:
         return

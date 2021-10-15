@@ -768,7 +768,7 @@ Some example code:
 int answer = 42;
 ----
 
-+++<del>+++This is not right+++</del>+++
+[.line-through]#This is not right#
 
 [cols="3*", options="autowidth"]
 |===
@@ -1124,6 +1124,42 @@ Some blocks are only to be included in specific output types.
 Include HTML only text.
 
 XML text should be included."""
+
+
+def test_parse_html_styles():
+    input_xml = """\
+    <detaileddescription>
+<para>Some extra visual styles are possible with HTML.</para>
+<para>CO<subscript>2</subscript> and X<superscript>2</superscript>.</para>
+<para><ins>Inserted text</ins><linebreak/>
+<del>Deleted test</del></para>
+<para><underline>Underlined text</underline></para>
+<para><s>Put a line through this</s></para>
+<para><small>Small text</small></para>
+<para><center> Some centered paragraphs.</center></para>
+<para><center>Nice in the center here. </center> </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Some extra visual styles are possible with HTML.
+
+CO~2~ and X^2^.
+
++++<ins>+++Inserted text+++</ins>+++ +
++++<del>+++Deleted test+++</del>+++
+
+[.underline]#Underlined text#
+
+[.line-through]#Put a line through this#
+
+[.small]#Small text#
+
+[.text-center]
+Some centered paragraphs.
+
+[.text-center]
+Nice in the center here."""
 
 
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():

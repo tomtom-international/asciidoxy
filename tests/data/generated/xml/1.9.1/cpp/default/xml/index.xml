@@ -53,6 +53,8 @@
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_html_headings" kind="class"><name>asciidoxy::descriptions::HtmlHeadings</name>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_html_styles" kind="class"><name>asciidoxy::descriptions::HtmlStyles</name>
+  </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" kind="class"><name>asciidoxy::descriptions::HybridList</name>
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_images" kind="class"><name>asciidoxy::descriptions::Images</name>

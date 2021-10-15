@@ -373,6 +373,29 @@ class HtmlHeadings {
 };
 
 /**
+ * Some extra visual styles are possible with HTML.
+ *
+ * CO<sub>2</sub> and X<sup>2</sup>.
+ *
+ * <ins>Inserted text</ins><br/>
+ * <del>Deleted test</del>
+ *
+ * <u>Underlined text</u>
+ *
+ * <s>Put a line through this</s>
+ *
+ * <small>Small text</small>
+ *
+ * <center>
+ * Some centered paragraphs.
+ *
+ * Nice in the center here.
+ * </center>
+ */
+class HtmlStyles {
+};
+
+/**
  * Manual anchors can be inserted in the code.
  *
  * @anchor MANUAL_ANCHOR

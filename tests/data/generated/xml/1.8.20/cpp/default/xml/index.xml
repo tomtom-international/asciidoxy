@@ -14,11 +14,11 @@
     <member refid="class_const_int_1aa068b95529ad462c527edb8af85323e8" kind="variable"><name>value_</name></member>
     <member refid="class_const_int_1a80d34fa86fe64d30733534924fda5483" kind="function"><name>ConstInt</name></member>
   </compound>
+  <compound refid="classasciidoxy_1_1traffic_1_1_convertor" kind="class"><name>asciidoxy::traffic::Convertor</name>
+  </compound>
   <compound refid="classasciidoxy_1_1_convertor" kind="class"><name>asciidoxy::Convertor</name>
   </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_convertor" kind="class"><name>asciidoxy::geometry::Convertor</name>
-  </compound>
-  <compound refid="classasciidoxy_1_1traffic_1_1_convertor" kind="class"><name>asciidoxy::traffic::Convertor</name>
   </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_coordinate" kind="class"><name>asciidoxy::geometry::Coordinate</name>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a52b32f5ac1d5690a56645ba6cc45ed3d" kind="variable"><name>latitude_</name></member>
@@ -52,6 +52,8 @@
   <compound refid="classasciidoxy_1_1descriptions_1_1_formulae" kind="class"><name>asciidoxy::descriptions::Formulae</name>
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_html_headings" kind="class"><name>asciidoxy::descriptions::HtmlHeadings</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_html_styles" kind="class"><name>asciidoxy::descriptions::HtmlStyles</name>
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" kind="class"><name>asciidoxy::descriptions::HybridList</name>
   </compound>
