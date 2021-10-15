@@ -447,5 +447,11 @@ void ParBlock(int parameter);
 class OutputSpecificBlocks {
 };
 
+/**
+ * @copydoc FunctionDocumentation()
+ */
+template<class Type>
+int CopyDoc(int first, double second, Type* third);
+
 }  // namespace descriptions
 }  // namespace asciidoxy

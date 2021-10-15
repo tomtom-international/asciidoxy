@@ -114,8 +114,11 @@
 <codeline lineno="447" refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" kindref="compound">OutputSpecificBlocks</ref><sp/>{</highlight></codeline>
 <codeline lineno="448"><highlight class="normal">};</highlight></codeline>
 <codeline lineno="449"><highlight class="normal"></highlight></codeline>
-<codeline lineno="450"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="451"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="453"><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>Type&gt;</highlight></codeline>
+<codeline lineno="454"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1af66d50405deb24f05eab85b3ed15f871" kindref="member">CopyDoc</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>first,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>second,<sp/>Type*<sp/>third);</highlight></codeline>
+<codeline lineno="455"><highlight class="normal"></highlight></codeline>
+<codeline lineno="456"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="457"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="descriptions.hpp"/>
   </compounddef>

@@ -127,6 +127,7 @@
   <compound refid="namespaceasciidoxy_1_1descriptions" kind="namespace"><name>asciidoxy::descriptions</name>
     <member refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kind="function"><name>FunctionDocumentation</name></member>
     <member refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" kind="function"><name>ParBlock</name></member>
+    <member refid="descriptions_8hpp_1af66d50405deb24f05eab85b3ed15f871" kind="function"><name>CopyDoc</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
   </compound>

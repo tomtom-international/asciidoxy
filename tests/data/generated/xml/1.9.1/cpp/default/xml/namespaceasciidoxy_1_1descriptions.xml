@@ -147,6 +147,100 @@
         </inbodydescription>
         <location file="descriptions.hpp" line="418" column="6" declfile="descriptions.hpp" declline="418" declcolumn="6"/>
       </memberdef>
+      <memberdef kind="function" id="descriptions_8hpp_1af66d50405deb24f05eab85b3ed15f871" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Type</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int asciidoxy::descriptions::CopyDoc</definition>
+        <argsstring>(int first, double second, Type *third)</argsstring>
+        <name>CopyDoc</name>
+        <param>
+          <type>int</type>
+          <declname>first</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>second</declname>
+        </param>
+        <param>
+          <type>Type *</type>
+          <declname>third</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Complete documentation for a function or method.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">first</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The first parameter. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">second</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The second parameter. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">third</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The third parameter. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A status code </para>
+</simplesect>
+<parameterlist kind="retval"><parameteritem>
+<parameternamelist>
+<parametername>0</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>All is ok. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Something went wrong. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>std::logic_error</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Something is wrong with the logic. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>Type</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The type to do something with. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="descriptions.hpp" line="454" column="5" declfile="descriptions.hpp" declline="454" declcolumn="5"/>
+      </memberdef>
       </sectiondef>
     <briefdescription>
     </briefdescription>
