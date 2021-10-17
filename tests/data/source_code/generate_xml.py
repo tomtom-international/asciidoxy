@@ -15,6 +15,7 @@
 """Generate XML output from Doxygen for the test source code."""
 
 import os
+import shutil
 import subprocess
 import sys
 
@@ -46,6 +47,14 @@ def main() -> int:
 
         env["OUTPUT_DIR"] = os.fspath(out_dir)
         subprocess.run([doxygen, os.fspath(doxyfile.resolve())], cwd=cwd, env=env, check=True)
+
+        xml_out_dir = out_dir / "xml"
+        image_dir = out_dir / "images"
+        if image_dir.exists():
+            shutil.rmtree(image_dir)
+        image_dir.mkdir(parents=True, exist_ok=True)
+        for image_file in xml_out_dir.glob("*.png"):
+            shutil.move(image_file, image_dir)
 
     return 0
 

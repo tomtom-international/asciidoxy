@@ -46,3 +46,9 @@ CASE_SENSE_NAMES       = NO
 # will not generate output for the diagram.
 
 PLANTUML_JAR_PATH      = /usr/share/java/plantuml/plantuml.jar
+
+# The IMAGE_PATH tag can be used to specify one or more files or directories
+# that contain images that are to be included in the documentation (see the
+# \image command).
+
+IMAGE_PATH             = images

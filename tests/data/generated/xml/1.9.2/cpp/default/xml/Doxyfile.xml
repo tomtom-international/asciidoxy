@@ -180,7 +180,8 @@
     <value><![CDATA[*]]></value>
   </option>
   <option  id='EXAMPLE_RECURSIVE' default='yes' type='bool'><value>NO</value></option>
-  <option  id='IMAGE_PATH' default='yes' type='stringlist'>
+  <option  id='IMAGE_PATH' default='no' type='stringlist'>
+    <value><![CDATA[images]]></value>
   </option>
   <option  id='INPUT_FILTER' default='yes' type='string'><value><![CDATA[]]></value></option>
   <option  id='FILTER_PATTERNS' default='yes' type='stringlist'>
