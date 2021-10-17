@@ -163,4 +163,4 @@ def test_doxygen_schema__description_parser(xml_data):
     unsupported_elements = (all_elements - NEW_ELEMENT.keys() - UPDATE_PARENT.keys() -
                             USE_PARENT.keys() - IGNORE - SpecialCharacter.SPECIAL_CHARACTERS.keys())
 
-    assert not unsupported_elements - UNSUPPORTED
+    assert not unsupported_elements - UNSUPPORTED.keys()

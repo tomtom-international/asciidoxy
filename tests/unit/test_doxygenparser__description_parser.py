@@ -1181,6 +1181,7 @@ def test_parse_emoji():
 
 &#x2b50;"""
 
+
 def test_select_descriptions__use_brief_and_detailed_as_in_xml():
     brief_xml = """\
     <briefdescription>

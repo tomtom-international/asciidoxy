@@ -1313,6 +1313,17 @@ class ParameterDescription(ParaContainer):
     """Description of a single parameter."""
 
 
+###################################################################################################
+# Special functionality
+###################################################################################################
+
+
+class Skipped(PlainText):
+    """An item that is skipped, either because it must be ignored or because it is not supported."""
+    def add_text(self, text: str) -> None:
+        """Ignored."""
+
+
 # Map of element tags for which a new element is to be constructed and added the the parent.
 NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
     "anchor": Anchor,
@@ -1392,30 +1403,48 @@ IGNORE = {
     "internal",
 }
 
-# Tags known to be unsupported for now.
+# Tags known to be unsupported for now. If a text is present, it is shown to the user as a warning,
+# otherwise it is silently ignored.
 UNSUPPORTED = {
     # External files
-    "diafile",
-    "dotfile",
+    "diafile":
+    "",
+    "dotfile":
+    "",
 
     # Index entries
-    "secondaryie",
-    "indexentry",
-    "primaryie",
+    "secondaryie":
+    "",
+    "indexentry":
+    "",
+    "primaryie":
+    "",
 
     # TOC
-    "tocitem",
-    "toclist",
+    "tocitem":
+    "",
+    "toclist":
+    "",
 
     # Diagram types not supported by AsciiDoctor Diagram
-    "msc",
-    "mscfile",
+    "msc":
+    "MSC diagrams are not supported by AsciiDoctor.",
+    "mscfile":
+    "MSC diagrams are not supported by AsciiDoctor.",
+
+    # Multiple language support
+    "language": ("Multiple languages are not supported by AsciiDoxy yet. Language specific text "
+                 "will be missing from the generated documentation."),
 
     # Other
-    "variablelist",
-    "parametertype",
-    "copydoc",  # Not seen when using @copydoc. Content is already duplicated in the XML output.
-    "language",  # Support needed to select the right language.
+    "variablelist":
+    "Please report an issue on GitHub with example code.",
+    "parametertype":
+    "Please report an issue on GitHub with example code.",
+
+    # Not seen when using @copydoc. Content is already duplicated in the XML output.
+    "copydoc":
+    "Please report an issue on GitHub with example code.",
 }
 
 
@@ -1439,13 +1468,17 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
         element = SpecialCharacter.from_xml(xml_element, language_tag)
 
     elif xml_element.tag in IGNORE:
-        return
+        element = Skipped.from_xml(xml_element, language_tag)
+
+    elif xml_element.tag in UNSUPPORTED:
+        warning = UNSUPPORTED[xml_element.tag]
+        if warning:
+            logger.warning(f"Unsupported XML tag <{xml_element.tag}>. {warning}")
+        element = Skipped.from_xml(xml_element, language_tag)
 
     else:
-        logger.warning(f"Unsupported XML tag <{xml_element.tag}>. Please report an issue on GitHub"
+        logger.warning(f"Unknown XML tag <{xml_element.tag}>. Please report an issue on GitHub"
                        " with example code.")
-
-    # TODO: Add tail of unsupported elements as plain text
 
     if element is None:
         return
@@ -1458,6 +1491,6 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
     if xml_element.tail:
         element.add_tail(parent, xml_element.tail)
 
-    for child in xml_element:
-        assert isinstance(element, NestedDescriptionElement)
-        _parse_description(child, element, language_tag)
+    if isinstance(element, NestedDescriptionElement):
+        for child in xml_element:
+            _parse_description(child, element, language_tag)
