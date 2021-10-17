@@ -1406,11 +1406,9 @@ IGNORE = {
 # Tags known to be unsupported for now. If a text is present, it is shown to the user as a warning,
 # otherwise it is silently ignored.
 UNSUPPORTED = {
-    # External files
-    "diafile":
-    "",
+    # Using dotfile generates an absolute path in the XML. AsciiDoxy cannot resolve that.
     "dotfile":
-    "",
+    "External dot files are not supported. Use inline dot diagrams instead.",
 
     # Index entries
     "secondaryie":
@@ -1431,6 +1429,8 @@ UNSUPPORTED = {
     "MSC diagrams are not supported by AsciiDoctor.",
     "mscfile":
     "MSC diagrams are not supported by AsciiDoctor.",
+    "diafile":
+    "Dia files are not supported by AsciiDoctor.",
 
     # Multiple language support
     "language": ("Multiple languages are not supported by AsciiDoxy yet. Language specific text "
