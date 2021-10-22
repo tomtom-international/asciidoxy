@@ -97,7 +97,7 @@ def test_resolve_partial_references_for_parameters(parser_driver_factory):
 def test_resolve_references_for_typedefs(parser_driver_factory):
     parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
-    member = parser.api_reference.find("asciidoxy::positioning::Traffic", kind="typedef")
+    member = parser.api_reference.find("asciidoxy::positioning::Traffic", kind="alias")
     assert member is not None
     assert member.returns
     assert member.returns.type

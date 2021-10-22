@@ -23,7 +23,7 @@ from typing import List, Optional
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser, find_tokens
-from ...model import Compound
+from ...model import Compound, Parameter
 
 
 class CppTraits(LanguageTraits):
@@ -121,6 +121,14 @@ class CppTypeParser(TypeParser):
             elif match[-3].category == TokenCategory.NAME:
                 match[-3].category = TokenCategory.ARG_NAME
 
+        # Typedefs for function types can leave a trailing (*
+        if (len(tokens) > 2 and tokens[-2].category == TokenCategory.ARGS_START
+                and tokens[-1].category == TokenCategory.OPERATOR):
+            tokens = tokens[:-2]
+        if (len(tokens) > 3 and tokens[-3].category == TokenCategory.ARGS_START
+                and tokens[-2].category == TokenCategory.OPERATOR):
+            tokens = tokens[:-3]
+
         return tokens
 
 
@@ -138,5 +146,39 @@ class CppParser(ParserBase):
         if member is not None and member.kind == "function" and member.args:
             member.default = self.DEFAULTED_RE.search(member.args) is not None
             member.deleted = self.DELETED_RE.search(member.args) is not None
+
+        if (member is not None and member.kind == "typedef" and member.definition
+                and member.definition.startswith("using")):
+            member.kind = "alias"
+
+        member = self._fix_function_typedef(member, memberdef_element)
+        return member
+
+    def _fix_function_typedef(self, member: Optional[Compound],
+                              memberdef_element: ET.Element) -> Optional[Compound]:
+        if member is None:
+            return None
+        if member.kind != "typedef" or not member.args:
+            return member
+
+        tokens = self.TYPE_PARSER.tokenize_text(member.args)
+        while tokens and tokens[0].category in (TokenCategory.WHITESPACE, TokenCategory.ARGS_START,
+                                                TokenCategory.ARGS_END):
+            tokens.pop(0)
+        while tokens and tokens[-1].category in (TokenCategory.WHITESPACE, TokenCategory.ARGS_END):
+            tokens.pop(-1)
+
+        while tokens:
+            type_tokens = []
+            while tokens and tokens[0].category != TokenCategory.SEPARATOR:
+                type_tokens.append(tokens.pop(0))
+            if tokens:
+                # Still tokens left, so there must be a separator here
+                tokens.pop(0)
+
+            if type_tokens:
+                ref = self.TYPE_PARSER.type_from_tokens(type_tokens, self._driver, member.full_name)
+                if ref is not None:
+                    member.params.append(Parameter(type=ref))
 
         return member

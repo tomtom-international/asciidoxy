@@ -67,6 +67,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   - Actually create links to known exceptions from method/function documentation.
   - #37: When type names contain nested types, and the nested types have namespaces, the short name
     was incorrectly generated, resulting in incorrect section titles.
+  - #35: {Cpp}: Support typedefs for function types. Limitation: documentation for the function
+    parameters is missing. A planned refactoring will fix this.
 
 
 == 0.7.5 (20 Aug 2021)

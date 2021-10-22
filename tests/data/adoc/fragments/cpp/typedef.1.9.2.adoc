@@ -1,11 +1,12 @@
 
 
-== [[cpp-traffic-event_8hpp_1aadd656922dd873c8ab5de7c891b557e1,asciidoxy::traffic::TpegCauseCode]]TpegCauseCode
+
+== [[cpp-traffic-event_8hpp_1adb4a21783ecb2c7bf30726a36c61a502,asciidoxy::traffic::Delay]]Delay
 
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-using TpegCauseCode = int
+typedef int Delay
 ----
 
 

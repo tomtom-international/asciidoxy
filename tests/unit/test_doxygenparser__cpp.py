@@ -561,7 +561,7 @@ Do not use this class ever!
           id="Struct with template parameter specialization"),
     param(dict(name="asciidoxy::traffic::TpegCauseCode", lang="cpp"),
           m_compound(
-              kind="typedef",
+              kind="alias",
               name="TpegCauseCode",
               full_name="asciidoxy::traffic::TpegCauseCode",
               namespace="asciidoxy::traffic",
@@ -581,6 +581,14 @@ Do not use this class ever!
               name="DEFAULT_CB",
               full_name="DEFAULT_CB",
               namespace=IsEmpty(),
+              returns=m_returnvalue(type=m_typeref(name="uint32_t", ), ),
+              params=[
+                  m_parameter(type=m_typeref(
+                      name="void",
+                      suffix=" *pvArg",
+                  )),
+                  m_parameter(type=m_typeref(name="uint32_t ulResult", )),
+              ],
           ),
           id="Function type typedef"),
 ])

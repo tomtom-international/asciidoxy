@@ -56,6 +56,8 @@ ${insert("asciidoxy::traffic::TpegCauseCode", leveloffset="+2")}
 
 ${insert("asciidoxy::traffic::Delay", leveloffset="+2")}
 
+${insert("DEFAULT_CB", leveloffset="+2")}
+
 ${insert("asciidoxy::traffic::TrafficEvent", leveloffset="+2")}
 
 ${insert("asciidoxy::tparam::is_container", leveloffset="+2")}

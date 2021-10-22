@@ -13,29 +13,22 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import h1, has, has_any
+from asciidoxy.templates.helpers import h1, has
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 from html import escape
-%>
-<%
-helper = CppTemplateHelper(api, element, insert_filter)
 %>
 ${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
 ${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
 ----
-%if has(element.params):
-typedef ${escape(helper.print_ref(element.returns.type))} (* ${element.name})${helper.argument_list(element.params)}
-%else:
-typedef ${escape(helper.print_ref(element.returns.type))} ${element.name}
-%endif
+using ${element.name} = ${escape(CppTemplateHelper(api).print_ref(element.returns.type))}
 ----
 ${element.brief}
 
 ${element.description}
 
-%if has_any(element.params, element.sections):
+%if has(element.sections):
 [cols='h,5a']
 |===
 % for section_title, section_text in element.sections.items():
@@ -43,18 +36,5 @@ ${element.description}
 | ${section_text}
 
 % endfor
-% if has(element.params):
-| Parameters
-|
-% for param in element.params:
-`${helper.parameter(param)}`::
-${param.description}
-% if param.default_value:
-+
-*Default value*: `${param.default_value}`
-% endif
-
-% endfor
-% endif
 |===
 % endif
