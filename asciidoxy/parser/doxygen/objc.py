@@ -76,6 +76,7 @@ class ObjectiveCTraits(LanguageTraits):
 
     NESTING_BOUNDARY = "<"
     NAMESPACE_SEPARATOR = "."
+    FILE_EXTENSIONS = ".h", ".m", ".mm"
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -91,12 +92,7 @@ class ObjectiveCTraits(LanguageTraits):
     def full_name(cls, name: str, parent: str = "", kind: Optional[str] = None) -> str:
         if kind in ("enum", "enumvalue", "interface", "protocol"):
             return name
-        if not parent or name.startswith(f"{parent}."):
-            return name
-        if parent.endswith(".h"):
-            # Parent is a header file, do not prepend
-            return name
-        return f"{parent}.{name}"
+        return super().full_name(name, parent, kind)
 
     @classmethod
     def namespace_and_name(cls,

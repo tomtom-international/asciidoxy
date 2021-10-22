@@ -161,6 +161,9 @@
   </compound>
   <compound refid="descriptions_8hpp" kind="file"><name>descriptions.hpp</name>
   </compound>
+  <compound refid="function__type_8hpp" kind="file"><name>function_type.hpp</name>
+    <member refid="function__type_8hpp_1a9527e199450050ae8e97b5a29f9ddc75" kind="typedef"><name>DEFAULT_CB</name></member>
+  </compound>
   <compound refid="logger_8hpp" kind="file"><name>logger.hpp</name>
   </compound>
   <compound refid="move__only_8hpp" kind="file"><name>move_only.hpp</name>

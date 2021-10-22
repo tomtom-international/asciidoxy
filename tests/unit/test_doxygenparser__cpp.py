@@ -559,6 +559,30 @@ Do not use this class ever!
               namespace="asciidoxy::tparam",
           ),
           id="Struct with template parameter specialization"),
+    param(dict(name="asciidoxy::traffic::TpegCauseCode", lang="cpp"),
+          m_compound(
+              kind="typedef",
+              name="TpegCauseCode",
+              full_name="asciidoxy::traffic::TpegCauseCode",
+              namespace="asciidoxy::traffic",
+          ),
+          id="Type alias"),
+    param(dict(name="asciidoxy::traffic::Delay", lang="cpp"),
+          m_compound(
+              kind="typedef",
+              name="Delay",
+              full_name="asciidoxy::traffic::Delay",
+              namespace="asciidoxy::traffic",
+          ),
+          id="Typedef"),
+    param(dict(name="DEFAULT_CB", lang="cpp"),
+          m_compound(
+              kind="typedef",
+              name="DEFAULT_CB",
+              full_name="DEFAULT_CB",
+              namespace=IsEmpty(),
+          ),
+          id="Function type typedef"),
 ])
 def test_parse_cpp(api_reference, search_params, matcher):
     matcher.assert_matches(api_reference.find(**search_params))

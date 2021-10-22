@@ -87,6 +87,7 @@ class LanguageTraits(ABC):
         ALLOWED_NAMES:            Token types that are allowed in type names.
         NESTING_BOUNDARY:         Character(s) indicating the start of nested types.
         NAMESPACE_SEPARATOR:      Character(s) separating namespaces and names.
+        FILE_EXTENSIONS:          Potential file extensions for source code files.
     """
     TAG: str
 
@@ -100,6 +101,7 @@ class LanguageTraits(ABC):
 
     NESTING_BOUNDARY: Optional[str]
     NAMESPACE_SEPARATOR: Optional[str]
+    FILE_EXTENSIONS: Optional[Sequence[str]] = None
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -181,6 +183,10 @@ class LanguageTraits(ABC):
             return name
         if not parent or name.startswith(f"{parent}{cls.NAMESPACE_SEPARATOR}"):
             return name
+        if parent and cls.FILE_EXTENSIONS:
+            for ext in cls.FILE_EXTENSIONS:
+                if parent.endswith(ext):
+                    return name
         return f"{parent}{cls.NAMESPACE_SEPARATOR}{name}"
 
     @classmethod

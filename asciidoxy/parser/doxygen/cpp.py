@@ -78,6 +78,7 @@ class CppTraits(LanguageTraits):
 
     NESTING_BOUNDARY = "<"
     NAMESPACE_SEPARATOR = "::"
+    FILE_EXTENSIONS = ".h", ".hpp", ".c", ".cpp"
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
