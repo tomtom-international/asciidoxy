@@ -184,9 +184,8 @@ class ParserBase(ABC):
         enumvalue.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
         enumvalue.prot = enumvalue_element.get("prot", "")
 
-        name = self.TRAITS.cleanup_name(enumvalue_element.findtext("name", ""))
-        enumvalue.name = self.TRAITS.short_name(name)
-        enumvalue.full_name = self.TRAITS.full_name(name, parent_name, "enumvalue")
+        enumvalue.name, enumvalue.full_name, _ = self.TRAITS.names(
+            enumvalue_element.findtext("name", ""), parent_name, "enumvalue")
 
         enumvalue.initializer = enumvalue_element.findtext("initializer", "")
         enumvalue.brief, enumvalue.description = select_descriptions(
@@ -202,10 +201,8 @@ class ParserBase(ABC):
         member.kind = memberdef_element.get("kind", "")
         member.prot = memberdef_element.get("prot", "")
 
-        name = self.TRAITS.cleanup_name(memberdef_element.findtext("name", ""))
-        member.name = self.TRAITS.short_name(name)
-        member.full_name = self.TRAITS.full_name(name, parent.full_name, member.kind)
-        member.namespace = self.TRAITS.namespace(member.full_name, member.kind)
+        member.name, member.full_name, member.namespace = self.TRAITS.names(
+            memberdef_element.findtext("name", ""), parent.full_name, member.kind)
         member.include = self.find_include(memberdef_element)
 
         if self.TRAITS.is_member_blacklisted(member.kind, member.name):
@@ -252,10 +249,8 @@ class ParserBase(ABC):
         compound.kind = compounddef_element.get("kind", "")
         compound.prot = compounddef_element.get("prot", "")
 
-        name = self.TRAITS.cleanup_name(compounddef_element.findtext("compoundname", ""))
-        compound.name = self.TRAITS.short_name(name)
-        compound.full_name = self.TRAITS.full_name(name, kind=compound.kind)
-        compound.namespace = self.TRAITS.namespace(compound.full_name, kind=compound.kind)
+        compound.name, compound.full_name, compound.namespace = self.TRAITS.names(
+            compounddef_element.findtext("compoundname", ""), kind=compound.kind)
         compound.include = self.find_include(compounddef_element)
 
         compound.members = [

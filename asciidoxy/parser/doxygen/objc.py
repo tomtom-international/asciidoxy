@@ -17,7 +17,7 @@ import string
 
 import xml.etree.ElementTree as ET
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
@@ -74,6 +74,9 @@ class ObjectiveCTraits(LanguageTraits):
     )
     ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME, TokenCategory.BUILT_IN_NAME,
 
+    NESTING_BOUNDARY = "<"
+    NAMESPACE_SEPARATOR = "."
+
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
         return type_name in cls.LANGUAGE_BUILT_IN_TYPES or type_name.startswith("NS")
@@ -96,13 +99,12 @@ class ObjectiveCTraits(LanguageTraits):
         return f"{parent}.{name}"
 
     @classmethod
-    def namespace(cls, full_name: str, kind: Optional[str] = None) -> Optional[str]:
+    def namespace_and_name(cls,
+                           full_name: str,
+                           kind: Optional[str] = None) -> Tuple[Optional[str], str]:
         if kind in ("enum", "enumvalue", "interface", "protocol"):
-            return None
-        if "." in full_name:
-            namespace, _ = full_name.rsplit(".", maxsplit=1)
-            return namespace
-        return None
+            return None, full_name
+        return super().namespace_and_name(full_name, kind)
 
     @classmethod
     def is_member_blacklisted(cls, kind: str, name: str) -> bool:

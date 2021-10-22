@@ -67,6 +67,10 @@
   <compound refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate" kind="class"><name>asciidoxy::geometry::InvalidCoordinate</name>
     <member refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate_1a3b0057e2237f2ecfe3ebc94ca2ba6a12" kind="function"><name>what</name></member>
   </compound>
+  <compound refid="structasciidoxy_1_1tparam_1_1is__container" kind="struct"><name>asciidoxy::tparam::is_container</name>
+  </compound>
+  <compound refid="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4" kind="struct"><name>asciidoxy::tparam::is_container&lt; std::array&lt; T, N &gt; &gt;</name>
+  </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_links" kind="class"><name>asciidoxy::descriptions::Links</name>
   </compound>
   <compound refid="class_logger" kind="class"><name>Logger</name>
@@ -140,6 +144,8 @@
   <compound refid="namespaceasciidoxy_1_1system" kind="namespace"><name>asciidoxy::system</name>
     <member refid="service_8hpp_1a7c44d1c4b121bf30bf90a517f8ff9fbc" kind="function"><name>CreateService</name></member>
   </compound>
+  <compound refid="namespaceasciidoxy_1_1tparam" kind="namespace"><name>asciidoxy::tparam</name>
+  </compound>
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
     <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>
     <member refid="traffic__event_8hpp_1adb4a21783ecb2c7bf30726a36c61a502" kind="typedef"><name>Delay</name></member>
@@ -166,6 +172,8 @@
   <compound refid="same__in__multiple__namespaces_8hpp" kind="file"><name>same_in_multiple_namespaces.hpp</name>
   </compound>
   <compound refid="service_8hpp" kind="file"><name>service.hpp</name>
+  </compound>
+  <compound refid="template__parameters_8hpp" kind="file"><name>template_parameters.hpp</name>
   </compound>
   <compound refid="traffic__event_8hpp" kind="file"><name>traffic_event.hpp</name>
   </compound>

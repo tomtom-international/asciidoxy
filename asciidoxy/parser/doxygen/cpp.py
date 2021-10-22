@@ -76,27 +76,12 @@ class CppTraits(LanguageTraits):
     ALLOWED_NAMES = (TokenCategory.WHITESPACE, TokenCategory.NAME,
                      TokenCategory.NAMESPACE_SEPARATOR, TokenCategory.BUILT_IN_NAME)
 
+    NESTING_BOUNDARY = "<"
+    NAMESPACE_SEPARATOR = "::"
+
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
         return type_name in cls.LANGUAGE_BUILT_IN_TYPES or type_name.startswith("std::")
-
-    @classmethod
-    def short_name(cls, name: str) -> str:
-        return name.split("::")[-1]
-
-    @classmethod
-    def full_name(cls, name: str, parent: str = "", kind: Optional[str] = None) -> str:
-        if not parent or name.startswith(f"{parent}::"):
-            return name
-        return f"{parent}::{name}"
-
-    @classmethod
-    def namespace(cls, full_name: str, kind: Optional[str] = None) -> Optional[str]:
-        if "::" in full_name:
-            namespace, _ = full_name.rsplit("::", maxsplit=1)
-            return namespace
-        else:
-            return None
 
     @classmethod
     def is_member_blacklisted(cls, kind: str, name: str) -> bool:

@@ -58,6 +58,10 @@ ${insert("asciidoxy::traffic::Delay", leveloffset="+2")}
 
 ${insert("asciidoxy::traffic::TrafficEvent", leveloffset="+2")}
 
+${insert("asciidoxy::tparam::is_container", leveloffset="+2")}
+
+${insert("asciidoxy::tparam::is_container< std::array< T, N > >", leveloffset="+2")}
+
 == Consumer
 
 ${insert("asciidoxy::positioning::Positioning", leveloffset="+2")}

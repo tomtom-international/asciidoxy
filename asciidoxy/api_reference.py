@@ -143,6 +143,7 @@ class NameFilter(ElementFilter):
     _namespace_parts: NamespaceList
 
     NAMESPACE_SEPARATORS = "::", "."
+    NESTED_SEPARATOR = "<"
 
     def __init__(self,
                  name: Optional[str],
@@ -202,9 +203,11 @@ class NameFilter(ElementFilter):
 
     @classmethod
     def _split_namespaces(cls, name: str) -> NamespaceList:
+        unnested_name, nested_sep, nested = name.partition(cls.NESTED_SEPARATOR)
         for sep in cls.NAMESPACE_SEPARATORS:
-            if sep in name:
-                namespaces = name.split(sep)
+            if sep in unnested_name:
+                namespaces = unnested_name.split(sep)
+                namespaces[-1] = f"{namespaces[-1]}{nested_sep}{nested}"
                 break
         else:
             return NamespaceList([name])
@@ -413,9 +416,11 @@ class ApiReference:
         if paramtype_matcher.applies:
             name = paramtype_matcher.name
 
+        unnested_name, nested_sep, nested = name.partition(NameFilter.NESTED_SEPARATOR)
         for separator in NameFilter.NAMESPACE_SEPARATORS:
-            if separator in name:
-                _, short_name = name.rsplit(separator, maxsplit=1)
+            if separator in unnested_name:
+                _, _, short_name = unnested_name.rpartition(separator)
+                short_name = f"{short_name}{nested_sep}{nested}"
                 break
         else:
             short_name = name

@@ -7,6 +7,7 @@
     <innernamespace refid="namespaceasciidoxy_1_1geometry">asciidoxy::geometry</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1relative__namespace">asciidoxy::relative_namespace</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1system">asciidoxy::system</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1tparam">asciidoxy::tparam</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1traffic">asciidoxy::traffic</innernamespace>
       <sectiondef kind="func">
       <memberdef kind="function" id="overloads_8hpp_1afbbb1c0274b5a0d90b2d1d39f1269027" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">

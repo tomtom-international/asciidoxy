@@ -544,6 +544,21 @@ Do not use this class ever!
                   name="InvalidCoordinate"), ),
           ], ),
           id="Exception with explicit id in XML"),
+    param(dict(name="asciidoxy::tparam::is_container", kind="struct", lang="cpp"),
+          m_compound(
+              name="is_container",
+              full_name="asciidoxy::tparam::is_container",
+              namespace="asciidoxy::tparam",
+          ),
+          id="Struct with template parameters"),
+    param(dict(
+        name="asciidoxy::tparam::is_container< std::array< T, N > >", kind="struct", lang="cpp"),
+          m_compound(
+              name="is_container< std::array< T, N > >",
+              full_name="asciidoxy::tparam::is_container< std::array< T, N > >",
+              namespace="asciidoxy::tparam",
+          ),
+          id="Struct with template parameter specialization"),
 ])
 def test_parse_cpp(api_reference, search_params, matcher):
     matcher.assert_matches(api_reference.find(**search_params))
