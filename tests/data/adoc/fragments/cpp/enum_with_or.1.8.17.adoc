@@ -1,0 +1,63 @@
+
+
+
+== [[cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757d,asciidoxy::wifi::ESP32WiFiProtocol]]ESP32WiFiProtocol
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;enums.hpp&gt;
+
+enum asciidoxy::wifi::ESP32WiFiProtocol
+----
+
+
+
+
+
+[cols='h,a']
+|===
+
+
+| [[cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da8a003930481b05de89c4ebf13ff9a6f9,eWIFI_11B]]eWIFI_11B = WIFI_PROTOCOL_11B
+|
+802.11b
+
+
+
+
+| [[cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757dab30be87b17ae0f708b5b42cf3bf6de83,eWIFI_11BG]]eWIFI_11BG = WIFI_PROTOCOL_11B {vbar} WIFI_PROTOCOL_11G
+|
+802.11bg
+
+
+
+
+| [[cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da7cc82be17a83a07f1b5e2e55d396bdb5,eWIFI_11BGN]]eWIFI_11BGN = WIFI_PROTOCOL_11B {vbar} WIFI_PROTOCOL_11G {vbar} WIFI_PROTOCOL_11N
+|
+802.11bgn
+
+
+
+
+| [[cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da80b47fd83a1260f34e08451cb14a9366,eWIFI_LR]]eWIFI_LR = WIFI_PROTOCOL_LR
+|
+ESP custom LR protocol.
+
+
+
+
+| [[cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757dab2f144be810c50dc1320100045c01b42,eWIFI_11BGNLR]]eWIFI_11BGNLR = WIFI_PROTOCOL_11B {vbar} WIFI_PROTOCOL_11G {vbar} WIFI_PROTOCOL_11N {vbar} WIFI_PROTOCOL_LR
+|
+802.11bgn+LR
+
+
+
+
+| [[cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757daec69ba3d6df7e31e1bea2dadb3210b72,eERROR]]eERROR 
+|
+error
+
+
+
+|===

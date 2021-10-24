@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any, h1, h2
+from asciidoxy.templates.helpers import has, has_any, h1, h2, tc
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 from html import escape
 from itertools import chain
@@ -58,7 +58,7 @@ else:
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % for prot in ("public", "protected", "private"):
@@ -68,7 +68,7 @@ else:
 |
 % for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 `<<${enclosed.id},++${enclosed.name}++>>`::
-${enclosed.brief}
+${enclosed.brief | tc}
 % endfor
 
 % endif
@@ -78,7 +78,7 @@ ${enclosed.brief}
 |
 % for constructor in helper.constructors(prot=prot):
 `<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
-${constructor.brief}
+${constructor.brief | tc}
 % endfor
 
 % endif
@@ -88,7 +88,7 @@ ${constructor.brief}
 |
 % for destructor in helper.destructors(prot=prot):
 `<<${destructor.id},++${destructor.name}()++>>`::
-${destructor.brief}
+${destructor.brief | tc}
 % endfor
 
 % endif
@@ -98,7 +98,7 @@ ${destructor.brief}
 |
 % for operator in helper.operators(prot=prot):
 `<<${operator.id},++${operator.name}${helper.type_list(operator.params)}++>>`::
-${operator.brief}
+${operator.brief | tc}
 % endfor
 
 % endif
@@ -108,7 +108,7 @@ ${operator.brief}
 |
 % for variable in helper.variables(prot=prot):
 `<<${variable.id},++${variable.name}++>>`::
-${variable.brief}
+${variable.brief | tc}
 % endfor
 % endif
 ###################################################################################################
@@ -117,7 +117,7 @@ ${variable.brief}
 |
 % for method in helper.static_methods(prot=prot):
 `<<${method.id},++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -127,7 +127,7 @@ ${method.brief}
 |
 % for method in helper.methods(prot=prot):
 `<<${method.id},++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${" const" if method.const else ""}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -183,9 +183,9 @@ ${api.inserted(variable)}
 ${escape(helper.print_ref(variable.returns.type))} ${variable.name}
 ----
 
-${variable.brief}
+${variable.brief | tc}
 
-${variable.description}
+${variable.description | tc}
 
 '''
 % endfor

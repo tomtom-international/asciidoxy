@@ -13,7 +13,7 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import h1, has, has_any
+from asciidoxy.templates.helpers import h1, has, has_any, tc
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 from html import escape
 %>
@@ -40,7 +40,7 @@ ${element.description}
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % if has(element.params):
@@ -48,10 +48,10 @@ ${element.description}
 |
 % for param in element.params:
 `${helper.parameter(param)}`::
-${param.description}
+${param.description | tc}
 % if param.default_value:
 +
-*Default value*: `${param.default_value}`
+*Default value*: `${param.default_value | tc}`
 % endif
 
 % endfor

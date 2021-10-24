@@ -248,3 +248,8 @@ def h1(leveloffset: int, title: str) -> str:
 
 def h2(leveloffset: int, title: str) -> str:
     return header(leveloffset + 2, title)
+
+
+def tc(text: str) -> str:
+    """Filter for table cell content."""
+    return text.replace("|", "{vbar}")

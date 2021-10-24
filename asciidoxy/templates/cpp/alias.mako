@@ -13,7 +13,7 @@
 ## limitations under the License.
 
 <%!
-from asciidoxy.templates.helpers import h1, has
+from asciidoxy.templates.helpers import h1, has, tc
 from asciidoxy.templates.cpp.helpers import CppTemplateHelper
 from html import escape
 %>
@@ -33,7 +33,7 @@ ${element.description}
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 |===

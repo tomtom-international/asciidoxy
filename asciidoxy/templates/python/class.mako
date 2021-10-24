@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any, h1, h2
+from asciidoxy.templates.helpers import has, has_any, h1, h2, tc
 from asciidoxy.templates.python.helpers import PythonTemplateHelper
 from html import escape
 %>
@@ -48,7 +48,7 @@ if not has_any(helper.complex_enclosed_types(prot="public"),
 
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 ###################################################################################################
@@ -57,7 +57,7 @@ if not has_any(helper.complex_enclosed_types(prot="public"),
 |
 % for enclosed in helper.complex_enclosed_types(prot="public"):
 `<<${enclosed.id},++${enclosed.name}++>>`::
-${enclosed.brief}
+${enclosed.brief | tc}
 % endfor
 
 % endif
@@ -67,7 +67,7 @@ ${enclosed.brief}
 |
 % for constructor in helper.constructors(prot="public"):
 `<<${constructor.id},++${constructor.name}++>>`::
-${constructor.brief}
+${constructor.brief | tc}
 % endfor
 
 % endif
@@ -77,7 +77,7 @@ ${constructor.brief}
 |
 % for variable in helper.variables(prot="public"):
 `<<${variable.id},++${variable.name}++>>`::
-${variable.brief}
+${variable.brief | tc}
 % endfor
 % endif
 ###################################################################################################
@@ -86,7 +86,7 @@ ${variable.brief}
 |
 % for method in helper.static_methods(prot="public"):
 `<<${method.id},++${method.name}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -96,7 +96,7 @@ ${method.brief}
 |
 % for method in helper.methods(prot="public"):
 `<<${method.id},++${method.name}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -131,9 +131,9 @@ ${variable.name}
 % endif
 ----
 
-${variable.brief}
+${variable.brief | tc}
 
-${variable.description}
+${variable.description | tc}
 
 '''
 % endfor

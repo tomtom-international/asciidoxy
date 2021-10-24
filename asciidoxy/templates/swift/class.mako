@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any, h1, h2
+from asciidoxy.templates.helpers import has, has_any, h1, h2, tc
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 from html import escape
 from itertools import chain
@@ -52,7 +52,7 @@ else:
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % for prot in ("open", "public", "internal", "file-private", "private"):
@@ -62,7 +62,7 @@ else:
 |
 % for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 `<<${enclosed.id},++${enclosed.name}++>>`::
-${enclosed.brief}
+${enclosed.brief | tc}
 % endfor
 
 % endif
@@ -72,7 +72,7 @@ ${enclosed.brief}
 |
 % for constructor in helper.constructors(prot=prot):
 `<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
-${constructor.brief}
+${constructor.brief | tc}
 % endfor
 
 % endif
@@ -82,7 +82,7 @@ ${constructor.brief}
 |
 % for prop in helper.properties(prot=prot):
 `<<${prop.id},++${prop.name}++>>`::
-${prop.brief}
+${prop.brief | tc}
 % endfor
 
 % endif
@@ -92,7 +92,7 @@ ${prop.brief}
 |
 % for method in helper.type_methods(prot=prot):
 `<<${method.id},++${method.name}${helper.type_list(method.params)}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -102,7 +102,7 @@ ${method.brief}
 |
 % for method in helper.methods(prot=prot):
 `<<${method.id},++${method.name}${helper.type_list(method.params)}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -144,9 +144,9 @@ ${api.inserted(prop)}
 var ${prop.name}: ${escape(helper.print_ref(prop.returns.type))}
 ----
 
-${prop.brief}
+${prop.brief | tc}
 
-${prop.description}
+${prop.description | tc}
 
 '''
 % endfor

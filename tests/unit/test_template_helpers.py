@@ -20,7 +20,7 @@ import pytest
 from unittest.mock import call, Mock
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.templates.helpers import has, has_any, TemplateHelper
+from asciidoxy.templates.helpers import has, has_any, TemplateHelper, header, h1, h2, tc
 from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 
 
@@ -1046,3 +1046,26 @@ def test_protected_enum_values__no_filter(helper):
 def test_private_enum_values__no_filter(helper):
     result = [m.name for m in helper.enum_values(prot="private")]
     assert result == ["PrivateEnumvalue"]
+
+
+def test_header():
+    assert header(1, "Header") == "= Header"
+    assert header(2, "Header") == "== Header"
+    assert header(3, "Header") == "=== Header"
+    assert header(0, "Header") == " Header"
+    assert header(1, "") == "= "
+
+    assert h1(0, "Header") == "= Header"
+    assert h1(1, "Header") == "== Header"
+    assert h1(2, "Header") == "=== Header"
+    assert h2(0, "Header") == "== Header"
+    assert h2(-1, "Header") == "= Header"
+    assert h2(1, "Header") == "=== Header"
+
+
+def test_tc():
+    assert tc("|") == "{vbar}"
+    assert tc(r"\|") == r"\{vbar}"
+    assert tc("") == ""
+    assert tc("Bla\nbla\nbla") == "Bla\nbla\nbla"
+    assert tc("Bla\nbla | bla\nbla") == "Bla\nbla {vbar} bla\nbla"

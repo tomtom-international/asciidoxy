@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any, h1, h2
+from asciidoxy.templates.helpers import has, has_any, h1, h2, tc
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 from html import escape
 from itertools import chain
@@ -55,7 +55,7 @@ else:
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % for prot in ("public", "protected", "private"):
@@ -65,7 +65,7 @@ else:
 |
 % for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 `<<${enclosed.id},++${enclosed.name}++>>`::
-${enclosed.brief}
+${enclosed.brief | tc}
 % endfor
 
 % endif
@@ -75,7 +75,7 @@ ${enclosed.brief}
 |
 % for prop in helper.properties(prot=prot):
 `<<${prop.id},++${prop.name}++>>`::
-${prop.brief}
+${prop.brief | tc}
 % endfor
 
 % endif
@@ -85,7 +85,7 @@ ${prop.brief}
 |
 % for method in helper.class_methods(prot=prot):
 `<<${method.id},+++ ${method.name}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -95,7 +95,7 @@ ${method.brief}
 |
 % for method in helper.methods(prot=prot):
 `<<${method.id},++- ${method.name}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -131,9 +131,9 @@ ${api.inserted(prop)}
 @property() ${escape(helper.print_ref(prop.returns.type))} ${prop.name}
 ----
 
-${prop.brief}
+${prop.brief | tc}
 
-${prop.description}
+${prop.description | tc}
 
 '''
 % endfor

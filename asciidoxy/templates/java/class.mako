@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any, h1, h2
+from asciidoxy.templates.helpers import has, has_any, h1, h2, tc
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from html import escape
 from itertools import chain
@@ -52,7 +52,7 @@ else:
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % for prot in ("public", "protected", "default", "private"):
@@ -62,7 +62,7 @@ else:
 |
 % for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 `<<${enclosed.id},++${enclosed.name}++>>`::
-${enclosed.brief}
+${enclosed.brief | tc}
 % endfor
 
 % endif
@@ -72,7 +72,7 @@ ${enclosed.brief}
 |
 % for constant in helper.constants(prot=prot):
 `<<${constant.id},++${constant.returns.type.name} ${constant.name}++>>`::
-${constant.brief}
+${constant.brief | tc}
 % endfor
 
 % endif
@@ -82,7 +82,7 @@ ${constant.brief}
 |
 % for constructor in helper.constructors(prot=prot):
 `<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
-${constructor.brief}
+${constructor.brief | tc}
 % endfor
 
 % endif
@@ -92,7 +92,7 @@ ${constructor.brief}
 |
 % for method in helper.static_methods(prot=prot):
 `<<${method.id},++static ${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -102,7 +102,7 @@ ${method.brief}
 |
 % for method in helper.methods(prot=prot):
 `<<${method.id},++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -139,9 +139,9 @@ ${api.inserted(constant)}
 ${constant.returns.type.name} ${constant.name}
 ----
 
-${constant.brief}
+${constant.brief | tc}
 
-${constant.description}
+${constant.description | tc}
 
 '''
 % endfor

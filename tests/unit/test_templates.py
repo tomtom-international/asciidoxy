@@ -24,6 +24,7 @@ import pytest
     ("asciidoxy::traffic::TpegCauseCode", "cpp", "fragments/cpp/alias.adoc"),
     ("asciidoxy::traffic::Delay", "cpp", "fragments/cpp/typedef.adoc"),
     ("DEFAULT_CB", "cpp", "fragments/cpp/function_typedef.adoc"),
+    ("asciidoxy::wifi::ESP32WiFiProtocol", "cpp", "fragments/cpp/enum_with_or.adoc"),
     ("asciidoxy::traffic::TrafficEvent", "cpp", "fragments/cpp/nested.adoc"),
     ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", "fragments/cpp/function.adoc"),
     ("asciidoxy::system::CreateService", "cpp", "fragments/cpp/free_function.adoc"),

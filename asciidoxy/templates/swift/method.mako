@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has_any
+from asciidoxy.templates.helpers import has_any, tc
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 from html import escape
 %>
@@ -38,7 +38,7 @@ ${element.description}
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % if element.params:
@@ -46,7 +46,7 @@ ${element.description}
 |
 % for param in element.params:
 `${helper.parameter(param)}`::
-${param.description}
+${param.description | tc}
 
 % endfor
 % endif
@@ -54,7 +54,7 @@ ${param.description}
 | Returns
 |
 `${helper.print_ref(element.returns.type)}`::
-${element.returns.description}
+${element.returns.description | tc}
 
 % endif
 % if element.exceptions:
@@ -62,7 +62,7 @@ ${element.returns.description}
 |
 % for exception in element.exceptions:
 `${helper.print_ref(exception.type)}`::
-${exception.description}
+${exception.description | tc}
 
 % endfor
 %endif

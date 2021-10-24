@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import has, has_any, h1, h2
+from asciidoxy.templates.helpers import has, has_any, h1, h2, tc
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
 from html import escape
@@ -55,7 +55,7 @@ else:
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % for prot in ("public", "protected", "internal", "private"):
@@ -65,7 +65,7 @@ else:
 |
 % for enclosed in chain(helper.simple_enclosed_types(prot=prot), helper.complex_enclosed_types(prot=prot)):
 `<<${enclosed.id},++${enclosed.name}++>>`::
-${enclosed.brief}
+${enclosed.brief | tc}
 % endfor
 
 % endif
@@ -75,7 +75,7 @@ ${enclosed.brief}
 |
 % for constant in helper.constants(prot=prot):
 `const val <<${constant.id},++${constant.name}: ${constant.returns.type.name}++>>`::
-${constant.brief}
+${constant.brief | tc}
 % endfor
 
 % endif
@@ -85,7 +85,7 @@ ${constant.brief}
 |
 % for constructor in helper.constructors(prot=prot):
 `<<${constructor.id},++${constructor.name}${helper.type_list(constructor.params)}++>>`::
-${constructor.brief}
+${constructor.brief | tc}
 % endfor
 
 % endif
@@ -95,7 +95,7 @@ ${constructor.brief}
 |
 % for prop in helper.properties(prot=prot):
 `<<${prop.id},++${prop.name}++>>`::
-${prop.brief}
+${prop.brief | tc}
 % endfor
 
 % endif
@@ -105,7 +105,7 @@ ${prop.brief}
 |
 % for method in java_helper.static_methods(prot=prot):
 `<<${method.id},++static ${java_helper.print_ref(method.returns.type, link=False)} ${method.name}${java_helper.type_list(method.params)}++>>`::
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -119,7 +119,7 @@ ${method.brief}
 % else:
 `<<${method.id},++${method.name}${helper.type_list(method.params)}++>>`::
 % endif
-${method.brief}
+${method.brief | tc}
 % endfor
 
 % endif
@@ -157,9 +157,9 @@ ${api.inserted(constant)}
 const val ${constant.name}: ${constant.returns.type.name}
 ----
 
-${constant.brief}
+${constant.brief | tc}
 
-${constant.description}
+${constant.description | tc}
 
 '''
 % endfor
@@ -177,9 +177,9 @@ ${api.inserted(prop)}
 val ${prop.name}: ${prop.returns.type.name}
 ----
 
-${prop.brief}
+${prop.brief | tc}
 
-${prop.description}
+${prop.description | tc}
 
 '''
 % endfor

@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import h1
+from asciidoxy.templates.helpers import h1, tc
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 %>
 ######################################################################## Header and introduction ##
@@ -39,7 +39,7 @@ ${element.description}
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % for enum in JavaTemplateHelper(api, element, insert_filter).variables(prot="public"):
@@ -47,9 +47,9 @@ ${api.inserted(enum)}
 |
 [[${enum.id},${enum.name}]]${enum.name}
 |
-${enum.brief}
+${enum.brief | tc}
 
-${enum.description}
+${enum.description | tc}
 
 % endfor
 |===

@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import has, has_any, h1
+from asciidoxy.templates.helpers import has, has_any, h1, tc
 from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
 from html import escape
 %>
@@ -36,7 +36,7 @@ ${element.description}
 |===
 % for section_title, section_text in element.sections.items():
 | ${section_title}
-| ${section_text}
+| ${section_text | tc}
 
 % endfor
 % if has(params(element)):
@@ -44,10 +44,10 @@ ${element.description}
 |
 % for param in params(element):
 `${helper.parameter(param)}`::
-${param.description}
+${param.description | tc}
 % if param.default_value:
 +
-*Default value*: `${param.default_value}`
+*Default value*: `${param.default_value | tc}`
 % endif
 
 % endfor
@@ -56,7 +56,7 @@ ${param.description}
 | Returns
 |
 `${helper.print_ref(element.returns.type)}`::
-${element.returns.description}
+${element.returns.description | tc}
 
 % endif
 % if has(insert_filter.exceptions(element)):
@@ -64,7 +64,7 @@ ${element.returns.description}
 |
 % for exception in insert_filter.exceptions(element):
 `${helper.print_ref(exception.type)}`::
-${exception.description}
+${exception.description | tc}
 
 % endfor
 %endif

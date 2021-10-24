@@ -69,6 +69,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     was incorrectly generated, resulting in incorrect section titles.
   - #35: {Cpp}: Support typedefs for function types. Limitation: documentation for the function
     parameters is missing. A planned refactoring will fix this.
+  - #31: Pipe symbols in documentation no longer cause tables to become malformed.
 
 
 == 0.7.5 (20 Aug 2021)
