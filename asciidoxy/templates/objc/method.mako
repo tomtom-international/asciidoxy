@@ -14,6 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
+from asciidoxy.templates.helpers import has_any, tc
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 from html import escape
 %>
@@ -31,25 +32,20 @@ ${element.brief}
 
 ${element.description}
 
-% if element.params or element.exceptions or element.returns or element.precondition or element.postcondition:
+% if has_any(element.params, element.exceptions, element.sections) or element.returns:
 [cols='h,5a']
 |===
-% if element.precondition:
-| Precondition
-| ${element.precondition}
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text | tc}
 
-% endif
-% if element.postcondition:
-| Postcondition
-| ${element.postcondition}
-
-% endif
+% endfor
 % if element.params:
 | Parameters
 |
 % for param in element.params:
 `(${helper.print_ref(param.type)})${param.name}`::
-${param.description}
+${param.description | tc}
 
 % endfor
 % endif
@@ -57,15 +53,15 @@ ${param.description}
 | Returns
 |
 `${helper.print_ref(element.returns.type)}`::
-${element.returns.description}
+${element.returns.description | tc}
 
 % endif
 % if element.exceptions:
 | Throws
 |
 % for exception in element.exceptions:
-`${exception.type.name}`::
-${exception.description}
+`${helper.print_ref(exception.type)}`::
+${exception.description | tc}
 
 % endfor
 %endif

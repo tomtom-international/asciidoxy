@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_diagrams" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::Diagrams</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Description with several diagrams.</para>
+<para>Class relations expressed via an inline dot graph:  Note that the classes in the above graph are clickable (in the HTML output).</para>
+<para>Receiver class. Can be used to receive and execute commands. After execution of a command, the receiver will send an acknowledgment <plantuml>  Receiver&lt;-Sender  : Command()
+  Receiver--&gt;Sender : Ack()</plantuml>
+ </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="125" column="1" bodyfile="descriptions.hpp" bodystart="125" bodyend="126"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

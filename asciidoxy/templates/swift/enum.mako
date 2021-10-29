@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.templates.helpers import h1
+from asciidoxy.templates.helpers import h1, tc
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 %>
 <%
@@ -40,13 +40,18 @@ ${element.description}
 [cols='h,5a']
 |===
 
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text | tc}
+
+% endfor
 % for value in helper.enum_values(prot="public"):
 ${api.inserted(value)}
 | [[${value.id},${value.name}]]${value.name}
 |
-${value.brief}
+${value.brief | tc}
 
-${value.description}
+${value.description | tc}
 
 % endfor
 |===

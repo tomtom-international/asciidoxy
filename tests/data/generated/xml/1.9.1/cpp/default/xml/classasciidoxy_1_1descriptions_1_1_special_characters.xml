@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_special_characters" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::SpecialCharacters</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Some special characters have specific XML representations.</para>
+<para>An angle between -90<deg/> and +90<deg/>.</para>
+<para>This is<nonbreakablespace/>a non breaking<nonbreakablespace/>space.</para>
+<para>There are a lot of special characters, <plusmn/>250: <alpha/><beta/><frac14/> </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="357" column="1" bodyfile="descriptions.hpp" bodystart="357" bodyend="358"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -204,6 +204,22 @@ def test_name_filter__namespace__exact_namespace_required__same_name():
     assert nf(FullNameObject("asciidoxy::geometry::Coordinate::Coordinate")) is True
 
 
+def test_name_filter__namespace__nested_name():
+    nf = NameFilter("geometry::Coordinate<geometry::Point>", namespace="asciidoxy::geometry")
+    assert nf.applies
+
+    assert nf(FullNameObject("asciidoxy::geometry::Coordinate<geometry::Point>")) is True
+    assert nf(FullNameObject("asciidoxy::geometry::geometry::Coordinate<geometry::Point>")) is True
+    assert nf(FullNameObject("geometry::Coordinate<geometry::Point>")) is True
+    assert nf(FullNameObject("asciidoxy::Coordinate<geometry::Point>")) is False
+    assert nf(
+        FullNameObject(
+            "asciidoxy::geometry::experimental::geometry::Coordinate<geometry::Point>")) is False
+    assert nf(FullNameObject("asciidoxy::geometry::Coordinate<>")) is False
+    assert nf(FullNameObject("asciidoxy::geometry::Coordinate")) is False
+    assert nf(FullNameObject("asciidoxy::geometry::Coordinate<geometry::Dot>")) is False
+
+
 @pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_complete_match(api_reference):
     assert api_reference.find("asciidoxy::geometry::Coordinate", kind="function",

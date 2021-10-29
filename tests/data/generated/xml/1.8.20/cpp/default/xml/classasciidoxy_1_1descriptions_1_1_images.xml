@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_images" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::Images</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Include images in the documentation.</para>
+<para>A simple image:</para>
+<para><image type="html" name="Check-256.png"></image>
+</para>
+<para>We can have inline <image type="html" name="User-Group-256.png" inline="yes"></image>
+ images as well.</para>
+<para>For accessibility we should always provide a caption:</para>
+<para><image type="html" name="User-Profile-256.png">Image of a user</image>
+</para>
+<para>Size can be set:</para>
+<para><image type="html" name="User-Group-256.png" width="50" height="100">Image of a user group</image>
+ </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="259" column="1" bodyfile="descriptions.hpp" bodystart="259" bodyend="260"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

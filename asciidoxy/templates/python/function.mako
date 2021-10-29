@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.templates.helpers import has, has_any, h1
+from asciidoxy.templates.helpers import has, has_any, h1, tc
 from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
 from html import escape
 %>
@@ -31,28 +31,23 @@ ${element.brief}
 
 ${element.description}
 
-% if has_any(params(element), insert_filter.exceptions(element)) or element.returns or element.postcondition or element.precondition:
+% if has_any(params(element), insert_filter.exceptions(element), element.sections) or element.returns:
 [cols='h,5a']
 |===
-% if element.precondition:
-| Precondition
-| ${element.precondition}
+% for section_title, section_text in element.sections.items():
+| ${section_title}
+| ${section_text | tc}
 
-% endif
-% if element.postcondition:
-| Postcondition
-| ${element.postcondition}
-
-% endif
+% endfor
 % if has(params(element)):
 | Parameters
 |
 % for param in params(element):
 `${helper.parameter(param)}`::
-${param.description}
+${param.description | tc}
 % if param.default_value:
 +
-*Default value*: `${param.default_value}`
+*Default value*: `${param.default_value | tc}`
 % endif
 
 % endfor
@@ -61,15 +56,15 @@ ${param.description}
 | Returns
 |
 `${helper.print_ref(element.returns.type)}`::
-${element.returns.description}
+${element.returns.description | tc}
 
 % endif
 % if has(insert_filter.exceptions(element)):
 | Throws
 |
 % for exception in insert_filter.exceptions(element):
-`${exception.type.name}`::
-${exception.description}
+`${helper.print_ref(exception.type)}`::
+${exception.description | tc}
 
 % endfor
 %endif

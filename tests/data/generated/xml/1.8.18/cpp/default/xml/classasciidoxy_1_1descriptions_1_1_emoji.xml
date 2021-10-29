@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_emoji" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::Emoji</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1descriptions_1_1_emoji" kindref="compound">Emoji</ref> can be used in Doxygen.</para>
+<para><emoji name="smile" unicode="&amp;#x1f604;"/> I am happy</para>
+<para><emoji name="cry" unicode="&amp;#x1f622;"/> I am sad</para>
+<para><emoji name="star" unicode="&amp;#x2b50;"/> </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="465" column="1" bodyfile="descriptions.hpp" bodystart="465" bodyend="466"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="descriptions_8hpp" kind="file" language="C++">
+    <compoundname>descriptions.hpp</compoundname>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" prot="public">asciidoxy::descriptions::DoxygenVisualStyle</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" prot="public">asciidoxy::descriptions::DoxygenList</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_code_block" prot="public">asciidoxy::descriptions::CodeBlock</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_code_block_no_new_line" prot="public">asciidoxy::descriptions::CodeBlockNoNewLine</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_diagrams" prot="public">asciidoxy::descriptions::Diagrams</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_sections" prot="public">asciidoxy::descriptions::Sections</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_links" prot="public">asciidoxy::descriptions::Links</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_external_links" prot="public">asciidoxy::descriptions::ExternalLinks</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" prot="public">asciidoxy::descriptions::ComplexHtmlTable</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_formulae" prot="public">asciidoxy::descriptions::Formulae</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_images" prot="public">asciidoxy::descriptions::Images</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_mark_down" prot="public">asciidoxy::descriptions::MarkDown</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" prot="public">asciidoxy::descriptions::HybridList</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_dashes" prot="public">asciidoxy::descriptions::Dashes</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_ascii_art" prot="public">asciidoxy::descriptions::AsciiArt</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_special_characters" prot="public">asciidoxy::descriptions::SpecialCharacters</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_headings" prot="public">asciidoxy::descriptions::HtmlHeadings</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_styles" prot="public">asciidoxy::descriptions::HtmlStyles</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_anchor" prot="public">asciidoxy::descriptions::Anchor</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" prot="public">asciidoxy::descriptions::OutputSpecificBlocks</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_emoji" prot="public">asciidoxy::descriptions::Emoji</innerclass>
+    <innernamespace refid="namespaceasciidoxy">asciidoxy</innernamespace>
+    <innernamespace refid="namespaceasciidoxy_1_1descriptions">asciidoxy::descriptions</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="2"><highlight class="comment"><sp/>*<sp/>Copyright<sp/>(C)<sp/>2019-2021,<sp/>TomTom<sp/>(http://tomtom.com).</highlight></codeline>
+<codeline lineno="3"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="4"><highlight class="comment"><sp/>*<sp/>Licensed<sp/>under<sp/>the<sp/>Apache<sp/>License,<sp/>Version<sp/>2.0<sp/>(the<sp/>&quot;License&quot;);</highlight></codeline>
+<codeline lineno="5"><highlight class="comment"><sp/>*<sp/>you<sp/>may<sp/>not<sp/>use<sp/>this<sp/>file<sp/>except<sp/>in<sp/>compliance<sp/>with<sp/>the<sp/>License.</highlight></codeline>
+<codeline lineno="6"><highlight class="comment"><sp/>*<sp/>You<sp/>may<sp/>obtain<sp/>a<sp/>copy<sp/>of<sp/>the<sp/>License<sp/>at</highlight></codeline>
+<codeline lineno="7"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="8"><highlight class="comment"><sp/>*<sp/><sp/><sp/>http://www.apache.org/licenses/LICENSE-2.0</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"><sp/>*</highlight></codeline>
+<codeline lineno="10"><highlight class="comment"><sp/>*<sp/>Unless<sp/>required<sp/>by<sp/>applicable<sp/>law<sp/>or<sp/>agreed<sp/>to<sp/>in<sp/>writing,<sp/>software</highlight></codeline>
+<codeline lineno="11"><highlight class="comment"><sp/>*<sp/>distributed<sp/>under<sp/>the<sp/>License<sp/>is<sp/>distributed<sp/>on<sp/>an<sp/>&quot;AS<sp/>IS&quot;<sp/>BASIS,</highlight></codeline>
+<codeline lineno="12"><highlight class="comment"><sp/>*<sp/>WITHOUT<sp/>WARRANTIES<sp/>OR<sp/>CONDITIONS<sp/>OF<sp/>ANY<sp/>KIND,<sp/>either<sp/>express<sp/>or<sp/>implied.</highlight></codeline>
+<codeline lineno="13"><highlight class="comment"><sp/>*<sp/>See<sp/>the<sp/>License<sp/>for<sp/>the<sp/>specific<sp/>language<sp/>governing<sp/>permissions<sp/>and</highlight></codeline>
+<codeline lineno="14"><highlight class="comment"><sp/>*<sp/>limitations<sp/>under<sp/>the<sp/>License.</highlight></codeline>
+<codeline lineno="15"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">asciidoxy<sp/>{</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">descriptions<sp/>{</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight></codeline>
+<codeline lineno="34" refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" kindref="compound">DoxygenVisualStyle</ref><sp/>{</highlight></codeline>
+<codeline lineno="35"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="50" refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" kindref="compound">DoxygenList</ref><sp/>{</highlight></codeline>
+<codeline lineno="51"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight></codeline>
+<codeline lineno="83" refid="classasciidoxy_1_1descriptions_1_1_code_block" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_code_block" kindref="compound">CodeBlock</ref><sp/>{</highlight></codeline>
+<codeline lineno="84"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"></highlight></codeline>
+<codeline lineno="101" refid="classasciidoxy_1_1descriptions_1_1_code_block_no_new_line" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_code_block_no_new_line" kindref="compound">CodeBlockNoNewLine</ref><sp/>{</highlight></codeline>
+<codeline lineno="102"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"></highlight></codeline>
+<codeline lineno="125" refid="classasciidoxy_1_1descriptions_1_1_diagrams" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_diagrams" kindref="compound">Diagrams</ref><sp/>{</highlight></codeline>
+<codeline lineno="126"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"></highlight></codeline>
+<codeline lineno="145" refid="classasciidoxy_1_1descriptions_1_1_sections" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_sections" kindref="compound">Sections</ref><sp/>{</highlight></codeline>
+<codeline lineno="146"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="147"><highlight class="normal"></highlight></codeline>
+<codeline lineno="160"><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>Type&gt;</highlight></codeline>
+<codeline lineno="161" refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kindref="member">FunctionDocumentation</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>first,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>second,<sp/>Type*<sp/>third);</highlight></codeline>
+<codeline lineno="162"><highlight class="normal"></highlight></codeline>
+<codeline lineno="173" refid="classasciidoxy_1_1descriptions_1_1_links" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_links" kindref="compound">Links</ref><sp/>{</highlight></codeline>
+<codeline lineno="174"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="175"><highlight class="normal"></highlight></codeline>
+<codeline lineno="184" refid="classasciidoxy_1_1descriptions_1_1_external_links" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_external_links" kindref="compound">ExternalLinks</ref><sp/>{</highlight></codeline>
+<codeline lineno="185"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="186"><highlight class="normal"></highlight></codeline>
+<codeline lineno="212" refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" kindref="compound">ComplexHtmlTable</ref><sp/>{</highlight></codeline>
+<codeline lineno="213"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="214"><highlight class="normal"></highlight></codeline>
+<codeline lineno="237" refid="classasciidoxy_1_1descriptions_1_1_formulae" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_formulae" kindref="compound">Formulae</ref><sp/>{</highlight></codeline>
+<codeline lineno="238"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="239"><highlight class="normal"></highlight></codeline>
+<codeline lineno="259" refid="classasciidoxy_1_1descriptions_1_1_images" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_images" kindref="compound">Images</ref><sp/>{</highlight></codeline>
+<codeline lineno="260"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="261"><highlight class="normal"></highlight></codeline>
+<codeline lineno="305" refid="classasciidoxy_1_1descriptions_1_1_mark_down" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_mark_down" kindref="compound">MarkDown</ref><sp/>{</highlight></codeline>
+<codeline lineno="306"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="307"><highlight class="normal"></highlight></codeline>
+<codeline lineno="319" refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" kindref="compound">HybridList</ref><sp/>{</highlight></codeline>
+<codeline lineno="320"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="321"><highlight class="normal"></highlight></codeline>
+<codeline lineno="329" refid="classasciidoxy_1_1descriptions_1_1_dashes" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_dashes" kindref="compound">Dashes</ref><sp/>{</highlight></codeline>
+<codeline lineno="330"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="331"><highlight class="normal"></highlight></codeline>
+<codeline lineno="344" refid="classasciidoxy_1_1descriptions_1_1_ascii_art" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_ascii_art" kindref="compound">AsciiArt</ref><sp/>{</highlight></codeline>
+<codeline lineno="345"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="346"><highlight class="normal"></highlight></codeline>
+<codeline lineno="347"><highlight class="normal"></highlight></codeline>
+<codeline lineno="357" refid="classasciidoxy_1_1descriptions_1_1_special_characters" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_special_characters" kindref="compound">SpecialCharacters</ref><sp/>{</highlight></codeline>
+<codeline lineno="358"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="359"><highlight class="normal"></highlight></codeline>
+<codeline lineno="372" refid="classasciidoxy_1_1descriptions_1_1_html_headings" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_html_headings" kindref="compound">HtmlHeadings</ref><sp/>{</highlight></codeline>
+<codeline lineno="373"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="374"><highlight class="normal"></highlight></codeline>
+<codeline lineno="395" refid="classasciidoxy_1_1descriptions_1_1_html_styles" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_html_styles" kindref="compound">HtmlStyles</ref><sp/>{</highlight></codeline>
+<codeline lineno="396"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="397"><highlight class="normal"></highlight></codeline>
+<codeline lineno="405" refid="classasciidoxy_1_1descriptions_1_1_anchor" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_anchor" kindref="compound">Anchor</ref><sp/>{</highlight></codeline>
+<codeline lineno="406"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="407"><highlight class="normal"></highlight></codeline>
+<codeline lineno="418" refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" refkind="member"><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" kindref="member">ParBlock</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>parameter);</highlight></codeline>
+<codeline lineno="419"><highlight class="normal"></highlight></codeline>
+<codeline lineno="447" refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" kindref="compound">OutputSpecificBlocks</ref><sp/>{</highlight></codeline>
+<codeline lineno="448"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="449"><highlight class="normal"></highlight></codeline>
+<codeline lineno="453"><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>Type&gt;</highlight></codeline>
+<codeline lineno="454" refid="descriptions_8hpp_1af66d50405deb24f05eab85b3ed15f871" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/><ref refid="descriptions_8hpp_1af66d50405deb24f05eab85b3ed15f871" kindref="member">CopyDoc</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>first,<sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>second,<sp/>Type*<sp/>third);</highlight></codeline>
+<codeline lineno="455"><highlight class="normal"></highlight></codeline>
+<codeline lineno="465" refid="classasciidoxy_1_1descriptions_1_1_emoji" refkind="compound"><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classasciidoxy_1_1descriptions_1_1_emoji" kindref="compound">Emoji</ref><sp/>{</highlight></codeline>
+<codeline lineno="466"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="467"><highlight class="normal"></highlight></codeline>
+<codeline lineno="468"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>descriptions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="469"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="descriptions.hpp"/>
+  </compounddef>
+</doxygen>

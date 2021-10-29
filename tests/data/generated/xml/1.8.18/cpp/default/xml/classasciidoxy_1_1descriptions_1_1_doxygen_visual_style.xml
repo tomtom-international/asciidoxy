@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::DoxygenVisualStyle</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Description with all kinds of Doxygen styles.</para>
+<para>Several <emphasis>words</emphasis> in this <emphasis>sentence</emphasis> are <emphasis>italic</emphasis>.</para>
+<para>Several <bold>words</bold> in this <bold>sentence</bold> are <bold>bold</bold>.</para>
+<para>Also a <computeroutput>some</computeroutput> words in <computeroutput>monotype</computeroutput>. </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="34" column="1" bodyfile="descriptions.hpp" bodystart="34" bodyend="35"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,4 +1,4 @@
-conan==1.39.0
+conan==1.40.3
 coverage==5.5
 doxypypy==0.8.8.6
 flake8==3.9.2

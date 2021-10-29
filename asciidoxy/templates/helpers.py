@@ -34,6 +34,7 @@ class TemplateHelper:
     PARAM_NAME_FIRST = False
     PARAM_NAME_SEP = " "
     SIMPLE_ENCLOSED_TYPES = (
+        "alias",
         "typedef",
         "enum",
     )
@@ -248,3 +249,8 @@ def h1(leveloffset: int, title: str) -> str:
 
 def h2(leveloffset: int, title: str) -> str:
     return header(leveloffset + 2, title)
+
+
+def tc(text: str) -> str:
+    """Filter for table cell content."""
+    return text.replace("|", "{vbar}")

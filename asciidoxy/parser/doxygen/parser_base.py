@@ -18,9 +18,11 @@ import logging
 import xml.etree.ElementTree as ET
 
 from abc import ABC
-from typing import List, Optional, Tuple, Type
+from typing import Dict, List, Optional, Type
 
-from .description_parser import DescriptionParser, select_descriptions
+from .description_parser import (parse_description, select_descriptions, Admonition,
+                                 NestedDescriptionElement, ParaContainer, ParameterItem,
+                                 ParameterList, Ref)
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
 from .type_parser import TypeParser, TypeParseError
@@ -33,6 +35,47 @@ def _yes_no_to_bool(yes_no: str) -> bool:
     if yes_no == "yes":
         return True
     return False
+
+
+def _to_asciidoc_or_empty(description: Optional[NestedDescriptionElement]) -> str:
+    if description is not None:
+        if isinstance(description, (Admonition, Ref)):
+            # Use a clean Para container to prevent creating a "sidebar" or link.
+            return ParaContainer(description.language_tag, *description.contents).to_asciidoc()
+        else:
+            return description.to_asciidoc()
+    return ""
+
+
+def _pop_sections(description: Optional[ParaContainer]) -> Dict[str, str]:
+    if description is None:
+        return {}
+
+    sections = {}
+    for section_name, section_title in {
+            "author": "Author",
+            "bug": "Bug",
+            "copyright": "Copyright",
+            "date": "Date",
+            "deprecated": "Deprecated",
+            "pre": "Precondition",
+            "post": "Postcondition",
+            "since": "Since",
+            "todo": "Todo",
+    }.items():
+        section = description.pop_section(Admonition, section_name)
+        if section is not None:
+            sections[section_title] = _to_asciidoc_or_empty(section)
+    return sections
+
+
+def _find_parameter_documentation(descriptions: ParameterList,
+                                  name: str) -> Optional[ParameterItem]:
+    for param_item in descriptions.children_of_type(ParameterItem):
+        for param_name in param_item.names():
+            if param_name.name == name:
+                return param_item
+    return None
 
 
 class ParserBase(ABC):
@@ -52,25 +95,8 @@ class ParserBase(ABC):
     def __init__(self, driver: DriverBase):
         self._driver = driver
 
-    def parse_description(self, description_element: Optional[ET.Element]) -> str:
-        if description_element is None:
-            return ""
-
-        return DescriptionParser(self.TRAITS.TAG).parse(description_element)
-
-    def parse_parameterlist(self, memberdef_element: ET.Element,
-                            kind: str) -> List[Tuple[str, str]]:
-        descriptions = []
-        for parameter_item in memberdef_element.iterfind(
-                f"detaileddescription/para/parameterlist[@kind='{kind}']/parameteritem"):
-            desc = self.parse_description(parameter_item.find("parameterdescription"))
-            for parameter_name in parameter_item.iterfind("parameternamelist/parametername"):
-                if parameter_name.text:
-                    descriptions.append((parameter_name.text, desc))
-        return descriptions
-
-    def parse_parameters(self, memberdef_element: ET.Element, parent: Compound) -> List[Parameter]:
-        descriptions = self.parse_parameterlist(memberdef_element, "param")
+    def parse_parameters(self, memberdef_element: ET.Element, parent: Compound,
+                         descriptions: Optional[ParameterList]) -> List[Parameter]:
         params = []
         for param_element in memberdef_element.iterfind("param"):
             param = Parameter()
@@ -80,11 +106,10 @@ class ParserBase(ABC):
             param.name = param_element.findtext("declname", "")
             param.default_value = param_element.findtext("defval", "")
 
-            matching_descriptions = [desc for name, desc in descriptions if name == param.name]
-            if matching_descriptions:
-                if len(matching_descriptions) > 1:
-                    logger.debug(f"Multiple descriptions for parameter {param.name}")
-                param.description = matching_descriptions[0]
+            if descriptions:
+                documentation = _find_parameter_documentation(descriptions, param.name)
+                if documentation:
+                    param.description = _to_asciidoc_or_empty(documentation.description())
 
             params.append(param)
         return params
@@ -106,38 +131,47 @@ class ParserBase(ABC):
                 f"Failed to parse type {ET.tostring(type_element, encoding='unicode')}.")
             return None
 
-    def parse_exceptions(self, memberdef_element: ET.Element,
-                         parent: Compound) -> List[ThrowsClause]:
+    def parse_exceptions(self, memberdef_element: ET.Element, parent: Compound,
+                         descriptions: Optional[ParameterList]) -> List[ThrowsClause]:
         exceptions = []
-        for name, desc in self.parse_parameterlist(memberdef_element, "exception"):
-            exception = ThrowsClause(self.TRAITS.TAG)
-            exception.type = TypeRef(name=name, language=self.TRAITS.TAG)
-            exception.type.namespace = parent.namespace
-            exception.description = desc
-            exceptions.append(exception)
-            self._driver.unresolved_ref(exception.type)
+        if descriptions:
+            for desc in descriptions.children_of_type(ParameterItem):
+                exception = ThrowsClause(self.TRAITS.TAG)
+
+                name = desc.first_name()
+                assert name is not None
+                ref = name.first_child_of_type(Ref)
+                if name.contents and ref is not None:
+                    refid = None
+                    if ref.refid:
+                        refid = f"{self.TRAITS.TAG}-{ref.refid}"
+                    exception.type = TypeRef(id=refid,
+                                             kind=ref.kindref,
+                                             name=_to_asciidoc_or_empty(ref),
+                                             language=self.TRAITS.TAG)
+                elif name.name:
+                    exception.type = TypeRef(name=name.name, language=self.TRAITS.TAG)
+                else:
+                    assert False, "Expected either type ref or name"
+
+                exception.type.namespace = parent.namespace
+                exception.description = _to_asciidoc_or_empty(desc.description())
+
+                exceptions.append(exception)
+                if not exception.type.id:
+                    self._driver.unresolved_ref(exception.type)
         return exceptions
 
-    def parse_returns(self, memberdef_element: ET.Element,
-                      parent: Compound) -> Optional[ReturnValue]:
+    def parse_returns(self, memberdef_element: ET.Element, parent: Compound,
+                      description: Optional[Admonition]) -> Optional[ReturnValue]:
         returns = ReturnValue()
         returns.type = self.parse_type(memberdef_element.find("type"), namespace=parent.namespace)
-
-        description = memberdef_element.find("detaileddescription/para/simplesect[@kind='return']")
-        if description:
-            returns.description = self.parse_description(description)
+        returns.description = _to_asciidoc_or_empty(description)
 
         if returns.type:
             return returns
         else:
             return None
-
-    def parse_condition(self, memberdef_element: ET.Element, condition: str) -> str:
-        description = memberdef_element.find(
-            f"detaileddescription/para/simplesect[@kind='{condition}']")
-        if description:
-            return self.parse_description(description)
-        return ""
 
     def parse_enumvalues(self, container_element: ET.Element, parent_name: str) -> List[Compound]:
         return [
@@ -150,14 +184,13 @@ class ParserBase(ABC):
         enumvalue.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
         enumvalue.prot = enumvalue_element.get("prot", "")
 
-        name = self.TRAITS.cleanup_name(enumvalue_element.findtext("name", ""))
-        enumvalue.name = self.TRAITS.short_name(name)
-        enumvalue.full_name = self.TRAITS.full_name(name, parent_name, "enumvalue")
+        enumvalue.name, enumvalue.full_name, _ = self.TRAITS.names(
+            enumvalue_element.findtext("name", ""), parent_name, "enumvalue")
 
         enumvalue.initializer = enumvalue_element.findtext("initializer", "")
         enumvalue.brief, enumvalue.description = select_descriptions(
-            self.parse_description(enumvalue_element.find("briefdescription")),
-            self.parse_description(enumvalue_element.find("detaileddescription")))
+            parse_description(enumvalue_element.find("briefdescription"), self.TRAITS.TAG),
+            parse_description(enumvalue_element.find("detaileddescription"), self.TRAITS.TAG))
 
         self._driver.register(enumvalue)
         return enumvalue
@@ -168,29 +201,34 @@ class ParserBase(ABC):
         member.kind = memberdef_element.get("kind", "")
         member.prot = memberdef_element.get("prot", "")
 
-        name = self.TRAITS.cleanup_name(memberdef_element.findtext("name", ""))
-        member.name = self.TRAITS.short_name(name)
-        member.full_name = self.TRAITS.full_name(name, parent.full_name, member.kind)
-        member.namespace = self.TRAITS.namespace(member.full_name, member.kind)
+        member.name, member.full_name, member.namespace = self.TRAITS.names(
+            memberdef_element.findtext("name", ""), parent.full_name, member.kind)
         member.include = self.find_include(memberdef_element)
 
         if self.TRAITS.is_member_blacklisted(member.kind, member.name):
             return None
 
+        brief = parse_description(memberdef_element.find("briefdescription"), self.TRAITS.TAG)
+        detailed = parse_description(memberdef_element.find("detaileddescription"), self.TRAITS.TAG)
+
+        # First extract other descriptions
+        member.returns = self.parse_returns(memberdef_element, member,
+                                            detailed.pop_section(Admonition, "return"))
+        member.params = self.parse_parameters(memberdef_element, member,
+                                              detailed.pop_section(ParameterList, "param"))
+        member.exceptions = self.parse_exceptions(memberdef_element, member,
+                                                  detailed.pop_section(ParameterList, "exception"))
+        member.sections = _pop_sections(detailed)
+
+        # Then generate description with unused sections
+        member.brief, member.description = select_descriptions(brief, detailed)
+
         member.definition = memberdef_element.findtext("definition", "")
         member.args = memberdef_element.findtext("argsstring", "")
-        member.params = self.parse_parameters(memberdef_element, member)
-        member.exceptions = self.parse_exceptions(memberdef_element, member)
-        member.brief, member.description = select_descriptions(
-            self.parse_description(memberdef_element.find("briefdescription")),
-            self.parse_description(memberdef_element.find("detaileddescription")))
-        member.returns = self.parse_returns(memberdef_element, member)
         member.members = self.parse_enumvalues(memberdef_element, member.full_name)
         member.static = _yes_no_to_bool(memberdef_element.get("static", "no"))
         member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
         member.constexpr = _yes_no_to_bool(memberdef_element.get("constexpr", "no"))
-        member.precondition = self.parse_condition(memberdef_element, "pre")
-        member.postcondition = self.parse_condition(memberdef_element, "post")
 
         self._driver.register(member)
         return member
@@ -211,10 +249,8 @@ class ParserBase(ABC):
         compound.kind = compounddef_element.get("kind", "")
         compound.prot = compounddef_element.get("prot", "")
 
-        name = self.TRAITS.cleanup_name(compounddef_element.findtext("compoundname", ""))
-        compound.name = self.TRAITS.short_name(name)
-        compound.full_name = self.TRAITS.full_name(name, kind=compound.kind)
-        compound.namespace = self.TRAITS.namespace(compound.full_name, kind=compound.kind)
+        compound.name, compound.full_name, compound.namespace = self.TRAITS.names(
+            compounddef_element.findtext("compoundname", ""), kind=compound.kind)
         compound.include = self.find_include(compounddef_element)
 
         compound.members = [
@@ -224,9 +260,15 @@ class ParserBase(ABC):
             if member is not None
         ] + self.parse_enumvalues(compounddef_element, compound.full_name)
 
-        compound.brief, compound.description = select_descriptions(
-            self.parse_description(compounddef_element.find("briefdescription")),
-            self.parse_description(compounddef_element.find("detaileddescription")))
+        brief = parse_description(compounddef_element.find("briefdescription"), self.TRAITS.TAG)
+        detailed = parse_description(compounddef_element.find("detaileddescription"),
+                                     self.TRAITS.TAG)
+
+        # First extract other descriptions
+        compound.sections = _pop_sections(detailed)
+
+        # Then generate description with unused sections
+        compound.brief, compound.description = select_descriptions(brief, detailed)
 
         for innerclass_element in compounddef_element.iterfind("innerclass"):
             self.parse_innerclass(compound, innerclass_element)

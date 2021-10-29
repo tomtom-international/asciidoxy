@@ -44,8 +44,8 @@ BROWSER := python3 -c "$$BROWSER_PYSCRIPT"
 export ROOT_DIR = $(CURDIR)
 export BUILD_DIR = $(CURDIR)/build
 
-DOXYGEN_VERSIONS := 1.8.17 1.8.18 1.8.20
-export LATEST_DOXYGEN_VERSION := 1.8.20
+DOXYGEN_VERSIONS := 1.8.17 1.8.18 1.8.20 1.9.1 1.9.2
+export LATEST_DOXYGEN_VERSION := 1.9.2
 
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
@@ -150,7 +150,8 @@ visual-test-$(notdir $(basename $(1))): $(1)
 		--build-dir $(VISUAL_TEST_CASE_BUILD_DIR) \
 		--spec-file $(patsubst %.adoc,%.toml,$(1)) \
 		--warnings-are-errors \
-		--debug
+		--debug \
+		--require asciidoctor-diagram
 	mv $(VISUAL_TEST_CASE_BUILD_DIR)/debug.json $(VISUAL_TEST_CASE_BUILD_DIR)/$(notdir $(basename $(1))).debug.json
 
 ALL_VISUAL_TEST_CASES := $$(ALL_VISUAL_TEST_CASES) visual-test-$(notdir $(basename $(1)))

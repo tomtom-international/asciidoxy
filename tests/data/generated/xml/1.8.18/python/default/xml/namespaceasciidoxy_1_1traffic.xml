@@ -2,6 +2,7 @@
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
   <compounddef id="namespaceasciidoxy_1_1traffic" kind="namespace" language="Python">
     <compoundname>asciidoxy::traffic</compoundname>
+    <innerclass refid="classasciidoxy_1_1traffic_1_1_traffic_event" prot="public">asciidoxy::traffic::TrafficEvent</innerclass>
     <briefdescription>
     </briefdescription>
     <detaileddescription>

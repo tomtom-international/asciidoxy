@@ -461,8 +461,10 @@ from .matchers import (AtLeast, HasNot, IsEmpty, IsFalse, IsNone, IsNotEmpty, Is
               definition="void asciidoxy::geometry::Coordinate::Update",
               args="(double latitude, double longitude, double altitude)",
               brief="Update from separate values.",
-              precondition="The coordinate exists.",
-              postcondition="New values are used for the coordinate.",
+              sections={
+                  "Precondition": "The coordinate exists.",
+                  "Postcondition": "New values are used for the coordinate.",
+              },
               params=[
                   m_parameter(name="latitude",
                               default_value="",
@@ -493,6 +495,102 @@ from .matchers import (AtLeast, HasNot, IsEmpty, IsFalse, IsNone, IsNotEmpty, Is
                                                    suffix=IsEmpty())),
           ),
           id="Method with pre and post condition"),
+    param(dict(name="asciidoxy::descriptions::Sections", kind="class", lang="cpp"),
+          m_compound(
+              name="Sections",
+              brief="Using sections in the description.",
+              description="""\
+This class demonstrates how all sections supported by Doxygen are handled.
+
+[CAUTION]
+====
+Be carefull with this class. It **could** blow up.
+====
+
+[NOTE]
+====
+Don't forget about ``this!``
+====
+
+[NOTE]
+====
+This class does not make much sense.
+====
+
+[WARNING]
+====
+Do not use this class ever!
+====""",
+              sections={
+                  "Author": "Rob van der Most",
+                  "Bug": "Not all sections may be rendered correctly.",
+                  "Copyright": "MIT license.",
+                  "Date": "28 August 2021",
+                  "Deprecated": "This empty class should no longer be used.",
+                  "Precondition": "The class should not exist yet.",
+                  "Postcondition": "The class suddenly exists.",
+                  "Since": "0.7.6",
+                  "Todo": "Create some content here.",
+              },
+          ),
+          id="Class with sections in the description"),
+    param(dict(name="asciidoxy::geometry::Coordinate::Update(const Coordinate&)",
+               kind="function",
+               lang="cpp"),
+          m_compound(exceptions=[
+              m_throwsclause(type=m_typeref(
+                  id="cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate",
+                  kind="compound",
+                  name="InvalidCoordinate"), ),
+          ], ),
+          id="Exception with explicit id in XML"),
+    param(dict(name="asciidoxy::tparam::is_container", kind="struct", lang="cpp"),
+          m_compound(
+              name="is_container",
+              full_name="asciidoxy::tparam::is_container",
+              namespace="asciidoxy::tparam",
+          ),
+          id="Struct with template parameters"),
+    param(dict(
+        name="asciidoxy::tparam::is_container< std::array< T, N > >", kind="struct", lang="cpp"),
+          m_compound(
+              name="is_container< std::array< T, N > >",
+              full_name="asciidoxy::tparam::is_container< std::array< T, N > >",
+              namespace="asciidoxy::tparam",
+          ),
+          id="Struct with template parameter specialization"),
+    param(dict(name="asciidoxy::traffic::TpegCauseCode", lang="cpp"),
+          m_compound(
+              kind="alias",
+              name="TpegCauseCode",
+              full_name="asciidoxy::traffic::TpegCauseCode",
+              namespace="asciidoxy::traffic",
+          ),
+          id="Type alias"),
+    param(dict(name="asciidoxy::traffic::Delay", lang="cpp"),
+          m_compound(
+              kind="typedef",
+              name="Delay",
+              full_name="asciidoxy::traffic::Delay",
+              namespace="asciidoxy::traffic",
+          ),
+          id="Typedef"),
+    param(dict(name="DEFAULT_CB", lang="cpp"),
+          m_compound(
+              kind="typedef",
+              name="DEFAULT_CB",
+              full_name="DEFAULT_CB",
+              namespace=IsEmpty(),
+              returns=m_returnvalue(type=m_typeref(name="uint32_t", ), ),
+              params=[
+                  m_parameter(type=m_typeref(
+                      name="void",
+                      suffix=" *pvArg",
+                  )),
+                  m_parameter(type=m_typeref(name="uint32_t ulResult", )),
+              ],
+          ),
+          id="Function type typedef"),
 ])
 def test_parse_cpp(api_reference, search_params, matcher):
     matcher.assert_matches(api_reference.find(**search_params))

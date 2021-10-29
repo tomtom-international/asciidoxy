@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_code_block" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::CodeBlock</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Description with some code blocks.</para>
+<para>Python example:</para>
+<para><programlisting filename=".py"><codeline><highlight class="normal">class<sp/>Python:</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">pass</highlight></codeline>
+</programlisting></para>
+<para>C++ example:</para>
+<para><programlisting filename=".cpp"><codeline><highlight class="keyword">class<sp/></highlight><highlight class="normal">Cpp<sp/>{};</highlight></codeline>
+</programlisting></para>
+<para>Unparsed code:</para>
+<para><programlisting filename=".unparsed"><codeline><highlight class="normal">Show<sp/>this<sp/>as-is<sp/>please</highlight></codeline>
+</programlisting></para>
+<para>Using the default language, C++ in this case:</para>
+<para><programlisting><codeline><highlight class="normal">class<sp/>AlsoCpp<sp/>{};</highlight></codeline>
+</programlisting></para>
+<para>That&apos;s all folks! </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="83" column="1" bodyfile="descriptions.hpp" bodystart="83" bodyend="84"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

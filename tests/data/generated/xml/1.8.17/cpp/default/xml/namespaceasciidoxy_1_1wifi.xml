@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="namespaceasciidoxy_1_1wifi" kind="namespace" language="C++">
+    <compoundname>asciidoxy::wifi</compoundname>
+      <sectiondef kind="enum">
+      <memberdef kind="enum" id="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757d" prot="public" static="no" strong="yes">
+        <type>uint8_t</type>
+        <name>ESP32WiFiProtocol</name>
+        <enumvalue id="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da8a003930481b05de89c4ebf13ff9a6f9" prot="public">
+          <name>eWIFI_11B</name>
+          <initializer>= WIFI_PROTOCOL_11B</initializer>
+          <briefdescription>
+<para>802.11b </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757dab30be87b17ae0f708b5b42cf3bf6de83" prot="public">
+          <name>eWIFI_11BG</name>
+          <initializer>= WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G</initializer>
+          <briefdescription>
+<para>802.11bg </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da7cc82be17a83a07f1b5e2e55d396bdb5" prot="public">
+          <name>eWIFI_11BGN</name>
+          <initializer>= WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G | WIFI_PROTOCOL_11N</initializer>
+          <briefdescription>
+<para>802.11bgn </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da80b47fd83a1260f34e08451cb14a9366" prot="public">
+          <name>eWIFI_LR</name>
+          <initializer>= WIFI_PROTOCOL_LR</initializer>
+          <briefdescription>
+<para>ESP custom LR protocol. </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757dab2f144be810c50dc1320100045c01b42" prot="public">
+          <name>eWIFI_11BGNLR</name>
+          <initializer>= WIFI_PROTOCOL_11B | WIFI_PROTOCOL_11G | WIFI_PROTOCOL_11N | WIFI_PROTOCOL_LR</initializer>
+          <briefdescription>
+<para>802.11bgn+LR </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757daec69ba3d6df7e31e1bea2dadb3210b72" prot="public">
+          <name>eERROR</name>
+          <briefdescription>
+<para>error </para>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="enums.hpp" line="31" column="29" bodyfile="enums.hpp" bodystart="31" bodyend="38"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="var">
+      <memberdef kind="variable" id="enums_8hpp_1a9d4194317977a3a368c213cc96d4f646" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr uint8_t</type>
+        <definition>constexpr uint8_t asciidoxy::wifi::WIFI_PROTOCOL_11B</definition>
+        <argsstring></argsstring>
+        <name>WIFI_PROTOCOL_11B</name>
+        <initializer>= 0x01</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="enums.hpp" line="26" column="19" bodyfile="enums.hpp" bodystart="26" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="enums_8hpp_1a1c3503507af22d840f2cba5845917a04" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr uint8_t</type>
+        <definition>constexpr uint8_t asciidoxy::wifi::WIFI_PROTOCOL_11N</definition>
+        <argsstring></argsstring>
+        <name>WIFI_PROTOCOL_11N</name>
+        <initializer>= 0x02</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="enums.hpp" line="27" column="19" bodyfile="enums.hpp" bodystart="27" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="enums_8hpp_1a9d172d91edb71e3ba638bf3b576fa2b9" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr uint8_t</type>
+        <definition>constexpr uint8_t asciidoxy::wifi::WIFI_PROTOCOL_11G</definition>
+        <argsstring></argsstring>
+        <name>WIFI_PROTOCOL_11G</name>
+        <initializer>= 0x04</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="enums.hpp" line="28" column="19" bodyfile="enums.hpp" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="enums_8hpp_1ab949dfee06a9db33f670260c1c4f5c14" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr uint8_t</type>
+        <definition>constexpr uint8_t asciidoxy::wifi::WIFI_PROTOCOL_LR</definition>
+        <argsstring></argsstring>
+        <name>WIFI_PROTOCOL_LR</name>
+        <initializer>= 0x10</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="enums.hpp" line="29" column="19" bodyfile="enums.hpp" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="enums.hpp" line="24" column="14"/>
+  </compounddef>
+</doxygen>

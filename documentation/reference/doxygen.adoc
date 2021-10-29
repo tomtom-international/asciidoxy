@@ -84,3 +84,12 @@ MARKDOWN_SUPPORT       = NO
 
 Support for type hints in Doxygen is still limited: https://github.com/doxygen/doxygen/issues/7320.
 
+== PlantUML support
+
+Doxygen will ignore PlantUML diagrams if the path to PlantUML is not set. This is also the case 
+when only the XML format is enabled and Doxygen has no need to call PlantUML. To make sure PlantUML 
+diagrams are exported to XML, make sure to set the path:
+
+----
+PLANTUML_JAR_PATH      = /usr/share/java/plantuml/plantuml.jar
+----

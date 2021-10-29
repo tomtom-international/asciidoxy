@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.20" xml:lang="en-US">
+  <compounddef id="namespaceasciidoxy_1_1tparam" kind="namespace" language="C++">
+    <compoundname>asciidoxy::tparam</compoundname>
+    <innerclass refid="structasciidoxy_1_1tparam_1_1is__container" prot="public">asciidoxy::tparam::is_container</innerclass>
+    <innerclass refid="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4" prot="public">asciidoxy::tparam::is_container&lt; std::array&lt; T, N &gt; &gt;</innerclass>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="template_parameters.hpp" line="21" column="1"/>
+  </compounddef>
+</doxygen>

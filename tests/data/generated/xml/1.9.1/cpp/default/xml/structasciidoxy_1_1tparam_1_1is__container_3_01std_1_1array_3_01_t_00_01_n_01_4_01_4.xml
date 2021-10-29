@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4" kind="struct" language="C++" prot="public">
+    <compoundname>asciidoxy::tparam::is_container&lt; std::array&lt; T, N &gt; &gt;</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">std::true_type</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>typename T</type>
+      </param>
+      <param>
+        <type>typename N</type>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>std::true_type</label>
+      </node>
+      <node id="1">
+        <label>asciidoxy::tparam::is_container&lt; std::array&lt; T, N &gt; &gt;</label>
+        <link refid="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>std::true_type</label>
+      </node>
+      <node id="1">
+        <label>asciidoxy::tparam::is_container&lt; std::array&lt; T, N &gt; &gt;</label>
+        <link refid="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="template_parameters.hpp" line="28" column="1" bodyfile="template_parameters.hpp" bodystart="28" bodyend="29"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

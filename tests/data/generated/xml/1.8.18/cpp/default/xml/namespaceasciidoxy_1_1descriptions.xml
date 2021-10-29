@@ -1,0 +1,252 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="namespaceasciidoxy_1_1descriptions" kind="namespace" language="C++">
+    <compoundname>asciidoxy::descriptions</compoundname>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_anchor" prot="public">asciidoxy::descriptions::Anchor</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_ascii_art" prot="public">asciidoxy::descriptions::AsciiArt</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_code_block" prot="public">asciidoxy::descriptions::CodeBlock</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_code_block_no_new_line" prot="public">asciidoxy::descriptions::CodeBlockNoNewLine</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" prot="public">asciidoxy::descriptions::ComplexHtmlTable</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_dashes" prot="public">asciidoxy::descriptions::Dashes</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_diagrams" prot="public">asciidoxy::descriptions::Diagrams</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" prot="public">asciidoxy::descriptions::DoxygenList</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" prot="public">asciidoxy::descriptions::DoxygenVisualStyle</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_emoji" prot="public">asciidoxy::descriptions::Emoji</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_external_links" prot="public">asciidoxy::descriptions::ExternalLinks</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_formulae" prot="public">asciidoxy::descriptions::Formulae</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_headings" prot="public">asciidoxy::descriptions::HtmlHeadings</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_html_styles" prot="public">asciidoxy::descriptions::HtmlStyles</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" prot="public">asciidoxy::descriptions::HybridList</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_images" prot="public">asciidoxy::descriptions::Images</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_links" prot="public">asciidoxy::descriptions::Links</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_mark_down" prot="public">asciidoxy::descriptions::MarkDown</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" prot="public">asciidoxy::descriptions::OutputSpecificBlocks</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_sections" prot="public">asciidoxy::descriptions::Sections</innerclass>
+    <innerclass refid="classasciidoxy_1_1descriptions_1_1_special_characters" prot="public">asciidoxy::descriptions::SpecialCharacters</innerclass>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Type</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int asciidoxy::descriptions::FunctionDocumentation</definition>
+        <argsstring>(int first, double second, Type *third)</argsstring>
+        <name>FunctionDocumentation</name>
+        <param>
+          <type>int</type>
+          <declname>first</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>second</declname>
+        </param>
+        <param>
+          <type>Type *</type>
+          <declname>third</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Complete documentation for a function or method.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">first</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The first parameter. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">second</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The second parameter. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">third</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The third parameter. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A status code </para>
+</simplesect>
+<parameterlist kind="retval"><parameteritem>
+<parameternamelist>
+<parametername>0</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>All is ok. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Something went wrong. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>std::logic_error</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Something is wrong with the logic. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>Type</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The type to do something with. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="descriptions.hpp" line="161" column="5" declfile="descriptions.hpp" declline="161" declcolumn="5"/>
+      </memberdef>
+      <memberdef kind="function" id="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::descriptions::ParBlock</definition>
+        <argsstring>(int parameter)</argsstring>
+        <name>ParBlock</name>
+        <param>
+          <type>int</type>
+          <declname>parameter</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Parblocks are used to add multiple paragraphs to commands that only accept a single parameter.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>parameter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><parblock><para>First paragraph about the parameter.</para>
+<para>Second paragraph about the parameter. </para>
+</parblock></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="descriptions.hpp" line="418" column="6" declfile="descriptions.hpp" declline="418" declcolumn="6"/>
+      </memberdef>
+      <memberdef kind="function" id="descriptions_8hpp_1af66d50405deb24f05eab85b3ed15f871" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Type</type>
+          </param>
+        </templateparamlist>
+        <type>int</type>
+        <definition>int asciidoxy::descriptions::CopyDoc</definition>
+        <argsstring>(int first, double second, Type *third)</argsstring>
+        <name>CopyDoc</name>
+        <param>
+          <type>int</type>
+          <declname>first</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>second</declname>
+        </param>
+        <param>
+          <type>Type *</type>
+          <declname>third</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Complete documentation for a function or method.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">first</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The first parameter. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="out">second</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The second parameter. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="inout">third</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The third parameter. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A status code </para>
+</simplesect>
+<parameterlist kind="retval"><parameteritem>
+<parameternamelist>
+<parametername>0</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>All is ok. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Something went wrong. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>std::logic_error</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Something is wrong with the logic. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>Type</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The type to do something with. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="descriptions.hpp" line="454" column="5" declfile="descriptions.hpp" declline="454" declcolumn="5"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="22" column="1"/>
+  </compounddef>
+</doxygen>

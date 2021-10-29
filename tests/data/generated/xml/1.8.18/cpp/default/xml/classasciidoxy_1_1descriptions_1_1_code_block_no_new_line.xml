@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_code_block_no_new_line" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::CodeBlockNoNewLine</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>For Doxygen no new line is needed between a paragraph and a code block.</para>
+<para>Python example: <programlisting filename=".py"><codeline><highlight class="keyword">class<sp/></highlight><highlight class="normal">Python:</highlight></codeline>
+<codeline><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">pass</highlight></codeline>
+</programlisting></para>
+<para>C++ example: <programlisting filename=".cpp"><codeline><highlight class="keyword">class<sp/></highlight><highlight class="normal">Cpp<sp/>{};</highlight></codeline>
+</programlisting> That&apos;s it! </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="101" column="1" bodyfile="descriptions.hpp" bodystart="101" bodyend="102"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

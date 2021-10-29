@@ -140,9 +140,9 @@ def test_member_filter__prot(cpp_class):
     member_names = [m.name for m in cpp_class.members if member_filter(m)]
     assert sorted(member_names) == sorted([
         "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
-        "ProtectedStruct", "ProtectedTrash", "ProtectedEnumvalue", "MyClass", "MyClass", "MyClass",
-        "operator++", "operator=", "operator=", "ProtectedMethod", "ProtectedStaticMethod",
-        "~MyClass"
+        "ProtectedAlias", "ProtectedStruct", "ProtectedTrash", "ProtectedEnumvalue", "MyClass",
+        "MyClass", "MyClass", "operator++", "operator=", "operator=", "ProtectedMethod",
+        "ProtectedStaticMethod", "~MyClass"
     ])
 
 
@@ -275,15 +275,16 @@ def test_insertion_filter__compound__no_filters(cpp_class):
 
     member_names = [member.name for member in insertion_filter.members(cpp_class)]
     assert sorted(member_names) == sorted([
-        "PublicVariable", "PublicEnum", "PublicClass", "PublicTypedef", "PublicStruct",
-        "PublicTrash", "PublicEnumvalue", "MyClass", "MyClass", "MyClass", "MyClass", "MyClass",
-        "MyClass", "MyClass", "operator++", "PublicMethod", "PublicStaticMethod",
-        "ProtectedVariable", "ProtectedEnum", "ProtectedClass", "ProtectedTypedef",
-        "ProtectedStruct", "ProtectedTrash", "ProtectedEnumvalue", "MyClass", "operator++",
-        "ProtectedMethod", "ProtectedStaticMethod", "PrivateVariable", "PrivateEnum",
-        "PrivateClass", "PrivateTypedef", "PrivateStruct", "PrivateTrash", "PrivateEnumvalue",
-        "MyClass", "operator++", "PrivateMethod", "PrivateStaticMethod", "operator=", "operator=",
-        "operator=", "operator=", "operator=", "operator=", "~MyClass", "~MyClass", "~MyClass"
+        "PublicVariable", "PublicEnum", "PublicClass", "PublicTypedef", "PublicAlias",
+        "PublicStruct", "PublicTrash", "PublicEnumvalue", "MyClass", "MyClass", "MyClass",
+        "MyClass", "MyClass", "MyClass", "MyClass", "operator++", "PublicMethod",
+        "PublicStaticMethod", "ProtectedVariable", "ProtectedEnum", "ProtectedClass",
+        "ProtectedTypedef", "ProtectedAlias", "ProtectedStruct", "ProtectedTrash",
+        "ProtectedEnumvalue", "MyClass", "operator++", "ProtectedMethod", "ProtectedStaticMethod",
+        "PrivateVariable", "PrivateEnum", "PrivateClass", "PrivateTypedef", "PrivateAlias",
+        "PrivateStruct", "PrivateTrash", "PrivateEnumvalue", "MyClass", "operator++",
+        "PrivateMethod", "PrivateStaticMethod", "operator=", "operator=", "operator=", "operator=",
+        "operator=", "operator=", "~MyClass", "~MyClass", "~MyClass"
     ])
 
 

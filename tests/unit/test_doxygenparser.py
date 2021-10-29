@@ -97,7 +97,7 @@ def test_resolve_partial_references_for_parameters(parser_driver_factory):
 def test_resolve_references_for_typedefs(parser_driver_factory):
     parser = parser_driver_factory("cpp/default", "cpp/consumer")
 
-    member = parser.api_reference.find("asciidoxy::positioning::Traffic", kind="typedef")
+    member = parser.api_reference.find("asciidoxy::positioning::Traffic", kind="alias")
     assert member is not None
     assert member.returns
     assert member.returns.type
@@ -241,12 +241,14 @@ def test_resolve_references_fails_when_ambiguous(parser_driver_factory):
 
 def test_resolve_references__report_progress(parser_driver_factory):
     parser = parser_driver_factory("cpp/default", "cpp/consumer")
+    unresolved_ref_count = parser.unresolved_ref_count
+    assert unresolved_ref_count > 70
 
     progress_mock = ProgressMock()
     parser.resolve_references(progress=progress_mock)
 
     assert progress_mock.ready == progress_mock.total
-    assert progress_mock.total == 49
+    assert progress_mock.total == unresolved_ref_count
 
 
 def test_force_language_java(parser_driver_factory):

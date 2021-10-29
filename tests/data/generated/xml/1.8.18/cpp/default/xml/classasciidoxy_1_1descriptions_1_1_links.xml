@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.18">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_links" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::Links</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1descriptions_1_1_links" kindref="compound">Links</ref> to other elements.</para>
+<para>Some other test classes are: <itemizedlist>
+<listitem><para><ref refid="classasciidoxy_1_1descriptions_1_1_code_block" kindref="compound">CodeBlock</ref> for code blocks. </para>
+</listitem>
+<listitem><para><ref refid="classasciidoxy_1_1descriptions_1_1_diagrams" kindref="compound">Diagrams</ref> for plantUML and Dot. </para>
+</listitem>
+<listitem><para><ref refid="classasciidoxy_1_1descriptions_1_1_sections" kindref="compound">Sections</ref> for all kinds of sections.</para>
+</listitem>
+</itemizedlist>
+Of course there is also <ref refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kindref="member">FunctionDocumentation()</ref>. </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="173" column="1" bodyfile="descriptions.hpp" bodystart="173" bodyend="174"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

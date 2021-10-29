@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_complex_html_table" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::ComplexHtmlTable</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Using HTML to create a complex table.</para>
+<para><table rows="9" cols="3"><caption>Complex table</caption>
+<row>
+<entry thead="yes"><para>Column 1 </para>
+</entry><entry thead="yes"><para>Column 2 </para>
+</entry><entry thead="yes"><para>Column 3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=1+2,col=1</para>
+</entry><entry thead="no"><para>cell row=1,col=2</para>
+</entry><entry thead="no"><para>cell row=1,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=2+3,col=2 </para>
+</entry><entry thead="no"><para>cell row=2,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=3,col=1 </para>
+</entry><entry thead="no"><para>cell row=3+4,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=4,col=1+2 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=5,col=1 </para>
+</entry><entry thead="no"><para>cell row=5,col=2+3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=6+7,col=1+2 </para>
+</entry><entry thead="no"><para>cell row=6,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=7,col=3 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>cell row=8,col=1 </para>
+</entry><entry thead="no"><para>cell row=8,col=2<linebreak/>
+ <table rows="2" cols="2"><row>
+<entry thead="no"><para>Inner cell row=1,col=1</para>
+</entry><entry thead="no"><para>Inner cell row=1,col=2 </para>
+</entry></row>
+<row>
+<entry thead="no"><para>Inner cell row=2,col=1</para>
+</entry><entry thead="no"><para>Inner cell row=2,col=2 </para>
+</entry></row>
+</table>
+</para>
+</entry><entry thead="no"><para>cell row=8,col=3 <itemizedlist>
+<listitem>
+<para>Item 1 </para>
+</listitem>
+<listitem>
+<para>Item 2 </para>
+</listitem>
+</itemizedlist>
+</para>
+</entry></row>
+</table>
+</para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="212" column="23" bodyfile="descriptions.hpp" bodystart="212" bodyend="213"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

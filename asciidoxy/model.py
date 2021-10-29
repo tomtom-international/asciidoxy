@@ -14,7 +14,7 @@
 """Models of API reference elements."""
 
 from abc import ABC
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 
 def json_repr(obj):
@@ -210,8 +210,7 @@ class Compound(ReferableElement):
         initializer:   Initial value assignment.
         brief:         Brief description of the compound.
         description:   Full description of the compound.
-        precondition:  Condition that must hold before using the compound.
-        postcondition: Condition that must hold after using the command.
+        sections:      Extra documentation sections with special meanings.
         static:        True if this is marked as static.
         const:         True if this is marked as const.
         deleted:       True if this is marked as deleted.
@@ -234,8 +233,7 @@ class Compound(ReferableElement):
 
     brief: str = ""
     description: str = ""
-    precondition: str = ""
-    postcondition: str = ""
+    sections: Dict[str, str]
 
     static: bool = False
     const: bool = False
@@ -249,11 +247,13 @@ class Compound(ReferableElement):
                  members: Optional[List["Compound"]] = None,
                  params: Optional[List[Parameter]] = None,
                  exceptions: Optional[List[ThrowsClause]] = None,
+                 sections: Optional[Dict[str, str]] = None,
                  **kwargs):
         super().__init__(language, **kwargs)
         self.members = members or []
         self.params = params or []
         self.exceptions = exceptions or []
+        self.sections = sections or {}
 
     def __str__(self):
         return f"Compound [{super().__str__()}]"
@@ -264,12 +264,12 @@ class Compound(ReferableElement):
         return (super().__eq__(other)
                 and (self.members, self.params, self.exceptions, self.returns, self.include,
                      self.namespace, self.prot, self.definition, self.args, self.initializer,
-                     self.brief, self.description, self.precondition, self.postcondition,
-                     self.static, self.const, self.deleted, self.default, self.constexpr)
+                     self.brief, self.description, self.sections, self.static, self.const,
+                     self.deleted, self.default, self.constexpr)
                 == (other.members, other.params, other.exceptions, other.returns, other.include,
                     other.namespace, other.prot, other.definition, other.args, other.initializer,
-                    other.brief, other.description, other.precondition, other.postcondition,
-                    other.static, other.const, other.deleted, other.default, other.constexpr))
+                    other.brief, other.description, other.sections, other.static, other.const,
+                    other.deleted, other.default, other.constexpr))
 
     def __hash__(self):
         return super().__hash__()

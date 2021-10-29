@@ -1,0 +1,73 @@
+@startuml
+skinparam groupInheritance 2
+
+abstract class DescriptionElement
+interface NamedSection
+
+together {
+  class ParaContainer
+  class Para
+}
+together {
+  class ParameterList
+  class ParameterItem
+  class ParameterName
+  class ParameterDescription
+}
+together {
+  class Table
+  class Row
+  class Entry
+}
+together {
+  class ListContainer
+  class ListItem
+}
+together {
+  class ProgramListing
+  class CodeLine
+}
+
+
+DescriptionElement <|-- NestedDescriptionElement
+NestedDescriptionElement <|-- ParaContainer
+NestedDescriptionElement <|-- Para
+DescriptionElement <|-- PlainText
+PlainText <|-- Anchor
+PlainText <|-- SpecialCharacter
+ParaContainer <|-- Section
+ParaContainer <|-- Admonition
+NamedSection <|-- Admonition
+NestedDescriptionElement <|-- Style
+ParaContainer <|-- ListContainer
+ParaContainer <|-- ListItem
+Para <|-- ProgramListing
+NestedDescriptionElement <|-- CodeLine
+Para <|-- Verbatim
+Para <|-- Diagram
+NestedDescriptionElement <|-- ParameterList
+NamedSection <|-- ParameterList
+NestedDescriptionElement <|-- ParameterItem
+NestedDescriptionElement <|-- ParameterName
+ParaContainer <|-- ParameterDescription
+NestedDescriptionElement <|-- Ref
+NestedDescriptionElement <|-- Ulink
+NestedDescriptionElement <|-- Table
+NestedDescriptionElement <|-- Row
+ParaContainer <|-- Entry
+DescriptionElement <|-- Formula
+DescriptionElement <|-- Image
+ParaContainer <|-- BlockQuote
+ParaContainer <|-- ParBlock
+Para <|-- HorizontalRuler
+
+ParaContainer *-- Para
+ParameterList *-- ParameterItem
+ParameterItem *-- ParameterName
+ParameterItem *-- ParameterDescription
+Table *-- Row
+Row *-- Entry
+ListContainer *-- ListItem
+ProgramListing *-- CodeLine
+
+@enduml

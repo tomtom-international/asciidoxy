@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_sections" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::Sections</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+<para>Using sections in the description. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>This class demonstrates how all sections supported by Doxygen are handled. <simplesect kind="author"><para>Rob van der Most </para>
+</simplesect>
+<simplesect kind="attention"><para>Be carefull with this class. It <bold>could</bold> blow up. </para>
+</simplesect>
+<xrefsect id="bug_1_bug000001"><xreftitle>Bug</xreftitle><xrefdescription><para>Not all sections may be rendered correctly. </para>
+</xrefdescription></xrefsect><simplesect kind="copyright"><para>MIT license. </para>
+</simplesect>
+<simplesect kind="date"><para>28 August 2021 </para>
+</simplesect>
+<xrefsect id="deprecated_1_deprecated000001"><xreftitle>Deprecated</xreftitle><xrefdescription><para>This empty class should no longer be used. </para>
+</xrefdescription></xrefsect><simplesect kind="note"><para>Don&apos;t forget about <computeroutput>this!</computeroutput> </para>
+</simplesect>
+<simplesect kind="pre"><para>The class should not exist yet. </para>
+</simplesect>
+<simplesect kind="post"><para>The class suddenly exists. </para>
+</simplesect>
+<simplesect kind="remark"><para>This class does not make much sense. </para>
+</simplesect>
+<simplesect kind="since"><para>0.7.6 </para>
+</simplesect>
+<xrefsect id="todo_1_todo000001"><xreftitle>Todo</xreftitle><xrefdescription><para>Create some content here. </para>
+</xrefdescription></xrefsect><simplesect kind="warning"><para>Do not use this class ever! </para>
+</simplesect>
+</para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="145" column="15" bodyfile="descriptions.hpp" bodystart="145" bodyend="146"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

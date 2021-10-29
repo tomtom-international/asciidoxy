@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.2" xml:lang="en-US">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_external_links" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::ExternalLinks</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1descriptions_1_1_links" kindref="compound">Links</ref> to external locations.</para>
+<para>Our website is <ulink url="https://asciidoxy.org">https://asciidoxy.org</ulink>. You can use <ulink url="mailto:info@example.com">info@example.com</ulink> for fake e-mail address examples.</para>
+<para>Don&apos;t forget to read our <ulink url="https://asciidoxy.org">documentation</ulink>. </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="184" column="1" bodyfile="descriptions.hpp" bodystart="184" bodyend="185"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

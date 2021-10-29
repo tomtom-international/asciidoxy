@@ -62,6 +62,10 @@ class Driver(DriverBase):
                          " detection.")
             self._force_language = None
 
+    @property
+    def unresolved_ref_count(self):
+        return len(self._unresolved_refs) + len(self._inner_type_refs)
+
     def _parse_element(self, xml_element: ET.Element) -> None:
         if self._force_language is not None:
             language_tag = self._force_language

@@ -1,14 +1,24 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.17">
+  <compound refid="classasciidoxy_1_1descriptions_1_1_anchor" kind="class"><name>asciidoxy::descriptions::Anchor</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_ascii_art" kind="class"><name>asciidoxy::descriptions::AsciiArt</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_code_block" kind="class"><name>asciidoxy::descriptions::CodeBlock</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_code_block_no_new_line" kind="class"><name>asciidoxy::descriptions::CodeBlockNoNewLine</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_complex_html_table" kind="class"><name>asciidoxy::descriptions::ComplexHtmlTable</name>
+  </compound>
   <compound refid="class_const_int" kind="class"><name>ConstInt</name>
     <member refid="class_const_int_1aa068b95529ad462c527edb8af85323e8" kind="variable"><name>value_</name></member>
     <member refid="class_const_int_1a80d34fa86fe64d30733534924fda5483" kind="function"><name>ConstInt</name></member>
   </compound>
-  <compound refid="classasciidoxy_1_1_convertor" kind="class"><name>asciidoxy::Convertor</name>
-  </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_convertor" kind="class"><name>asciidoxy::geometry::Convertor</name>
   </compound>
   <compound refid="classasciidoxy_1_1traffic_1_1_convertor" kind="class"><name>asciidoxy::traffic::Convertor</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1_convertor" kind="class"><name>asciidoxy::Convertor</name>
   </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_coordinate" kind="class"><name>asciidoxy::geometry::Coordinate</name>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a52b32f5ac1d5690a56645ba6cc45ed3d" kind="variable"><name>latitude_</name></member>
@@ -27,7 +37,29 @@
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3" kind="function"><name>Update</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891" kind="function"><name>Update</name></member>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_dashes" kind="class"><name>asciidoxy::descriptions::Dashes</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_diagrams" kind="class"><name>asciidoxy::descriptions::Diagrams</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_doxygen_list" kind="class"><name>asciidoxy::descriptions::DoxygenList</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_doxygen_visual_style" kind="class"><name>asciidoxy::descriptions::DoxygenVisualStyle</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_emoji" kind="class"><name>asciidoxy::descriptions::Emoji</name>
+  </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1detail_1_1_error_descriptor" kind="class"><name>asciidoxy::relative_namespace::detail::ErrorDescriptor</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_external_links" kind="class"><name>asciidoxy::descriptions::ExternalLinks</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_formulae" kind="class"><name>asciidoxy::descriptions::Formulae</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_html_headings" kind="class"><name>asciidoxy::descriptions::HtmlHeadings</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_html_styles" kind="class"><name>asciidoxy::descriptions::HtmlStyles</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_hybrid_list" kind="class"><name>asciidoxy::descriptions::HybridList</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_images" kind="class"><name>asciidoxy::descriptions::Images</name>
   </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes" kind="class"><name>asciidoxy::relative_namespace::InterfaceWithDetailClasses</name>
     <member refid="classasciidoxy_1_1relative__namespace_1_1_interface_with_detail_classes_1a8c43ece59b1a2ab96463b44396f70ecf" kind="function"><name>DoSomething</name></member>
@@ -35,8 +67,16 @@
   <compound refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate" kind="class"><name>asciidoxy::geometry::InvalidCoordinate</name>
     <member refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate_1a3b0057e2237f2ecfe3ebc94ca2ba6a12" kind="function"><name>what</name></member>
   </compound>
+  <compound refid="structasciidoxy_1_1tparam_1_1is__container" kind="struct"><name>asciidoxy::tparam::is_container</name>
+  </compound>
+  <compound refid="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4" kind="struct"><name>asciidoxy::tparam::is_container&lt; std::array&lt; T, N &gt; &gt;</name>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_links" kind="class"><name>asciidoxy::descriptions::Links</name>
+  </compound>
   <compound refid="class_logger" kind="class"><name>Logger</name>
     <member refid="class_logger_1adfed6b5c5cb7fab63527144e705c1fa8" kind="function"><name>Log</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_mark_down" kind="class"><name>asciidoxy::descriptions::MarkDown</name>
   </compound>
   <compound refid="classasciidoxy_1_1system_1_1_move_only" kind="class"><name>asciidoxy::system::MoveOnly</name>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a6dc67ce1f9071ebb2bf144874b589ba1" kind="function"><name>MoveOnly</name></member>
@@ -46,9 +86,13 @@
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a0a96fb07ea0d648c1077a30cab963f6c" kind="function"><name>operator=</name></member>
     <member refid="classasciidoxy_1_1system_1_1_move_only_1a52622305a840ea66ccc83df35563a920" kind="function"><name>operator=</name></member>
   </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_output_specific_blocks" kind="class"><name>asciidoxy::descriptions::OutputSpecificBlocks</name>
+  </compound>
   <compound refid="classasciidoxy_1_1geometry_1_1_point" kind="class"><name>asciidoxy::geometry::Point</name>
     <member refid="classasciidoxy_1_1geometry_1_1_point_1aabf939f4746751aeb2f1e9e3553eecb4" kind="function"><name>Point</name></member>
     <member refid="classasciidoxy_1_1geometry_1_1_point_1adfae49e86896e8683fa86005fc000ce8" kind="function"><name>increment</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_sections" kind="class"><name>asciidoxy::descriptions::Sections</name>
   </compound>
   <compound refid="classasciidoxy_1_1system_1_1_service" kind="interface"><name>asciidoxy::system::Service</name>
     <member refid="classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8" kind="function"><name>Start</name></member>
@@ -57,6 +101,8 @@
   <compound refid="classasciidoxy_1_1system_1_1_service_starter" kind="class"><name>asciidoxy::system::ServiceStarter</name>
     <member refid="classasciidoxy_1_1system_1_1_service_starter_1a6474ceb8669761e879329b39c3afb899" kind="friend"><name>Service</name></member>
     <member refid="classasciidoxy_1_1system_1_1_service_starter_1a8923b0ad14de8aa8768a1e36318b0924" kind="function"><name>Register</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1descriptions_1_1_special_characters" kind="class"><name>asciidoxy::descriptions::SpecialCharacters</name>
   </compound>
   <compound refid="classasciidoxy_1_1relative__namespace_1_1detail_1_1_success_descriptor" kind="class"><name>asciidoxy::relative_namespace::detail::SuccessDescriptor</name>
   </compound>
@@ -84,6 +130,11 @@
     <member refid="overloads_8hpp_1afbbb1c0274b5a0d90b2d1d39f1269027" kind="function"><name>to_string</name></member>
     <member refid="overloads_8hpp_1a8eebbc44a7bed882754da89a49139680" kind="function"><name>to_string</name></member>
   </compound>
+  <compound refid="namespaceasciidoxy_1_1descriptions" kind="namespace"><name>asciidoxy::descriptions</name>
+    <member refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kind="function"><name>FunctionDocumentation</name></member>
+    <member refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" kind="function"><name>ParBlock</name></member>
+    <member refid="descriptions_8hpp_1af66d50405deb24f05eab85b3ed15f871" kind="function"><name>CopyDoc</name></member>
+  </compound>
   <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
   </compound>
   <compound refid="namespaceasciidoxy_1_1relative__namespace" kind="namespace"><name>asciidoxy::relative_namespace</name>
@@ -93,16 +144,38 @@
   <compound refid="namespaceasciidoxy_1_1system" kind="namespace"><name>asciidoxy::system</name>
     <member refid="service_8hpp_1a7c44d1c4b121bf30bf90a517f8ff9fbc" kind="function"><name>CreateService</name></member>
   </compound>
+  <compound refid="namespaceasciidoxy_1_1tparam" kind="namespace"><name>asciidoxy::tparam</name>
+  </compound>
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
     <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>
     <member refid="traffic__event_8hpp_1adb4a21783ecb2c7bf30726a36c61a502" kind="typedef"><name>Delay</name></member>
     <member refid="overloads_8hpp_1aebc2b625b914c709f972b5b8eca35d39" kind="function"><name>to_string</name></member>
+  </compound>
+  <compound refid="namespaceasciidoxy_1_1wifi" kind="namespace"><name>asciidoxy::wifi</name>
+    <member refid="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757d" kind="enum"><name>ESP32WiFiProtocol</name></member>
+    <member refid="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da8a003930481b05de89c4ebf13ff9a6f9" kind="enumvalue"><name>eWIFI_11B</name></member>
+    <member refid="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757dab30be87b17ae0f708b5b42cf3bf6de83" kind="enumvalue"><name>eWIFI_11BG</name></member>
+    <member refid="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da7cc82be17a83a07f1b5e2e55d396bdb5" kind="enumvalue"><name>eWIFI_11BGN</name></member>
+    <member refid="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757da80b47fd83a1260f34e08451cb14a9366" kind="enumvalue"><name>eWIFI_LR</name></member>
+    <member refid="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757dab2f144be810c50dc1320100045c01b42" kind="enumvalue"><name>eWIFI_11BGNLR</name></member>
+    <member refid="enums_8hpp_1a4991f0f57db1f25ffff935a6befd757daec69ba3d6df7e31e1bea2dadb3210b72" kind="enumvalue"><name>eERROR</name></member>
+    <member refid="enums_8hpp_1a9d4194317977a3a368c213cc96d4f646" kind="variable"><name>WIFI_PROTOCOL_11B</name></member>
+    <member refid="enums_8hpp_1a1c3503507af22d840f2cba5845917a04" kind="variable"><name>WIFI_PROTOCOL_11N</name></member>
+    <member refid="enums_8hpp_1a9d172d91edb71e3ba638bf3b576fa2b9" kind="variable"><name>WIFI_PROTOCOL_11G</name></member>
+    <member refid="enums_8hpp_1ab949dfee06a9db33f670260c1c4f5c14" kind="variable"><name>WIFI_PROTOCOL_LR</name></member>
   </compound>
   <compound refid="constexpr_8hpp" kind="file"><name>constexpr.hpp</name>
   </compound>
   <compound refid="coordinate_8hpp" kind="file"><name>coordinate.hpp</name>
   </compound>
   <compound refid="default__values_8hpp" kind="file"><name>default_values.hpp</name>
+  </compound>
+  <compound refid="descriptions_8hpp" kind="file"><name>descriptions.hpp</name>
+  </compound>
+  <compound refid="enums_8hpp" kind="file"><name>enums.hpp</name>
+  </compound>
+  <compound refid="function__type_8hpp" kind="file"><name>function_type.hpp</name>
+    <member refid="function__type_8hpp_1a9527e199450050ae8e97b5a29f9ddc75" kind="typedef"><name>DEFAULT_CB</name></member>
   </compound>
   <compound refid="logger_8hpp" kind="file"><name>logger.hpp</name>
   </compound>
@@ -116,6 +189,14 @@
   </compound>
   <compound refid="service_8hpp" kind="file"><name>service.hpp</name>
   </compound>
+  <compound refid="template__parameters_8hpp" kind="file"><name>template_parameters.hpp</name>
+  </compound>
   <compound refid="traffic__event_8hpp" kind="file"><name>traffic_event.hpp</name>
+  </compound>
+  <compound refid="todo" kind="page"><name>todo</name>
+  </compound>
+  <compound refid="deprecated" kind="page"><name>deprecated</name>
+  </compound>
+  <compound refid="bug" kind="page"><name>bug</name>
   </compound>
 </doxygenindex>

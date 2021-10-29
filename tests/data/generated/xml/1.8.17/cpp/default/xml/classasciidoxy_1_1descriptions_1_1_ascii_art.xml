@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classasciidoxy_1_1descriptions_1_1_ascii_art" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::descriptions::AsciiArt</compoundname>
+    <includes refid="descriptions_8hpp" local="no">descriptions.hpp</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Developers can get creative with Ascii art in comments.</para>
+<para><preformatted>
+Arcs:    O----------------&gt;O---------&gt;O-----------------------&gt;O
+Stretch: |            ^======================^
+Route:   |       ^-------------------------------------^
+         |     Origin                             Destination
+         |&lt;----------&gt;|               |&lt;----&gt;|
+Offsets:  front_offset               back_offset
+</preformatted> </para>
+    </detaileddescription>
+    <location file="descriptions.hpp" line="344" column="15" bodyfile="descriptions.hpp" bodystart="344" bodyend="345"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

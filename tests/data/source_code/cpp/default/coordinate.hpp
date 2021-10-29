@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#import <exception>
-#import <tuple>
+#include <exception>
+#include <tuple>
 
 namespace asciidoxy {
 namespace geometry {
@@ -79,6 +79,8 @@ class Coordinate {
 
   /**
    * Update from another coordinate.
+   *
+   * @throws InvalidCoordinate The input coordinate is invalid.
    */
   void Update(const Coordinate& coordinate);
 

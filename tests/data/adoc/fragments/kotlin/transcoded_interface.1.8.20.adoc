@@ -1,0 +1,14 @@
+
+
+
+== [[kotlin-interfacecom_1_1asciidoxy_1_1system_1_1_service,com.asciidoxy.system.Service]]Service
+
+
+[source,kotlin,subs="-specialchars,macros+"]
+----
+interface com.asciidoxy.system.Service
+----
+Base class for services.
+
+
+

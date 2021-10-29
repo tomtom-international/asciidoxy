@@ -28,3 +28,29 @@ GitHub] with the following information:
 * The Doxygen configuration and version used to create the XML input.
 * The version of AsciiDoxy used.
 * Log output when running AsciiDoxy with `--log DEBUG`.
+
+== Diagrams are shown as text
+
+AsciiDoctor-Diagram is required to generate the diagrams. It may also depend on external tools like 
+GraphViz and PlantUML. Make sure they are all installed. Then enable AsciiDoctor-Diagram when using 
+AsciiDoxy:
+
+[source]
+----
+asciidoxy ... --require asciidoctor-diagram ...
+----
+
+== PlantUML diagrams are missing
+
+Doxygen ignores PlantUML diagrams if the path to PlantUML is not set. They are not even exported to 
+the XML output. Make sure you set the path to PlantUML when creating the XML to be used as input to 
+AsciiDoxy.
+
+See also the
+${cross_document_ref("../reference/doxygen.adoc",
+                     link_text="Doxygen configuration examples")}.
+
+== Formulae are shown as text
+
+By default equations and formulae (called STEM in AsciiDoc) are not enabled. To enable equations 
+and formulae add the `:stem:` attribute to the document header of each file containing them.

@@ -41,6 +41,9 @@ def simple_package(tmp_path, xml_data):
     shutil.copy(
         xml_data / "cpp" / "default" / "xml" / "classasciidoxy_1_1geometry_1_1_coordinate.xml",
         package_dir / "xml")
+    shutil.copy(
+        xml_data / "cpp" / "default" / "xml" /
+        "classasciidoxy_1_1geometry_1_1_invalid_coordinate.xml", package_dir / "xml")
     return package_dir
 
 

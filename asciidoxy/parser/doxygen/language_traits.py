@@ -17,7 +17,7 @@ import logging
 
 from abc import ABC
 from enum import Enum, auto
-from typing import Mapping, Optional, Sequence
+from typing import Mapping, Optional, Sequence, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +85,9 @@ class LanguageTraits(ABC):
         ALLOWED_PREFIXES:         Token types that are allowed in type prefixes.
         ALLOWED_SUFFIXES:         Token types that are allowed in type suffixes.
         ALLOWED_NAMES:            Token types that are allowed in type names.
+        NESTING_BOUNDARY:         Character(s) indicating the start of nested types.
+        NAMESPACE_SEPARATOR:      Character(s) separating namespaces and names.
+        FILE_EXTENSIONS:          Potential file extensions for source code files.
     """
     TAG: str
 
@@ -95,6 +98,10 @@ class LanguageTraits(ABC):
     ALLOWED_PREFIXES: Optional[Sequence[TokenCategory]]
     ALLOWED_SUFFIXES: Optional[Sequence[TokenCategory]]
     ALLOWED_NAMES: Sequence[TokenCategory]
+
+    NESTING_BOUNDARY: Optional[str]
+    NAMESPACE_SEPARATOR: Optional[str]
+    FILE_EXTENSIONS: Optional[Sequence[str]] = None
 
     @classmethod
     def is_language_standard_type(cls, type_name: str) -> bool:
@@ -110,8 +117,30 @@ class LanguageTraits(ABC):
         return False
 
     @classmethod
+    def names(cls,
+              raw_name: str,
+              parent_name: str = "",
+              kind: Optional[str] = None) -> Tuple[str, str, Optional[str]]:
+        """Determine the full name, short name and namespace.
+
+        Args:
+            raw_name:    Raw name from the XML file.
+            parent_name: Optional name of the parent element.
+            kind:        Kind of element the name belongs to.
+
+        Returns:
+            Short name.
+            Full name.
+            Namespace.
+        """
+        name = cls.cleanup_name(raw_name)
+        full_name = cls.full_name(name, parent_name, kind)
+        namespace, short_name = cls.namespace_and_name(full_name, kind)
+        return short_name, full_name, namespace
+
+    @classmethod
     def cleanup_name(cls, name: str) -> str:
-        """Clean up the name acoording to language rules.
+        """Clean up the name according to language rules.
 
         Doxygen causes some non C++ names to look like C++.
 
@@ -133,6 +162,7 @@ class LanguageTraits(ABC):
         Returns:
             The short version of the name.
         """
+        _, name = cls.namespace_and_name(name)
         return name
 
     @classmethod
@@ -149,7 +179,15 @@ class LanguageTraits(ABC):
         Returns:
             Long version of the name.
         """
-        return name
+        if not cls.NAMESPACE_SEPARATOR:
+            return name
+        if not parent or name.startswith(f"{parent}{cls.NAMESPACE_SEPARATOR}"):
+            return name
+        if parent and cls.FILE_EXTENSIONS:
+            for ext in cls.FILE_EXTENSIONS:
+                if parent.endswith(ext):
+                    return name
+        return f"{parent}{cls.NAMESPACE_SEPARATOR}{name}"
 
     @classmethod
     def namespace(cls, full_name: str, kind: Optional[str] = None) -> Optional[str]:
@@ -161,7 +199,30 @@ class LanguageTraits(ABC):
         Returns:
             The namespace part of the name, or None if there is no namespace.
         """
-        return None
+        namespace, _ = cls.namespace_and_name(full_name, kind)
+        return namespace
+
+    @classmethod
+    def namespace_and_name(cls,
+                           full_name: str,
+                           kind: Optional[str] = None) -> Tuple[Optional[str], str]:
+        """Determine the namespace and short name from a fully qualified name.
+
+        Args:
+            full_name: Fully qualified name.
+            kind:      Kind of element this namespace applies to.
+        Returns:
+            The namespace part of the name.
+            The short name.
+        """
+        if not cls.NAMESPACE_SEPARATOR:
+            return None, full_name
+        if cls.NESTING_BOUNDARY:
+            name, sep, nested = full_name.partition(cls.NESTING_BOUNDARY)
+        else:
+            name, sep, nested = full_name, "", ""
+        namespace, _, name = name.rpartition(cls.NAMESPACE_SEPARATOR)
+        return namespace if namespace else None, f"{name}{sep}{nested}"
 
     @classmethod
     def is_member_blacklisted(cls, kind: str, name: str) -> bool:

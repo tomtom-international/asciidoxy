@@ -154,6 +154,12 @@ def adoc_data_work_file(adoc_data, package_manager):
     return prepare
 
 
+def adoc_data_expected_result_file(input_file, multipage, doxygen_version):
+    assert input_file.suffixes == [".input", ".adoc"]
+    mode = "multipage" if multipage else "singlepage"
+    return input_file.with_suffix("").with_suffix(f".expected.{mode}.{doxygen_version}.adoc")
+
+
 def test_insert__preprocessing(preprocessing_api):
     result = preprocessing_api.insert("asciidoxy::geometry::Coordinate")
     assert not result
@@ -314,9 +320,10 @@ def test_insert_error_when_ambiguous(generating_api):
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 def test_insert_tracks_all_references(preprocessing_api, context):
     preprocessing_api.insert("asciidoxy::positioning::Positioning")
-    assert len(context.linked) == 2
+    assert len(context.linked) == 3
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
     assert "cpp-classasciidoxy_1_1traffic_1_1_traffic_event" in context.linked
+    assert "cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate" in context.linked
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
@@ -1299,9 +1306,10 @@ def test_multipage_toc__preprocessing_run(preprocessing_api, input_file, multipa
 @pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
 def test_process_adoc_single_file(warnings_are_errors, test_file_name, single_and_multipage,
                                   adoc_data, api_reference, package_manager,
-                                  update_expected_results):
+                                  update_expected_results, doxygen_version):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
-    expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
+    expected_output_file = adoc_data_expected_result_file(input_file, single_and_multipage,
+                                                          doxygen_version)
 
     package_manager.set_input_files(input_file)
     package_manager.work_dir = adoc_data
@@ -1324,7 +1332,8 @@ def test_process_adoc_single_file(warnings_are_errors, test_file_name, single_an
 
 
 def test_process_adoc_multi_file(single_and_multipage, api_reference, package_manager,
-                                 adoc_data_work_file, update_expected_results, adoc_data):
+                                 adoc_data_work_file, update_expected_results, adoc_data,
+                                 doxygen_version):
     main_doc_file = adoc_data_work_file("multifile_test.input.adoc")
     sub_doc_file = main_doc_file.parent / "sub_directory" / "multifile_subdoc_test.input.adoc"
     sub_doc_in_table_file = main_doc_file.parent / "sub_directory" \
@@ -1345,8 +1354,8 @@ def test_process_adoc_multi_file(single_and_multipage, api_reference, package_ma
         f".asciidoxy.{sub_doc_in_table_file.name}"))
     for input_file, output_file in output_files.items():
         assert output_file.is_file()
-        expected_output_file = input_file.with_suffix(
-            ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
+        expected_output_file = adoc_data_expected_result_file(input_file, single_and_multipage,
+                                                              doxygen_version)
         expected_output_file = adoc_data / expected_output_file.relative_to(main_doc_file.parent)
         content = output_file.read_text()
         content = content.replace(os.fspath(main_doc_file.parent), "SRC_DIR")
@@ -1361,9 +1370,10 @@ def test_process_adoc_multi_file(single_and_multipage, api_reference, package_ma
 
 
 def test_process_adoc_env_variables(single_and_multipage, api_reference, package_manager,
-                                    adoc_data_work_file):
-    main_doc_file = adoc_data_work_file("env_variables.adoc")
-    sub_doc_file = main_doc_file.parent / "env_variables_include.adoc"
+                                    adoc_data_work_file, doxygen_version, update_expected_results,
+                                    adoc_data):
+    main_doc_file = adoc_data_work_file("env_variables.input.adoc")
+    sub_doc_file = main_doc_file.parent / "env_variables_include.input.adoc"
 
     progress_mock = ProgressMock()
     output_files = process_adoc(main_doc_file,
@@ -1378,10 +1388,15 @@ def test_process_adoc_env_variables(single_and_multipage, api_reference, package
     assert (output_files[sub_doc_file] == sub_doc_file.with_name(f".asciidoxy.{sub_doc_file.name}"))
     for input_file, output_file in output_files.items():
         assert output_file.is_file()
-        expected_output_file = input_file.with_suffix(
-            ".expected.multipage.adoc" if single_and_multipage else ".expected.singlepage.adoc")
+        expected_output_file = adoc_data_expected_result_file(input_file, single_and_multipage,
+                                                              doxygen_version)
+        expected_output_file = adoc_data / expected_output_file.relative_to(main_doc_file.parent)
         content = output_file.read_text()
         content = content.replace(os.fspath(main_doc_file.parent), "SRC_DIR")
+
+        if update_expected_results:
+            expected_output_file.write_text(content)
+
         assert content == expected_output_file.read_text()
 
     assert progress_mock.ready == progress_mock.total
@@ -1412,16 +1427,13 @@ def test_process_adoc__embedded_file_not_in_output_map(single_and_multipage, api
     "test_file_name",
     ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
 def test_process_adoc_file_warning(test_file_name, single_and_multipage, adoc_data, api_reference,
-                                   package_manager, update_expected_results):
+                                   package_manager, update_expected_results, doxygen_version):
     input_file = adoc_data / f"{test_file_name}.input.adoc"
     package_manager.set_input_files(input_file)
     package_manager.work_dir = adoc_data
 
-    expected_output_file = adoc_data / f"{test_file_name}.expected.adoc"
-    if single_and_multipage:
-        expected_output_file_multipage = expected_output_file.with_suffix('.multipage.adoc')
-        if expected_output_file_multipage.is_file():
-            expected_output_file = expected_output_file_multipage
+    expected_output_file = adoc_data_expected_result_file(input_file, single_and_multipage,
+                                                          doxygen_version)
 
     output_file = process_adoc(input_file,
                                api_reference,
