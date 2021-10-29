@@ -156,25 +156,12 @@ class Driver(DriverBase):
 
     def resolve_reference(self, ref: TypeRef) -> Optional[ReferableElement]:
         try:
-            perfect_match = self.api_reference.find(ref.name,
-                                                    target_id=ref.id,
-                                                    lang=ref.language,
-                                                    namespace=ref.namespace)
-            if perfect_match is not None:
-                return perfect_match
+            return self.api_reference.find(ref.name,
+                                           target_id=ref.id,
+                                           lang=ref.language,
+                                           namespace=ref.namespace)
         except AmbiguousLookupError:
-            pass
-
-        partial_matches = []
-        for compound in self.api_reference.elements:
-            if compound.name and compound.full_name.endswith(f"::{ref.name}"):
-                partial_matches.append(compound)
-        if len(partial_matches) == 1:
-            return partial_matches[0]
-        elif len(partial_matches) > 1:
-            logger.debug(f"Multiple partial matches: {ref.name} ")
-
-        return None
+            return None
 
 
 def safe_language_tag(name: Optional[str]) -> str:

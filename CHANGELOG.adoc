@@ -18,6 +18,15 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== Unreleased
+
+=== Fixed
+
+  * Removed unneccessary pass for partial matches when resolving references. Resolving references
+    is now almost instantaneous (on large code bases). The old pass was mostly finding incorrect 
+    matches.
+
+
 == 0.8.0 (29 Oct 2021)
 
 === Added
