@@ -15,8 +15,8 @@
 
 import pytest
 
-from asciidoxy.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.generator.filters import InsertionFilter
+from asciidoxy.templates.java.helpers import JavaTemplateHelper
 
 from .builders import SimpleClassBuilder
 

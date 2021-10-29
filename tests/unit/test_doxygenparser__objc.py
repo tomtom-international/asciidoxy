@@ -20,8 +20,16 @@ from pytest import param
 
 from asciidoxy.parser.doxygen.objc import ObjectiveCTraits
 
-from .matchers import (IsEmpty, IsFalse, IsNone, Unordered, m_compound, m_parameter, m_returnvalue,
-                       m_typeref)
+from .matchers import (
+    IsEmpty,
+    IsFalse,
+    IsNone,
+    Unordered,
+    m_compound,
+    m_parameter,
+    m_returnvalue,
+    m_typeref,
+)
 
 
 @pytest.mark.parametrize("api_reference_set", [["objc/default"]], ids=[""])

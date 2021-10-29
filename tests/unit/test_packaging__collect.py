@@ -13,15 +13,23 @@
 # limitations under the License.
 """Tests for collecting source files."""
 
-import pytest
-import toml
-
-from aiohttp import web
 from pathlib import Path
 
-from asciidoxy.packaging.collect import (DownloadError, InvalidPackageError, HttpPackageSpec,
-                                         Package, SpecificationError, LocalPackageSpec, collect,
-                                         specs_from_file, versions_from_file)
+import pytest
+import toml
+from aiohttp import web
+
+from asciidoxy.packaging.collect import (
+    DownloadError,
+    HttpPackageSpec,
+    InvalidPackageError,
+    LocalPackageSpec,
+    Package,
+    SpecificationError,
+    collect,
+    specs_from_file,
+    versions_from_file,
+)
 
 from .shared import ProgressMock
 

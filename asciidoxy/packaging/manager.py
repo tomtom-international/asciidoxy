@@ -16,10 +16,10 @@
 import asyncio
 import logging
 import shutil
-
 from pathlib import Path
-from tqdm import tqdm
 from typing import Dict, Optional, Tuple
+
+from tqdm import tqdm
 
 from ..parser.doxygen import Driver
 from .collect import CollectError, Package, collect, specs_from_file

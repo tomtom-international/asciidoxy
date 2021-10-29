@@ -19,8 +19,13 @@ from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.base import TranscoderBase, TranscoderError
 from asciidoxy.transcoder.kotlin import KotlinTranscoder
 
-from .builders import (make_compound, make_parameter, make_return_value, make_throws_clause,
-                       make_type_ref)
+from .builders import (
+    make_compound,
+    make_parameter,
+    make_return_value,
+    make_throws_clause,
+    make_type_ref,
+)
 
 
 class _TestTranscoder(TranscoderBase):

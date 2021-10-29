@@ -13,11 +13,11 @@
 # limitations under the License.
 """Tests for generating navigation for multi page output."""
 
-import pytest
-
 from pathlib import Path
 
-from asciidoxy.generator.navigation import DocumentTreeNode, navigation_bar, multipage_toc
+import pytest
+
+from asciidoxy.generator.navigation import DocumentTreeNode, multipage_toc, navigation_bar
 
 
 @pytest.fixture

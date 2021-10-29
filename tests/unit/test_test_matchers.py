@@ -14,8 +14,20 @@
 """Test test functionality for partial model comparison."""
 
 from asciidoxy.model import Compound, Parameter
-from .matchers import (AtLeast, HasNot, IsEmpty, IsFalse, IsNone, IsNotEmpty, IsTrue, PartialModel,
-                       SizeIs, Unordered, m_compound)
+
+from .matchers import (
+    AtLeast,
+    HasNot,
+    IsEmpty,
+    IsFalse,
+    IsNone,
+    IsNotEmpty,
+    IsTrue,
+    PartialModel,
+    SizeIs,
+    Unordered,
+    m_compound,
+)
 
 
 def test_match_only_specified_attributes():

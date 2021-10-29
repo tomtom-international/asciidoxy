@@ -15,10 +15,16 @@
 
 import xml.etree.ElementTree as ET
 
-from asciidoxy.parser.doxygen.description_parser import (Admonition, DescriptionElement,
-                                                         NestedDescriptionElement, ParameterList,
-                                                         Ref, SpecialCharacter, parse_description,
-                                                         select_descriptions)
+from asciidoxy.parser.doxygen.description_parser import (
+    Admonition,
+    DescriptionElement,
+    NestedDescriptionElement,
+    ParameterList,
+    Ref,
+    SpecialCharacter,
+    parse_description,
+    select_descriptions,
+)
 
 
 def debug_print(element: DescriptionElement, prefix: str = "") -> None:

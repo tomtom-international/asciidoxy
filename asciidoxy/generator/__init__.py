@@ -13,7 +13,7 @@
 # limitations under the License.
 """Modules for generating AsciiDoc output as part of the preprocessing."""
 
-from .asciidoc import process_adoc, Context
+from .asciidoc import Context, process_adoc
 from .errors import AsciiDocError
 from .filters import InsertionFilter
 

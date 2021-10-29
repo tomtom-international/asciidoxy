@@ -13,17 +13,17 @@
 # limitations under the License.
 """General tests for type parsing."""
 
-import pytest
 import random
 import string
-
 import xml.etree.ElementTree as ET
-
 from typing import List, NamedTuple, Optional
 from unittest.mock import MagicMock
 
+import pytest
+
 from asciidoxy.parser.doxygen.language_traits import LanguageTraits, TokenCategory
 from asciidoxy.parser.doxygen.type_parser import Token, TypeParser, find_tokens
+
 from .shared import assert_equal_or_none_if_empty, sub_element
 
 

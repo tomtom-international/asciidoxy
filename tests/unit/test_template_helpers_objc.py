@@ -18,7 +18,7 @@ Tests for Objective C template helpers.
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.model import Compound, ReturnValue, Parameter, TypeRef
+from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 
 from .builders import SimpleClassBuilder

@@ -116,6 +116,7 @@ docker: dist ## build the docker image
 
 format: ## format the code
 	yapf -r -i -p setup.py asciidoxy tests/unit
+	isort .
 
 docs: doxygen ## generate documentation
 	cd documentation && $(MAKE)

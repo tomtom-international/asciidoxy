@@ -16,7 +16,6 @@ Shared functionality for unit tests.
 """
 
 import xml.etree.ElementTree as ET
-
 from typing import Optional
 
 

@@ -13,14 +13,18 @@
 # limitations under the License.
 """Tests for managing packages."""
 
-import pytest
-import toml
-
 from pathlib import Path
 from unittest.mock import MagicMock, call
 
-from asciidoxy.packaging.manager import (FileCollisionError, PackageManager, UnknownFileError,
-                                         UnknownPackageError)
+import pytest
+import toml
+
+from asciidoxy.packaging.manager import (
+    FileCollisionError,
+    PackageManager,
+    UnknownFileError,
+    UnknownPackageError,
+)
 
 
 @pytest.fixture

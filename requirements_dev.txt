@@ -3,6 +3,7 @@ conan==1.42.0
 coverage==6.0.2
 doxypypy==0.8.8.6
 flake8==4.0.1
+isort==5.9.3
 mypy==0.910
 pip==21.3.1
 pip-upgrader==1.4.15

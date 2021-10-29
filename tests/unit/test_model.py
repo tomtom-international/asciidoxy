@@ -15,8 +15,14 @@
 Tests for the `asciidoxy.model` module.
 """
 
-from asciidoxy.model import (Compound, Parameter, ReferableElement, ReturnValue, ThrowsClause,
-                             TypeRef)
+from asciidoxy.model import (
+    Compound,
+    Parameter,
+    ReferableElement,
+    ReturnValue,
+    ThrowsClause,
+    TypeRef,
+)
 
 
 def test_minimal_constructed_repr():

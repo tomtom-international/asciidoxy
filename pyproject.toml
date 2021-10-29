@@ -10,6 +10,7 @@ build-backend = "setuptools.build_meta"
 module = [
     "mako.exceptions.*",
     "mako.lookup.*",
+    "mako.template.*",
     "tqdm.*",
     "xml.dom.*",
     "xml.dom.minidom.*",
@@ -21,3 +22,10 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
 junit_family = "legacy"
+
+[tool.isort]
+profile = "hug"
+src_paths = [
+    "asciidoxy",
+    "tests"
+]

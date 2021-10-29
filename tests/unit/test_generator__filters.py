@@ -15,10 +15,19 @@
 
 import pytest
 
-from asciidoxy.generator.filters import (AllStringFilter, NoneStringFilter, IncludeStringFilter,
-                                         ExcludeStringFilter, ChainedStringFilter, MemberFilter,
-                                         FilterAction, ExceptionFilter, filter_from_strings,
-                                         InsertionFilter, combine_specs)
+from asciidoxy.generator.filters import (
+    AllStringFilter,
+    ChainedStringFilter,
+    ExceptionFilter,
+    ExcludeStringFilter,
+    FilterAction,
+    IncludeStringFilter,
+    InsertionFilter,
+    MemberFilter,
+    NoneStringFilter,
+    combine_specs,
+    filter_from_strings,
+)
 from asciidoxy.model import ThrowsClause
 
 

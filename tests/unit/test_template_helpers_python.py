@@ -17,7 +17,7 @@ import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
-from asciidoxy.templates.python.helpers import params, PythonTemplateHelper
+from asciidoxy.templates.python.helpers import PythonTemplateHelper, params
 
 from .builders import SimpleClassBuilder
 

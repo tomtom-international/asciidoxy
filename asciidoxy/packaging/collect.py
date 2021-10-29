@@ -18,7 +18,6 @@ server. Each package can contain XML files containing the API reference document
 other files that can be directly included in the documentation.
 """
 
-import aiohttp
 import asyncio
 import csv
 import io
@@ -26,12 +25,12 @@ import logging
 import os
 import shutil
 import tarfile
-import toml
-
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Type, TypeVar, Union
 
+import aiohttp
+import toml
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)

@@ -14,12 +14,11 @@
 """Support for Java documentation."""
 
 import string
-
 from typing import List, Optional
 
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
-from .type_parser import TypeParser, Token, find_tokens
+from .type_parser import Token, TypeParser, find_tokens
 
 
 class JavaTraits(LanguageTraits):

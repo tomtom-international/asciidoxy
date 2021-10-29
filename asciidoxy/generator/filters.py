@@ -16,7 +16,6 @@
 import collections
 import re
 import sys
-
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Generator, List, Mapping, Optional, Pattern, Sequence, Type, TypeVar, Union

@@ -14,14 +14,12 @@
 """Parsing of types from strings and XML."""
 
 import logging
-
 import xml.etree.ElementTree as ET
-
 from typing import Iterator, List, Optional, Sequence, Tuple, Type
 
+from ...model import Parameter, TypeRef
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenCategory
-from ...model import Parameter, TypeRef
 
 logger = logging.getLogger(__name__)
 

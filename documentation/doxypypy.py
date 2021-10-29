@@ -17,13 +17,14 @@ Temporary copy from: https://github.com/Feneric/doxypypy/blob/master/doxypypy/do
 Includes fixes for python 3.8
 """
 
-from ast import NodeVisitor, parse, iter_fields, AST, Name, get_docstring
-from re import compile as regexpCompile, IGNORECASE, MULTILINE
-from types import GeneratorType
-from sys import stderr, stdout
-from os import linesep
-from string import whitespace
+from ast import AST, Name, NodeVisitor, get_docstring, iter_fields, parse
 from codeop import compile_command
+from os import linesep
+from re import IGNORECASE, MULTILINE
+from re import compile as regexpCompile
+from string import whitespace
+from sys import stderr, stdout
+from types import GeneratorType
 
 
 def coroutine(func):
@@ -792,12 +793,15 @@ def main():
     Starts the parser on the file given by the filename as the first
     argument on the command line.
     """
-    from optparse import OptionParser, OptionGroup
+    from codecs import BOM_UTF8
+    from codecs import open as codecsOpen
+    from optparse import OptionGroup, OptionParser
     from os import sep
     from os.path import basename, getsize
-    from sys import argv, exit as sysExit
+    from sys import argv
+    from sys import exit as sysExit
+
     from chardet import detect
-    from codecs import BOM_UTF8, open as codecsOpen
 
     def optParse():
         """

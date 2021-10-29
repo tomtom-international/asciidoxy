@@ -16,23 +16,30 @@ Tests for the `asciidoxy.generator.asciidoc`.
 """
 
 import os
-import pytest
-
 from pathlib import Path
 from typing import Optional
 
+import pytest
+
+from asciidoxy import __version__
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.generator.asciidoc import ApiProxy, GeneratingApi, PreprocessingApi, process_adoc
 from asciidoxy.generator.context import Context, StackFrame
+from asciidoxy.generator.errors import (
+    AmbiguousReferenceError,
+    ConsistencyError,
+    IncludeFileNotFoundError,
+    IncompatibleVersionError,
+    InvalidApiCallError,
+    MissingPackageError,
+    MissingPackageFileError,
+    ReferenceNotFoundError,
+    TemplateMissingError,
+    UnknownAnchorError,
+)
 from asciidoxy.generator.navigation import DocumentTreeNode
-from asciidoxy.generator.errors import (AmbiguousReferenceError, ConsistencyError,
-                                        IncludeFileNotFoundError, IncompatibleVersionError,
-                                        InvalidApiCallError, MissingPackageError,
-                                        MissingPackageFileError, ReferenceNotFoundError,
-                                        TemplateMissingError, UnknownAnchorError)
 from asciidoxy.packaging import Package, PackageManager
 
-from asciidoxy import __version__
 from .shared import ProgressMock
 
 

@@ -19,20 +19,19 @@ import logging
 import platform
 import subprocess
 import sys
-
 from pathlib import Path
 from typing import List, Optional, Sequence
 
 from mako.exceptions import RichTraceback
 from tqdm import tqdm
 
+from ._version import __version__
 from .api_reference import ApiReference
 from .generator import process_adoc
 from .model import json_repr
 from .packaging import CollectError, PackageManager, SpecificationError
 from .parser.doxygen import Driver as DoxygenDriver
 from .path_utils import relative_path
-from ._version import __version__
 
 
 def error(*args, **kwargs) -> None:

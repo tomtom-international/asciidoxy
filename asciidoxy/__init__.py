@@ -13,8 +13,15 @@
 # limitations under the License.
 """Top-level package for AsciiDoxy."""
 
-from ._version import (__title__, __description__, __url__, __version__, __author__,
-                       __author_email__, __license__)
+from ._version import (
+    __author__,
+    __author_email__,
+    __description__,
+    __license__,
+    __title__,
+    __url__,
+    __version__,
+)
 
 __all__ = [
     "__title__", "__description__", "__url__", "__version__", "__author__", "__author_email__",

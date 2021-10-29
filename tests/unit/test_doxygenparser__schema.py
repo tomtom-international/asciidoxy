@@ -14,12 +14,17 @@
 """Parse the Doxygen XML schema and verify all elements are supported by the AsciiDoxy parser."""
 
 import xml.etree.ElementTree as ET
-
 from pathlib import Path
 from typing import Dict, List, Set
 
-from asciidoxy.parser.doxygen.description_parser import (IGNORE, NEW_ELEMENT, UPDATE_PARENT,
-                                                         USE_PARENT, UNSUPPORTED, SpecialCharacter)
+from asciidoxy.parser.doxygen.description_parser import (
+    IGNORE,
+    NEW_ELEMENT,
+    UNSUPPORTED,
+    UPDATE_PARENT,
+    USE_PARENT,
+    SpecialCharacter,
+)
 
 
 def _xsd(tag: str) -> str:

@@ -16,7 +16,6 @@
 import copy
 import logging
 import uuid
-
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, MutableMapping, NamedTuple, Optional, Tuple

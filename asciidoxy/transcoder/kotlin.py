@@ -15,8 +15,8 @@
 
 from typing import List, Optional, Tuple, Union
 
-from .base import TranscoderBase
 from ..model import Compound, Parameter, ReferableElement, TypeRef
+from .base import TranscoderBase
 
 # https://kotlinlang.org/docs/reference/java-interop.html#mapped-types
 _MAPPED_TYPES = {

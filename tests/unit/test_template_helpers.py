@@ -15,13 +15,13 @@
 Tests for the shared template helpers.
 """
 
+from unittest.mock import Mock, call
+
 import pytest
 
-from unittest.mock import call, Mock
-
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.templates.helpers import has, has_any, TemplateHelper, header, h1, h2, tc
 from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
+from asciidoxy.templates.helpers import TemplateHelper, h1, h2, has, has_any, header, tc
 
 
 @pytest.fixture

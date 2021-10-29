@@ -14,7 +14,6 @@
 """Support for parsing python documentation."""
 
 import string
-
 from typing import List, Optional
 
 from .language_traits import LanguageTraits, TokenCategory

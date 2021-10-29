@@ -14,9 +14,7 @@
 """Parse brief and detailed descriptions from Doxygen XML."""
 
 import logging
-
 import xml.etree.ElementTree as ET
-
 from abc import ABC, abstractmethod
 from typing import Iterator, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 

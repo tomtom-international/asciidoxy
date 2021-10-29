@@ -15,8 +15,8 @@
 
 from typing import List, Optional
 
-from ..model import Compound, ReferableElement
 from .._version import __version__
+from ..model import Compound, ReferableElement
 
 
 class AsciiDocError(Exception):

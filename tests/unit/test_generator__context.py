@@ -13,9 +13,9 @@
 # limitations under the License.
 """Tests for the generator's context."""
 
-import pytest
-
 from pathlib import Path
+
+import pytest
 
 from asciidoxy.generator.context import StackFrame, stacktrace
 from asciidoxy.generator.errors import ConsistencyError, DuplicateAnchorError, UnknownAnchorError

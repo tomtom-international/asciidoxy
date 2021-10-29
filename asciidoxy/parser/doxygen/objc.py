@@ -14,15 +14,13 @@
 """Support for Objective-C documentation."""
 
 import string
-
 import xml.etree.ElementTree as ET
-
 from typing import List, Optional, Tuple
 
+from ...model import Compound
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
-from .type_parser import TypeParser, Token, find_tokens
-from ...model import Compound
+from .type_parser import Token, TypeParser, find_tokens
 
 
 class ObjectiveCTraits(LanguageTraits):

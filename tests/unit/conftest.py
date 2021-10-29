@@ -13,9 +13,9 @@
 # limitations under the License.
 """Fixtures for testing AsciiDoxy."""
 
-import pytest
-
 from pathlib import Path
+
+import pytest
 
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi

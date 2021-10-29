@@ -13,17 +13,17 @@
 # limitations under the License.
 """Tests for C++ type parsing."""
 
-import pytest
-
 import xml.etree.ElementTree as ET
-
 from unittest.mock import MagicMock
+
+import pytest
 
 from asciidoxy.parser.doxygen.cpp import CppTypeParser
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
 from asciidoxy.parser.doxygen.type_parser import Token
 from tests.unit.shared import assert_equal_or_none_if_empty, sub_element
-from .test_doxygenparser__type_parser import name, args_start, whitespace, args_end, arg_name
+
+from .test_doxygenparser__type_parser import arg_name, args_end, args_start, name, whitespace
 
 
 @pytest.fixture(params=[

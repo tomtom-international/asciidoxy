@@ -14,21 +14,19 @@
 """Read API reference information from Doxygen XML output."""
 
 import logging
-
 import xml.etree.ElementTree as ET
-
 from typing import List, Mapping, Optional, Set, Tuple
 
 from tqdm import tqdm
 
+from ...api_reference import AmbiguousLookupError, ApiReference
+from ...model import Compound, ReferableElement, TypeRef
 from .cpp import CppParser
 from .driver_base import DriverBase
 from .java import JavaParser
 from .objc import ObjectiveCParser
 from .parser_base import ParserBase
 from .python import PythonParser
-from ...api_reference import AmbiguousLookupError, ApiReference
-from ...model import Compound, ReferableElement, TypeRef
 
 logger = logging.getLogger(__name__)
 

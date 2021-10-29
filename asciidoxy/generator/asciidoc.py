@@ -17,35 +17,53 @@ import functools
 import inspect
 import logging
 import os
-
 from abc import ABC, abstractmethod
 from functools import wraps
+from pathlib import Path
+from typing import (
+    Any,
+    Callable,
+    MutableMapping,
+    NamedTuple,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+    cast,
+)
+
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
-from pathlib import Path
-from packaging.specifiers import SpecifierSet
-from packaging.version import Version
-from typing import (Any, Callable, MutableMapping, NamedTuple, Optional, Sequence, TypeVar, Union,
-                    cast)
-
 from tqdm import tqdm
 
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
+
 from .. import templates
+from .._version import __version__
 from ..api_reference import AmbiguousLookupError, ApiReference
-from ..parser.doxygen import safe_language_tag
 from ..model import ReferableElement
-from ..packaging import PackageManager, UnknownPackageError, UnknownFileError
+from ..packaging import PackageManager, UnknownFileError, UnknownPackageError
+from ..parser.doxygen import safe_language_tag
 from ..path_utils import relative_path
 from ..transcoder import TranscoderBase
-from .._version import __version__
 from .context import Context, stacktrace
-from .errors import (AmbiguousReferenceError, ConsistencyError, IncludeFileNotFoundError,
-                     IncompatibleVersionError, InvalidApiCallError, MissingPackageError,
-                     MissingPackageFileError, ReferenceNotFoundError, TemplateMissingError,
-                     UnknownAnchorError, UnlinkableError)
+from .errors import (
+    AmbiguousReferenceError,
+    ConsistencyError,
+    IncludeFileNotFoundError,
+    IncompatibleVersionError,
+    InvalidApiCallError,
+    MissingPackageError,
+    MissingPackageFileError,
+    ReferenceNotFoundError,
+    TemplateMissingError,
+    UnknownAnchorError,
+    UnlinkableError,
+)
 from .filters import FilterSpec, InsertionFilter
-from .navigation import DocumentTreeNode, navigation_bar, multipage_toc
+from .navigation import DocumentTreeNode, multipage_toc, navigation_bar
 
 logger = logging.getLogger(__name__)
 

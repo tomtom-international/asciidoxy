@@ -17,9 +17,7 @@ import logging
 import os
 import re
 import xml.dom.minidom
-
 import xml.etree.ElementTree as ET
-
 from pathlib import Path
 from typing import List, Optional, Set, Tuple
 

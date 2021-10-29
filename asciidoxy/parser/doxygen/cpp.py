@@ -15,15 +15,13 @@
 
 import re
 import string
-
 import xml.etree.ElementTree as ET
-
 from typing import List, Optional
 
+from ...model import Compound, Parameter
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser, find_tokens
-from ...model import Compound, Parameter
 
 
 class CppTraits(LanguageTraits):

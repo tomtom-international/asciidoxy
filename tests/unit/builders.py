@@ -13,7 +13,7 @@
 # limitations under the License.
 """Builders to create models for testing."""
 
-from asciidoxy.model import (Compound, Parameter, ReturnValue, ThrowsClause, TypeRef)
+from asciidoxy.model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 
 
 def make_compound(*,

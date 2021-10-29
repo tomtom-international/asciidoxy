@@ -14,7 +14,6 @@
 """Traits describing how to parse different languages."""
 
 import logging
-
 from abc import ABC
 from enum import Enum, auto
 from typing import Mapping, Optional, Sequence, Tuple
