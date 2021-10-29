@@ -15,10 +15,9 @@
 
 import copy
 import logging
-import uuid
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, MutableMapping, NamedTuple, Optional, Tuple
+from typing import Dict, List, MutableMapping, NamedTuple, Optional, Set, Tuple
 
 from tqdm import tqdm
 
@@ -150,7 +149,7 @@ class Context(object):
     inserted: MutableMapping[str, Tuple[Path, List[StackFrame]]]
     anchors: Dict[str, Tuple[Path, Optional[str]]]
     in_to_out_file_map: Dict[Path, Path]
-    embedded_file_map: Dict[Tuple[Path, Path], Path]
+    embedded_file_map: Dict[Path, Set[Path]]
     current_document: DocumentTreeNode
     current_package: Package
     call_stack: List[StackFrame]
@@ -169,7 +168,7 @@ class Context(object):
         self.inserted = {}
         self.anchors = {}
         self.in_to_out_file_map = {}
-        self.embedded_file_map = {}
+        self.embedded_file_map = defaultdict(set)
         self.current_document = current_document
         self.current_package = current_package
         self.call_stack = []
@@ -232,17 +231,16 @@ class Context(object):
     def register_adoc_file(self, in_file: Path) -> Path:
         assert in_file.is_absolute()
         if self.embedded:
-            out_file = self.embedded_file_map.get((in_file, self.current_document.in_file), None)
+            out_file = self.current_document.in_file
+            self.embedded_file_map[in_file].add(out_file)
         else:
-            out_file = self.in_to_out_file_map.get(in_file, None)
+            known_out_file = self.in_to_out_file_map.get(in_file)
 
-        if out_file is None:
-            if self.embedded:
-                out_file = _embedded_out_file_name(in_file)
-                self.embedded_file_map[(in_file, self.current_document.in_file)] = out_file
-            else:
+            if known_out_file is None:
                 out_file = _out_file_name(in_file)
                 self.in_to_out_file_map[in_file] = out_file
+            else:
+                out_file = known_out_file
 
         return out_file
 
@@ -256,20 +254,44 @@ class Context(object):
         assert file_name.is_absolute()
 
         if self.multipage:
-            embedded_file = self.embedded_file_map.get((file_name, self.current_document.in_file))
-            if embedded_file is not None:
-                # File is embedded in the current document, link to generated embedded file
-                return relative_path(self.current_document.in_file, embedded_file)
+            embedded_files = self.embedded_file_map.get(file_name)
+            if embedded_files is not None:
+                if len(embedded_files) == 1:
+                    # File is only embedded in one file, link to that file
+                    return relative_path(self.current_document.in_file, list(embedded_files)[0])
+                else:
+                    # File is embedded multiple time, can only link if it is embedded in the
+                    # current document
+                    if self.current_document.in_file in embedded_files:
+                        return Path(self.current_document.in_file.name)
+                    else:
+                        raise ConsistencyError("Cannot resolve link to embedded file: The same file"
+                                               " is embedded multiple times. Either embed the file"
+                                               " in only one file, or only link to it from the"
+                                               " files it is embedded in.")
             else:
                 # File is not embedded, link to original file name
                 return relative_path(self.current_document.in_file, file_name)
 
         else:
             # In singlepage mode all links need to be relative to the root file
-            embedded_file = self.embedded_file_map.get((file_name, self.current_document.in_file))
-            if embedded_file is not None:
-                # File is embedded in the current document, link to generated embedded file
-                return relative_path(self.current_document.root().in_file, embedded_file)
+            embedded_files = self.embedded_file_map.get(file_name)
+            if embedded_files is not None:
+                if len(embedded_files) == 1:
+                    # File is only embedded in one file, link to that file
+                    return relative_path(self.current_document.root().in_file,
+                                         list(embedded_files)[0])
+                else:
+                    # File is embedded multiple time, can only link if it is embedded in the
+                    # current document
+                    if self.current_document.in_file in embedded_files:
+                        return relative_path(self.current_document.root().in_file,
+                                             self.current_document.in_file)
+                    else:
+                        raise ConsistencyError("Cannot resolve link to embedded file: The same file"
+                                               " is embedded multiple times. Either embed the file"
+                                               " in only one file, or only link to it from the"
+                                               " files it is embedded in.")
 
             out_file = self.in_to_out_file_map.get(file_name, None)
             if out_file is not None:
@@ -317,10 +339,6 @@ class Context(object):
 
 def _out_file_name(in_file: Path) -> Path:
     return in_file.parent / f".asciidoxy.{in_file.name}"
-
-
-def _embedded_out_file_name(in_file: Path) -> Path:
-    return in_file.parent / f".asciidoxy.{uuid.uuid4()}.{in_file.name}"
 
 
 def _docinfo_footer_file_name(out_file: Path) -> Path:

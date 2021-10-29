@@ -151,9 +151,8 @@ def test_register_adoc_file__embedded(empty_context, input_file):
     embedded_file = input_file.with_name("embedded.adoc")
 
     out_file = empty_context.register_adoc_file(embedded_file)
-    assert out_file.parent == embedded_file.parent
-    assert out_file.name.endswith(embedded_file.name)
-    assert out_file.name.startswith(".asciidoxy.")
+    assert out_file.parent == input_file.parent
+    assert out_file.name.endswith(input_file.name)
     assert out_file != embedded_file
 
 
@@ -165,8 +164,7 @@ def test_register_adoc_file__embedded__always_returns_same_file(empty_context, i
     assert empty_context.register_adoc_file(embedded_file) == out_file
 
 
-def test_register_adoc_file__embedded__different_file_when_embedded_in_different_file(
-        empty_context, input_file):
+def test_register_adoc_file__embedded__can_be_embedded_in_multiple_files(empty_context, input_file):
     empty_context.embedded = True
     embedded_file = input_file.with_name("embedded.adoc")
 
@@ -191,12 +189,45 @@ def test_link_to_adoc_file__singlepage__unknown_file(empty_context, input_file):
         input_file.parent)
 
 
-def test_link_to_adoc_file__singlepage__embedded_file(empty_context, input_file):
+def test_link_to_adoc_file__singlepage__link_to_embedded_file(empty_context, input_file):
     empty_context.embedded = True
     linked_file = input_file.with_name("linked_file.adoc")
     linked_out_file = empty_context.register_adoc_file(linked_file)
     empty_context.embedded = False
     assert empty_context.link_to_adoc_file(linked_file) == linked_out_file.relative_to(
+        input_file.parent)
+
+
+def test_link_to_adoc_file__singlepage__multiple_times_embedded__link_different_file(
+        empty_context, input_file):
+
+    embedded_file = input_file.with_name("embedded_file.adoc")
+    second_file = input_file.with_name("second_file.adoc")
+    other_file = input_file.with_name("other_file.adoc")
+
+    empty_context.embedded = True
+    empty_context.register_adoc_file(embedded_file)
+    empty_context.current_document.in_file = second_file
+    empty_context.register_adoc_file(embedded_file)
+    empty_context.embedded = False
+
+    empty_context.current_document.in_file = other_file
+    with pytest.raises(ConsistencyError):
+        empty_context.link_to_adoc_file(embedded_file)
+
+
+def test_link_to_adoc_file__singlepage__link_to_embedded_file__link_different_file(
+        empty_context, input_file):
+
+    embedded_file = input_file.with_name("embedded_file.adoc")
+    other_file = input_file.with_name("other_file.adoc")
+
+    empty_context.embedded = True
+    empty_context.register_adoc_file(embedded_file)
+    empty_context.embedded = False
+
+    empty_context.current_document.in_file = other_file
+    assert empty_context.link_to_adoc_file(embedded_file) == input_file.relative_to(
         input_file.parent)
 
 
@@ -215,13 +246,69 @@ def test_link_to_adoc_file__multipage__unknown_file(empty_context, input_file):
         input_file.parent)
 
 
-def test_link_to_adoc_file__multipage__embedded_file(empty_context, input_file):
+def test_link_to_adoc_file__multipage__link_to_embedded_file(empty_context, input_file):
     empty_context.multipage = True
     empty_context.embedded = True
     linked_file = input_file.with_name("linked_file.adoc")
     linked_out_file = empty_context.register_adoc_file(linked_file)
     empty_context.embedded = False
     assert empty_context.link_to_adoc_file(linked_file) == linked_out_file.relative_to(
+        input_file.parent)
+
+
+def test_link_to_adoc_file__multipage__multiple_times_embedded__link_different_file(
+        empty_context, input_file):
+
+    embedded_file = input_file.with_name("embedded_file.adoc")
+    second_file = input_file.with_name("second_file.adoc")
+    other_file = input_file.with_name("other_file.adoc")
+
+    empty_context.multipage = True
+    empty_context.embedded = True
+    empty_context.register_adoc_file(embedded_file)
+    empty_context.current_document.in_file = second_file
+    empty_context.register_adoc_file(embedded_file)
+    empty_context.embedded = False
+
+    empty_context.current_document.in_file = other_file
+    with pytest.raises(ConsistencyError):
+        empty_context.link_to_adoc_file(embedded_file)
+
+
+def test_link_to_adoc_file__multipage__link_to_embedded_file__link_different_file(
+        empty_context, input_file):
+
+    embedded_file = input_file.with_name("embedded_file.adoc")
+    other_file = input_file.with_name("other_file.adoc")
+
+    empty_context.multipage = True
+    empty_context.embedded = True
+    empty_context.register_adoc_file(embedded_file)
+    empty_context.embedded = False
+
+    empty_context.current_document.in_file = other_file
+    assert empty_context.link_to_adoc_file(embedded_file) == input_file.relative_to(
+        input_file.parent)
+
+
+def test_link_to_adoc_file__link_to_embedded_file__multiple_times_embedded__link_same_file(
+        empty_context, input_file):
+
+    embedded_file = input_file.with_name("embedded_file.adoc")
+    second_file = input_file.with_name("second_file.adoc")
+
+    empty_context.embedded = True
+    input_linked_out_file = empty_context.register_adoc_file(embedded_file)
+    empty_context.current_document.in_file = second_file
+    second_linked_out_file = empty_context.register_adoc_file(embedded_file)
+    empty_context.embedded = False
+
+    empty_context.current_document.in_file = input_file
+    assert empty_context.link_to_adoc_file(embedded_file) == input_linked_out_file.relative_to(
+        input_file.parent)
+
+    empty_context.current_document.in_file = second_file
+    assert empty_context.link_to_adoc_file(embedded_file) == second_linked_out_file.relative_to(
         input_file.parent)
 
 

@@ -1225,63 +1225,29 @@ def test_include__error_file_not_found(test_data_builder, tdb_warnings_are_and_a
 
 def test_include__always_embed(test_data_builder, tdb_single_and_multipage):
     test_data_builder.add_input_file("input.adoc")
-    test_data_builder.add_include_file("includes/another_file.adoc")
+    include_file = test_data_builder.add_include_file("includes/another_file.adoc")
+    include_file.write_text("Embedded")
 
     for api in test_data_builder.apis():
         result = api.include("includes/another_file.adoc", always_embed=True)
-        assert result.startswith("include::")
-        assert result.endswith("[leveloffset=+1]")
-
-        file_name = Path(result[9:-16])
-        assert file_name.is_file() == isinstance(api, GeneratingApi)
-        assert file_name.is_absolute()
-
-
-def test_include__always_embed__unique_name_for_each_including_file(test_data_builder,
-                                                                    tdb_single_and_multipage):
-    test_data_builder.add_include_file("includes/another_file.adoc")
-
-    file_names = []
-
-    for i in range(10):
-        test_data_builder.add_input_file(f"base{i}.adoc")
-        for api in test_data_builder.apis():
-            result = api.include("includes/another_file.adoc", always_embed=True)
-            assert result.startswith("include::")
-            assert result.endswith("[leveloffset=+1]")
-
-            file_name = Path(result[9:-16])
-            assert file_name.is_file() == isinstance(api, GeneratingApi)
-            assert file_name.is_absolute()
-
-            if isinstance(api, PreprocessingApi):
-                assert file_name not in file_names
-                file_names.append(file_name)
+        assert result == "Embedded"
 
 
 def test_include__always_embed__correct_sub_context(test_data_builder, tdb_single_and_multipage):
     test_data_builder.add_input_file("input.adoc")
     include_file = test_data_builder.add_include_file("includes/another_file.adoc")
-    include_file.write_text("""
-${cross_document_ref("../input.adoc", anchor="bla")}}
-""")
+    include_file.write_text("""${cross_document_ref("../input.adoc", anchor="bla")}""")
 
     for api in test_data_builder.apis():
         result = api.include("includes/another_file.adoc", always_embed=True)
-        assert result.startswith("include::")
-        assert result.endswith("[leveloffset=+1]")
 
-        file_name = Path(result[9:-16])
-        assert file_name.is_file() == isinstance(api, GeneratingApi)
-        assert file_name.is_absolute()
-
-    contents = file_name.read_text()
-    if tdb_single_and_multipage:
-        # multipage
-        assert "<<input.adoc#bla,bla>>" in contents, contents
-    else:
-        # singlepage
-        assert "<<.asciidoxy.input.adoc#bla,bla>>" in contents, contents
+        if isinstance(api, GeneratingApi):
+            if tdb_single_and_multipage:
+                # multipage
+                assert result == "<<input.adoc#bla,bla>>"
+            else:
+                # singlepage
+                assert result == "<<.asciidoxy.input.adoc#bla,bla>>"
 
 
 def test_multipage_toc__default(generating_api, input_file, multipage):
@@ -1426,7 +1392,7 @@ def test_process_adoc__embedded_file_not_in_output_map(single_and_multipage, api
         output_files[main_doc_file] == main_doc_file.with_name(f".asciidoxy.{main_doc_file.name}"))
 
     assert progress_mock.ready == progress_mock.total
-    assert progress_mock.total == 4
+    assert progress_mock.total == 2
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])

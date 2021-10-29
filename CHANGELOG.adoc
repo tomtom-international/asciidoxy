@@ -20,6 +20,16 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == Unreleased
 
+
+=== Changed
+
+  * Embedded files, inserted with `include` and `always_embed=True`, are no longer using temporary
+    files.
+  * Linking to an embedded file from outside the file where it is embedded is now possible iff the
+    file is embedded only once. If the file is embedded multiple times it can only be linked from 
+    those files that embed it.
+
+
 === Fixed
 
   * Removed unneccessary pass for partial matches when resolving references. Resolving references

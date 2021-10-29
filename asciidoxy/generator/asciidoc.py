@@ -486,7 +486,11 @@ class Api(ABC):
         if file_path is None:
             return ""
 
-        out_file = self._sub_api(file_path, package_name, always_embed).process_adoc()
+        sub_api = self._sub_api(file_path, package_name, always_embed)
+        if always_embed:
+            return sub_api.render_adoc()
+
+        out_file = sub_api.process_adoc()
 
         if self._context.multipage and not always_embed:
             if multipage_link:
@@ -507,10 +511,7 @@ class Api(ABC):
             asciidoc_options["leveloffset"] = leveloffset
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
-        if always_embed:
-            return f"include::{out_file}[{attributes}]"
-        else:
-            return f"[[{self._file_top_anchor(file_path)}]]\ninclude::{out_file}[{attributes}]"
+        return f"[[{self._file_top_anchor(file_path)}]]\ninclude::{out_file}[{attributes}]"
 
     def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
@@ -676,11 +677,25 @@ class Api(ABC):
         """Insert a link to a specific element."""
         ...
 
+    def render_adoc(self, skip_register: bool = False) -> str:
+        """Render combined AsciiDoc from the contents of the file.
+
+        Args:
+            skip_register: True to skip registering the AsciiDoc file in the context.
+
+        Returns:
+            Rendered AsciiDoc.
+        """
+        if not skip_register:
+            self._context.register_adoc_file(self._work_file)
+        template = Template(filename=os.fspath(self._work_file), input_encoding="utf-8")
+        return template.render(api=ApiProxy(self), env=self._context.env, **self._commands())
+
     @abstractmethod
     def process_adoc(self) -> Path:
         """Process the AsciiDoc file.
 
-        Returns
+        Returns:
             Name of the processed output file.
         """
         ...
@@ -793,12 +808,10 @@ class PreprocessingApi(Api):
         out_file = self._context.register_adoc_file(self._work_file)
 
         if self._context.progress is not None:
-            self._context.progress.total = 2 * (len(self._context.in_to_out_file_map) +
-                                                len(self._context.embedded_file_map))
+            self._context.progress.total = 2 * len(self._context.in_to_out_file_map)
             self._context.progress.update(0)
 
-        template = Template(filename=os.fspath(self._work_file), input_encoding="utf-8")
-        template.render(api=ApiProxy(self), env=self._context.env, **self._commands())
+        self.render_adoc(skip_register=True)
 
         if self._context.progress is not None:
             self._context.progress.update()
@@ -923,10 +936,7 @@ class GeneratingApi(Api):
 
         out_file = self._context.register_adoc_file(self._work_file)
 
-        template = Template(filename=os.fspath(self._work_file), input_encoding="utf-8")
-        rendered_doc = template.render(api=ApiProxy(self),
-                                       env=self._context.env,
-                                       **self._commands())
+        rendered_doc = self.render_adoc(skip_register=True)
 
         with out_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
