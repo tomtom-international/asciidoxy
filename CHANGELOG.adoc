@@ -18,58 +18,58 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
-== UNRELEASED
+== 0.8.0 (29 Oct 2021)
 
 === Added
 
-  - Completely rewritten description parser for Doxygen. It supports more kinds of tags and inserts
+  * Completely rewritten description parser for Doxygen. It supports more kinds of tags and inserts
     much less whitespace in the resulting AsciiDoc. It more closely follows the way Doxygen intends
     to format the descriptions.
-  - Support `dot` and `plantuml` diagrams in Doxygen descriptions. They require AsciiDoctor-Diagram
-    to be rendered. In the Doxyfile the option `PLANTUML_JAR_PATH` is required, even though Doxygen 
-    is not really rendering the plantuml diagrams. Without the option, plantuml diagrams are 
-    ignored by Doxygen.
-  - Verbatim text in Doxygen descriptions is supported.
-  - Support special Doxygen paragraphs that are similar to AsciiDoc admonitions: `\attention`,
-    `\note`, `\remark`, and `\warning`.
-  - Support special Doxygen paragraphs that contain metadata: `\author`, `\bug`, `\copyright`,
-    `\date`, `\deprecated`, `\since`, and `\todo`. They are added to the overview table of 
-    class-like elements, or the parameter table of functions/methods.
-  - Complex tables with cells spanning multiple columns and/or rows and nested tables (1 level) are
-    now supported.
-  - Support explicit line breaks in paragraphs.
-  - Support LatexMath formulae in Doxygen descriptions. It is required to enable `:stem:` in the
-    AsciiDoc header to render the formulae.
-  - Support images in Doxygen descriptions. Only `html` type images are shown, also for PDF output.
-    Make sure to include all images in the package containing the xml and specify the 
-    `asciidoc.image_dir` option in `contents.toml`.
-  - Support MarkDown (preprocessed by Doxygen) in Doxygen descriptions. This adds support for:
-    headers, strikethrough, numbered and nested lists, horizontal rulers, and block quotes.
-  - Support special characters. This includes 250 characters that Doxygen represents with a
-    separate XML tag.
-  - Support HTML headings, preformatted text and other HTML specific styles.
-  - Support custom anchors.
-  - Support parameter descriptions consisting of multiple paragraphs.
-  - Respect output type specific content. Only content for XML and HTML output is used.
-  - Support Unicode emoji.
+  ** Support `dot` and `plantuml` diagrams in Doxygen descriptions. They require
+     AsciiDoctor-Diagram to be rendered. In the Doxyfile the option `PLANTUML_JAR_PATH` is 
+     required, even though Doxygen is not really rendering the plantuml diagrams. Without the 
+     option, plantuml diagrams are ignored by Doxygen.
+  ** Verbatim text in Doxygen descriptions is supported.
+  ** Support special Doxygen paragraphs that are similar to AsciiDoc admonitions: `\attention`,
+     `\note`, `\remark`, and `\warning`.
+  ** Support special Doxygen paragraphs that contain metadata: `\author`, `\bug`, `\copyright`,
+     `\date`, `\deprecated`, `\since`, and `\todo`. They are added to the overview table of 
+     class-like elements, or the parameter table of functions/methods.
+  ** Complex tables with cells spanning multiple columns and/or rows and nested tables (1 level)
+     are now supported.
+  ** Support explicit line breaks in paragraphs.
+  ** Support LatexMath formulae in Doxygen descriptions. It is required to enable `:stem:` in the
+     AsciiDoc header to render the formulae.
+  ** Support images in Doxygen descriptions. Only `html` type images are shown, also for PDF
+     output. Make sure to include all images in the package containing the xml and specify the 
+     `asciidoc.image_dir` option in `contents.toml`.
+  ** Support MarkDown (preprocessed by Doxygen) in Doxygen descriptions. This adds support for:
+     headers, strikethrough, numbered and nested lists, horizontal rulers, and block quotes.
+  ** Support special characters. This includes 250 characters that Doxygen represents with a
+     separate XML tag.
+  ** Support HTML headings, preformatted text and other HTML specific styles.
+  ** Support custom anchors.
+  ** Support parameter descriptions consisting of multiple paragraphs.
+  ** Respect output type specific content. Only content for XML and HTML output is used.
+  ** Support Unicode emoji.
 
 
 === Changed
 
-  - Code blocks in descriptions try to respect the language specified in the original code. This
+  * Code blocks in descriptions try to respect the language specified in the original code. This
     includes "unparsed" code blocks. Only if no language is specified, the language of the 
     described element is used.
 
 
 === Fixed
 
-  - Spaces in code blocks, present as `<sp />`, are no longer ignored.
-  - Actually create links to known exceptions from method/function documentation.
-  - #37: When type names contain nested types, and the nested types have namespaces, the short name
+  * Spaces in code blocks, present as `<sp />`, are no longer ignored.
+  * Actually create links to known exceptions from method/function documentation.
+  * #37: When type names contain nested types, and the nested types have namespaces, the short name
     was incorrectly generated, resulting in incorrect section titles.
-  - #35: {Cpp}: Support typedefs for function types. Limitation: documentation for the function
+  * #35: {Cpp}: Support typedefs for function types. Limitation: documentation for the function
     parameters is missing. A planned refactoring will fix this.
-  - #31: Pipe symbols in documentation no longer cause tables to become malformed.
+  * #31: Pipe symbols in documentation no longer cause tables to become malformed.
 
 
 == 0.7.5 (20 Aug 2021)
