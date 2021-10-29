@@ -942,7 +942,7 @@ def test_private_constructors__no_filter(helper):
 
 def test_public_simple_enclosed_types__no_filter(helper):
     simple_enclosed_types = [m.name for m in helper.simple_enclosed_types(prot="public")]
-    assert sorted(simple_enclosed_types) == sorted(["PublicEnum", "PublicTypedef"])
+    assert sorted(simple_enclosed_types) == sorted(["PublicEnum", "PublicTypedef", "PublicAlias"])
 
 
 def test_public_simple_enclosed_types__filter_match(helper):
@@ -959,12 +959,14 @@ def test_public_simple_enclosed_types__filter_no_match(helper):
 
 def test_protected_simple_enclosed_types__no_filter(helper):
     simple_enclosed_types = [m.name for m in helper.simple_enclosed_types(prot="protected")]
-    assert sorted(simple_enclosed_types) == sorted(["ProtectedEnum", "ProtectedTypedef"])
+    assert sorted(simple_enclosed_types) == sorted(
+        ["ProtectedEnum", "ProtectedTypedef", "ProtectedAlias"])
 
 
 def test_private_simple_enclosed_types__no_filter(helper):
     simple_enclosed_types = [m.name for m in helper.simple_enclosed_types(prot="private")]
-    assert sorted(simple_enclosed_types) == sorted(["PrivateEnum", "PrivateTypedef"])
+    assert sorted(simple_enclosed_types) == sorted(
+        ["PrivateEnum", "PrivateTypedef", "PrivateAlias"])
 
 
 def test_public_complex_enclosed_types__no_filter(helper):

@@ -161,7 +161,8 @@ def cpp_class():
 
     # fill class with typical members
     for visibility in ("public", "protected", "private"):
-        for member_type in ("variable", "enum", "class", "typedef", "struct", "trash", "enumvalue"):
+        for member_type in ("variable", "enum", "class", "typedef", "struct", "trash", "enumvalue",
+                            "alias"):
             builder.simple_member(kind=member_type, prot=visibility)
 
         # constructor

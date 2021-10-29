@@ -34,6 +34,7 @@ class TemplateHelper:
     PARAM_NAME_FIRST = False
     PARAM_NAME_SEP = " "
     SIMPLE_ENCLOSED_TYPES = (
+        "alias",
         "typedef",
         "enum",
     )
