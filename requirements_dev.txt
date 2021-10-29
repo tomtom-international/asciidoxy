@@ -1,3 +1,4 @@
+build==0.7.0
 conan==1.42.0
 coverage==6.0.2
 doxypypy==0.8.8.6
