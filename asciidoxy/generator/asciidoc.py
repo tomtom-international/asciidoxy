@@ -1041,11 +1041,11 @@ def _check_links(context: Context):
             element = context.reference.find(target_id=element_id)
             if element is None:
                 raise RuntimeError(f"Internal consistency error: unknown element id: {element_id}."
-                                   "Please file a bug report.")
+                                   " Please file a bug report.")
 
             traces = '\n'.join(stacktrace(t) for t in context.linked[element_id])
             messages.append(f"{element.language}: {element.full_name} not included in"
-                            f"documentation, but linked here:\n{traces}")
+                            f" documentation, but linked here:\n{traces}")
 
         if context.warnings_are_errors:
             raise ConsistencyError("\n".join(messages))
