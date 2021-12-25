@@ -61,7 +61,6 @@ class UnknownFileError(Exception):
 class PackageManager:
     build_dir: Path
     work_dir: Path
-    image_work_dir: Path
     packages: Dict[str, Package]
     warnings_are_errors: bool
     copied_files: Dict[Path, Package]
@@ -72,10 +71,13 @@ class PackageManager:
         self.warnings_are_errors = warnings_are_errors
 
         self.work_dir = build_dir / "intermediate"
-        self.image_work_dir = self.work_dir / "images"
         self.packages = {}
         self.copied_files = {}
         self.copied_dirs = {}
+
+    @property
+    def image_work_dir(self) -> Path:
+        return self.work_dir / "images"
 
     def set_input_files(self,
                         in_file: Path,
@@ -150,11 +152,15 @@ class PackageManager:
             if progress is not None:
                 progress.update()
 
-    def prepare_work_directory(self, in_file: Path, progress: Optional[tqdm] = None) -> Document:
+    def prepare_work_directory(self,
+                               in_file: Path,
+                               clear: bool = True,
+                               progress: Optional[tqdm] = None) -> Document:
         """Create a work directory in which the files to be processed by AsciiDoctor can be created.
 
         Args:
             in_file:  Input file that will be processed.
+            clear:    Clear the work directory if it already exists.
             progress: Optional progress reporting.
 
         Returns:
@@ -170,7 +176,7 @@ class PackageManager:
             progress.total = len(self.packages)
             progress.update(0)
 
-        if self.work_dir.exists():
+        if clear and self.work_dir.exists():
             shutil.rmtree(self.work_dir)
 
         self.image_work_dir.mkdir(parents=True, exist_ok=True)

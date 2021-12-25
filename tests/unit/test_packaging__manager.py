@@ -407,6 +407,36 @@ def test_prepare_work_directory__same_dir_in_multiple_packages(package_manager, 
     assert (doc.work_dir / "other" / "b_another.adoc").is_file()
 
 
+@pytest.mark.parametrize("clear", [True, False])
+def test_prepare_work_directory__clear_existing(clear, package_manager, event_loop, tmp_path,
+                                                build_dir, work_dir):
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+    (src_dir / "chapter.adoc").touch()
+    (src_dir / "other").mkdir()
+    (src_dir / "other" / "another.adoc").touch()
+
+    work_dir.mkdir(parents=True, exist_ok=True)
+    (work_dir / "existing_file").touch()
+
+    package_manager.set_input_files(in_file, src_dir)
+    doc = package_manager.prepare_work_directory(in_file, clear)
+    assert doc.work_file.is_file()
+    assert doc.work_file.name == "index.adoc"
+    assert doc.package is not None
+    assert doc.package.is_input_package is True
+
+    assert (doc.work_dir / "index.adoc").is_file()
+    assert (doc.work_dir / "chapter.adoc").is_file()
+    assert (doc.work_dir / "other").is_dir()
+    assert (doc.work_dir / "other" / "another.adoc").is_file()
+
+    assert work_dir == doc.work_dir
+    assert (work_dir / "existing_file").exists() is not clear
+
+
 def test_make_image_directory(package_manager, event_loop, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")

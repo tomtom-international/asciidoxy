@@ -65,12 +65,7 @@ def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, mul
 
 
 def output_extension(backend: str) -> Optional[str]:
-    if backend == "html5":
-        return ".html"
-    elif backend == "pdf":
-        return ".pdf"
-    else:
-        return None
+    return {"html5": ".html", "pdf": ".pdf", "adoc": ".adoc"}.get(backend)
 
 
 class PathArgument:
@@ -140,7 +135,8 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                         "--backend",
                         metavar="BACKEND",
                         default="html5",
-                        help="Set output backend format used by AsciiDoctor.")
+                        help="Set output backend format used by AsciiDoctor. Use special backend"
+                        " `adoc` to produce AsciiDoc files only and not run AsciiDoctor on it.")
     parser.add_argument("--build-dir",
                         metavar="BUILD_DIR",
                         default="build",
@@ -225,9 +221,14 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     else:
         api_reference = ApiReference()
 
+    if args.backend == "adoc":
+        pkg_mgr.work_dir = destination_dir
+        clear_work_dir = False
+    else:
+        clear_work_dir = True
     pkg_mgr.set_input_files(args.input_file, args.base_dir, args.image_dir)
     with tqdm(desc="Preparing work directory", unit="pkg") as progress:
-        in_doc = pkg_mgr.prepare_work_directory(args.input_file, progress)
+        in_doc = pkg_mgr.prepare_work_directory(args.input_file, clear_work_dir, progress)
 
     try:
         with tqdm(desc="Processing asciidoc     ", total=1, unit="file") as progress:
@@ -242,17 +243,18 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         logger.error(human_traceback(pkg_mgr))
         sys.exit(1)
 
-    for doc in tqdm(documents, desc="Running asciidoctor     ", unit="doc"):
-        if args.multipage and doc.is_embedded:
-            continue
-        if not args.multipage and not doc.is_root:
-            continue
+    if args.backend != "adoc":
+        for doc in tqdm(documents, desc="Running asciidoctor     ", unit="doc"):
+            if args.multipage and doc.is_embedded:
+                continue
+            if not args.multipage and not doc.is_root:
+                continue
 
-        out_file = destination_dir / doc.relative_path.with_suffix(extension)
-        rel_image_dir = relative_path(doc.work_file, pkg_mgr.image_work_dir)
-        asciidoctor(destination_dir, out_file, doc.work_file, args.multipage, args.backend,
-                    extra_args, rel_image_dir)
-        logger.info(f"Generated: {out_file}")
+            out_file = destination_dir / doc.relative_path.with_suffix(extension)
+            rel_image_dir = relative_path(doc.work_file, pkg_mgr.image_work_dir)
+            asciidoctor(destination_dir, out_file, doc.work_file, args.multipage, args.backend,
+                        extra_args, rel_image_dir)
+            logger.info(f"Generated: {out_file}")
 
     if args.backend != "pdf":
         with tqdm(desc="Copying images          ", unit="pkg") as progress:

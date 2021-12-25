@@ -21,6 +21,14 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 == Unreleased
 
 
+=== Added
+
+  * Running AsciiDoctor automatically is now optional. By using `--backend adoc` the generated
+    AsciiDoc files are exported to the output directory, instead of the output of AsciiDoctor. This 
+    allows direct use of the AsciiDoc by other tools. The generated AsciiDoc is now optimized for 
+    this use case by not having any absolute paths, temporary files, and fragment files.
+
+
 === Changed
 
   * Embedded files, inserted with `include` and `always_embed=True`, are no longer using temporary
