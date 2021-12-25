@@ -18,7 +18,7 @@ import pytest
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.templates.java.helpers import JavaTemplateHelper
 
-from .builders import SimpleClassBuilder
+from ...builders import SimpleClassBuilder
 
 
 @pytest.fixture

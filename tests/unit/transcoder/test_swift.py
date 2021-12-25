@@ -18,7 +18,7 @@ import pytest
 from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.swift import SwiftTranscoder
 
-from .builders import (
+from ..builders import (
     make_compound,
     make_parameter,
     make_return_value,

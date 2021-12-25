@@ -19,8 +19,7 @@ import pytest
 from pytest import param
 
 from asciidoxy.parser.doxygen.objc import ObjectiveCTraits
-
-from .matchers import (
+from tests.unit.matchers import (
     IsEmpty,
     IsFalse,
     IsNone,

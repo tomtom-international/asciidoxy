@@ -23,8 +23,7 @@ import pytest
 
 from asciidoxy.parser.doxygen.language_traits import LanguageTraits, TokenCategory
 from asciidoxy.parser.doxygen.type_parser import Token, TypeParser, find_tokens
-
-from .shared import assert_equal_or_none_if_empty, sub_element
+from tests.unit.shared import assert_equal_or_none_if_empty, sub_element
 
 
 class TestTraits(LanguageTraits):

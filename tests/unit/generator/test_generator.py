@@ -36,7 +36,7 @@ from asciidoxy.generator.errors import (
 )
 from asciidoxy.packaging import Package
 
-from .shared import ProgressMock
+from ..shared import ProgressMock
 
 
 @pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
@@ -205,7 +205,7 @@ def test_insert_error_when_reference_not_found(generating_api):
 
 
 @pytest.mark.parametrize("xml_data,api_reference_set",
-                         [(Path(__file__).parent.parent / "data", [""])])
+                         [(Path(__file__).parent.parent.parent / "data", [""])])
 def test_insert_error_when_kind_not_supported(generating_api):
     with pytest.raises(TemplateMissingError):
         generating_api.insert("asciidoxy::unsupported_kind::kUnsupportedKindSample")

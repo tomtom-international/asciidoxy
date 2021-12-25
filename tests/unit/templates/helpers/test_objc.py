@@ -21,7 +21,7 @@ from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 from asciidoxy.templates.objc.helpers import ObjcTemplateHelper
 
-from .builders import SimpleClassBuilder
+from ...builders import SimpleClassBuilder
 
 
 @pytest.fixture

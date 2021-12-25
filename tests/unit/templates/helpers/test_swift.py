@@ -19,7 +19,7 @@ from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 from asciidoxy.templates.swift.helpers import SwiftTemplateHelper
 
-from .builders import SimpleClassBuilder
+from ...builders import SimpleClassBuilder
 
 
 @pytest.fixture

@@ -19,7 +19,7 @@ from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 from asciidoxy.templates.kotlin.helpers import KotlinTemplateHelper
 
-from .builders import SimpleClassBuilder
+from ...builders import SimpleClassBuilder
 
 
 @pytest.fixture

@@ -13,7 +13,7 @@
 # limitations under the License.
 """Generic tests for parsing Doxygen XML files."""
 
-from .shared import ProgressMock
+from tests.unit.shared import ProgressMock
 
 
 def test_resolve_references_for_return_types(parser_driver_factory):

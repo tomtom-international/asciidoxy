@@ -23,7 +23,7 @@ from asciidoxy.parser.doxygen.language_traits import TokenCategory
 from asciidoxy.parser.doxygen.type_parser import Token
 from tests.unit.shared import assert_equal_or_none_if_empty, sub_element
 
-from .test_doxygenparser__type_parser import arg_name, args_end, args_start, name, whitespace
+from .test_type_parser import arg_name, args_end, args_start, name, whitespace
 
 
 @pytest.fixture(params=[

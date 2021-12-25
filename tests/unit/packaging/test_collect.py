@@ -29,7 +29,7 @@ from asciidoxy.packaging.collect import (
     versions_from_file,
 )
 
-from .shared import ProgressMock
+from ..shared import ProgressMock
 
 
 async def start_server(aiohttp_server, *routes):
@@ -39,19 +39,19 @@ async def start_server(aiohttp_server, *routes):
 
 
 async def xml_file_response(request):
-    return web.FileResponse(Path(__file__).parent.parent / "data" / "xml.tar.gz")
+    return web.FileResponse(Path(__file__).parent.parent.parent / "data" / "xml.tar.gz")
 
 
 async def include_file_response(request):
-    return web.FileResponse(Path(__file__).parent.parent / "data" / "adoc.tar.gz")
+    return web.FileResponse(Path(__file__).parent.parent.parent / "data" / "adoc.tar.gz")
 
 
 async def package_file_response(request):
-    return web.FileResponse(Path(__file__).parent.parent / "data" / "package.tar.gz")
+    return web.FileResponse(Path(__file__).parent.parent.parent / "data" / "package.tar.gz")
 
 
 async def currupt_package_file_response(request):
-    return web.FileResponse(Path(__file__).parent.parent / "data" / "corrupt_package.tar.gz")
+    return web.FileResponse(Path(__file__).parent.parent.parent / "data" / "corrupt_package.tar.gz")
 
 
 async def error404_response(request):

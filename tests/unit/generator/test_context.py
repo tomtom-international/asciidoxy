@@ -22,7 +22,7 @@ from asciidoxy.generator.context import StackFrame, stacktrace
 from asciidoxy.generator.errors import ConsistencyError, DuplicateAnchorError, UnknownAnchorError
 from asciidoxy.packaging import UnknownFileError, UnknownPackageError
 
-from .builders import make_compound
+from ..builders import make_compound
 
 
 def test_initial_document_is_registered(empty_context, document):

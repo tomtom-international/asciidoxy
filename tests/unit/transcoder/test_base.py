@@ -19,7 +19,7 @@ from asciidoxy.api_reference import ApiReference
 from asciidoxy.transcoder.base import TranscoderBase, TranscoderError
 from asciidoxy.transcoder.kotlin import KotlinTranscoder
 
-from .builders import (
+from ..builders import (
     make_compound,
     make_parameter,
     make_return_value,
