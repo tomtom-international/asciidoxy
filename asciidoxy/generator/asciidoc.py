@@ -337,7 +337,8 @@ class Api(ABC):
 
         Since AsciiDoxy in multi-page mode generates intermediate AsciiDoc files and process them
         with AsciiDoctor in order to create final output document(s) the direct AsciiDoc syntax
-        (i.e. `<<file_name#anchor,link_tex>>`) doesn't work. You must use this method instead.
+        (i.e. `++&lt;&lt;file_name#anchor,link_text&gt;&gt;++`) doesn't work. You must use this
+        method instead.
 
         Args:
              file_name:    Name of the file. If `package_name` is specified, it must be relative to
