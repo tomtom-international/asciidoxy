@@ -18,14 +18,15 @@ from pathlib import Path
 import pytest
 
 from asciidoxy.api_reference import ApiReference
+from asciidoxy.document import Document, Package
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
-from asciidoxy.generator.navigation import DocumentTreeNode
 from asciidoxy.model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
-from asciidoxy.packaging import Package, PackageManager
+from asciidoxy.packaging import PackageManager
 from asciidoxy.parser.doxygen import Driver as ParserDriver
 
 from .builders import SimpleClassBuilder
+from .file_builder import FileBuilder
 
 _test_data_dir = Path(__file__).parent.parent / "data"
 _xml_dir = _test_data_dir / "generated" / "xml"
@@ -90,22 +91,42 @@ def build_dir(tmp_path):
 
 @pytest.fixture
 def package_manager(build_dir):
-    return PackageManager(build_dir)
+    mgr = PackageManager(build_dir)
+    mgr.work_dir.mkdir(parents=True, exist_ok=True)
+    return mgr
+
+
+@pytest.fixture
+def original_dir(tmp_path):
+    d = tmp_path / "original"
+    d.mkdir(parents=True)
+    return d
+
+
+@pytest.fixture
+def original_file(original_dir, package_manager):
+    f = original_dir / "input_file.adoc"
+    f.touch()
+    package_manager.set_input_files(f, include_dir=original_dir)
+    return f
 
 
 @pytest.fixture
 def work_dir(package_manager):
-    wd = package_manager.work_dir
-    wd.mkdir(parents=True, exist_ok=True)
-    return wd
+    return package_manager.work_dir
 
 
 @pytest.fixture
-def input_file(work_dir, package_manager):
+def work_file(original_file, work_dir):
     f = work_dir / "input_file.adoc"
     f.touch()
-    package_manager.set_input_files(f, include_dir=work_dir)
     return f
+
+
+@pytest.fixture
+def document(package_manager, original_file, work_file):
+    return Document(Path("input_file.adoc"), package_manager.input_package(),
+                    package_manager.work_dir)
 
 
 @pytest.fixture
@@ -135,23 +156,19 @@ def api_reference(parser_driver_factory, api_reference_set, forced_language):
 
 
 @pytest.fixture
-def context(input_file, api_reference, package_manager):
-    c = Context(base_dir=input_file.parent,
-                reference=api_reference,
-                package_manager=package_manager,
-                current_document=DocumentTreeNode(input_file),
-                current_package=Package(PackageManager.INPUT_FILES))
+def context(document, api_reference, package_manager):
+    c = Context(reference=api_reference, package_manager=package_manager, document=document)
     return c
 
 
 @pytest.fixture
-def preprocessing_api(input_file, context):
-    return PreprocessingApi(input_file, context)
+def preprocessing_api(context):
+    return PreprocessingApi(context)
 
 
 @pytest.fixture
-def generating_api(input_file, context):
-    return GeneratingApi(input_file, context)
+def generating_api(context):
+    return GeneratingApi(context)
 
 
 @pytest.fixture
@@ -221,22 +238,81 @@ def single_and_multipage(request, context):
 
 
 @pytest.fixture
-def empty_context(input_file, package_manager):
-    return Context(base_dir=input_file.parent,
-                   reference=ApiReference(),
-                   package_manager=package_manager,
-                   current_document=DocumentTreeNode(input_file),
-                   current_package=Package(PackageManager.INPUT_FILES))
+def empty_context(document, package_manager):
+    return Context(reference=ApiReference(), package_manager=package_manager, document=document)
 
 
 @pytest.fixture
-def empty_preprocessing_api(input_file, empty_context):
-    return PreprocessingApi(input_file, empty_context)
+def empty_preprocessing_api(empty_context):
+    return PreprocessingApi(empty_context)
 
 
 @pytest.fixture
-def empty_generating_api(input_file, empty_context):
-    return GeneratingApi(input_file, empty_context)
+def empty_generating_api(empty_context):
+    return GeneratingApi(empty_context)
+
+
+@pytest.fixture
+def file_builder(tmp_path, build_dir):
+    return FileBuilder(tmp_path, build_dir)
+
+
+@pytest.fixture
+def document_tree(tmp_path):
+    # Test tree:
+    #
+    #       root
+    #        /|\
+    #       / | \
+    #      /  |  \
+    #     /   |   \
+    #    a    b    c
+    #    /\        /\
+    #   /  \      /  \
+    # a_a  a_b  c_a  c_b
+    #      / \
+    #     /   \
+    #    /     \
+    #  a_b_a  a_b_b
+    #
+    # Special embedded files:
+    # a_a_emb -> embedded in a_a
+    # c_emb -> embedded in c, c_a, c_b
+    # c_emb_emb -> embedded in c_emb
+    pkg_dir = tmp_path / "pkg"
+    work_dir = tmp_path / "work"
+    pkg = Package("my-package")
+    pkg.adoc_src_dir = pkg_dir
+
+    root = Document(Path("root.adoc"), pkg, work_dir)
+    root.is_root = True
+    tree = {"root": root}
+
+    def add(name, included_in=None, embedded_in=None):
+        doc = root.with_relative_path(f"{name}.adoc")
+        if included_in:
+            tree[included_in].include(doc)
+        if embedded_in:
+            tree[embedded_in].embed(doc)
+        tree[name] = doc
+
+    add("a", included_in="root")
+    add("b", included_in="root")
+    add("c", included_in="root")
+    add("a/a_a", included_in="a")
+    add("a/a_b", included_in="a")
+    add("c/c_a", included_in="c")
+    add("c/c_b", included_in="c")
+    add("a/b/a_b_a", included_in="a/a_b")
+    add("a/b/a_b_b", included_in="a/a_b")
+
+    add("a/a/a_a_emb", embedded_in="a/a_a")
+    add("c/c_emb", embedded_in="c")
+    tree["c/c_a"].embed(tree["c/c_emb"])
+    tree["c/c_b"].embed(tree["c/c_emb"])
+    add("c/c_emb_emb", embedded_in="c/c_emb")
+
+    return tree
 
 
 _custom_types = {

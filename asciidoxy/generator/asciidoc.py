@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import (
     Any,
     Callable,
+    List,
     MutableMapping,
     NamedTuple,
     Optional,
@@ -43,10 +44,10 @@ from packaging.version import Version
 from .. import templates
 from .._version import __version__
 from ..api_reference import AmbiguousLookupError, ApiReference
+from ..document import Document
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError, UnknownPackageError
 from ..parser.doxygen import safe_language_tag
-from ..path_utils import relative_path
 from ..transcoder import TranscoderBase
 from .context import Context, stacktrace
 from .errors import (
@@ -63,7 +64,7 @@ from .errors import (
     UnlinkableError,
 )
 from .filters import FilterSpec, InsertionFilter
-from .navigation import DocumentTreeNode, multipage_toc, navigation_bar
+from .navigation import multipage_toc, navigation_bar
 
 logger = logging.getLogger(__name__)
 
@@ -130,11 +131,11 @@ def _stackframe(original_function: Optional[_WrappedFunc] = None,
         @wraps(f)
         def _wrapper(*args, **kwargs):
             _self = _other_self or args[0]
-            _context(_self).push_stack(_format_action(_name(f), args[1:], kwargs, arg_indices,
-                                                      kwarg_names),
-                                       file=_api(_self)._original_file if not internal else None,
-                                       package=_api(_self)._context.current_package.name,
-                                       internal=internal)
+            _context(_self).push_stack(
+                _format_action(_name(f), args[1:], kwargs, arg_indices, kwarg_names),
+                document=_api(_self)._context.document if not internal else None,
+                package=_api(_self)._context.document.package.name,
+                internal=internal)
             ret = f(*args, **kwargs)
             _context(_self).pop_stack()
             return ret
@@ -180,21 +181,11 @@ class Api(ABC):
 
     _template_cache: MutableMapping[TemplateKey, Template] = {}
 
-    _work_file: Path
-    _original_file: Path
     _context: Context
 
-    def __init__(self, work_file: Path, context: Context):
-        assert work_file.is_file()
-        assert context.base_dir.is_dir()
+    def __init__(self, context: Context):
         assert context.package_manager.work_dir.is_dir()
         assert context.reference is not None
-
-        self._work_file = work_file
-        _, self._original_file = context.package_manager.find_original_file(
-            work_file, context.current_package.name)
-        if self._original_file is None:
-            self._original_file = work_file
 
         self._context = context
 
@@ -397,42 +388,6 @@ class Api(ABC):
         """
         ...
 
-    def _find_absolute_file_path(self, file_name: Optional[str],
-                                 package_name: Optional[str]) -> Optional[Path]:
-        if package_name is not None:
-            return self._file_from_package(file_name, package_name)
-        else:
-            assert file_name is not None
-            package_name = self._context.current_package.name
-            absolute_work_file_path = (self._work_file.parent / file_name).resolve()
-            if not absolute_work_file_path.exists():
-                self._warning_or_error(IncludeFileNotFoundError(file_name))
-                return None
-
-            if not self._context.current_package.scoped:
-                return absolute_work_file_path
-            else:
-                relative_work_file_path = absolute_work_file_path.relative_to(
-                    self._context.package_manager.work_dir)
-                return self._file_from_package(str(relative_work_file_path), package_name)
-
-    def _file_from_package(self, file_name: Optional[str], package_name: str) -> Optional[Path]:
-        try:
-            return self._context.package_manager.file_in_work_directory(package_name, file_name)
-
-        except UnknownPackageError:
-            self._warning_or_error(MissingPackageError(package_name))
-            return None
-        except UnknownFileError:
-            self._warning_or_error(MissingPackageFileError(package_name, file_name))
-            return None
-
-    def _warning_or_error(self, error: Exception):
-        if self._context.warnings_are_errors:
-            raise error
-        else:
-            logger.warning(str(error))
-
     @_api_stackframe(show_args=("file_name", ))
     def include(self,
                 file_name: str,
@@ -482,27 +437,21 @@ class Api(ABC):
         if Path(file_name).is_absolute():
             raise InvalidApiCallError("`file_name` must be a relative path.")
 
-        file_path = self._find_absolute_file_path(file_name, package_name)
-        if file_path is None:
+        doc = self._find_document(file_name, package_name)
+        if doc is None:
             return ""
 
-        sub_api = self._sub_api(file_path, package_name, always_embed)
+        sub_api = self._sub_api(doc, always_embed)
         if always_embed:
             return sub_api.render_adoc()
 
-        out_file = sub_api.process_adoc()
+        sub_api.process_adoc()
 
         if self._context.multipage and not always_embed:
             if multipage_link:
-                referenced_file = relative_path(self._work_file, file_path)
-
+                referenced_file = self._context.document.relative_path_to(doc)
                 if not link_text:
-                    document = next(
-                        (d for d in self._context.current_document.all_documents_in_tree()
-                         if d.in_file == file_path), None)
-                    assert document is not None
-                    link_text = document.title
-
+                    link_text = doc.title
                 return (f"{link_prefix}" f"<<{referenced_file}#,{link_text}>>")
             else:
                 return ""
@@ -511,7 +460,8 @@ class Api(ABC):
             asciidoc_options["leveloffset"] = leveloffset
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
-        return f"[[{self._file_top_anchor(file_path)}]]\ninclude::{out_file}[{attributes}]"
+        rel_path = self._context.document.relative_path_to(doc)
+        return f"[[{self._file_top_anchor(doc)}]]\ninclude::{rel_path}[{attributes}]"
 
     def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
@@ -677,22 +627,18 @@ class Api(ABC):
         """Insert a link to a specific element."""
         ...
 
-    def render_adoc(self, skip_register: bool = False) -> str:
+    def render_adoc(self) -> str:
         """Render combined AsciiDoc from the contents of the file.
-
-        Args:
-            skip_register: True to skip registering the AsciiDoc file in the context.
 
         Returns:
             Rendered AsciiDoc.
         """
-        if not skip_register:
-            self._context.register_adoc_file(self._work_file)
-        template = Template(filename=os.fspath(self._work_file), input_encoding="utf-8")
+        template = Template(filename=os.fspath(self._context.document.original_file),
+                            input_encoding="utf-8")
         return template.render(api=ApiProxy(self), env=self._context.env, **self._commands())
 
     @abstractmethod
-    def process_adoc(self) -> Path:
+    def process_adoc(self) -> None:
         """Process the AsciiDoc file.
 
         Returns:
@@ -702,12 +648,51 @@ class Api(ABC):
 
     # "Protected" methods
 
+    def _find_document(self, file_name: Optional[str],
+                       package_name: Optional[str]) -> Optional[Document]:
+        assert file_name or package_name
+        requested_package_name = package_name
+
+        try:
+            rel_file_name: Optional[Path]
+            if package_name and file_name:
+                rel_file_name = Path(file_name)
+            elif file_name and not self._context.document.package.scoped:
+                # and not package_name
+                # Deprecated support for old style packages
+                package_name, rel_file_name = self._context.package_manager.find_original_file(
+                    (self._context.document.work_file.parent / file_name).resolve())
+            elif file_name:  # and not package_name
+                rel_file_name = self._context.document.resolve_relative_path(file_name)
+                package_name = self._context.document.package.name
+            else:  # package_name and not file_name
+                rel_file_name = None
+            return self._context.find_document(package_name, rel_file_name)
+
+        except UnknownPackageError:
+            assert requested_package_name
+            self._warning_or_error(MissingPackageError(requested_package_name))
+            return None
+        except UnknownFileError:
+            assert file_name
+            if not requested_package_name:
+                self._warning_or_error(IncludeFileNotFoundError(file_name))
+            else:
+                self._warning_or_error(MissingPackageFileError(requested_package_name, file_name))
+            return None
+
+    def _warning_or_error(self, error: Exception):
+        if self._context.warnings_are_errors:
+            raise error
+        else:
+            logger.warning(str(error))
+
     def _template(self, lang: str, kind: str) -> Template:
         key = Api.TemplateKey(lang, kind)
         template = self._template_cache.get(key, None)
         if template is None:
             templates_path = templates.__path__  # type: ignore  # mypy issue #1422
-            lookup = TemplateLookup(directories=templates_path + [self._context.base_dir],
+            lookup = TemplateLookup(directories=templates_path + [self._context.document.work_dir],
                                     input_encoding="utf-8")
             try:
                 template = lookup.get_template(f"{lang}/{kind}.mako")
@@ -716,24 +701,8 @@ class Api(ABC):
                 raise TemplateMissingError(lang, kind)
         return template
 
-    def _sub_api(self,
-                 file_path: Path,
-                 package_name: Optional[str],
-                 embedded: bool = False) -> "Api":
-        sub_context = self._context.sub_context()
-
-        if package_name and self._context.current_package.name != package_name:
-            package = self._context.package_manager.packages.get(package_name, None)
-            assert package is not None
-            sub_context.current_package = package
-
-        if embedded:
-            sub_context.embedded = True
-        else:
-            sub_context.current_document = self._context.current_document.find_child(file_path)
-            assert sub_context.current_document is not None
-
-        return self.__class__(file_path, sub_context)
+    def _sub_api(self, document: Document, embedded: bool = False) -> "Api":
+        return self.__class__(self._context.sub_context(document))
 
     def _render(self,
                 element,
@@ -755,34 +724,23 @@ class Api(ABC):
                                                              leveloffset=leveloffset,
                                                              **self._commands())
 
-    def _file_top_anchor(self, file_name: Path) -> str:
-        relative_to_base = file_name.relative_to(self._context.base_dir)
-        return "top-" + "-".join(relative_to_base.with_suffix("").parts) + "-top"
+    def _file_top_anchor(self, doc: Document) -> str:
+        return "top-" + "-".join(doc.relative_path.with_suffix("").parts) + "-top"
 
     def _commands(self):
         return {name: getattr(self, name) for name in SUPPORTED_COMMANDS}
 
 
 class PreprocessingApi(Api):
-    def _sub_api(self,
-                 file_path: Path,
-                 package_name: Optional[str],
-                 embedded: bool = False) -> "Api":
-        sub_context = self._context.sub_context()
-
-        if package_name and self._context.current_package.name != package_name:
-            package = self._context.package_manager.packages.get(package_name, None)
-            assert package is not None
-            sub_context.current_package = package
+    def _sub_api(self, document: Document, embedded: bool = False) -> "Api":
+        sub_context = self._context.sub_context(document)
 
         if embedded:
-            sub_context.embedded = True
+            self._context.document.embed(document)
         else:
-            sub_context.current_document = DocumentTreeNode(file_path,
-                                                            self._context.current_document)
-            self._context.current_document.children.append(sub_context.current_document)
+            self._context.document.include(document)
 
-        return self.__class__(file_path, sub_context)
+        return self.__class__(sub_context)
 
     @_api_stackframe(name="insert", show_args=("element", ), internal=True)
     def insert_fragment(self,
@@ -803,20 +761,16 @@ class PreprocessingApi(Api):
         return ""
 
     def process_adoc(self):
-        logger.info(f"Preprocessing {self._original_file}")
-
-        out_file = self._context.register_adoc_file(self._work_file)
+        logger.info(f"Preprocessing {self._context.document}")
 
         if self._context.progress is not None:
-            self._context.progress.total = 2 * len(self._context.in_to_out_file_map)
+            self._context.progress.total = 2 * len(self._context.documents)
             self._context.progress.update(0)
 
-        self.render_adoc(skip_register=True)
+        self.render_adoc()
 
         if self._context.progress is not None:
             self._context.progress.update()
-
-        return out_file
 
     def cross_document_ref(self,
                            file_name: Optional[str] = None,
@@ -832,13 +786,13 @@ class PreprocessingApi(Api):
 
         if file_name or package_name:
             # Only check the existance of the file in the correct package
-            self._find_absolute_file_path(file_name, package_name)
+            self._find_document(file_name, package_name)
         return ""
 
     def anchor(self, name: str, *, link_text: Optional[str] = None) -> str:
         if not name:
             raise InvalidApiCallError("`name` cannot be empty.")
-        self._context.register_anchor(name, link_text, self._work_file)
+        self._context.register_anchor(name, link_text)
         return ""
 
 
@@ -847,7 +801,7 @@ class GeneratingApi(Api):
         if not self._context.multipage:
             return ""
 
-        toc_content = multipage_toc(self._context.current_document, side)
+        toc_content = multipage_toc(self._context.output_document, side)
         with self._context.docinfo_footer_file().open(mode="w", encoding="utf-8") as f:
             f.write(toc_content)
         return ":docinfo: private"
@@ -863,15 +817,13 @@ class GeneratingApi(Api):
             raise InvalidApiCallError("`file_name` must be a relative path.")
 
         if file_name or package_name:
-            absolute_file_path = self._find_absolute_file_path(file_name, package_name)
-            if absolute_file_path is None:
+            document = self._find_document(file_name, package_name)
+            if document is None:
                 return ""
 
-            document = next((d for d in self._context.current_document.all_documents_in_tree()
-                             if d.in_file == absolute_file_path), None)
-            if document is None:
-                msg = (f"Invalid cross-reference from document '{self._original_file}' "
-                       f"to document: '{file_name}'. The referenced document: {absolute_file_path} "
+            if not document.is_used:
+                msg = (f"Invalid cross-reference from document '{self._context.document}' "
+                       f"to document: '{file_name}'. The referenced document: {document} "
                        f"is not included anywhere across the whole documentation tree.")
                 self._warning_or_error(ConsistencyError(msg))
                 return ""
@@ -883,11 +835,11 @@ class GeneratingApi(Api):
 
             if not anchor:
                 if not self._context.multipage:
-                    anchor = self._file_top_anchor(absolute_file_path)
+                    anchor = self._file_top_anchor(document)
                 else:
                     anchor = ""
 
-            link_file_path = self._context.link_to_adoc_file(absolute_file_path)
+            link_file_path = self._context.link_to_document(document)
 
         elif anchor:
             # Flexible anchor
@@ -895,7 +847,7 @@ class GeneratingApi(Api):
                 link_file_path, default_link_text = self._context.link_to_anchor(anchor)
             except UnknownAnchorError as ex:
                 self._warning_or_error(ex)
-                link_file_path = self._context.link_to_adoc_file(self._work_file)
+                link_file_path = self._context.link_to_document(self._context.document)
                 default_link_text = None
 
             link_text = link_text or default_link_text or anchor
@@ -922,33 +874,29 @@ class GeneratingApi(Api):
 
     @_api_stackframe(name="link", show_args=("link_text", ), internal=True)
     def link_to_element(self, element_id: str, link_text: str) -> str:
-        containing_file = self._context.file_with_element(element_id)
-        if containing_file is not None:
-            file_part = f"{relative_path(self._context.current_document.in_file, containing_file)}#"
+        containing_doc = self._context.file_with_element(element_id)
+        if containing_doc is not None:
+            file_part = f"{self._context.document.relative_path_to(containing_doc)}#"
         else:
             file_part = ""
 
         return f"xref:{file_part}{element_id}[++{link_text}++]"
 
     def process_adoc(self):
-        logger.info(f"Processing {self._original_file}")
+        logger.info(f"Processing {self._context.document}")
         self._context.linked = []
 
-        out_file = self._context.register_adoc_file(self._work_file)
+        rendered_doc = self.render_adoc()
 
-        rendered_doc = self.render_adoc(skip_register=True)
-
-        with out_file.open("w", encoding="utf-8") as f:
+        with self._context.document.work_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
-            if self._context.multipage and not self._context.embedded:
-                nav_bar = navigation_bar(self._context.current_document)
+            if self._context.multipage and not self._context.document.is_embedded:
+                nav_bar = navigation_bar(self._context.document)
                 if nav_bar:
                     print(nav_bar, file=f)
 
         if self._context.progress is not None:
             self._context.progress.update()
-
-        return out_file
 
 
 class ApiProxy:
@@ -998,39 +946,38 @@ class ApiProxy:
                                  **asciidoc_options)
 
 
-def process_adoc(in_file: Path,
+def process_adoc(doc: Document,
                  api_reference: ApiReference,
                  package_manager: PackageManager,
                  warnings_are_errors: bool = False,
                  multipage: bool = False,
-                 progress: Optional[tqdm] = None):
-    """Process an AsciiDoc file and insert API reference.
+                 progress: Optional[tqdm] = None) -> List[Document]:
+    """Process an AsciiDoc file and execute all embedded python code.
 
     Args:
-        in_file:             AsciiDoc file to process.
+        doc:                 AsciiDoc file to process.
         api_reference:       API reference to insert in the documents.
+        package_manager:     Reference to the package manager to get additional files from.
         warnings_are_errors: True to treat every warning as an error.
-        multipage:          True to enable multi page output.
+        multipage:           True to enable multi page output.
+        progress:            Optional progress reporting widget.
 
     Returns:
         Dictionary that maps input AsciiDoc files to output AsciiDoc files with inserted API
             reference.
     """
 
-    context = Context(base_dir=in_file.parent,
-                      reference=api_reference,
-                      package_manager=package_manager,
-                      current_document=DocumentTreeNode(in_file, None),
-                      current_package=package_manager.input_package())
+    doc.is_root = True
+    context = Context(reference=api_reference, package_manager=package_manager, document=doc)
 
     context.warnings_are_errors = warnings_are_errors
     context.multipage = multipage
     context.progress = progress
 
-    PreprocessingApi(in_file, context).process_adoc()
+    PreprocessingApi(context).process_adoc()
     _check_links(context)
-    GeneratingApi(in_file, context).process_adoc()
-    return context.in_to_out_file_map
+    GeneratingApi(context).process_adoc()
+    return list(context.documents.values())
 
 
 def _check_links(context: Context):

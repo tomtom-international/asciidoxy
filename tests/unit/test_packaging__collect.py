@@ -16,7 +16,6 @@
 from pathlib import Path
 
 import pytest
-import toml
 from aiohttp import web
 
 from asciidoxy.packaging.collect import (
@@ -24,7 +23,6 @@ from asciidoxy.packaging.collect import (
     HttpPackageSpec,
     InvalidPackageError,
     LocalPackageSpec,
-    Package,
     SpecificationError,
     collect,
     specs_from_file,
@@ -983,126 +981,3 @@ version = "1.0.0"
     assert spec.url_template == "https://example.com/{version}"
     assert spec.file_names == ["{name}-{version}.tar.gz"]
     assert spec.version == "1.0.0"
-
-
-def test_package__from_toml(tmp_path):
-    contents = """\
-[package]
-name = "package"
-
-[reference]
-type = "doxygen"
-dir = "xml"
-
-[asciidoc]
-src_dir = "adoc"
-image_dir = "images"
-root_doc = "index.adoc"
-"""
-
-    pkg = Package("my-package")
-    pkg.load_from_toml(tmp_path, toml.loads(contents))
-
-    assert pkg.name == "package"
-    assert pkg.scoped is True
-    assert pkg.reference_type == "doxygen"
-    assert pkg.reference_dir == tmp_path / "xml"
-    assert pkg.adoc_src_dir == tmp_path / "adoc"
-    assert pkg.adoc_image_dir == tmp_path / "images"
-    assert pkg.adoc_root_doc == tmp_path / "adoc" / "index.adoc"
-
-
-def test_package__from_toml__no_name(tmp_path):
-    contents = """\
-[package]
-
-[reference]
-type = "doxygen"
-dir = "xml"
-
-[asciidoc]
-src_dir = "adoc"
-image_dir = "images"
-root_doc = "index.adoc"
-"""
-
-    pkg = Package("my-package")
-    pkg.load_from_toml(tmp_path, toml.loads(contents))
-
-    assert pkg.name == "my-package"
-    assert pkg.scoped is True
-    assert pkg.reference_type == "doxygen"
-    assert pkg.reference_dir == tmp_path / "xml"
-    assert pkg.adoc_src_dir == tmp_path / "adoc"
-    assert pkg.adoc_image_dir == tmp_path / "images"
-    assert pkg.adoc_root_doc == tmp_path / "adoc" / "index.adoc"
-
-
-def test_package__from_toml__no_reference(tmp_path):
-    contents = """\
-[package]
-name = "package"
-
-[asciidoc]
-src_dir = "adoc"
-image_dir = "images"
-root_doc = "index.adoc"
-"""
-
-    pkg = Package("my-package")
-    pkg.load_from_toml(tmp_path, toml.loads(contents))
-
-    assert pkg.name == "package"
-    assert pkg.scoped is True
-    assert pkg.reference_type is None
-    assert pkg.reference_dir is None
-    assert pkg.adoc_src_dir == tmp_path / "adoc"
-    assert pkg.adoc_image_dir == tmp_path / "images"
-    assert pkg.adoc_root_doc == tmp_path / "adoc" / "index.adoc"
-
-
-def test_package__from_toml__no_asciidoc(tmp_path):
-    contents = """\
-[package]
-name = "package"
-
-[reference]
-type = "doxygen"
-dir = "xml"
-"""
-
-    pkg = Package("my-package")
-    pkg.load_from_toml(tmp_path, toml.loads(contents))
-
-    assert pkg.name == "package"
-    assert pkg.scoped is True
-    assert pkg.reference_type == "doxygen"
-    assert pkg.reference_dir == tmp_path / "xml"
-    assert pkg.adoc_src_dir is None
-    assert pkg.adoc_image_dir is None
-    assert pkg.adoc_root_doc is None
-
-
-def test_package__from_toml__root_doc_no_src_dir(tmp_path):
-    contents = """\
-[package]
-name = "package"
-
-[reference]
-type = "doxygen"
-dir = "xml"
-
-[asciidoc]
-root_doc = "index.adoc"
-"""
-
-    pkg = Package("my-package")
-    pkg.load_from_toml(tmp_path, toml.loads(contents))
-
-    assert pkg.name == "package"
-    assert pkg.scoped is True
-    assert pkg.reference_type == "doxygen"
-    assert pkg.reference_dir == tmp_path / "xml"
-    assert pkg.adoc_src_dir is None
-    assert pkg.adoc_image_dir is None
-    assert pkg.adoc_root_doc is None

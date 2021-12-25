@@ -227,29 +227,30 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     pkg_mgr.set_input_files(args.input_file, args.base_dir, args.image_dir)
     with tqdm(desc="Preparing work directory", unit="pkg") as progress:
-        in_file = pkg_mgr.prepare_work_directory(args.input_file, progress)
+        in_doc = pkg_mgr.prepare_work_directory(args.input_file, progress)
 
     try:
         with tqdm(desc="Processing asciidoc     ", total=1, unit="file") as progress:
-            in_to_out_file_map = process_adoc(in_file,
-                                              api_reference,
-                                              pkg_mgr,
-                                              warnings_are_errors=args.warnings_are_errors,
-                                              multipage=args.multipage,
-                                              progress=progress)
+            documents = process_adoc(in_doc,
+                                     api_reference,
+                                     pkg_mgr,
+                                     warnings_are_errors=args.warnings_are_errors,
+                                     multipage=args.multipage,
+                                     progress=progress)
 
     except:  # noqa: E722
         logger.error(human_traceback(pkg_mgr))
         sys.exit(1)
 
-    in_dir = in_file.parent
-    for (in_adoc_file, out_adoc_file) in tqdm(
-        [(k, v) for (k, v) in in_to_out_file_map.items() if args.multipage or k == in_file],
-            desc="Running asciidoctor     ",
-            unit="file"):
-        out_file = destination_dir / in_adoc_file.relative_to(in_dir).with_suffix(extension)
-        rel_image_dir = relative_path(out_adoc_file, pkg_mgr.image_work_dir)
-        asciidoctor(destination_dir, out_file, out_adoc_file, args.multipage, args.backend,
+    for doc in tqdm(documents, desc="Running asciidoctor     ", unit="doc"):
+        if args.multipage and doc.is_embedded:
+            continue
+        if not args.multipage and not doc.is_root:
+            continue
+
+        out_file = destination_dir / doc.relative_path.with_suffix(extension)
+        rel_image_dir = relative_path(doc.work_file, pkg_mgr.image_work_dir)
+        asciidoctor(destination_dir, out_file, doc.work_file, args.multipage, args.backend,
                     extra_args, rel_image_dir)
         logger.info(f"Generated: {out_file}")
 

@@ -103,7 +103,7 @@ def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, a
     ])
 
     output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
     asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
                                              "html5", [], Path("images"))
     assert processed_file.is_file()
@@ -126,7 +126,7 @@ def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destin
     ])
 
     output_file = destination_dir / "simple_test.input.pdf"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
     asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
                                              "pdf", [], Path("images"))
     assert processed_file.is_file()
@@ -161,7 +161,7 @@ def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, desti
     ])
 
     output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
     asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
                                              "html5", [], Path("images"))
     assert processed_file.is_file()
@@ -179,7 +179,7 @@ def test_forward_unknown_options(asciidoctor_mock, build_dir, spec_file, destina
     ])
 
     output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
     asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
                                              "html5", ["--verbose", "-a", "specialoption"],
                                              Path("images"))
@@ -211,7 +211,7 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
     ])
 
     output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
     asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
                                              "html5", [], Path("images"))
     assert processed_file.is_file()
@@ -223,7 +223,7 @@ def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_
     main([str(in_file), "--destination-dir", str(destination_dir), "--build-dir", str(build_dir)])
 
     output_file = destination_dir / "no_api_reference.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.no_api_reference.input.adoc"
+    processed_file = build_dir / "intermediate" / "no_api_reference.input.adoc"
     asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
                                              "html5", [], Path("images"))
     assert processed_file.is_file()
