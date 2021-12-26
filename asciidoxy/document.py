@@ -15,7 +15,6 @@
 
 import logging
 import re
-from os import PathLike
 from pathlib import Path
 from typing import Any, Iterator, List, Mapping, Optional, Union
 
@@ -172,7 +171,7 @@ class Document:
         """
         return relative_path(self.work_file, doc.work_file)
 
-    def resolve_relative_path(self, to: Union[str, PathLike[str]]) -> Path:
+    def resolve_relative_path(self, to: Union[str, Path]) -> Path:
         """Determine a workspace/package relative path from a relative path starting at the current
         document.
 
@@ -200,7 +199,7 @@ class Document:
         child.embedded_in.append(self)
         self.children.append(child)
 
-    def with_relative_path(self, rel_path: Union[str, PathLike[str]]) -> "Document":
+    def with_relative_path(self, rel_path: Union[str, Path]) -> "Document":
         """Create an empty copy of this document with a different relative path."""
         return Document(Path(rel_path), self.package, self.work_dir)
 

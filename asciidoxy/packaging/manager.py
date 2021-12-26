@@ -16,7 +16,6 @@
 import asyncio
 import logging
 import shutil
-from os import PathLike
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Union
 
@@ -48,9 +47,9 @@ class UnknownPackageError(Exception):
 
 class UnknownFileError(Exception):
     package_name: str
-    file_name: Optional[Union[str, PathLike[str]]]
+    file_name: Optional[Union[str, Path]]
 
-    def __init__(self, package_name: str, file_name: Optional[Union[str, PathLike[str]]]):
+    def __init__(self, package_name: str, file_name: Optional[Union[str, Path]]):
         self.package_name = package_name
         self.file_name = file_name
 
@@ -246,7 +245,7 @@ class PackageManager:
 
     def make_document(self,
                       package_name: Optional[str] = None,
-                      file_name: Optional[Union[str, PathLike[str]]] = None) -> Document:
+                      file_name: Optional[Union[str, Path]] = None) -> Document:
         """Get a document from a package.
 
         Args:
