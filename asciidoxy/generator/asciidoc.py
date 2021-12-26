@@ -453,7 +453,7 @@ class Api(ABC):
                 referenced_file = self._context.document.relative_path_to(doc)
                 if not link_text:
                     link_text = doc.title
-                return (f"{link_prefix}" f"<<{referenced_file}#,{link_text}>>")
+                return (f"{link_prefix}<<{referenced_file}#,{link_text}>>")
             else:
                 return ""
 
@@ -693,7 +693,8 @@ class Api(ABC):
         template = self._template_cache.get(key, None)
         if template is None:
             templates_path = templates.__path__  # type: ignore  # mypy issue #1422
-            lookup = TemplateLookup(directories=templates_path + [self._context.document.work_dir],
+            lookup = TemplateLookup(directories=templates_path +
+                                    [str(self._context.document.work_dir)],
                                     input_encoding="utf-8")
             try:
                 template = lookup.get_template(f"{lang}/{kind}.mako")

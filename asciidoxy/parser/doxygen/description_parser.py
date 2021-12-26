@@ -1051,7 +1051,7 @@ class Table(NestedDescriptionElement):
         return f"{caption}{options}\n{separator}===\n\n{rows}\n\n{separator}==="
 
     def __repr__(self) -> str:
-        return (f"{self.__class__.__name__}: cols={self.cols}, " f"{self.caption}")
+        return f"{self.__class__.__name__}: cols={self.cols}, {self.caption}"
 
     @classmethod
     def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Table":

@@ -737,7 +737,7 @@ def test_cross_document_ref__links_to_package_are_relative_to_package_root(
             if tdb_single_and_multipage:
                 assert result == "<<../other_dir/include.adoc#,bla>>"
             else:
-                assert result == ("<<../other_dir/include.adoc#" "top-other_dir-include-top,bla>>")
+                assert result == "<<../other_dir/include.adoc#top-other_dir-include-top,bla>>"
 
 
 def test_cross_document_ref__document_not_in_tree(file_builder, tdb_single_and_multipage):

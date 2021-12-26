@@ -50,7 +50,8 @@ def simple_package(tmp_path, xml_data):
 @pytest.fixture
 def version_file(tmp_path):
     version_file = tmp_path / "versions.csv"
-    version_file.write_text("Component name,Version\n" "package,4.1.2")
+    version_file.write_text("Component name,Version\n"
+                            "package,4.1.2")
     return version_file
 
 
