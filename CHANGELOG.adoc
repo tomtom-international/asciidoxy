@@ -36,6 +36,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   * Linking to an embedded file from outside the file where it is embedded is now possible iff the
     file is embedded only once. If the file is embedded multiple times it can only be linked from 
     those files that embed it.
+  * Minimum supported python version is now 3.7. Python 3.6 is end of life.
 
 
 === Fixed

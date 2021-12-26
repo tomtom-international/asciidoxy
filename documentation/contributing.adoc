@@ -41,7 +41,7 @@ website is generated from the `master` branch manually.
 
 == Development environment
 
-AsciiDoxy is developed in python 3.6. For development it is recommended to set up a virtual
+AsciiDoxy is developed for python 3.7 and up. For development it is recommended to set up a virtual
 environment with all dependencies. Use the following commands to quickly set up the entire
 environment:
 
