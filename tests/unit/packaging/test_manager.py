@@ -105,7 +105,7 @@ def create_package_spec(parent: Path, *names: str) -> Path:
     return spec_file
 
 
-def test_collect(package_manager, event_loop, tmp_path, build_dir):
+def test_collect(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -134,7 +134,7 @@ def test_collect(package_manager, event_loop, tmp_path, build_dir):
     assert pkg_b.adoc_image_dir.is_dir()
 
 
-def test_load_reference(package_manager, event_loop, tmp_path, build_dir):
+def test_load_reference(package_manager, tmp_path, build_dir):
     pkg_a_dir = create_package_dir(tmp_path, "a")
     pkg_b_dir = create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -147,7 +147,7 @@ def test_load_reference(package_manager, event_loop, tmp_path, build_dir):
          call(pkg_b_dir / "xml" / "b.xml")], any_order=True)
 
 
-def test_prepare_work_directory(package_manager, event_loop, tmp_path, build_dir):
+def test_prepare_work_directory(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -180,7 +180,7 @@ def test_prepare_work_directory(package_manager, event_loop, tmp_path, build_dir
     assert (doc.work_dir / "images" / "b.png").is_file()
 
 
-def test_prepare_work_directory__no_include_dir(package_manager, event_loop, tmp_path, build_dir):
+def test_prepare_work_directory__no_include_dir(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -213,7 +213,7 @@ def test_prepare_work_directory__no_include_dir(package_manager, event_loop, tmp
     assert (doc.work_dir / "images" / "b.png").is_file()
 
 
-def test_prepare_work_directory__explicit_images(package_manager, event_loop, tmp_path, build_dir):
+def test_prepare_work_directory__explicit_images(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -252,7 +252,7 @@ def test_prepare_work_directory__explicit_images(package_manager, event_loop, tm
     assert (doc.work_dir / "images" / "b.png").is_file()
 
 
-def test_prepare_work_directory__implicit_images(package_manager, event_loop, tmp_path, build_dir):
+def test_prepare_work_directory__implicit_images(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -291,7 +291,7 @@ def test_prepare_work_directory__implicit_images(package_manager, event_loop, tm
     assert (doc.work_dir / "images" / "b.png").is_file()
 
 
-def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp_path, build_dir,
+def test_prepare_work_directory__file_collision(package_manager, tmp_path, build_dir,
                                                 warnings_are_and_are_not_errors):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
@@ -315,7 +315,7 @@ def test_prepare_work_directory__file_collision(package_manager, event_loop, tmp
 
 
 def test_prepare_work_directory__dir_and_file_collision__file_overwrites_dir_from_input(
-        package_manager, event_loop, tmp_path, build_dir, warnings_are_and_are_not_errors):
+        package_manager, tmp_path, build_dir, warnings_are_and_are_not_errors):
 
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
@@ -336,7 +336,7 @@ def test_prepare_work_directory__dir_and_file_collision__file_overwrites_dir_fro
 
 
 def test_prepare_work_directory__dir_and_file_collision__dir_overwrites_file(
-        package_manager, event_loop, tmp_path, build_dir, warnings_are_and_are_not_errors):
+        package_manager, tmp_path, build_dir, warnings_are_and_are_not_errors):
 
     create_package_dir(tmp_path, "a")
     pkg_b_dir = create_package_dir(tmp_path, "b")
@@ -357,7 +357,7 @@ def test_prepare_work_directory__dir_and_file_collision__dir_overwrites_file(
 
 
 def test_prepare_work_directory__dir_and_file_collision__file_overwrites_dir(
-        package_manager, event_loop, tmp_path, build_dir, warnings_are_and_are_not_errors):
+        package_manager, tmp_path, build_dir, warnings_are_and_are_not_errors):
 
     pkg_a_dir = create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
@@ -376,8 +376,8 @@ def test_prepare_work_directory__dir_and_file_collision__file_overwrites_dir(
     assert "File b.adoc from package b is also a directory in package a." in str(excinfo.value)
 
 
-def test_prepare_work_directory__same_dir_in_multiple_packages(package_manager, event_loop,
-                                                               tmp_path, build_dir):
+def test_prepare_work_directory__same_dir_in_multiple_packages(package_manager, tmp_path,
+                                                               build_dir):
     pkg_a_dir = create_package_dir(tmp_path, "a")
     pkg_b_dir = create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -408,8 +408,8 @@ def test_prepare_work_directory__same_dir_in_multiple_packages(package_manager, 
 
 
 @pytest.mark.parametrize("clear", [True, False])
-def test_prepare_work_directory__clear_existing(clear, package_manager, event_loop, tmp_path,
-                                                build_dir, work_dir):
+def test_prepare_work_directory__clear_existing(clear, package_manager, tmp_path, build_dir,
+                                                work_dir):
     src_dir = tmp_path / "src"
     src_dir.mkdir()
     in_file = src_dir / "index.adoc"
@@ -437,7 +437,7 @@ def test_prepare_work_directory__clear_existing(clear, package_manager, event_lo
     assert (work_dir / "existing_file").exists() is not clear
 
 
-def test_make_image_directory(package_manager, event_loop, tmp_path, build_dir):
+def test_make_image_directory(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -451,8 +451,7 @@ def test_make_image_directory(package_manager, event_loop, tmp_path, build_dir):
     assert (output_dir / "images" / "b.png").is_file()
 
 
-def test_make_image_directory__existing_output_dir(package_manager, event_loop, tmp_path,
-                                                   build_dir):
+def test_make_image_directory__existing_output_dir(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -474,7 +473,7 @@ def test_make_image_directory__existing_output_dir(package_manager, event_loop, 
     assert (output_dir / "images" / "b.png").is_file()
 
 
-def test_make_image_directory__from_input_files(package_manager, event_loop, tmp_path, build_dir):
+def test_make_image_directory__from_input_files(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -501,7 +500,7 @@ def test_make_image_directory__from_input_files(package_manager, event_loop, tmp
 
 
 def test_make_image_directory__file_collision__file_overwrites_directory(
-        package_manager, event_loop, tmp_path, build_dir):
+        package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -516,7 +515,7 @@ def test_make_image_directory__file_collision__file_overwrites_directory(
 
 
 def test_make_image_directory__file_collision__directory_overwrites_file(
-        package_manager, event_loop, tmp_path, build_dir):
+        package_manager, tmp_path, build_dir):
     pkg_a_dir = create_package_dir(tmp_path, "a")
     (pkg_a_dir / "images" / "a_subdir").mkdir(parents=True)
     (pkg_a_dir / "images" / "a_subdir" / "a_subdir_file.png").touch()
@@ -535,8 +534,7 @@ def test_make_image_directory__file_collision__directory_overwrites_file(
 
 
 @pytest.mark.parametrize("package_hint", [None, "", "a", "b", Package.INPUT_PACKAGE_NAME])
-def test_find_original_file__with_include_dir(package_hint, package_manager, event_loop, tmp_path,
-                                              build_dir):
+def test_find_original_file__with_include_dir(package_hint, package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -569,8 +567,8 @@ def test_find_original_file__with_include_dir(package_hint, package_manager, eve
 
 
 @pytest.mark.parametrize("package_hint", [None, "", "a", "b", Package.INPUT_PACKAGE_NAME])
-def test_find_original_file__without_include_dir(package_hint, package_manager, event_loop,
-                                                 tmp_path, build_dir):
+def test_find_original_file__without_include_dir(package_hint, package_manager, tmp_path,
+                                                 build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -593,7 +591,7 @@ def test_find_original_file__without_include_dir(package_hint, package_manager, 
                                               package_hint) == ("b", Path("b.adoc"))
 
 
-def test_make_document__input_dir(package_manager, event_loop, tmp_path, build_dir):
+def test_make_document__input_dir(package_manager, tmp_path, build_dir):
     src_dir = tmp_path / "src"
     src_dir.mkdir()
     in_file = src_dir / "index.adoc"
@@ -609,7 +607,7 @@ def test_make_document__input_dir(package_manager, event_loop, tmp_path, build_d
     assert doc.package.is_input_package is True
 
 
-def test_make_document__input_dir__unknown_file(package_manager, event_loop, tmp_path, build_dir):
+def test_make_document__input_dir__unknown_file(package_manager, tmp_path, build_dir):
     src_dir = tmp_path / "src"
     src_dir.mkdir()
     in_file = src_dir / "index.adoc"
@@ -622,7 +620,7 @@ def test_make_document__input_dir__unknown_file(package_manager, event_loop, tmp
         package_manager.make_document(file_name="unknown.adoc")
 
 
-def test_make_document__input_file(package_manager, event_loop, tmp_path, build_dir):
+def test_make_document__input_file(package_manager, tmp_path, build_dir):
     src_dir = tmp_path / "src"
     src_dir.mkdir()
     in_file = src_dir / "index.adoc"
@@ -638,7 +636,7 @@ def test_make_document__input_file(package_manager, event_loop, tmp_path, build_
     assert doc.package.is_input_package is True
 
 
-def test_make_document__package_file(package_manager, event_loop, tmp_path, build_dir):
+def test_make_document__package_file(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -665,7 +663,7 @@ def test_make_document__package_file(package_manager, event_loop, tmp_path, buil
     assert doc.package.name == "b"
 
 
-def test_make_document__unknown_package(package_manager, event_loop, tmp_path, build_dir):
+def test_make_document__unknown_package(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -683,7 +681,7 @@ def test_make_document__unknown_package(package_manager, event_loop, tmp_path, b
         package_manager.make_document(package_name="c", file_name="a.adoc")
 
 
-def test_make_document__unknown_package_file(package_manager, event_loop, tmp_path, build_dir):
+def test_make_document__unknown_package_file(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
@@ -703,7 +701,7 @@ def test_make_document__unknown_package_file(package_manager, event_loop, tmp_pa
         package_manager.make_document(package_name="b", file_name="c.adoc")
 
 
-def test_make_document__wrong_package_file(package_manager, event_loop, tmp_path, build_dir):
+def test_make_document__wrong_package_file(package_manager, tmp_path, build_dir):
     create_package_dir(tmp_path, "a")
     create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
