@@ -27,6 +27,7 @@ from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError
 from .errors import ConsistencyError, DuplicateAnchorError, UnknownAnchorError
 from .filters import InsertionFilter
+from .templates.cache import TemplateCache
 
 logger = logging.getLogger(__name__)
 
@@ -160,6 +161,8 @@ class Context(object):
     documents: Dict[Path, Document]
     document_stack: List[Document]
 
+    templates: TemplateCache
+
     def __init__(self, reference: ApiReference, package_manager: PackageManager,
                  document: Document):
         self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]})
@@ -176,6 +179,8 @@ class Context(object):
 
         self.documents = {document.relative_path: document}
         self.document_stack = [document]
+
+        self.templates = TemplateCache(filesystem_checks=False)
 
     def insert(self, element: ReferableElement) -> None:
         """Register insertion of an element."""
@@ -215,6 +220,7 @@ class Context(object):
         sub.progress = self.progress
         sub.call_stack = self.call_stack
         sub.documents = self.documents
+        sub.templates = self.templates
 
         return sub
 

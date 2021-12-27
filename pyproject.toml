@@ -14,6 +14,7 @@ module = [
     "tqdm.*",
     "xml.dom.*",
     "xml.dom.minidom.*",
+    "importlib_resources.*",
 ]
 ignore_missing_imports = true
 

@@ -33,8 +33,6 @@ from typing import (
     cast,
 )
 
-from mako.exceptions import TopLevelLookupException
-from mako.lookup import TemplateLookup
 from mako.template import Template
 from tqdm import tqdm
 
@@ -48,7 +46,6 @@ from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError, UnknownPackageError
 from ..parser.doxygen import safe_language_tag
 from ..transcoder import TranscoderBase
-from . import templates
 from .context import Context, stacktrace
 from .errors import (
     AmbiguousReferenceError,
@@ -59,7 +56,6 @@ from .errors import (
     MissingPackageError,
     MissingPackageFileError,
     ReferenceNotFoundError,
-    TemplateMissingError,
     UnknownAnchorError,
     UnlinkableError,
 )
@@ -688,21 +684,6 @@ class Api(ABC):
         else:
             logger.warning(str(error))
 
-    def _template(self, lang: str, kind: str) -> Template:
-        key = Api.TemplateKey(lang, kind)
-        template = self._template_cache.get(key, None)
-        if template is None:
-            templates_path = templates.__path__  # type: ignore  # mypy issue #1422
-            lookup = TemplateLookup(directories=templates_path +
-                                    [str(self._context.document.work_dir)],
-                                    input_encoding="utf-8")
-            try:
-                template = lookup.get_template(f"{lang}/{kind}.mako")
-                self._template_cache[key] = template
-            except TopLevelLookupException:
-                raise TemplateMissingError(lang, kind)
-        return template
-
     def _sub_api(self, document: Document, embedded: bool = False) -> "Api":
         return self.__class__(self._context.sub_context(document))
 
@@ -719,12 +700,13 @@ class Api(ABC):
         else:
             kind = kind_override
 
-        return self._template(element.language, kind).render(element=element,
-                                                             insert_filter=insert_filter,
-                                                             api_context=self._context,
-                                                             api=self,
-                                                             leveloffset=leveloffset,
-                                                             **self._commands())
+        template = self._context.templates.template_for(element.language, kind)
+        return template.render(element=element,
+                               insert_filter=insert_filter,
+                               api_context=self._context,
+                               api=self,
+                               leveloffset=leveloffset,
+                               **self._commands())
 
     def _file_top_anchor(self, doc: Document) -> str:
         return "top-" + "-".join(doc.relative_path.with_suffix("").parts) + "-top"
