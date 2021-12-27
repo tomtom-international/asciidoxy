@@ -52,7 +52,7 @@ def test_template_for__custom__template_from_custom_with_custom_name(tmp_path):
     (tmp_path / "cpp").mkdir(parents=True)
     (tmp_path / "cpp" / "myclass.mako").write_text("Hello world")
 
-    cache = TemplateCache(directories=[str(tmp_path)])
+    cache = TemplateCache(custom_template_dir=tmp_path)
     template = cache.template_for("cpp", "myclass")
     assert template is not None
     assert template.source.startswith("Hello world")
@@ -62,7 +62,7 @@ def test_template_for__custom__fallback_to_internal(tmp_path):
     (tmp_path / "cpp").mkdir(parents=True)
     (tmp_path / "cpp" / "class.mako").write_text("Hello world")
 
-    cache = TemplateCache(directories=[str(tmp_path)])
+    cache = TemplateCache(custom_template_dir=tmp_path)
     template = cache.template_for("cpp", "struct")
     assert template is not None
     assert template.source.startswith("## Copyright (C) 2019-2021, TomTom (http://tomtom.com).")
@@ -72,7 +72,7 @@ def test_template_for__custom__kind_not_found(tmp_path):
     (tmp_path / "cpp").mkdir(parents=True)
     (tmp_path / "cpp" / "class.mako").write_text("Hello world")
 
-    cache = TemplateCache(directories=[str(tmp_path)])
+    cache = TemplateCache(custom_template_dir=tmp_path)
     with pytest.raises(TemplateMissingError):
         cache.template_for("cpp", "klass")
 
@@ -81,6 +81,6 @@ def test_template_for__custom__language_not_found(tmp_path):
     (tmp_path / "cpp").mkdir(parents=True)
     (tmp_path / "cpp" / "class.mako").write_text("Hello world")
 
-    cache = TemplateCache(directories=[str(tmp_path)])
+    cache = TemplateCache(custom_template_dir=tmp_path)
     with pytest.raises(TemplateMissingError):
         cache.template_for("smalltalk", "class")

@@ -27,7 +27,8 @@ ${"""
 ${insert(<name>,
          [kind=<kind>,]
          [lang=<language>,]
-         [leveloffset])}
+         [leveloffset=<leveloffset>,]
+         [template=<template name>])}
 """}
 ----
 
@@ -39,6 +40,8 @@ The `insert` method takes the following arguments:
 `kind`:: Optional. Kind of element to insert.
 `leveloffset`:: Optional. Offset for the headers in the reference from the top level of the current
 file. Defaults to +1. Provide `None` to not set the offset.
+`template`:: *Experimental.* Optional. Alternative template to use for generating the API 
+documentation.
 
 Trying to insert an unknown element will result in an error.
 

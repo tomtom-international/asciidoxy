@@ -32,6 +32,8 @@ A step-by-step guide to get you started with AsciiDoxy.
 . ${cross_document_ref("getting-started/api-reference.adoc",
                            link_text="Including API reference")}:
   Add API reference documentation extracted from source code.
+. ${cross_document_ref("getting-started/custom-templates.adoc", link_text="Custom templates")}:
+  Customize the generated output of AsciiDoxy with your own templates.
 
 ${include("getting-started/installation.adoc", multipage_link=False)}
 ${include("getting-started/basic-asciidoc-file.adoc", multipage_link=False)}
@@ -39,3 +41,4 @@ ${include("getting-started/using-python.adoc", multipage_link=False)}
 ${include("getting-started/multipage.adoc", multipage_link=False)}
 ${include("getting-started/packages.adoc", multipage_link=False)}
 ${include("getting-started/api-reference.adoc", multipage_link=False)}
+${include("getting-started/custom-templates.adoc", multipage_link=False)}

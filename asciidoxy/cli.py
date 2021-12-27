@@ -175,6 +175,14 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                         help="Force language used when parsing doxygen XML files. Ignores the"
                         " language specified in the XML files.")
     parser.add_argument("--multipage", action="store_true", help="Generate multi-page document.")
+    parser.add_argument("--template-dir",
+                        metavar="TEMPLATE_DIR",
+                        default=None,
+                        type=PathArgument(existing_dir=True),
+                        help="*Experimental* Directory containing custom templates to use instead"
+                        " of the default templates shipped with AsciiDoxy. Templates found in this"
+                        " directory will be used in favor of the default templates. Only when a"
+                        " template is not found here, the default templates are used.")
     if argv is None:
         argv = sys.argv[1:]
     args, extra_args = parser.parse_known_args(argv)
@@ -237,6 +245,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                                      pkg_mgr,
                                      warnings_are_errors=args.warnings_are_errors,
                                      multipage=args.multipage,
+                                     custom_template_dir=args.template_dir,
                                      progress=progress)
 
     except:  # noqa: E722

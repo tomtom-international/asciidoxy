@@ -34,6 +34,7 @@ from asciidoxy.generator.errors import (
     TemplateMissingError,
     UnknownAnchorError,
 )
+from asciidoxy.generator.templates.cache import TemplateCache
 from asciidoxy.packaging import Package
 
 from ..shared import ProgressMock
@@ -142,6 +143,28 @@ def test_insert_with_default_language_can_be_overridden(generating_api):
     generating_api.language("java")
     result = generating_api.insert("asciidoxy::geometry::Coordinate", lang="cpp")
     assert "class asciidoxy::geometry::Coordinate" in result
+
+
+def test_insert_with_custom_template(generating_api, context, tmp_path):
+    template_dir = tmp_path / "templates"
+    (template_dir / "cpp").mkdir(parents=True)
+    (template_dir / "cpp" / "class.mako").write_text("Hello my class")
+    context.templates = TemplateCache(template_dir)
+
+    result = generating_api.insert("asciidoxy::geometry::Coordinate", lang="cpp")
+    assert result == "Hello my class"
+
+
+def test_insert_with_custom_template_override_name(generating_api, context, tmp_path):
+    template_dir = tmp_path / "templates"
+    (template_dir / "cpp").mkdir(parents=True)
+    (template_dir / "cpp" / "myclass.mako").write_text("Hello my class")
+    context.templates = TemplateCache(template_dir)
+
+    result = generating_api.insert("asciidoxy::geometry::Coordinate",
+                                   lang="cpp",
+                                   template="myclass")
+    assert result == "Hello my class"
 
 
 def test_insert__transcode__explicit(generating_api):
@@ -1336,6 +1359,36 @@ def test_process_adoc__embedded_doc_included(single_and_multipage, api_reference
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == 2
+
+
+def test_process_adoc_custom_templates(warnings_are_errors, single_and_multipage, adoc_data,
+                                       api_reference, package_manager, update_expected_results,
+                                       doxygen_version, tmp_path):
+    template_dir = tmp_path / "templates"
+    (template_dir / "cpp").mkdir(parents=True)
+    (template_dir / "cpp" / "class.mako").write_text("Custom class template")
+    (template_dir / "cpp" / "myclass.mako").write_text("My class template")
+
+    input_file = adoc_data / "custom_templates.input.adoc"
+    expected_output_file = adoc_data_expected_result_file(input_file, single_and_multipage,
+                                                          doxygen_version)
+
+    package_manager.set_input_files(input_file)
+    doc = package_manager.prepare_work_directory(input_file)
+
+    progress_mock = ProgressMock()
+    output_doc = process_adoc(doc,
+                              api_reference,
+                              package_manager,
+                              warnings_are_errors=warnings_are_errors,
+                              custom_template_dir=template_dir,
+                              progress=progress_mock)[0]
+    assert output_doc.work_file.is_file()
+
+    content = output_doc.work_file.read_text()
+    if update_expected_results:
+        expected_output_file.write_text(content)
+    assert content == expected_output_file.read_text()
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])

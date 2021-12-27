@@ -154,6 +154,27 @@ def test_process_file_backend_adoc(asciidoctor_mock, build_dir, spec_file, desti
     assert output_file.is_file()
 
 
+def test_process_custom_file_template_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
+                                          adoc_data, event_loop, tmp_path):
+    in_file = adoc_data / "custom_templates.input.adoc"
+    template_dir = tmp_path / "templates"
+    (template_dir / "cpp").mkdir(parents=True)
+    (template_dir / "cpp" / "class.mako").write_text("Custom class template")
+    (template_dir / "cpp" / "myclass.mako").write_text("My class template")
+
+    main([
+        str(in_file), "--spec-file",
+        str(spec_file), "--destination-dir",
+        str(destination_dir), "--build-dir",
+        str(build_dir), "--backend", "adoc", "--template-dir",
+        str(template_dir)
+    ])
+
+    asciidoctor_mock.assert_not_called()
+    output_file = destination_dir / "custom_templates.input.adoc"
+    assert output_file.is_file()
+
+
 def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
                      adoc_data, event_loop, tmp_path):
     in_file = adoc_data / "simple_test.input.adoc"

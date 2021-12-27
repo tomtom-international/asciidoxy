@@ -13,6 +13,9 @@
 # limitations under the License.
 """Cache implementation for Mako templates supporting package resources."""
 
+from pathlib import Path
+from typing import Optional
+
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
 from mako.template import Template
@@ -29,7 +32,17 @@ class TemplateCache(TemplateLookup):
     Supports reading templates from a custom location using the `directories` argument of the
     constructor. If templates are not found in the custom location, the internal package resources
     of AsciiDoxy are searched.
+
+    By default file system checks for changes to source files are disabled.
     """
+    def __init__(self, custom_template_dir: Optional[Path] = None, *args, **kwargs):
+        if custom_template_dir is not None:
+            kwargs["directories"] = [str(custom_template_dir)]
+        if "filesystem_checks" not in kwargs:
+            kwargs["filesystem_checks"] = False
+
+        super().__init__(*args, **kwargs)
+
     def template_for(self, lang: str, kind: str) -> Template:
         try:
             return self.get_template(f"{lang}/{kind}.mako")

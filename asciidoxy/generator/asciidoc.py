@@ -239,7 +239,8 @@ class Api(ABC):
                members: Optional[FilterSpec] = None,
                exceptions: Optional[FilterSpec] = None,
                ignore_global_filter: bool = False,
-               leveloffset: str = "+1") -> str:
+               leveloffset: str = "+1",
+               template: Optional[str] = None) -> str:
         """Insert API reference documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
@@ -259,6 +260,8 @@ class Api(ABC):
                                       to apply the filters on top of the global filter.
             leveloffset:          Offset of the top header of the inserted text from the top level
                                       header of the including document.
+            template:             *Experimental* Alternative template to use when inserting the
+                                      reference documentation.
 
         Returns:
             AsciiDoc text to include in the document.
@@ -270,9 +273,13 @@ class Api(ABC):
         else:
             insert_filter = self._context.insert_filter
 
-        return self.insert_fragment(
-            self.find_element(name, kind=kind, lang=lang, allow_overloads=False), insert_filter,
-            leveloffset)
+        return self.insert_fragment(self.find_element(name,
+                                                      kind=kind,
+                                                      lang=lang,
+                                                      allow_overloads=False),
+                                    insert_filter,
+                                    leveloffset,
+                                    kind_override=template)
 
     @_api_stackframe
     def link(self,
@@ -935,6 +942,7 @@ def process_adoc(doc: Document,
                  package_manager: PackageManager,
                  warnings_are_errors: bool = False,
                  multipage: bool = False,
+                 custom_template_dir: Optional[Path] = None,
                  progress: Optional[tqdm] = None) -> List[Document]:
     """Process an AsciiDoc file and execute all embedded python code.
 
@@ -952,7 +960,10 @@ def process_adoc(doc: Document,
     """
 
     doc.is_root = True
-    context = Context(reference=api_reference, package_manager=package_manager, document=doc)
+    context = Context(reference=api_reference,
+                      package_manager=package_manager,
+                      document=doc,
+                      custom_template_dir=custom_template_dir)
 
     context.warnings_are_errors = warnings_are_errors
     context.multipage = multipage

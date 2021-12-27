@@ -25,7 +25,7 @@ is important to understand how to include python code in you AsciiDoc files.
 :sectnums:
 == Basic syntax
 
-AsciiDoxy uses https://www.makotemplates.org/[Make templates] to combine python and AsciiDoc in a
+AsciiDoxy uses https://www.makotemplates.org/[Mako templates] to combine python and AsciiDoc in a
 single file. It supports all syntax supported by Mako.
 
 The construct `${"${}"}` can be used to execute python code and insert the result in its place.
