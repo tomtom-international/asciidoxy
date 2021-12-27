@@ -41,7 +41,6 @@ from tqdm import tqdm
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
-from .. import templates
 from .._version import __version__
 from ..api_reference import AmbiguousLookupError, ApiReference
 from ..document import Document
@@ -49,6 +48,7 @@ from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError, UnknownPackageError
 from ..parser.doxygen import safe_language_tag
 from ..transcoder import TranscoderBase
+from . import templates
 from .context import Context, stacktrace
 from .errors import (
     AmbiguousReferenceError,
