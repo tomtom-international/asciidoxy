@@ -16,7 +16,6 @@
 import functools
 import inspect
 import logging
-import os
 from abc import ABC, abstractmethod
 from functools import wraps
 from pathlib import Path
@@ -637,8 +636,7 @@ class Api(ABC):
         Returns:
             Rendered AsciiDoc.
         """
-        template = Template(filename=os.fspath(self._context.document.original_file),
-                            input_encoding="utf-8")
+        template = self._context.document_cache.get_document(self._context.document)
         return template.render(api=ApiProxy(self), env=self._context.env, **self._commands())
 
     @abstractmethod

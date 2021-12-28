@@ -25,9 +25,9 @@ from ..api_reference import ApiReference
 from ..document import Document, Package
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError
+from .cache import DocumentCache, TemplateCache
 from .errors import ConsistencyError, DuplicateAnchorError, UnknownAnchorError
 from .filters import InsertionFilter
-from .templates.cache import TemplateCache
 
 logger = logging.getLogger(__name__)
 
@@ -162,6 +162,7 @@ class Context(object):
     document_stack: List[Document]
 
     templates: TemplateCache
+    document_cache: DocumentCache
 
     def __init__(self,
                  reference: ApiReference,
@@ -185,6 +186,7 @@ class Context(object):
         self.document_stack = [document]
 
         self.templates = TemplateCache(custom_template_dir, cache_dir)
+        self.document_cache = DocumentCache(cache_dir)
 
     def insert(self, element: ReferableElement) -> None:
         """Register insertion of an element."""
@@ -225,6 +227,7 @@ class Context(object):
         sub.call_stack = self.call_stack
         sub.documents = self.documents
         sub.templates = self.templates
+        sub.document_cache = self.document_cache
 
         return sub
 

@@ -66,6 +66,7 @@ def test_create_sub_context(empty_context, document):
     assert sub.call_stack is context.call_stack
     assert sub.documents is context.documents
     assert sub.templates is context.templates
+    assert sub.document_cache is context.document_cache
 
     assert sub.insert_filter is not context.insert_filter
 

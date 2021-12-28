@@ -22,11 +22,44 @@ from mako.template import Template
 
 import asciidoxy.generator.templates
 
-from ...compat import importlib_resources
-from ..errors import TemplateMissingError
+from ..compat import importlib_resources
+from ..document import Document
+from .errors import TemplateMissingError
 
 
-class TemplateCache(TemplateLookup):
+class BaseCache(TemplateLookup):
+    def __init__(self, cache_name: str, cache_dir: Optional[Path] = None, *args, **kwargs):
+        if cache_dir is not None:
+            named_cache_dir = cache_dir / cache_name
+            named_cache_dir.mkdir(parents=True, exist_ok=True)
+            kwargs["module_directory"] = str(named_cache_dir)
+        if "filesystem_checks" not in kwargs:
+            kwargs["filesystem_checks"] = False
+        if "input_encoding" not in kwargs:
+            kwargs["input_encoding"] = "utf-8"
+
+        super().__init__(*args, **kwargs)
+
+
+class DocumentCache(BaseCache):
+    """Cache for input documents."""
+    def __init__(self, cache_dir: Optional[Path] = None, *args, **kwargs):
+        super().__init__("documents", cache_dir, *args, **kwargs)
+
+    def get_document(self, document: Document) -> Template:
+        return self.get_template(str(document.original_file))
+
+    def get_template(self, uri: str) -> Template:
+        try:
+            return super().get_template(uri)
+
+        except TopLevelLookupException:
+            template = Template(uri=uri, filename=uri, lookup=self, **self.template_args)
+            self.put_template(uri, template)
+            return template
+
+
+class TemplateCache(BaseCache):
     """Cache for Mako templates used by AsciiDoxy.
 
     Supports reading templates from a custom location using the `directories` argument of the
@@ -42,16 +75,8 @@ class TemplateCache(TemplateLookup):
                  **kwargs):
         if custom_template_dir is not None:
             kwargs["directories"] = [str(custom_template_dir)]
-        if cache_dir is not None:
-            template_cache_dir = cache_dir / "templates"
-            template_cache_dir.mkdir(parents=True, exist_ok=True)
-            kwargs["module_directory"] = str(template_cache_dir)
-        if "filesystem_checks" not in kwargs:
-            kwargs["filesystem_checks"] = False
-        if "input_encoding" not in kwargs:
-            kwargs["input_encoding"] = "utf-8"
 
-        super().__init__(*args, **kwargs)
+        super().__init__("templates", cache_dir, *args, **kwargs)
 
     def template_for(self, lang: str, kind: str) -> Template:
         try:

@@ -21,6 +21,7 @@ import pytest
 
 from asciidoxy import __version__
 from asciidoxy.generator.asciidoc import ApiProxy, GeneratingApi, PreprocessingApi, process_adoc
+from asciidoxy.generator.cache import TemplateCache
 from asciidoxy.generator.context import InsertData, StackFrame
 from asciidoxy.generator.errors import (
     AmbiguousReferenceError,
@@ -34,7 +35,6 @@ from asciidoxy.generator.errors import (
     TemplateMissingError,
     UnknownAnchorError,
 )
-from asciidoxy.generator.templates.cache import TemplateCache
 from asciidoxy.packaging import Package
 
 from ..shared import ProgressMock

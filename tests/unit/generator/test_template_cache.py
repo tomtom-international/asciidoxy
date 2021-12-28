@@ -15,8 +15,8 @@
 
 import pytest
 
+from asciidoxy.generator.cache import TemplateCache
 from asciidoxy.generator.errors import TemplateMissingError
-from asciidoxy.generator.templates.cache import TemplateCache
 
 
 def test_template_for__internal__template_available():
@@ -24,6 +24,8 @@ def test_template_for__internal__template_available():
     template = cache.template_for("cpp", "class")
     assert template is not None
     assert template.source.startswith("## Copyright (C) 2019-2021, TomTom (http://tomtom.com).")
+
+    assert cache.template_for("cpp", "class") is template
 
 
 def test_template_for__internal__kind_not_found():
