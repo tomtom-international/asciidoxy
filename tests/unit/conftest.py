@@ -18,6 +18,7 @@ from pathlib import Path
 import pytest
 
 from asciidoxy.api_reference import ApiReference
+from asciidoxy.config import Configuration
 from asciidoxy.document import Document, Package
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
@@ -156,8 +157,27 @@ def api_reference(parser_driver_factory, api_reference_set, forced_language):
 
 
 @pytest.fixture
-def context(document, api_reference, package_manager):
-    c = Context(reference=api_reference, package_manager=package_manager, document=document)
+def default_config(document, build_dir):
+    config = Configuration()
+    config.input_file = document.original_file
+    config.build_dir = build_dir
+    config.destination_dir = build_dir / "output"
+    config.cache_dir = build_dir / "cache"
+    config.backend = "html5"
+    config.warnings_are_errors = False
+    config.debug = False
+    config.log_level = "INFO"
+    config.multipage = False
+    config.extra = []
+    return config
+
+
+@pytest.fixture
+def context(document, api_reference, package_manager, default_config):
+    c = Context(reference=api_reference,
+                package_manager=package_manager,
+                document=document,
+                config=default_config)
     return c
 
 
@@ -214,32 +234,35 @@ def cpp_class():
 
 
 @pytest.fixture
-def warnings_are_errors(context):
-    context.warnings_are_errors = True
+def warnings_are_errors(default_config):
+    default_config.warnings_are_errors = True
     return True
 
 
 @pytest.fixture(params=[True, False], ids=["warnings-are-errors", "warnings-are-not-errors"])
-def warnings_are_and_are_not_errors(request, context):
-    context.warnings_are_errors = request.param
+def warnings_are_and_are_not_errors(request, default_config):
+    default_config.warnings_are_errors = request.param
     return request.param
 
 
 @pytest.fixture
-def multipage(context):
-    context.multipage = True
+def multipage(default_config):
+    default_config.multipage = True
     return True
 
 
 @pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
-def single_and_multipage(request, context):
-    context.multipage = request.param
+def single_and_multipage(request, default_config):
+    default_config.multipage = request.param
     return request.param
 
 
 @pytest.fixture
-def empty_context(document, package_manager):
-    return Context(reference=ApiReference(), package_manager=package_manager, document=document)
+def empty_context(document, package_manager, default_config):
+    return Context(reference=ApiReference(),
+                   package_manager=package_manager,
+                   document=document,
+                   config=default_config)
 
 
 @pytest.fixture

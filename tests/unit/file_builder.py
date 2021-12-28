@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Optional
 
 from asciidoxy.api_reference import ApiReference
+from asciidoxy.config import Configuration
 from asciidoxy.document import Document
 from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
@@ -88,9 +89,22 @@ class FileBuilder:
         return pkg
 
     def context(self):
+        config = Configuration()
+        config.input_file = self.input_doc.original_file
+        config.build_dir = self.package_manager.build_dir
+        config.destination_dir = self.package_manager.build_dir / "output"
+        config.cache_dir = self.package_manager.build_dir / "cache"
+        config.backend = "html5"
+        config.warnings_are_errors = self.warnings_are_errors
+        config.debug = False
+        config.log_level = "INFO"
+        config.multipage = self.multipage
+        config.extra = []
+
         c = Context(reference=ApiReference(),
                     package_manager=self.package_manager,
-                    document=self.input_doc)
+                    document=self.input_doc,
+                    config=config)
 
         for file in self.adoc_files_to_register:
             c.documents[file.relative_path] = file

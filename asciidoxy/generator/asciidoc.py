@@ -40,6 +40,7 @@ from packaging.version import Version
 
 from .._version import __version__
 from ..api_reference import AmbiguousLookupError, ApiReference
+from ..config import Configuration
 from ..document import Document
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError, UnknownPackageError
@@ -450,7 +451,7 @@ class Api(ABC):
 
         sub_api.process_adoc()
 
-        if self._context.multipage and not always_embed:
+        if self._context.config.multipage and not always_embed:
             if multipage_link:
                 referenced_file = self._context.document.relative_path_to(doc)
                 if not link_text:
@@ -684,7 +685,7 @@ class Api(ABC):
             return None
 
     def _warning_or_error(self, error: Exception):
-        if self._context.warnings_are_errors:
+        if self._context.config.warnings_are_errors:
             raise error
         else:
             logger.warning(str(error))
@@ -787,7 +788,7 @@ class PreprocessingApi(Api):
 
 class GeneratingApi(Api):
     def multipage_toc(self, side: str = "left") -> str:
-        if not self._context.multipage:
+        if not self._context.config.multipage:
             return ""
 
         toc_content = multipage_toc(self._context.output_document, side)
@@ -823,7 +824,7 @@ class GeneratingApi(Api):
                 link_text = anchor
 
             if not anchor:
-                if not self._context.multipage:
+                if not self._context.config.multipage:
                     anchor = self._file_top_anchor(document)
                 else:
                     anchor = ""
@@ -879,7 +880,7 @@ class GeneratingApi(Api):
 
         with self._context.document.work_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
-            if self._context.multipage and not self._context.document.is_embedded:
+            if self._context.config.multipage and not self._context.document.is_embedded:
                 nav_bar = navigation_bar(self._context.document)
                 if nav_bar:
                     print(nav_bar, file=f)
@@ -938,10 +939,7 @@ class ApiProxy:
 def process_adoc(doc: Document,
                  api_reference: ApiReference,
                  package_manager: PackageManager,
-                 warnings_are_errors: bool = False,
-                 multipage: bool = False,
-                 custom_template_dir: Optional[Path] = None,
-                 cache_dir: Optional[Path] = None,
+                 config: Configuration,
                  progress: Optional[tqdm] = None) -> List[Document]:
     """Process an AsciiDoc file and execute all embedded python code.
 
@@ -949,11 +947,7 @@ def process_adoc(doc: Document,
         doc:                 AsciiDoc file to process.
         api_reference:       API reference to insert in the documents.
         package_manager:     Reference to the package manager to get additional files from.
-        warnings_are_errors: True to treat every warning as an error.
-        multipage:           True to enable multi page output.
-        custom_template_dir: Directory containing custom templates to use.
-        cache_dir:           Directory for caching generated python code for templates and input
-                                 files.
+        config:              Configuration from the command line arguments.
         progress:            Optional progress reporting widget.
 
     Returns:
@@ -965,11 +959,8 @@ def process_adoc(doc: Document,
     context = Context(reference=api_reference,
                       package_manager=package_manager,
                       document=doc,
-                      custom_template_dir=custom_template_dir,
-                      cache_dir=cache_dir)
+                      config=config)
 
-    context.warnings_are_errors = warnings_are_errors
-    context.multipage = multipage
     context.progress = progress
 
     PreprocessingApi(context).process_adoc()
@@ -992,7 +983,7 @@ def _check_links(context: Context):
             messages.append(f"{element.language}: {element.full_name} not included in"
                             f" documentation, but linked here:\n{traces}")
 
-        if context.warnings_are_errors:
+        if context.config.warnings_are_errors:
             raise ConsistencyError("\n".join(messages))
         else:
             logger.warning("\n".join(messages))

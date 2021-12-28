@@ -22,6 +22,7 @@ from typing import Dict, List, MutableMapping, NamedTuple, Optional, Tuple
 from tqdm import tqdm
 
 from ..api_reference import ApiReference
+from ..config import Configuration
 from ..document import Document, Package
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError
@@ -128,8 +129,6 @@ class Context(object):
         language:              Default language to use when looking up references.
         insert_filter:         Filter used to select members of elements to insert.
         env:                   Environment variables to share with subdocuments.
-        warnings_are_errors:   True to treat every warning as an error.
-        multipage:             True when multi page output is enabled.
         reference:             API reference information.
         linked:                All elements to which links are inserted in the documentation.
         inserted:              All elements that have been inserted in the documentation.
@@ -138,15 +137,13 @@ class Context(object):
         document:              Current document being processed.
         documents:             All known documents.
         document_stack:        Stack of documents containing/including the current document.
+        config:                The configuration deduced from the command line arguments.
     """
     namespace: Optional[str] = None
     language: Optional[str] = None
     source_language: Optional[str] = None
     insert_filter: InsertionFilter
     env: Environment
-
-    warnings_are_errors: bool = False
-    multipage: bool = False
 
     reference: ApiReference
     package_manager: PackageManager
@@ -164,12 +161,10 @@ class Context(object):
     templates: TemplateCache
     document_cache: DocumentCache
 
-    def __init__(self,
-                 reference: ApiReference,
-                 package_manager: PackageManager,
-                 document: Document,
-                 custom_template_dir: Optional[Path] = None,
-                 cache_dir: Optional[Path] = None):
+    config: Configuration
+
+    def __init__(self, reference: ApiReference, package_manager: PackageManager, document: Document,
+                 config: Configuration):
         self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]})
         self.env = Environment()
 
@@ -185,8 +180,10 @@ class Context(object):
         self.documents = {document.relative_path: document}
         self.document_stack = [document]
 
-        self.templates = TemplateCache(custom_template_dir, cache_dir)
-        self.document_cache = DocumentCache(cache_dir)
+        self.templates = TemplateCache(config.template_dir, config.cache_dir)
+        self.document_cache = DocumentCache(config.cache_dir)
+
+        self.config = config
 
     def insert(self, element: ReferableElement) -> None:
         """Register insertion of an element."""
@@ -196,7 +193,7 @@ class Context(object):
             msg = (f"Duplicate insertion of {element.name}.\nTrying to insert at:\n"
                    f"{stacktrace(self.call_stack, prefix='  ')}\nPreviously inserted at:\n"
                    f"{stacktrace(trace, prefix='  ')}")
-            if self.warnings_are_errors:
+            if self.config.warnings_are_errors:
                 raise ConsistencyError(msg)
             else:
                 logger.warning(msg)
@@ -206,14 +203,13 @@ class Context(object):
         """Create a new sub context to process `document`."""
         sub = Context(reference=self.reference,
                       package_manager=self.package_manager,
-                      document=document)
+                      document=document,
+                      config=self.config)
 
         # Copies
         sub.namespace = self.namespace
         sub.language = self.language
         sub.source_language = self.source_language
-        sub.warnings_are_errors = self.warnings_are_errors
-        sub.multipage = self.multipage
         sub.env = copy.copy(self.env)
         sub.insert_filter = copy.deepcopy(self.insert_filter)
         sub.document_stack = self.document_stack[:]
@@ -237,7 +233,7 @@ class Context(object):
         Returns:
             The document containing the element or None if the element is not inserted anywhere.
         """
-        if not self.multipage or element_id not in self.inserted:
+        if not self.config.multipage or element_id not in self.inserted:
             return None
 
         containing_doc = self.inserted[element_id].document
@@ -351,7 +347,7 @@ class Context(object):
     @property
     def output_document(self):
         """Generated output document that should be used as a base for resolving relative paths."""
-        if self.multipage:
+        if self.config.multipage:
             # In multipage mode all links are relative to the generated page
             if self.document.is_embedded:
                 for doc in reversed(self.document_stack):

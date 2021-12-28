@@ -37,8 +37,6 @@ def test_create_sub_context(empty_context, document):
     context.namespace = "ns"
     context.language = "lang"
     context.source_language = "java"
-    context.warnings_are_errors = True
-    context.multipage = True
     context.env.variable = 42
 
     sub_doc = document.with_relative_path("other.adoc")
@@ -54,9 +52,6 @@ def test_create_sub_context(empty_context, document):
     assert sub.env is not context.env
     assert sub.env.variable == 42
 
-    assert sub.warnings_are_errors is True
-    assert sub.multipage is True
-
     assert sub.reference is context.reference
     assert sub.progress is context.progress
 
@@ -67,6 +62,7 @@ def test_create_sub_context(empty_context, document):
     assert sub.documents is context.documents
     assert sub.templates is context.templates
     assert sub.document_cache is context.document_cache
+    assert sub.config is context.config
 
     assert sub.insert_filter is not context.insert_filter
 
@@ -92,7 +88,7 @@ def test_create_sub_context(empty_context, document):
 
 
 def test_file_with_element__different_file(empty_context):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
 
     doc1 = empty_context.document.with_relative_path("file_1.adoc")
     empty_context.document = doc1
@@ -109,7 +105,7 @@ def test_file_with_element__different_file(empty_context):
 
 
 def test_file_with_element__same_file(empty_context):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
 
     doc1 = empty_context.document.with_relative_path("file_1.adoc")
     empty_context.document = doc1
@@ -126,7 +122,7 @@ def test_file_with_element__same_file(empty_context):
 
 
 def test_file_with_element__not_in_singlepage(empty_context):
-    empty_context.multipage = False
+    empty_context.config.multipage = False
 
     doc1 = empty_context.document.with_relative_path("file_1.adoc")
     empty_context.document = doc1
@@ -145,7 +141,7 @@ def test_file_with_element__not_in_singlepage(empty_context):
 
 
 def test_file_with_element__element_not_found(empty_context):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     assert empty_context.file_with_element("element-id-1") is None
 
 
@@ -200,7 +196,7 @@ def test_link_to_document__singlepage__embedded_multiple_times__other_files(
 
 def test_link_to_document__multipage__included(empty_context, document):
     document.relative_path = Path("dir1/index.adoc")
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     linked_doc = document.with_relative_path("linked_file.adoc")
     document.include(linked_doc)
     assert empty_context.link_to_document(linked_doc) == Path("../linked_file.adoc")
@@ -208,14 +204,14 @@ def test_link_to_document__multipage__included(empty_context, document):
 
 def test_link_to_document__multipage__not_included(empty_context, document):
     document.relative_path = Path("dir1/index.adoc")
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     linked_doc = document.with_relative_path("linked_file.adoc")
     assert empty_context.link_to_document(linked_doc) == Path("../linked_file.adoc")
 
 
 def test_link_to_document__multipage__embedded__same_file(empty_context, document):
     document.relative_path = Path("dir1/index.adoc")
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     linked_doc = document.with_relative_path("dir2/linked_file.adoc")
     document.embed(linked_doc)
     assert empty_context.link_to_document(linked_doc) == Path("index.adoc")
@@ -223,7 +219,7 @@ def test_link_to_document__multipage__embedded__same_file(empty_context, documen
 
 def test_link_to_document__multipage__embedded__other_file(empty_context, document):
     document.relative_path = Path("dir1/index.adoc")
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     linked_doc = document.with_relative_path("dir2/linked_file.adoc")
     other_doc = document.with_relative_path("dir3/other_file.adoc")
     other_doc.embed(linked_doc)
@@ -232,7 +228,7 @@ def test_link_to_document__multipage__embedded__other_file(empty_context, docume
 
 def test_link_to_document__multipage__embedded_multiple_times__same_file(empty_context, document):
     document.relative_path = Path("dir1/index.adoc")
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     linked_doc = document.with_relative_path("linked_file.adoc")
     document.embed(linked_doc)
     other_doc = document.with_relative_path("dir3/other_file.adoc")
@@ -242,7 +238,7 @@ def test_link_to_document__multipage__embedded_multiple_times__same_file(empty_c
 
 def test_link_to_document__multipage__embedded_multiple_times__other_files(empty_context, document):
     document.relative_path = Path("dir1/index.adoc")
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     linked_doc = document.with_relative_path("linked_file.adoc")
     other_doc = document.with_relative_path("other_file.adoc")
     other_doc.embed(linked_doc)
@@ -253,7 +249,7 @@ def test_link_to_document__multipage__embedded_multiple_times__other_files(empty
 
 
 def test_link_to_document__multipage__inside_embedded_file(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     document.relative_path = Path("dir1/index.adoc")
     document.is_root = False
     parent = document.with_relative_path("parent.adoc")
@@ -294,7 +290,7 @@ def test_docinfo_footer_file__singlepage__embedded(empty_context, document):
 
 
 def test_docinfo_footer_file__multipage(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
 
     footer_file = empty_context.docinfo_footer_file()
     assert footer_file.parent == document.work_file.parent
@@ -302,7 +298,7 @@ def test_docinfo_footer_file__multipage(empty_context, document):
 
 
 def test_docinfo_footer_file__multipage__included(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     parent = document.with_relative_path("parent.adoc")
     parent.is_root = True
     parent.include(document)
@@ -314,7 +310,7 @@ def test_docinfo_footer_file__multipage__included(empty_context, document):
 
 
 def test_docinfo_footer_file__multipage__embedded(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     parent = document.with_relative_path("parent.adoc")
     parent.is_root = True
     parent.embed(document)
@@ -327,7 +323,7 @@ def test_docinfo_footer_file__multipage__embedded(empty_context, document):
 
 
 def test_docinfo_footer_file__multipage__embedded_multiple_times(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     other_parent = document.with_relative_path("other_parent.adoc")
     other_parent.embed(document)
     parent = document.with_relative_path("parent.adoc")
@@ -443,7 +439,7 @@ def test_insert__store_stacktrace(empty_context, document):
 
 
 def test_insert__duplicate(empty_context, document):
-    empty_context.warnings_are_errors = True
+    empty_context.config.warnings_are_errors = True
 
     element = make_compound(id="cpp-my_element", name="MyElement")
     other_doc = document.with_relative_path("other_file.adoc")
@@ -604,7 +600,7 @@ def test_output_document__singlepage__root_document(empty_context, document):
 
 
 def test_output_document__multipage__root_document(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     assert empty_context.output_document is document
 
 
@@ -616,7 +612,7 @@ def test_output_document__singlepage__included_document(empty_context, document)
 
 
 def test_output_document__multipage__included_document(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     sub_doc = document.with_relative_path("sub.adoc")
     document.include(sub_doc)
     sub_context = empty_context.sub_context(sub_doc)
@@ -631,7 +627,7 @@ def test_output_document__singlepage__embedded_document(empty_context, document)
 
 
 def test_output_document__multipage__embedded_document(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     sub_doc = document.with_relative_path("sub.adoc")
     document.embed(sub_doc)
     sub_context = empty_context.sub_context(sub_doc)
@@ -650,7 +646,7 @@ def test_output_document__singlepage__multiple_embedded_document(empty_context, 
 
 
 def test_output_document__multipage__multiple_embedded_document(empty_context, document):
-    empty_context.multipage = True
+    empty_context.config.multipage = True
     other_doc = document.with_relative_path("other.adoc")
     sub_doc = document.with_relative_path("sub.adoc")
     other_doc.embed(sub_doc)
