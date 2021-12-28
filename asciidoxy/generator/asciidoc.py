@@ -638,7 +638,10 @@ class Api(ABC):
             Rendered AsciiDoc.
         """
         template = self._context.document_cache.get_document(self._context.document)
-        return template.render(api=ApiProxy(self), env=self._context.env, **self._commands())
+        return template.render(api=ApiProxy(self),
+                               env=self._context.env,
+                               config=self._context.config,
+                               **self._commands())
 
     @abstractmethod
     def process_adoc(self) -> None:

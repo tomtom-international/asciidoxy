@@ -33,6 +33,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   * For increased performence in subsequent runs, generated python code for templates and input
     documents is cached in the build directory. Use command line argument `--cache-dir` to set a 
     different location for the cache.
+  * Command-line arguments are exposed inside AsciiDoc files through the `config` object .
 
 
 === Changed

@@ -1396,6 +1396,28 @@ def test_process_adoc_custom_templates(warnings_are_errors, single_and_multipage
     assert content == expected_output_file.read_text()
 
 
+def test_process_adoc_access_config(warnings_are_errors, single_and_multipage, adoc_data,
+                                    api_reference, package_manager, update_expected_results,
+                                    doxygen_version, tmp_path, default_config):
+    input_file = adoc_data / "access_config.input.adoc"
+    adoc_data_expected_result_file(input_file, single_and_multipage, doxygen_version)
+
+    package_manager.set_input_files(input_file)
+    doc = package_manager.prepare_work_directory(input_file)
+
+    progress_mock = ProgressMock()
+    default_config.warnings_are_errors = warnings_are_errors
+    output_doc = process_adoc(doc,
+                              api_reference,
+                              package_manager,
+                              config=default_config,
+                              progress=progress_mock)[0]
+    assert output_doc.work_file.is_file()
+
+    content = output_doc.work_file.read_text()
+    assert f"Build dir: {default_config.build_dir}" in content
+
+
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 @pytest.mark.parametrize(
     "test_file_name",

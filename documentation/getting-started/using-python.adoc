@@ -245,3 +245,27 @@ ${"""
 The sum of 1, 2, 3 and 4 is ${env.my_sum(1, 2, 3, 4)}.
 """}
 ----
+
+== Accessing command line arguments
+
+All command line arguments provided to AsciiDoxy can be accessed in the AsciiDoc files through the 
+`config` object. Arguments directly supported by AsciiDoxy are available by name. The dashes (`-`) 
+are replaced by underscores (`_`). Arguments that have default values, will have these defaults 
+applied. The other arguments that are passed through to AsciiDoctor are present unmodified in 
+`config.extra`.
+
+For example the build directory passed to Asciidoxy:
+
+[source,bash]
+----
+asciidoxy --build-dir my-build-dir ...
+----
+
+Can be used inside AsciiDoc files:
+
+[source]
+----
+${"""
+${config.build_dir}
+"""}
+----
