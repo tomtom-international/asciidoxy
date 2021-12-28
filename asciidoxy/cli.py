@@ -183,6 +183,13 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                         " of the default templates shipped with AsciiDoxy. Templates found in this"
                         " directory will be used in favor of the default templates. Only when a"
                         " template is not found here, the default templates are used.")
+    parser.add_argument("--cache-dir",
+                        metavar="CACHE_DIR",
+                        default=None,
+                        type=PathArgument(new_dir=True),
+                        help="Directory for caching generated python code for templates and input"
+                        " documents. Reduces runtime for consecutive runs by skipping code"
+                        "generation for unchanged files.")
     if argv is None:
         argv = sys.argv[1:]
     args, extra_args = parser.parse_known_args(argv)
@@ -196,6 +203,10 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         destination_dir = args.destination_dir
     else:
         destination_dir = args.build_dir / "output"
+    if args.cache_dir is not None:
+        cache_dir = args.cache_dir
+    else:
+        cache_dir = args.build_dir / "cache"
     extension = output_extension(args.backend)
     if extension is None:
         logger.error(f"Backend {args.backend} is not supported.")
@@ -246,6 +257,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                                      warnings_are_errors=args.warnings_are_errors,
                                      multipage=args.multipage,
                                      custom_template_dir=args.template_dir,
+                                     cache_dir=cache_dir,
                                      progress=progress)
 
     except:  # noqa: E722

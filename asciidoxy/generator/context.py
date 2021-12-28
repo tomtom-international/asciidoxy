@@ -167,7 +167,8 @@ class Context(object):
                  reference: ApiReference,
                  package_manager: PackageManager,
                  document: Document,
-                 custom_template_dir: Optional[Path] = None):
+                 custom_template_dir: Optional[Path] = None,
+                 cache_dir: Optional[Path] = None):
         self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]})
         self.env = Environment()
 
@@ -183,7 +184,7 @@ class Context(object):
         self.documents = {document.relative_path: document}
         self.document_stack = [document]
 
-        self.templates = TemplateCache(custom_template_dir)
+        self.templates = TemplateCache(custom_template_dir, cache_dir)
 
     def insert(self, element: ReferableElement) -> None:
         """Register insertion of an element."""

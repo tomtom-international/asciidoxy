@@ -30,6 +30,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   * *Experimental.* Replace the builtin templates for generating API reference with your own
     customized versions. Provide a directory that overrides the builtin templates and allow 
     specifying a different template to use in the `insert` command.
+  * For increased performence in subsequent runs, generated python code for templates is cached in
+    the build directory. Use command line argument `--cache-dir` to set a different location for 
+    the cache.
 
 
 === Changed

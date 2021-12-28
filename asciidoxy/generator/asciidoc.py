@@ -943,6 +943,7 @@ def process_adoc(doc: Document,
                  warnings_are_errors: bool = False,
                  multipage: bool = False,
                  custom_template_dir: Optional[Path] = None,
+                 cache_dir: Optional[Path] = None,
                  progress: Optional[tqdm] = None) -> List[Document]:
     """Process an AsciiDoc file and execute all embedded python code.
 
@@ -952,6 +953,9 @@ def process_adoc(doc: Document,
         package_manager:     Reference to the package manager to get additional files from.
         warnings_are_errors: True to treat every warning as an error.
         multipage:           True to enable multi page output.
+        custom_template_dir: Directory containing custom templates to use.
+        cache_dir:           Directory for caching generated python code for templates and input
+                                 files.
         progress:            Optional progress reporting widget.
 
     Returns:
@@ -963,7 +967,8 @@ def process_adoc(doc: Document,
     context = Context(reference=api_reference,
                       package_manager=package_manager,
                       document=doc,
-                      custom_template_dir=custom_template_dir)
+                      custom_template_dir=custom_template_dir,
+                      cache_dir=cache_dir)
 
     context.warnings_are_errors = warnings_are_errors
     context.multipage = multipage

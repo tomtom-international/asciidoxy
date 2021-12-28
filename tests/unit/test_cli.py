@@ -175,6 +175,42 @@ def test_process_custom_file_template_dir(asciidoctor_mock, build_dir, spec_file
     assert output_file.is_file()
 
 
+def test_process_default_cache_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
+                                   adoc_data, event_loop):
+    in_file = adoc_data / "simple_test.input.adoc"
+
+    main([
+        str(in_file), "--spec-file",
+        str(spec_file), "--destination-dir",
+        str(destination_dir), "--build-dir",
+        str(build_dir)
+    ])
+
+    assert (build_dir / "cache" / "templates").is_dir()
+    assert (build_dir / "cache" / "templates" / "cpp" / "class.mako.py").is_file()
+
+
+def test_process_custom_cache_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
+                                  adoc_data, event_loop, tmp_path):
+    in_file = adoc_data / "simple_test.input.adoc"
+    cache_dir = tmp_path / "my-cache"
+
+    main([
+        str(in_file),
+        "--spec-file",
+        str(spec_file),
+        "--destination-dir",
+        str(destination_dir),
+        "--build-dir",
+        str(build_dir),
+        "--cache-dir",
+        str(cache_dir),
+    ])
+
+    assert (cache_dir / "templates").is_dir()
+    assert (cache_dir / "templates" / "cpp" / "class.mako.py").is_file()
+
+
 def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
                      adoc_data, event_loop, tmp_path):
     in_file = adoc_data / "simple_test.input.adoc"

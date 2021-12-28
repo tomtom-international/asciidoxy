@@ -35,11 +35,21 @@ class TemplateCache(TemplateLookup):
 
     By default file system checks for changes to source files are disabled.
     """
-    def __init__(self, custom_template_dir: Optional[Path] = None, *args, **kwargs):
+    def __init__(self,
+                 custom_template_dir: Optional[Path] = None,
+                 cache_dir: Optional[Path] = None,
+                 *args,
+                 **kwargs):
         if custom_template_dir is not None:
             kwargs["directories"] = [str(custom_template_dir)]
+        if cache_dir is not None:
+            template_cache_dir = cache_dir / "templates"
+            template_cache_dir.mkdir(parents=True, exist_ok=True)
+            kwargs["module_directory"] = str(template_cache_dir)
         if "filesystem_checks" not in kwargs:
             kwargs["filesystem_checks"] = False
+        if "input_encoding" not in kwargs:
+            kwargs["input_encoding"] = "utf-8"
 
         super().__init__(*args, **kwargs)
 
@@ -58,7 +68,11 @@ class TemplateCache(TemplateLookup):
         except TopLevelLookupException:
             source = importlib_resources.files(asciidoxy.generator.templates).joinpath(uri)
             if source.is_file():
-                template = Template(text=source.read_text(encoding="UTF-8"), lookup=self)
+                with importlib_resources.as_file(source) as source_file:
+                    template = Template(uri=uri,
+                                        filename=str(source_file),
+                                        lookup=self,
+                                        **self.template_args)
                 self.put_template(uri, template)
                 return template
             else:
