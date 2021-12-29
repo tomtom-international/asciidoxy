@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 import shutil
-
-from pathlib import Path
 from unittest.mock import patch
+
+import pytest
 
 from asciidoxy.cli import main
 
 
 @pytest.fixture
 def asciidoctor_mock():
-    with patch("asciidoxy.cli.asciidoctor") as mock:
+    with patch("asciidoxy.asciidoctor.run_ruby") as mock:
         yield mock
 
 
@@ -50,7 +49,8 @@ def simple_package(tmp_path, xml_data):
 @pytest.fixture
 def version_file(tmp_path):
     version_file = tmp_path / "versions.csv"
-    version_file.write_text("Component name,Version\n" "package,4.1.2")
+    version_file.write_text("Component name,Version\n"
+                            "package,4.1.2")
     return version_file
 
 
@@ -73,6 +73,12 @@ def destination_dir(tmp_path):
     d = tmp_path / "output"
     d.mkdir(parents=True)
     return d
+
+
+def read_asciidoctor_runner(asciidoctor_mock):
+    asciidoctor_mock.assert_called_once()
+    runner_path = asciidoctor_mock.call_args[0][0]
+    return runner_path.read_text()
 
 
 def test_no_arguments():
@@ -103,9 +109,11 @@ def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, a
     ])
 
     output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
-    asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
-                                             "html5", [], Path("images"))
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    runner = read_asciidoctor_runner(asciidoctor_mock)
+    assert f"to_file: '{output_file}'" in runner
+    assert f"convert_file '{processed_file}'" in runner
+    assert "backend: 'html5'" in runner
     assert processed_file.is_file()
 
 
@@ -126,10 +134,90 @@ def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destin
     ])
 
     output_file = destination_dir / "simple_test.input.pdf"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
-    asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
-                                             "pdf", [], Path("images"))
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    runner = read_asciidoctor_runner(asciidoctor_mock)
+    assert f"to_file: '{output_file}'" in runner
+    assert f"convert_file '{processed_file}'" in runner
+    assert "backend: 'pdf'" in runner
     assert processed_file.is_file()
+
+
+def test_process_file_backend_adoc(asciidoctor_mock, build_dir, spec_file, destination_dir,
+                                   adoc_data, event_loop):
+    in_file = adoc_data / "simple_test.input.adoc"
+
+    main([
+        str(in_file),
+        "--spec-file",
+        str(spec_file),
+        "--destination-dir",
+        str(destination_dir),
+        "--build-dir",
+        str(build_dir),
+        "--backend",
+        "adoc",
+    ])
+
+    asciidoctor_mock.assert_not_called()
+    output_file = destination_dir / "simple_test.input.adoc"
+    assert output_file.is_file()
+
+
+def test_process_custom_file_template_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
+                                          adoc_data, event_loop, tmp_path):
+    in_file = adoc_data / "custom_templates.input.adoc"
+    template_dir = tmp_path / "templates"
+    (template_dir / "cpp").mkdir(parents=True)
+    (template_dir / "cpp" / "class.mako").write_text("Custom class template")
+    (template_dir / "cpp" / "myclass.mako").write_text("My class template")
+
+    main([
+        str(in_file), "--spec-file",
+        str(spec_file), "--destination-dir",
+        str(destination_dir), "--build-dir",
+        str(build_dir), "--backend", "adoc", "--template-dir",
+        str(template_dir)
+    ])
+
+    asciidoctor_mock.assert_not_called()
+    output_file = destination_dir / "custom_templates.input.adoc"
+    assert output_file.is_file()
+
+
+def test_process_default_cache_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
+                                   adoc_data, event_loop):
+    in_file = adoc_data / "simple_test.input.adoc"
+
+    main([
+        str(in_file), "--spec-file",
+        str(spec_file), "--destination-dir",
+        str(destination_dir), "--build-dir",
+        str(build_dir)
+    ])
+
+    assert (build_dir / "cache" / "templates").is_dir()
+    assert (build_dir / "cache" / "templates" / "cpp" / "class.mako.py").is_file()
+
+
+def test_process_custom_cache_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
+                                  adoc_data, event_loop, tmp_path):
+    in_file = adoc_data / "simple_test.input.adoc"
+    cache_dir = tmp_path / "my-cache"
+
+    main([
+        str(in_file),
+        "--spec-file",
+        str(spec_file),
+        "--destination-dir",
+        str(destination_dir),
+        "--build-dir",
+        str(build_dir),
+        "--cache-dir",
+        str(cache_dir),
+    ])
+
+    assert (cache_dir / "templates").is_dir()
+    assert (cache_dir / "templates" / "cpp" / "class.mako.py").is_file()
 
 
 def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
@@ -161,28 +249,37 @@ def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, desti
     ])
 
     output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
-    asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
-                                             "html5", [], Path("images"))
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    runner = read_asciidoctor_runner(asciidoctor_mock)
+    assert f"to_file: '{output_file}'" in runner
+    assert f"convert_file '{processed_file}'" in runner
+    assert "backend: 'html5'" in runner
     assert processed_file.is_file()
 
 
-def test_forward_unknown_options(asciidoctor_mock, build_dir, spec_file, destination_dir, adoc_data,
-                                 event_loop):
+def test_forward_asciidoctor_options(asciidoctor_mock, build_dir, spec_file, destination_dir,
+                                     adoc_data, event_loop):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
         str(in_file), "--spec-file",
         str(spec_file), "--destination-dir",
         str(destination_dir), "--build-dir",
-        str(build_dir), "--verbose", "-a", "specialoption"
+        str(build_dir), "-a", "specialoption", "-a", "version=12", "-S", "server", "-d", "book",
+        "-r", "asciidoctor-diagram"
     ])
 
     output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
-    asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
-                                             "html5", ["--verbose", "-a", "specialoption"],
-                                             Path("images"))
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    runner = read_asciidoctor_runner(asciidoctor_mock)
+    assert f"to_file: '{output_file}'" in runner
+    assert f"convert_file '{processed_file}'" in runner
+    assert "backend: 'html5'" in runner
+    assert "specialoption" in runner
+    assert "version=12" in runner
+    assert "doctype: 'book'" in runner
+    assert "safe: :server" in runner
+    assert "require 'asciidoctor-diagram'\n" in runner
     assert processed_file.is_file()
 
 
@@ -211,9 +308,11 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
     ])
 
     output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.simple_test.input.adoc"
-    asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
-                                             "html5", [], Path("images"))
+    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    runner = read_asciidoctor_runner(asciidoctor_mock)
+    assert f"to_file: '{output_file}'" in runner
+    assert f"convert_file '{processed_file}'" in runner
+    assert "backend: 'html5'" in runner
     assert processed_file.is_file()
 
 
@@ -223,7 +322,9 @@ def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_
     main([str(in_file), "--destination-dir", str(destination_dir), "--build-dir", str(build_dir)])
 
     output_file = destination_dir / "no_api_reference.input.html"
-    processed_file = build_dir / "intermediate" / ".asciidoxy.no_api_reference.input.adoc"
-    asciidoctor_mock.assert_called_once_with(destination_dir, output_file, processed_file, False,
-                                             "html5", [], Path("images"))
+    processed_file = build_dir / "intermediate" / "no_api_reference.input.adoc"
+    runner = read_asciidoctor_runner(asciidoctor_mock)
+    assert f"to_file: '{output_file}'" in runner
+    assert f"convert_file '{processed_file}'" in runner
+    assert "backend: 'html5'" in runner
     assert processed_file.is_file()

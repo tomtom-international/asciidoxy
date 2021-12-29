@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,19 +14,24 @@
 """Base support for parsing documentation for different languages."""
 
 import logging
-
 import xml.etree.ElementTree as ET
-
 from abc import ABC
 from typing import Dict, List, Optional, Type
 
-from .description_parser import (parse_description, select_descriptions, Admonition,
-                                 NestedDescriptionElement, ParaContainer, ParameterItem,
-                                 ParameterList, Ref)
+from ...model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
+from .description_parser import (
+    Admonition,
+    NestedDescriptionElement,
+    ParaContainer,
+    ParameterItem,
+    ParameterList,
+    Ref,
+    parse_description,
+    select_descriptions,
+)
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits
-from .type_parser import TypeParser, TypeParseError
-from ...model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
+from .type_parser import TypeParseError, TypeParser
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ import os
 import shutil
 import subprocess
 import sys
-
 from pathlib import Path
 from subprocess import PIPE
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ server. Each package can contain XML files containing the API reference document
 other files that can be directly included in the documentation.
 """
 
-import aiohttp
 import asyncio
 import csv
 import io
@@ -26,13 +25,15 @@ import logging
 import os
 import shutil
 import tarfile
-import toml
-
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Type, TypeVar, Union
 
+import aiohttp
+import toml
 from tqdm import tqdm
+
+from ..document import Package
 
 logger = logging.getLogger(__name__)
 
@@ -77,58 +78,6 @@ class SpecificationError(Exception):
 
     def __str__(self) -> str:
         return f"Invalid specification: {self.message}"
-
-
-def path_from_toml(data: Mapping[str, Any], key: str, root: Path) -> Optional[Path]:
-    value = data.get(key, None)
-    if value is not None:
-        return root / value
-    return None
-
-
-class Package:
-    """A package that is ready to be used by AsciiDoxy.
-
-    Attributes:
-        name:           Name of the package.
-        reference_type: Type of API reference information in the package.
-        reference_dir:  Directory containing API reference information.
-        adoc_src_dir:   Directory containing AsciiDoc files and other files to include in the
-                            documentation. Image files should be separate in `adoc_image_dir`.
-        adoc_image_dir: Directory containing images to include in the documentation.
-        adoc_root_doc:  Entry point document for the package. To be linked to if no specific file
-                            in the package is mentioned.
-        scoped:         True if this is a new-style, scoped package.
-    """
-    name: str
-    reference_type: Optional[str] = None
-    reference_dir: Optional[Path] = None
-    adoc_src_dir: Optional[Path] = None
-    adoc_image_dir: Optional[Path] = None
-    adoc_root_doc: Optional[Path] = None
-    scoped: bool = False
-
-    def __init__(self, name: str):
-        self.name = name
-
-    def load_from_toml(self, pkg_root: Path, data: Mapping[str, Any]) -> None:
-        package = data.get("package", None)
-        if package is not None:
-            self.name = package.get("name", self.name)
-
-        reference = data.get("reference", None)
-        if reference is not None:
-            self.reference_type = reference.get("type", None)
-            self.reference_dir = path_from_toml(reference, "dir", pkg_root)
-
-        adoc = data.get("asciidoc", None)
-        if adoc is not None:
-            self.adoc_src_dir = path_from_toml(adoc, "src_dir", pkg_root)
-            self.adoc_image_dir = path_from_toml(adoc, "image_dir", pkg_root)
-            if self.adoc_src_dir is not None:
-                self.adoc_root_doc = path_from_toml(adoc, "root_doc", self.adoc_src_dir)
-
-        self.scoped = True
 
 
 PackageSpecT = TypeVar("PackageSpecT", bound="PackageSpec")

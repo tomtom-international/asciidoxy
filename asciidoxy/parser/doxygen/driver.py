@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,21 +14,19 @@
 """Read API reference information from Doxygen XML output."""
 
 import logging
-
 import xml.etree.ElementTree as ET
-
 from typing import List, Mapping, Optional, Set, Tuple
 
 from tqdm import tqdm
 
+from ...api_reference import AmbiguousLookupError, ApiReference
+from ...model import Compound, ReferableElement, TypeRef
 from .cpp import CppParser
 from .driver_base import DriverBase
 from .java import JavaParser
 from .objc import ObjectiveCParser
 from .parser_base import ParserBase
 from .python import PythonParser
-from ...api_reference import AmbiguousLookupError, ApiReference
-from ...model import Compound, ReferableElement, TypeRef
 
 logger = logging.getLogger(__name__)
 
@@ -156,25 +154,12 @@ class Driver(DriverBase):
 
     def resolve_reference(self, ref: TypeRef) -> Optional[ReferableElement]:
         try:
-            perfect_match = self.api_reference.find(ref.name,
-                                                    target_id=ref.id,
-                                                    lang=ref.language,
-                                                    namespace=ref.namespace)
-            if perfect_match is not None:
-                return perfect_match
+            return self.api_reference.find(ref.name,
+                                           target_id=ref.id,
+                                           lang=ref.language,
+                                           namespace=ref.namespace)
         except AmbiguousLookupError:
-            pass
-
-        partial_matches = []
-        for compound in self.api_reference.elements:
-            if compound.name and compound.full_name.endswith(f"::{ref.name}"):
-                partial_matches.append(compound)
-        if len(partial_matches) == 1:
-            return partial_matches[0]
-        elif len(partial_matches) > 1:
-            logger.debug(f"Multiple partial matches: {ref.name} ")
-
-        return None
+            return None
 
 
 def safe_language_tag(name: Optional[str]) -> str:

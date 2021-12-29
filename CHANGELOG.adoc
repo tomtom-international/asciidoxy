@@ -18,6 +18,46 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.8.1 (29 Dec 2021)
+
+
+=== Added
+
+  * Running AsciiDoctor automatically is now optional. By using `--backend adoc` the generated
+    AsciiDoc files are exported to the output directory, instead of the output of AsciiDoctor. This 
+    allows direct use of the AsciiDoc by other tools. The generated AsciiDoc is now optimized for 
+    this use case by not having any absolute paths, temporary files, and fragment files.
+  * *Experimental.* Replace the builtin templates for generating API reference with your own
+    customized versions. Provide a directory that overrides the builtin templates and allow 
+    specifying a different template to use in the `insert` command.
+  * For increased performence in subsequent runs, generated python code for templates and input
+    documents is cached in the build directory. Use command line argument `--cache-dir` to set a 
+    different location for the cache.
+  * Command-line arguments are exposed inside AsciiDoc files through the `config` object .
+
+
+=== Changed
+
+  * Embedded files, inserted with `include` and `always_embed=True`, are no longer using temporary
+    files.
+  * Linking to an embedded file from outside the file where it is embedded is now possible iff the
+    file is embedded only once. If the file is embedded multiple times it can only be linked from 
+    those files that embed it.
+  * Minimum supported python version is now 3.7. Python 3.6 is end of life.
+  * The Ruby interpreter is now started only once to process all generated AsciiDoc files. This
+    significantly decreases the time required to process a large number of pages in multipage mode.
+  * Unknown arguments are no longer passed through to AsciiDoctor. Commonly used arguments are
+    explicitly supported by AsciiDoxy now. If you need to pass additional arguments, use the `adoc` 
+    backend to generate the AsciiDoc files and manually run AsciiDoctor on the output.
+
+
+=== Fixed
+
+  * Removed unneccessary pass for partial matches when resolving references. Resolving references
+    is now almost instantaneous (on large code bases). The old pass was mostly finding incorrect 
+    matches.
+
+
 == 0.8.0 (29 Oct 2021)
 
 === Added

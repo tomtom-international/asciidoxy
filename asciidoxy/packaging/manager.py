@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 import asyncio
 import logging
 import shutil
-
 from pathlib import Path
-from tqdm import tqdm
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Union
 
+from tqdm import tqdm
+
+from ..document import Document, Package
 from ..parser.doxygen import Driver
-from .collect import CollectError, Package, collect, specs_from_file
+from .collect import CollectError, collect, specs_from_file
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +47,9 @@ class UnknownPackageError(Exception):
 
 class UnknownFileError(Exception):
     package_name: str
-    file_name: Optional[str]
+    file_name: Optional[Union[str, Path]]
 
-    def __init__(self, package_name: str, file_name: Optional[str]):
+    def __init__(self, package_name: str, file_name: Optional[Union[str, Path]]):
         self.package_name = package_name
         self.file_name = file_name
 
@@ -59,23 +60,23 @@ class UnknownFileError(Exception):
 class PackageManager:
     build_dir: Path
     work_dir: Path
-    image_work_dir: Path
     packages: Dict[str, Package]
     warnings_are_errors: bool
     copied_files: Dict[Path, Package]
     copied_dirs: Dict[Path, Package]
-
-    INPUT_FILES: str = "INPUT"
 
     def __init__(self, build_dir: Path, warnings_are_errors: bool = True):
         self.build_dir = build_dir
         self.warnings_are_errors = warnings_are_errors
 
         self.work_dir = build_dir / "intermediate"
-        self.image_work_dir = self.work_dir / "images"
         self.packages = {}
         self.copied_files = {}
         self.copied_dirs = {}
+
+    @property
+    def image_work_dir(self) -> Path:
+        return self.work_dir / "images"
 
     def set_input_files(self,
                         in_file: Path,
@@ -91,7 +92,7 @@ class PackageManager:
                             directory named `images` is present next to the `in_file`, that
                             directory is used for images. Otherwise, no images are copied.
         """
-        pkg = Package(self.INPUT_FILES)
+        pkg = Package(Package.INPUT_PACKAGE_NAME)
         pkg.adoc_src_dir = include_dir
         pkg.adoc_root_doc = in_file
         pkg.scoped = True
@@ -100,7 +101,12 @@ class PackageManager:
             pkg.adoc_image_dir = image_dir
         elif (in_file.parent / "images").is_dir():
             pkg.adoc_image_dir = in_file.parent / "images"
-        self.packages[self.INPUT_FILES] = pkg
+
+        if include_dir is None:
+            pkg.copy_adoc_src_dir = False
+            pkg.adoc_src_dir = in_file.parent
+
+        self.packages[Package.INPUT_PACKAGE_NAME] = pkg
 
     def collect(self,
                 spec_file: Path,
@@ -123,8 +129,8 @@ class PackageManager:
             progress.update(0)
 
         download_dir = self.build_dir / "download"
-        packages = asyncio.get_event_loop().run_until_complete(
-            collect(specs, download_dir, progress))
+        loop = asyncio.get_event_loop_policy().new_event_loop()
+        packages = loop.run_until_complete(collect(specs, download_dir, progress))
         self.packages.update({pkg.name: pkg for pkg in packages})
 
     def load_reference(self, parser: Driver, progress: Optional[tqdm] = None) -> None:
@@ -145,30 +151,37 @@ class PackageManager:
             if progress is not None:
                 progress.update()
 
-    def prepare_work_directory(self, in_file: Path, progress: Optional[tqdm] = None) -> Path:
+    def prepare_work_directory(self,
+                               in_file: Path,
+                               clear: bool = True,
+                               progress: Optional[tqdm] = None) -> Document:
         """Create a work directory in which the files to be processed by AsciiDoctor can be created.
 
         Args:
             in_file:  Input file that will be processed.
+            clear:    Clear the work directory if it already exists.
             progress: Optional progress reporting.
 
         Returns:
-            Location of the input file in the working directory.
+            Document to start processing.
 
         Raises:
             FileCollisionError: The same file is present in multiple packages.
         """
+        if Package.INPUT_PACKAGE_NAME not in self.packages:
+            self.set_input_files(in_file)
+
         if progress is not None:
             progress.total = len(self.packages)
             progress.update(0)
 
-        if self.work_dir.exists():
+        if clear and self.work_dir.exists():
             shutil.rmtree(self.work_dir)
 
         self.image_work_dir.mkdir(parents=True, exist_ok=True)
 
         for pkg in self.packages.values():
-            if pkg.adoc_src_dir is not None:
+            if pkg.copy_adoc_src_dir and pkg.adoc_src_dir is not None:
                 self._copy_dir_contents(pkg.adoc_src_dir, self.work_dir, pkg)
             elif pkg.adoc_root_doc is not None:
                 shutil.copy2(pkg.adoc_root_doc, self.work_dir)
@@ -177,7 +190,7 @@ class PackageManager:
             if progress is not None:
                 progress.update()
 
-        return self.work_dir / in_file.name
+        return self.make_document(Package.INPUT_PACKAGE_NAME, in_file.name)
 
     def make_image_directory(self, parent: Path, progress: Optional[tqdm] = None) -> None:
         """Create an `images` directory in the specified path.
@@ -203,51 +216,10 @@ class PackageManager:
             if progress is not None:
                 progress.update()
 
-    def file_in_work_directory(self, package_name: str, file_name: Optional[str]) -> Path:
-        """Get the absolute path to a file in the work directory.
-
-        Args:
-            package_name: Package the file is in.
-            file_name:    Name of the file in the package. None or empty to use the default file for
-                              the package.
-
-        Returns:
-            Absolute path to the file.
-
-        Raises:
-            UnknownPackageError: There is no package with that name.
-            UnknownFileError:    The package does not contain a file with that name, or does not
-                                     have a default file.
-        """
-        pkg = self.packages.get(package_name, None)
-        if pkg is None:
-            raise UnknownPackageError(package_name)
-
-        if file_name is not None and pkg.name == self.INPUT_FILES and pkg.adoc_src_dir is None:
-            return self.work_dir / file_name
-
-        if pkg.adoc_src_dir is None:
-            raise UnknownFileError(package_name, file_name)
-
-        if file_name:
-            src_file = pkg.adoc_src_dir / file_name
-            work_file = self.work_dir / file_name
-        else:
-            if pkg.adoc_root_doc is None:
-                raise UnknownFileError(package_name, file_name)
-            src_file = pkg.adoc_root_doc
-            work_file = self.work_dir / src_file.relative_to(pkg.adoc_src_dir)
-
-        if not src_file.is_file():
-            raise UnknownFileError(package_name, file_name)
-
-        assert work_file.is_file()
-        return work_file
-
     def input_package(self) -> Package:
         """Get the meta-package representing the input and include files."""
-        assert self.INPUT_FILES in self.packages
-        return self.packages[self.INPUT_FILES]
+        assert Package.INPUT_PACKAGE_NAME in self.packages
+        return self.packages[Package.INPUT_PACKAGE_NAME]
 
     def find_original_file(self,
                            work_file: Path,
@@ -263,13 +235,51 @@ class PackageManager:
         input_pkg = self.input_package()
         assert input_pkg.adoc_root_doc is not None
         if input_pkg.adoc_src_dir is None and work_file.name == input_pkg.adoc_root_doc.name:
-            return self.INPUT_FILES, Path(work_file.name)
+            return Package.INPUT_PACKAGE_NAME, Path(work_file.name)
 
         for pkg in self.packages.values():
             if pkg.adoc_src_dir is not None and (pkg.adoc_src_dir / rel_path).is_file():
                 return pkg.name, rel_path
 
         assert False, "Cannot locate original file"
+
+    def make_document(self,
+                      package_name: Optional[str] = None,
+                      file_name: Optional[Union[str, Path]] = None) -> Document:
+        """Get a document from a package.
+
+        Args:
+            package_name: Name of the containing package. Empty to look in input files.
+            file_name:    File name of the document. Empty to use the package default file.
+
+        Returns:
+            A valid document.
+
+        Raises:
+            UnknownPackageError
+            UnknownFileError
+        """
+        if not package_name:
+            package_name = Package.INPUT_PACKAGE_NAME
+
+        pkg = self.packages.get(package_name, None)
+        if pkg is None:
+            raise UnknownPackageError(package_name)
+
+        if file_name:
+            file_path = Path(file_name)
+        else:
+            if pkg.adoc_root_doc is None or pkg.adoc_src_dir is None:
+                # TODO: More specific error about missing default document
+                raise UnknownFileError(package_name, file_name)
+            file_path = pkg.adoc_root_doc.relative_to(pkg.adoc_src_dir)
+
+        doc = Document(file_path, pkg, self.work_dir)
+
+        if not doc.original_file.is_file():
+            raise UnknownFileError(package_name, file_name)
+
+        return doc
 
     def _warning_or_error(self, error: Exception):
         if self.warnings_are_errors:

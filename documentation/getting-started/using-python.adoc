@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+// Copyright (C) 2019, TomTom (http://tomtom.com).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ is important to understand how to include python code in you AsciiDoc files.
 :sectnums:
 == Basic syntax
 
-AsciiDoxy uses https://www.makotemplates.org/[Make templates] to combine python and AsciiDoc in a
+AsciiDoxy uses https://www.makotemplates.org/[Mako templates] to combine python and AsciiDoc in a
 single file. It supports all syntax supported by Mako.
 
 The construct `${"${}"}` can be used to execute python code and insert the result in its place.
@@ -243,5 +243,29 @@ ${include("sub.adoc")}
 ----
 ${"""
 The sum of 1, 2, 3 and 4 is ${env.my_sum(1, 2, 3, 4)}.
+"""}
+----
+
+== Accessing command line arguments
+
+All command line arguments provided to AsciiDoxy can be accessed in the AsciiDoc files through the 
+`config` object. Arguments directly supported by AsciiDoxy are available by name. The dashes (`-`) 
+are replaced by underscores (`_`). Arguments that have default values, will have these defaults 
+applied. The other arguments that are passed through to AsciiDoctor are present unmodified in 
+`config.extra`.
+
+For example the build directory passed to Asciidoxy:
+
+[source,bash]
+----
+asciidoxy --build-dir my-build-dir ...
+----
+
+Can be used inside AsciiDoc files:
+
+[source]
+----
+${"""
+${config.build_dir}
 """}
 ----

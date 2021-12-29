@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 import collections
 import re
 import sys
-
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Generator, List, Mapping, Optional, Pattern, Sequence, Type, TypeVar, Union

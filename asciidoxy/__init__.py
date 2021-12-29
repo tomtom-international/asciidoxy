@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,15 @@
 # limitations under the License.
 """Top-level package for AsciiDoxy."""
 
-from ._version import (__title__, __description__, __url__, __version__, __author__,
-                       __author_email__, __license__)
+from ._version import (
+    __author__,
+    __author_email__,
+    __description__,
+    __license__,
+    __title__,
+    __url__,
+    __version__,
+)
 
 __all__ = [
     "__title__", "__description__", "__url__", "__version__", "__author__", "__author_email__",

@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 import importlib
 import os
 import pkgutil
-
 from abc import ABC
 from typing import Callable, Mapping, Optional, Tuple, Type, TypeVar, Union
 

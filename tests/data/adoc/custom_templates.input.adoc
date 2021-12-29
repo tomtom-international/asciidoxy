@@ -1,0 +1,7 @@
+= Test document
+
+The class reference:
+
+${insert("asciidoxy::geometry::Coordinate")}
+
+${insert("asciidoxy::geometry::InvalidCoordinate", template="myclass")}

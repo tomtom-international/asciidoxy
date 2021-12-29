@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
 """Parse brief and detailed descriptions from Doxygen XML."""
 
 import logging
-
 import xml.etree.ElementTree as ET
-
 from abc import ABC, abstractmethod
 from typing import Iterator, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
@@ -1053,7 +1051,7 @@ class Table(NestedDescriptionElement):
         return f"{caption}{options}\n{separator}===\n\n{rows}\n\n{separator}==="
 
     def __repr__(self) -> str:
-        return (f"{self.__class__.__name__}: cols={self.cols}, " f"{self.caption}")
+        return f"{self.__class__.__name__}: cols={self.cols}, {self.caption}"
 
     @classmethod
     def from_xml(cls, xml_element: ET.Element, language_tag: str) -> "Table":

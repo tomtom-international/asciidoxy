@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+// Copyright (C) 2019, TomTom (http://tomtom.com).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ ${include("../_header.adoc", always_embed=True, leveloffset=None)}
 
 To run AsciiDoxy you need at least:
 
-- https://www.python.org/[python 3.6, 3.7, 3.8, 3.9, or 3.10]
+- https://www.python.org/[python 3.7, 3.8, 3.9, or 3.10]
 - https://asciidoctor.org/[AsciiDoctor]
 
 To extract documentation from source code you need:
@@ -25,6 +25,6 @@ To extract documentation from source code you need:
 
 AsciiDoxy has been tested with:
 
-- python: 3.6, 3.7, 3.8, 3.9, 3.10
+- python: 3.7, 3.8, 3.9, 3.10
 - AsciiDoctor: 2.0.10
 - Doxygen: 1.8.16, 1.8.18, 1.8.20, 1.9.1, 1.9.2

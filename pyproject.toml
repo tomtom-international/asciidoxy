@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+# Empty section required as of mypy 0.800;
+# see https://github.com/python/mypy/issues/9940
+
+[[tool.mypy.overrides]]
+module = [
+    "mako.exceptions.*",
+    "mako.lookup.*",
+    "mako.template.*",
+    "tqdm.*",
+    "xml.dom.*",
+    "xml.dom.minidom.*",
+    "importlib_resources.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+junit_family = "legacy"
+
+[tool.isort]
+profile = "hug"
+src_paths = [
+    "asciidoxy",
+    "tests"
+]

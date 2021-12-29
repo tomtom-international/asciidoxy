@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,20 @@
 """Test test functionality for partial model comparison."""
 
 from asciidoxy.model import Compound, Parameter
-from .matchers import (AtLeast, HasNot, IsEmpty, IsFalse, IsNone, IsNotEmpty, IsTrue, PartialModel,
-                       SizeIs, Unordered, m_compound)
+
+from .matchers import (
+    AtLeast,
+    HasNot,
+    IsEmpty,
+    IsFalse,
+    IsNone,
+    IsNotEmpty,
+    IsTrue,
+    PartialModel,
+    SizeIs,
+    Unordered,
+    m_compound,
+)
 
 
 def test_match_only_specified_attributes():

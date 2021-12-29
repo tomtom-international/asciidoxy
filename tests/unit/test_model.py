@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,14 @@
 Tests for the `asciidoxy.model` module.
 """
 
-from asciidoxy.model import (Compound, Parameter, ReferableElement, ReturnValue, ThrowsClause,
-                             TypeRef)
+from asciidoxy.model import (
+    Compound,
+    Parameter,
+    ReferableElement,
+    ReturnValue,
+    ThrowsClause,
+    TypeRef,
+)
 
 
 def test_minimal_constructed_repr():

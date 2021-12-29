@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
 """Parsing of types from strings and XML."""
 
 import logging
-
 import xml.etree.ElementTree as ET
-
 from typing import Iterator, List, Optional, Sequence, Tuple, Type
 
+from ...model import Parameter, TypeRef
 from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenCategory
-from ...model import Parameter, TypeRef
 
 logger = logging.getLogger(__name__)
 

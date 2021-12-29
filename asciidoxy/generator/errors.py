@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 
 from typing import List, Optional
 
-from ..model import Compound, ReferableElement
 from .._version import __version__
+from ..model import Compound, ReferableElement
 
 
 class AsciiDocError(Exception):

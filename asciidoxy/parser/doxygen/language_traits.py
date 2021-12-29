@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 """Traits describing how to parse different languages."""
 
 import logging
-
 from abc import ABC
 from enum import Enum, auto
 from typing import Mapping, Optional, Sequence, Tuple

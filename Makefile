@@ -99,8 +99,7 @@ release: dist ## package and upload a release
 	twine upload dist/*
 
 dist: clean ## builds source and wheel package
-	python3 setup.py sdist
-	python3 setup.py bdist_wheel
+	python3 -m build
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
@@ -117,6 +116,7 @@ docker: dist ## build the docker image
 
 format: ## format the code
 	yapf -r -i -p setup.py asciidoxy tests/unit
+	isort .
 
 docs: doxygen ## generate documentation
 	cd documentation && $(MAKE)
@@ -151,7 +151,8 @@ visual-test-$(notdir $(basename $(1))): $(1)
 		--spec-file $(patsubst %.adoc,%.toml,$(1)) \
 		--warnings-are-errors \
 		--debug \
-		--require asciidoctor-diagram
+		--require asciidoctor-diagram \
+		--failure-level ERROR
 	mv $(VISUAL_TEST_CASE_BUILD_DIR)/debug.json $(VISUAL_TEST_CASE_BUILD_DIR)/$(notdir $(basename $(1))).debug.json
 
 ALL_VISUAL_TEST_CASES := $$(ALL_VISUAL_TEST_CASES) visual-test-$(notdir $(basename $(1)))

@@ -1,0 +1,3 @@
+= Test document
+
+Build dir: ${config.build_dir}

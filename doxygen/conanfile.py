@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from conans import ConanFile
-
 import os
+
+from conans import ConanFile
 
 
 class DoxygenConan(ConanFile):

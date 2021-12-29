@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 
 from typing import List, Optional, Tuple, Union
 
-from .base import TranscoderBase
 from ..model import Compound, Parameter, ReferableElement, TypeRef
+from .base import TranscoderBase
 
 # https://kotlinlang.org/docs/reference/java-interop.html#mapped-types
 _MAPPED_TYPES = {

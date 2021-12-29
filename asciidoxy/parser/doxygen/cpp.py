@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,15 +15,13 @@
 
 import re
 import string
-
 import xml.etree.ElementTree as ET
-
 from typing import List, Optional
 
+from ...model import Compound, Parameter
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
 from .type_parser import Token, TypeParser, find_tokens
-from ...model import Compound, Parameter
 
 
 class CppTraits(LanguageTraits):

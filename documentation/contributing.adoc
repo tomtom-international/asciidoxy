@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+// Copyright (C) 2019, TomTom (http://tomtom.com).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ website is generated from the `master` branch manually.
 
 == Development environment
 
-AsciiDoxy is developed in python 3.6. For development it is recommended to set up a virtual
+AsciiDoxy is developed for python 3.7 and up. For development it is recommended to set up a virtual
 environment with all dependencies. Use the following commands to quickly set up the entire
 environment:
 

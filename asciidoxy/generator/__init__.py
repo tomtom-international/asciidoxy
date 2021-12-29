@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 """Modules for generating AsciiDoc output as part of the preprocessing."""
 
-from .asciidoc import process_adoc, Context
+from .asciidoc import Context, process_adoc
 from .errors import AsciiDocError
 from .filters import InsertionFilter
 

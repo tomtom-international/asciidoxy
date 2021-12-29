@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 
 import copy
 import logging
-import uuid
-
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, MutableMapping, NamedTuple, Optional, Tuple
@@ -24,12 +22,13 @@ from typing import Dict, List, MutableMapping, NamedTuple, Optional, Tuple
 from tqdm import tqdm
 
 from ..api_reference import ApiReference
+from ..config import Configuration
+from ..document import Document, Package
 from ..model import ReferableElement
-from ..packaging import Package, PackageManager
-from ..path_utils import relative_path
+from ..packaging import PackageManager, UnknownFileError
+from .cache import DocumentCache, TemplateCache
 from .errors import ConsistencyError, DuplicateAnchorError, UnknownAnchorError
 from .filters import InsertionFilter
-from .navigation import DocumentTreeNode
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +91,7 @@ def stacktrace(trace: List[StackFrame], prefix: str = "") -> str:
     if not trace[0].internal:
         lines.append(f"{prefix}Commands in input files:")
     while trace and not trace[0].internal:
-        if trace[0].package and trace[0].package != "INPUT":
+        if trace[0].package and trace[0].package != Package.INPUT_PACKAGE_NAME:
             pkg = f"{trace[0].package}:/"
         else:
             pkg = ""
@@ -108,58 +107,64 @@ def stacktrace(trace: List[StackFrame], prefix: str = "") -> str:
     return "\n".join(lines)
 
 
+class AnchorData(NamedTuple):
+    """Data for inserted anchors."""
+    document: Document
+    link_text: Optional[str]
+
+
+class InsertData(NamedTuple):
+    """Data for tracking inserted elements."""
+    document: Document
+    stacktrace: List[StackFrame]
+
+
 class Context(object):
     """Contextual information about the document being generated.
 
     This information is meant to be shared with all included documents as well.
 
     Attributes:
-        base_dir:           Base directory from which the documentation is generated. Relative
-                                paths are relative to the base directory.
-        namespace:          Current namespace to use when looking up references.
-        language:           Default language to use when looking up references.
-        insert_filter:      Filter used to select members of elements to insert.
-        env:                Environment variables to share with subdocuments.
-        warnings_are_errors:True to treat every warning as an error.
-        multipage:          True when multi page output is enabled.
-        reference:          API reference information.
-        linked:             All elements to which links are inserted in the documentation.
-        inserted:           All elements that have been inserted in the documentation.
-        anchors:            Mapping from flexible anchors to the containing files.
-        in_to_out_file_map: Mapping from input files for AsciiDoctor to the resulting output files.
-        current_document:   Node in the Document Tree that is currently being processed.
-        current_package:    Package containing the current files.
-        call_stack:         Stack of actions resulting in the current action.
+        namespace:             Current namespace to use when looking up references.
+        language:              Default language to use when looking up references.
+        insert_filter:         Filter used to select members of elements to insert.
+        env:                   Environment variables to share with subdocuments.
+        reference:             API reference information.
+        linked:                All elements to which links are inserted in the documentation.
+        inserted:              All elements that have been inserted in the documentation.
+        anchors:               Mapping from flexible anchors to the containing files.
+        call_stack:            Stack of actions resulting in the current action.
+        document:              Current document being processed.
+        documents:             All known documents.
+        document_stack:        Stack of documents containing/including the current document.
+        config:                The configuration deduced from the command line arguments.
     """
-    base_dir: Path
-
     namespace: Optional[str] = None
     language: Optional[str] = None
     source_language: Optional[str] = None
     insert_filter: InsertionFilter
     env: Environment
 
-    warnings_are_errors: bool = False
-    multipage: bool = False
-    embedded: bool = False
-
     reference: ApiReference
     package_manager: PackageManager
     progress: Optional[tqdm] = None
 
     linked: Dict[str, List[List[StackFrame]]]
-    inserted: MutableMapping[str, Tuple[Path, List[StackFrame]]]
-    anchors: Dict[str, Tuple[Path, Optional[str]]]
-    in_to_out_file_map: Dict[Path, Path]
-    embedded_file_map: Dict[Tuple[Path, Path], Path]
-    current_document: DocumentTreeNode
-    current_package: Package
+    inserted: MutableMapping[str, InsertData]
+    anchors: Dict[str, AnchorData]
     call_stack: List[StackFrame]
 
-    def __init__(self, base_dir: Path, reference: ApiReference, package_manager: PackageManager,
-                 current_document: DocumentTreeNode, current_package: Package):
-        self.base_dir = base_dir
+    document: Document
+    documents: Dict[Path, Document]
+    document_stack: List[Document]
 
+    templates: TemplateCache
+    document_cache: DocumentCache
+
+    config: Configuration
+
+    def __init__(self, reference: ApiReference, package_manager: PackageManager, document: Document,
+                 config: Configuration):
         self.insert_filter = InsertionFilter(members={"prot": ["+public", "+protected"]})
         self.env = Environment()
 
@@ -169,160 +174,189 @@ class Context(object):
         self.linked = defaultdict(list)
         self.inserted = {}
         self.anchors = {}
-        self.in_to_out_file_map = {}
-        self.embedded_file_map = {}
-        self.current_document = current_document
-        self.current_package = current_package
+        self.document = document
         self.call_stack = []
 
+        self.documents = {document.relative_path: document}
+        self.document_stack = [document]
+
+        self.templates = TemplateCache(config.template_dir, config.cache_dir)
+        self.document_cache = DocumentCache(config.cache_dir)
+
+        self.config = config
+
     def insert(self, element: ReferableElement) -> None:
+        """Register insertion of an element."""
         assert element.id
         if element.id in self.inserted:
-            _, trace = self.inserted[element.id]
+            trace = self.inserted[element.id].stacktrace
             msg = (f"Duplicate insertion of {element.name}.\nTrying to insert at:\n"
                    f"{stacktrace(self.call_stack, prefix='  ')}\nPreviously inserted at:\n"
                    f"{stacktrace(trace, prefix='  ')}")
-            if self.warnings_are_errors:
+            if self.config.warnings_are_errors:
                 raise ConsistencyError(msg)
             else:
                 logger.warning(msg)
-        self.inserted[element.id] = (self.current_document.in_file, self.call_stack[:])
+        self.inserted[element.id] = InsertData(self.document, self.call_stack[:])
 
-    def sub_context(self) -> "Context":
-        sub = Context(base_dir=self.base_dir,
-                      reference=self.reference,
+    def sub_context(self, document: Document) -> "Context":
+        """Create a new sub context to process `document`."""
+        sub = Context(reference=self.reference,
                       package_manager=self.package_manager,
-                      current_document=self.current_document,
-                      current_package=self.current_package)
+                      document=document,
+                      config=self.config)
 
         # Copies
         sub.namespace = self.namespace
         sub.language = self.language
         sub.source_language = self.source_language
-        sub.warnings_are_errors = self.warnings_are_errors
-        sub.multipage = self.multipage
-        sub.embedded = self.embedded
         sub.env = copy.copy(self.env)
         sub.insert_filter = copy.deepcopy(self.insert_filter)
+        sub.document_stack = self.document_stack[:]
+        sub.document_stack.append(document)
 
         # References
         sub.linked = self.linked
         sub.inserted = self.inserted
         sub.anchors = self.anchors
-        sub.in_to_out_file_map = self.in_to_out_file_map
-        sub.embedded_file_map = self.embedded_file_map
         sub.progress = self.progress
         sub.call_stack = self.call_stack
+        sub.documents = self.documents
+        sub.templates = self.templates
+        sub.document_cache = self.document_cache
 
         return sub
 
-    def file_with_element(self, element_id: str) -> Optional[Path]:
-        if not self.multipage or element_id not in self.inserted:
+    def file_with_element(self, element_id: str) -> Optional[Document]:
+        """Find the file containing given element.
+
+        Returns:
+            The document containing the element or None if the element is not inserted anywhere.
+        """
+        if not self.config.multipage or element_id not in self.inserted:
             return None
 
-        containing_file = self.inserted[element_id][0]
-        assert containing_file is not None
-        if self.current_document.in_file != containing_file:
-            return containing_file
+        containing_doc = self.inserted[element_id].document
+        assert containing_doc is not None
+        if self.document is not containing_doc:
+            return containing_doc
         else:
             return None
 
     def link_to_element(self, element_id: str) -> None:
+        """Register a link to an element."""
         self.linked[element_id].append(self.call_stack[:])
 
-    def register_adoc_file(self, in_file: Path) -> Path:
-        assert in_file.is_absolute()
-        if self.embedded:
-            out_file = self.embedded_file_map.get((in_file, self.current_document.in_file), None)
+    def find_document(self, package_name: Optional[str], rel_path: Optional[Path]) -> Document:
+        """Find a document if it exists.
+
+        Args:
+            package_name: Name of the package containing the file. Empty to look in the input files.
+            rel_path:     Relative path to the file. Empty to take the default file, if present.
+
+        Raises:
+            UnknownPackageError: There is no package with name `package_name`.
+            UnknownFileError:    The file does not exist, or the package does not have a default
+                                     file.
+        """
+        assert package_name or rel_path
+
+        if rel_path is None:
+            default_doc = self.package_manager.make_document(package_name)
+            known_doc = self.documents.get(default_doc.relative_path)
+            if known_doc is None:
+                self.documents[default_doc.relative_path] = default_doc
+                return default_doc
+            return known_doc
+
         else:
-            out_file = self.in_to_out_file_map.get(in_file, None)
 
-        if out_file is None:
-            if self.embedded:
-                out_file = _embedded_out_file_name(in_file)
-                self.embedded_file_map[(in_file, self.current_document.in_file)] = out_file
-            else:
-                out_file = _out_file_name(in_file)
-                self.in_to_out_file_map[in_file] = out_file
+            known_doc = self.documents.get(rel_path)
+            if known_doc is None:
+                doc = self.package_manager.make_document(package_name, rel_path)
+                self.documents[doc.relative_path] = doc
+                return doc
+            elif package_name and known_doc.package.name != package_name:
+                raise UnknownFileError(package_name, str(rel_path))
+            return known_doc
 
-        return out_file
-
-    def link_to_adoc_file(self, file_name: Path) -> Path:
-        """Determine the correct path to link to a file.
+    def link_to_document(self, document: Document) -> Path:
+        """Determine the correct path to link to a document.
 
         The exact path differs for single and multipage mode and whether a file is embedded or not.
         AsciiDoctor processes links in included files as if they are originating from the top level
         file.
         """
-        assert file_name.is_absolute()
+        if not document.is_embedded:
+            # File is not embedded, link to original file name
+            return self.output_document.relative_path_to(document)
 
-        if self.multipage:
-            embedded_file = self.embedded_file_map.get((file_name, self.current_document.in_file))
-            if embedded_file is not None:
-                # File is embedded in the current document, link to generated embedded file
-                return relative_path(self.current_document.in_file, embedded_file)
-            else:
-                # File is not embedded, link to original file name
-                return relative_path(self.current_document.in_file, file_name)
+        elif len(document.embedded_in) == 1:
+            # File is only embedded in one file, link to that file
+            return self.output_document.relative_path_to(document.find_embedder())
+
+        elif document.is_embedded_in(self.document):
+            # File is embedded multiple time, can only link if it is embedded in the
+            # current document
+            return Path(self.document.relative_path.name)
 
         else:
-            # In singlepage mode all links need to be relative to the root file
-            embedded_file = self.embedded_file_map.get((file_name, self.current_document.in_file))
-            if embedded_file is not None:
-                # File is embedded in the current document, link to generated embedded file
-                return relative_path(self.current_document.root().in_file, embedded_file)
-
-            out_file = self.in_to_out_file_map.get(file_name, None)
-            if out_file is not None:
-                # File has been processed, and as we are in single page mode, it is embedded as
-                # well
-                return relative_path(self.current_document.root().in_file, out_file)
-
-            else:
-                # File is not processed, create relative link from current top level document
-                return relative_path(self.current_document.root().in_file, file_name)
+            raise ConsistencyError(f"Cannot resolve link to embedded file {document}: The same file"
+                                   " is embedded multiple times. Either embed the file"
+                                   " in only one file, or only link to it from the"
+                                   " files it is embedded in.")
 
     def docinfo_footer_file(self) -> Path:
-        if self.multipage:
-            in_file = self.current_document.in_file
-        else:
-            in_file = self.current_document.root().in_file
+        """Path to the optional file containing a docinfo footer."""
+        return self.output_document.docinfo_footer_file
 
-        out_file = self.in_to_out_file_map.get(in_file, None)
-        if out_file is None:
-            out_file = _out_file_name(in_file)
+    def register_anchor(self, name: str, link_text: Optional[str]) -> None:
+        """Register insertion of a flexible, global anchor.
 
-        return _docinfo_footer_file_name(out_file)
-
-    def register_anchor(self, name: str, link_text: Optional[str], file_name: Path) -> None:
+        Raises:
+            DuplicateAnchorError: There is already an anchor with the same name.
+        """
         if name in self.anchors:
             raise DuplicateAnchorError(name)
-        self.anchors[name] = file_name, link_text
+        self.anchors[name] = AnchorData(self.document, link_text)
 
     def link_to_anchor(self, name: str) -> Tuple[Path, Optional[str]]:
-        file_name, link_text = self.anchors.get(name, (None, None))
-        if file_name is None:
+        """Get the path and optionally the link text for a flexible, global anchor.
+
+        Raises:
+            UnknownAnchorError: There is no anchor with given name.
+        """
+        anchor = self.anchors.get(name)
+        if anchor is None:
             raise UnknownAnchorError(name)
-        return self.link_to_adoc_file(file_name), link_text
+        return self.link_to_document(anchor.document), anchor.link_text
 
     def push_stack(self,
                    command: str,
-                   file: Optional[Path] = None,
+                   document: Optional[Document] = None,
                    package: Optional[str] = None,
                    internal: bool = False) -> None:
-        self.call_stack.append(StackFrame(command, file, package, internal))
+        """Push a command to the stack for error reporting."""
+        self.call_stack.append(
+            StackFrame(command, document.relative_path if document else None, package, internal))
 
     def pop_stack(self) -> None:
+        """Pop a command from the stack for error reporting."""
         self.call_stack.pop(-1)
 
-
-def _out_file_name(in_file: Path) -> Path:
-    return in_file.parent / f".asciidoxy.{in_file.name}"
-
-
-def _embedded_out_file_name(in_file: Path) -> Path:
-    return in_file.parent / f".asciidoxy.{uuid.uuid4()}.{in_file.name}"
-
-
-def _docinfo_footer_file_name(out_file: Path) -> Path:
-    return out_file.parent / f"{out_file.stem}-docinfo-footer.html"
+    @property
+    def output_document(self):
+        """Generated output document that should be used as a base for resolving relative paths."""
+        if self.config.multipage:
+            # In multipage mode all links are relative to the generated page
+            if self.document.is_embedded:
+                for doc in reversed(self.document_stack):
+                    if not doc.is_embedded:
+                        return doc
+                else:
+                    return self.document_stack[0]
+            else:
+                return self.document
+        else:
+            # In singlepage mode all links need to be relative to the root file
+            return self.document.root()

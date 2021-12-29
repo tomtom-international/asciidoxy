@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 __title__ = "asciidoxy"
 __description__ = "AsciiDoxy generates API documentation from Doxygen XML output to AsciiDoc."
 __url__ = "https://asciidoxy.org"
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 __author__ = "Rob van der Most"
 __author_email__ = "Rob.vanderMost@TomTom.com"
 __license__ = "Apache 2.0"
