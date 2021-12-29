@@ -15,8 +15,6 @@
 
 import json
 import logging
-import platform
-import subprocess
 import sys
 from pathlib import Path
 from typing import List, Optional, Sequence
@@ -26,46 +24,17 @@ from tqdm import tqdm
 
 from ._version import __version__
 from .api_reference import ApiReference
+from .asciidoctor import convert_documents
 from .config import parse_args
 from .generator import process_adoc
 from .model import json_repr
 from .packaging import CollectError, PackageManager, SpecificationError
 from .parser.doxygen import Driver as DoxygenDriver
-from .path_utils import relative_path
 
 
 def error(*args, **kwargs) -> None:
     kwargs["file"] = sys.stderr
     print(*args, **kwargs)
-
-
-def asciidoctor(destination_dir: Path, out_file: Path, processed_file: Path, multipage: bool,
-                backend: str, extra_args: Sequence[str], image_dir: Path) -> None:
-    args = [
-        "asciidoctor",
-        "-D",
-        str(destination_dir),
-        "-o",
-        str(out_file),
-        "-b",
-        backend,
-        "-a",
-        f"imagesdir@={image_dir}",
-        str(processed_file),
-    ]
-    if multipage:
-        args += ["-a", "multipage"]
-    if extra_args:
-        args += extra_args
-
-    if platform.system() == "Windows":
-        subprocess.run(args, shell=True, check=True)
-    else:
-        subprocess.run(" ".join(args), shell=True, check=True)
-
-
-def output_extension(backend: str) -> Optional[str]:
-    return {"html5": ".html", "pdf": ".pdf", "adoc": ".adoc"}.get(backend)
 
 
 def main(argv: Optional[Sequence[str]] = None) -> None:
@@ -84,11 +53,6 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
 
     logger = logging.getLogger(__name__)
-
-    extension = output_extension(config.backend)
-    if extension is None:
-        logger.error(f"Backend {config.backend} is not supported.")
-        sys.exit(1)
 
     pkg_mgr = PackageManager(config.build_dir, config.warnings_are_errors)
     if config.spec_file is not None:
@@ -136,17 +100,10 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         sys.exit(1)
 
     if config.backend != "adoc":
-        for doc in tqdm(documents, desc="Running asciidoctor     ", unit="doc"):
-            if config.multipage and doc.is_embedded:
-                continue
-            if not config.multipage and not doc.is_root:
-                continue
-
-            out_file = config.destination_dir / doc.relative_path.with_suffix(extension)
-            rel_image_dir = relative_path(doc.work_file, pkg_mgr.image_work_dir)
-            asciidoctor(config.destination_dir, out_file, doc.work_file, config.multipage,
-                        config.backend, config.extra, rel_image_dir)
-            logger.info(f"Generated: {out_file}")
+        logger.info("Running AsciiDoctor...")
+        convert_documents(documents, config, pkg_mgr)
+    else:
+        logger.info("Skipping AsciiDoctor")
 
     if config.backend != "pdf":
         with tqdm(desc="Copying images          ", unit="pkg") as progress:

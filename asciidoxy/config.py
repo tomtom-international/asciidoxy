@@ -76,94 +76,149 @@ class Configuration(argparse.Namespace):
     force_language: Optional[str] = None
     multipage: bool
 
-    extra: List[str]
+    safe_mode: str
+    attribute: List[str]
+    doctype: Optional[str]
+    require: List[str]
 
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(description="Generate API documentation using AsciiDoctor",
                                      allow_abbrev=False)
-    parser.add_argument("input_file",
-                        metavar="INPUT_FILE",
-                        type=PathArgument(existing_file=True),
-                        help="Input AsciiDoc file.")
-    parser.add_argument("-B",
-                        "--base-dir",
-                        metavar="BASE_DIR",
-                        default=None,
-                        type=PathArgument(existing_dir=True),
-                        help="Base directory containing the document and resources. If no base"
-                        " directory is specified, local include files cannot be found.")
-    parser.add_argument("--image-dir",
-                        metavar="IMAGE_DIR",
-                        default=None,
-                        type=PathArgument(existing_dir=True),
-                        help="Directory containing images to include. If no image directory is"
-                        " specified, only images in the `images` directory next to the input file"
-                        " can be included.")
-    parser.add_argument("-b",
-                        "--backend",
-                        metavar="BACKEND",
-                        default="html5",
-                        help="Set output backend format used by AsciiDoctor. Use special backend"
-                        " `adoc` to produce AsciiDoc files only and not run AsciiDoctor on it.")
-    parser.add_argument("--build-dir",
-                        metavar="BUILD_DIR",
-                        default="build",
-                        type=PathArgument(new_dir=True),
-                        help="Build directory.")
-    parser.add_argument("-D",
-                        "--destination-dir",
-                        metavar="DESTINATION_DIR",
-                        default=None,
-                        type=PathArgument(new_dir=True),
-                        help="Destination for generated documentation.")
-    parser.add_argument("-s",
-                        "--spec-file",
-                        metavar="SPEC_FILE",
-                        default=None,
-                        type=PathArgument(existing_file=True),
-                        help="Package specification file.")
-    parser.add_argument("-v",
-                        "--version-file",
-                        metavar="VERSION_FILE",
-                        default=None,
-                        type=PathArgument(existing_file=True),
-                        help="Version specification file.")
-    parser.add_argument("-W",
-                        "--warnings-are-errors",
-                        action="store_true",
-                        help="Stop processing input files when a warning is encountered.")
-    parser.add_argument("--debug", action="store_true", help="Store debug information.")
-    parser.add_argument("--log",
-                        metavar="LOG_LEVEL",
-                        default="WARNING",
-                        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-                        help="Set the log level.")
-    parser.add_argument("--force-language",
-                        metavar="LANGUAGE",
-                        help="Force language used when parsing doxygen XML files. Ignores the"
-                        " language specified in the XML files.")
-    parser.add_argument("--multipage", action="store_true", help="Generate multi-page document.")
-    parser.add_argument("--template-dir",
-                        metavar="TEMPLATE_DIR",
-                        default=None,
-                        type=PathArgument(existing_dir=True),
-                        help="*Experimental* Directory containing custom templates to use instead"
-                        " of the default templates shipped with AsciiDoxy. Templates found in this"
-                        " directory will be used in favor of the default templates. Only when a"
-                        " template is not found here, the default templates are used.")
-    parser.add_argument("--cache-dir",
-                        metavar="CACHE_DIR",
-                        default=None,
-                        type=PathArgument(new_dir=True),
-                        help="Directory for caching generated python code for templates and input"
-                        " documents. Reduces runtime for consecutive runs by skipping code"
-                        "generation for unchanged files.")
+    input_group = parser.add_argument_group(title="Specifying input resources")
+    input_group.add_argument("input_file",
+                             metavar="INPUT_FILE",
+                             type=PathArgument(existing_file=True),
+                             help="Input AsciiDoc file.")
+    input_group.add_argument("-B",
+                             "--base-dir",
+                             metavar="BASE_DIR",
+                             default=None,
+                             type=PathArgument(existing_dir=True),
+                             help="Base directory containing the document and resources. If no base"
+                             " directory is specified, local include files cannot be found.")
+    input_group.add_argument(
+        "--image-dir",
+        metavar="IMAGE_DIR",
+        default=None,
+        type=PathArgument(existing_dir=True),
+        help="Directory containing images to include. If no image directory is"
+        " specified, only images in the `images` directory next to the input file"
+        " can be included.")
+
+    external_data_group = parser.add_argument_group(title="Loading external data")
+    external_data_group.add_argument("-s",
+                                     "--spec-file",
+                                     metavar="SPEC_FILE",
+                                     default=None,
+                                     type=PathArgument(existing_file=True),
+                                     help="Package specification file.")
+    external_data_group.add_argument("-v",
+                                     "--version-file",
+                                     metavar="VERSION_FILE",
+                                     default=None,
+                                     type=PathArgument(existing_file=True),
+                                     help="Version specification file.")
+
+    output_group = parser.add_argument_group(title="Controlling output")
+    output_group.add_argument("--build-dir",
+                              metavar="BUILD_DIR",
+                              default="build",
+                              type=PathArgument(new_dir=True),
+                              help="Build directory.")
+    output_group.add_argument("-D",
+                              "--destination-dir",
+                              metavar="DESTINATION_DIR",
+                              default=None,
+                              type=PathArgument(new_dir=True),
+                              help="Destination for generated documentation.")
+    output_group.add_argument(
+        "-b",
+        "--backend",
+        metavar="BACKEND",
+        default="html5",
+        choices=["html5", "pdf", "adoc"],
+        help="Set output backend format used by AsciiDoctor. Use special backend"
+        " `adoc` to produce AsciiDoc files only and not run AsciiDoctor on it.")
+
+    behavior_group = parser.add_argument_group(title="AsciiDoxy behavior")
+    behavior_group.add_argument("--multipage",
+                                action="store_true",
+                                help="Generate multi-page document.")
+    behavior_group.add_argument("-W",
+                                "--warnings-are-errors",
+                                action="store_true",
+                                help="Stop processing input files when a warning is encountered.")
+    behavior_group.add_argument(
+        "--force-language",
+        metavar="LANGUAGE",
+        help="Force language used when parsing doxygen XML files. Ignores the"
+        " language specified in the XML files.")
+    behavior_group.add_argument(
+        "--cache-dir",
+        metavar="CACHE_DIR",
+        default=None,
+        type=PathArgument(new_dir=True),
+        help="Directory for caching generated python code for templates and input"
+        " documents. Reduces runtime for consecutive runs by skipping code"
+        "generation for unchanged files.")
+
+    asciidoctor_group = parser.add_argument_group(
+        title="AsciiDoctor options",
+        description="These options are not used by AsciiDoxy itself, but are used to"
+        " run AsciiDoctor. See AsciiDoctor documentation for details.")
+    asciidoctor_group.add_argument("-S",
+                                   "--safe-mode",
+                                   metavar="SAFE_MODE",
+                                   default="unsafe",
+                                   choices=["unsafe", "safe", "server", "secure"],
+                                   help="Set safe mode level.")
+    asciidoctor_group.add_argument("-a",
+                                   "--attribute",
+                                   metavar="ATTRIBUTE",
+                                   action="append",
+                                   type=str,
+                                   default=[],
+                                   help="Define, override, or unset a document attribute.")
+    asciidoctor_group.add_argument("-d",
+                                   "--doctype",
+                                   metavar="DOCTYPE",
+                                   default=None,
+                                   choices=["article", "book", "manpage", "inline"],
+                                   help="Set the document type.")
+    asciidoctor_group.add_argument(
+        "-r",
+        "--require",
+        metavar="LIBRARY",
+        action="append",
+        type=str,
+        default=[],
+        help="Require the specified library before executing AsciiDoctor.")
+
+    debug_group = parser.add_argument_group(title="Debugging AsciiDoxy")
+    debug_group.add_argument("--debug", action="store_true", help="Store debug information.")
+    debug_group.add_argument("--log",
+                             metavar="LOG_LEVEL",
+                             default="WARNING",
+                             choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+                             help="Set the log level.")
+
+    experimental_group = parser.add_argument_group(title="Experimental features",
+                                                   description="Use at your own risk!")
+    experimental_group.add_argument(
+        "--template-dir",
+        metavar="TEMPLATE_DIR",
+        default=None,
+        type=PathArgument(existing_dir=True),
+        help="Directory containing custom templates to use instead"
+        " of the default templates shipped with AsciiDoxy. Templates found in this"
+        " directory will be used in favor of the default templates. Only when a"
+        " template is not found here, the default templates are used.")
     if argv is None:
         argv = sys.argv[1:]
 
     config = Configuration()
-    config, config.extra = parser.parse_known_args(argv, namespace=config)
+    config = parser.parse_args(argv, namespace=config)
 
     if config.destination_dir is None:
         config.destination_dir = config.build_dir / "output"

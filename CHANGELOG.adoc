@@ -44,6 +44,11 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     file is embedded only once. If the file is embedded multiple times it can only be linked from 
     those files that embed it.
   * Minimum supported python version is now 3.7. Python 3.6 is end of life.
+  * The Ruby interpreter is now started only once to process all generated AsciiDoc files. This
+    significantly decreases the time required to process a large number of pages in multipage mode.
+  * Unknown arguments are no longer passed through to AsciiDoctor. Commonly used arguments are
+    explicitly supported by AsciiDoxy now. If you need to pass additional arguments, use the `adoc` 
+    backend to generate the AsciiDoc files and manually run AsciiDoctor on the output.
 
 
 === Fixed
