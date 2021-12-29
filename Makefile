@@ -151,7 +151,8 @@ visual-test-$(notdir $(basename $(1))): $(1)
 		--spec-file $(patsubst %.adoc,%.toml,$(1)) \
 		--warnings-are-errors \
 		--debug \
-		--require asciidoctor-diagram
+		--require asciidoctor-diagram \
+		--failure-level ERROR
 	mv $(VISUAL_TEST_CASE_BUILD_DIR)/debug.json $(VISUAL_TEST_CASE_BUILD_DIR)/$(notdir $(basename $(1))).debug.json
 
 ALL_VISUAL_TEST_CASES := $$(ALL_VISUAL_TEST_CASES) visual-test-$(notdir $(basename $(1)))

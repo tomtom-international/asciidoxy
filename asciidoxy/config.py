@@ -80,6 +80,7 @@ class Configuration(argparse.Namespace):
     attribute: List[str]
     doctype: Optional[str]
     require: List[str]
+    failure_level: str
 
 
 def parse_args(argv):
@@ -194,6 +195,12 @@ def parse_args(argv):
         type=str,
         default=[],
         help="Require the specified library before executing AsciiDoctor.")
+    asciidoctor_group.add_argument(
+        "--failure-level",
+        metavar="LEVEL",
+        default="FATAL",
+        choices=["FATAL", "ERROR", "WARN"],
+        help="Set the minimum log level that results in a failure for AsciiDoctor.")
 
     debug_group = parser.add_argument_group(title="Debugging AsciiDoxy")
     debug_group.add_argument("--debug", action="store_true", help="Store debug information.")

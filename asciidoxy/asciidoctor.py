@@ -57,6 +57,14 @@ def generate_requires(config: Configuration) -> str:
     return "\n".join(f"require '{library}'" for library in ["asciidoctor"] + config.require)
 
 
+def generate_exit_code(config: Configuration) -> str:
+    return f"""\
+logger = Asciidoctor::LoggerManager.logger
+exit 1 if (logger.respond_to? :max_severity) &&
+  logger.max_severity &&
+  logger.max_severity >= (::Logger::Severity.const_get '{config.failure_level}')"""
+
+
 def write_asciidoctor_runner(documents: List[Document], config: Configuration,
                              pkg_mgr: PackageManager) -> Path:
     runner_path = config.build_dir / "asciidoctor_runner.rb"
@@ -68,6 +76,7 @@ def write_asciidoctor_runner(documents: List[Document], config: Configuration,
             if not config.multipage and not doc.is_root:
                 continue
             print(generate_convert_file_command(doc, config, pkg_mgr), file=runner_file)
+        print(generate_exit_code(config), file=runner_file)
     return runner_path
 
 

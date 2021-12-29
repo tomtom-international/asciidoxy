@@ -172,6 +172,7 @@ def default_config(document, build_dir):
     config.attribute = []
     config.doctype = None
     config.require = []
+    config.failure_level = "FATAL"
     return config
 
 
