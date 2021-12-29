@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2021, TomTom (http://tomtom.com).
+# Copyright (C) 2019, TomTom (http://tomtom.com).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ def test_template_for__internal__template_available():
     cache = TemplateCache()
     template = cache.template_for("cpp", "class")
     assert template is not None
-    assert template.source.startswith("## Copyright (C) 2019-2021, TomTom (http://tomtom.com).")
+    assert template.source.startswith("## Copyright (C) 2019, TomTom (http://tomtom.com).")
 
     assert cache.template_for("cpp", "class") is template
 
@@ -67,7 +67,7 @@ def test_template_for__custom__fallback_to_internal(tmp_path):
     cache = TemplateCache(custom_template_dir=tmp_path)
     template = cache.template_for("cpp", "struct")
     assert template is not None
-    assert template.source.startswith("## Copyright (C) 2019-2021, TomTom (http://tomtom.com).")
+    assert template.source.startswith("## Copyright (C) 2019, TomTom (http://tomtom.com).")
 
 
 def test_template_for__custom__kind_not_found(tmp_path):
@@ -93,5 +93,5 @@ def test_cache_dir(tmp_path):
     cache = TemplateCache(cache_dir=cache_dir)
     template = cache.template_for("cpp", "class")
     assert template is not None
-    assert template.source.startswith("## Copyright (C) 2019-2021, TomTom (http://tomtom.com).")
+    assert template.source.startswith("## Copyright (C) 2019, TomTom (http://tomtom.com).")
     assert (cache_dir / "templates" / "cpp" / "class.mako.py").is_file()
