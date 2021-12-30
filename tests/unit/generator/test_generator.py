@@ -1463,7 +1463,8 @@ def test_require_version__exact_match(preprocessing_api):
 
 
 def test_require_version__exact_match__fail(preprocessing_api):
-    version_parts = __version__.split(".")
+    base_version, _, _ = __version__.partition("-")
+    version_parts = base_version.split(".")
     version_parts[2] = str(int(version_parts[2]) + 1)
     version = ".".join(version_parts)
     with pytest.raises(IncompatibleVersionError):
