@@ -140,6 +140,13 @@ ${cross_document_ref("reference.adoc", package_name="my-package")}
 """}
 ----
 
+[TIP]
+====
+When a `package_name` is provided, the path used in `include` and `cross_document_ref` must be 
+relative to the root of the package. That is different from using these commands without a 
+`package_name`. This means that absolute paths and `..` are not allowed here.
+====
+
 The package name must match the package containing the file. No file will be included, or no link
 will be created, if:
 

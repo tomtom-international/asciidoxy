@@ -76,6 +76,13 @@ The last line is AsciiDoxy's version of `include::`. Similar to the normal `incl
 AsciiDoxy that you want to include the contents of another file here in the document. However, in a
 moment you will see that this version can do much more.
 
+[TIP]
+====
+The path provided in the `include` command must be a path relative to the current document.  
+Absolute paths are not allowed. This also means that parent directories can be referred to using 
+`..`.
+====
+
 Run AsciiDoxy again:
 
 [source,bash]
@@ -185,6 +192,12 @@ ${cross_document_ref("multipage.adoc", link_text="Documentation")}
 
 AsciiDoxy takes the first title found in the document. If it cannot parse the file, it will use the
 stem of the file name: `index` in this case.
+
+[TIP]
+====
+Similar to the `include` command, the provided path must be a path relative to the current 
+document.  Absolute paths are not allowed.
+====
 
 If the default link text is not what you want, you can override the text using the `link_text`
 argument:

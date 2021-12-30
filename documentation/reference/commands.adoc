@@ -265,7 +265,10 @@ ${include(<file_name>,
 """}
 ----
 
-`file_name`:: Relative or absolute path to the file to include.
+`file_name`:: Relative path to the file to include. Absolute paths are not allowed.
++
+When `package_name` is provided, the path is relative to the root of the package. Otherwise, it is 
+relative to the current file.
 `package_name`:: Package containing the file to include. Defaults to the current package.
 `leveloffset`:: Offset for the headers in the included file from the top level of the current file.
 Defaults to +1.
@@ -298,20 +301,20 @@ https://asciidoctor.org/docs/user-manual/#include-directive[the AsciiDoctor manu
 ----
 ${"""
 ${include("component/reference.adoc")}                                           # <1>
-${include("/mount/data/reference.adoc", leveloffset="+3")}                       # <2>
+${include("../reference.adoc", leveloffset="+3")}                                # <2>
 ${include("component/reference.adoc", link_text="Reference", link_prefix=". ")}  # <3>
-${include("/component/reference.adoc", multipage_link=False)}                    # <4>
+${include("component/reference.adoc", multipage_link=False)}                     # <4>
 """}
 ----
 <1> Include and process `component/reference.adoc` relative to this file.
-<2> Include and process `/mount/data/reference.adoc` as an absolute path to the file. Increase the
+<2> Include and process `reference.adoc` in the parent directory of this file. Increase the
     level of the headers by 3.
 <3> In multi-page mode use the link text "Reference" and prefix with a dot to create a numbered
     list. In single-page mode the document is embedded.
 <4> In multi-page mode process the file, but do not create a link to it. In single page mode the
     document is embedded.
 
-== Cross-referencing sections in other AsciiDoc files[[cross_referencing,cross referencing]]
+== Cross-referencing other AsciiDoc files[[cross_referencing,cross referencing]]
 
 In multi-page mode, normal https://asciidoctor.org/docs/user-manual/#xref[cross references] to
 anchors in included files do not work. A link to the appropariate file needs to be created. For this
@@ -320,17 +323,22 @@ there is `${link("Api.cross_document_ref", text="cross_document_ref")}`.
 [source,python]
 ----
 ${"""
-${cross_document_ref(<file_name>,
+${cross_document_ref([<file_name>,]
                      [package_name=<package name>,]
                      [anchor=<section-anchor>,]
                      [link_text=<text>])}
 """}
 ----
 
-`file_name`:: File containing the anchor to link to.
+`file_name`:: Relative path to the file to link to. Absolute paths are not allowed.
++
+When `package_name` is provided, the path is relative to the root of the package. Otherwise, it is 
+relative to the current file.
 `package_name`:: Package containing the file to link to. Defaults to the current package.
 `anchor`:: Anchor to link to.
 `link_text`:: Text to use for the link.
+
+When `file_name` is not provided, a link to a <<_flexible_anchors,flexible anchor>> is made.
 
 If `link_text` is not provided, AsciiDoxy tries to select the most appropriate text for the link. It
 will use the first available of:
