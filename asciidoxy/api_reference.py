@@ -16,7 +16,7 @@
 import re
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, TypeVar
 
 from .model import Compound, ReferableElement
 
@@ -148,13 +148,13 @@ class NameFilter(ElementFilter):
                  name: Optional[str],
                  namespace: Optional[str] = None,
                  exact_namespace: bool = False):
-        self._name = name
-        self._namespace = namespace
+        self._name = uniform_long_name(name)
+        self._namespace = uniform_long_name(namespace)
         self._exact_namespace = exact_namespace
 
-        if name is not None and namespace is not None:
-            self._name_parts = self._split_namespaces(name)
-            self._namespace_parts = self._split_namespaces(namespace)
+        if self._name is not None and self._namespace is not None:
+            self._name_parts = self._split_namespaces(self._name)
+            self._namespace_parts = self._split_namespaces(self._namespace)
         else:
             self._name_parts = NamespaceList()
             self._namespace_parts = NamespaceList()
@@ -177,9 +177,10 @@ class NameFilter(ElementFilter):
         return self._name is not None
 
     def _full_name_match(self, full_name: str) -> bool:
-        return full_name == self._name
+        return uniform_long_name(full_name) == self._name
 
     def _namespaced_match(self, full_name: str) -> bool:
+        full_name = uniform_long_name(full_name)
         if self._name is None:
             return False
 
@@ -372,7 +373,7 @@ class ApiReference:
         self._id_index[element.id] = element
 
         assert element.name
-        self._name_index[element.name].append(element)
+        self._name_index[uniform_short_name(element.name)].append(element)
 
     def find(self,
              name: Optional[str] = None,
@@ -415,15 +416,7 @@ class ApiReference:
         if paramtype_matcher.applies:
             name = paramtype_matcher.name
 
-        unnested_name, nested_sep, nested = name.partition(NameFilter.NESTED_SEPARATOR)
-        for separator in NameFilter.NAMESPACE_SEPARATORS:
-            if separator in unnested_name:
-                _, _, short_name = unnested_name.rpartition(separator)
-                short_name = f"{short_name}{nested_sep}{nested}"
-                break
-        else:
-            short_name = name
-
+        short_name = uniform_short_name(name)
         potential_matches = self._name_index[short_name]
         if len(potential_matches) == 0:
             return None
@@ -454,3 +447,24 @@ class ApiReference:
             return matches[0]
 
         raise AmbiguousLookupError(matches)
+
+
+MaybeOptionalStr = TypeVar("MaybeOptionalStr", str, Optional[str])
+
+
+def uniform_long_name(name: MaybeOptionalStr) -> MaybeOptionalStr:
+    if name is None:
+        return None
+    return name.replace(" ", "")
+
+
+def uniform_short_name(name: str) -> str:
+    """Create a uniform short name without excess spaces."""
+    name = name.replace(" ", "")
+    unnested_name, nested_sep, nested = name.partition(NameFilter.NESTED_SEPARATOR)
+    for separator in NameFilter.NAMESPACE_SEPARATORS:
+        if separator in unnested_name:
+            _, _, short_name = unnested_name.rpartition(separator)
+            return f"{short_name}{nested_sep}{nested}"
+    else:
+        return name
