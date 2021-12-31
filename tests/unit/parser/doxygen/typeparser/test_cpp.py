@@ -14,15 +14,14 @@
 """Tests for C++ type parsing."""
 
 import xml.etree.ElementTree as ET
-from unittest.mock import MagicMock
 
 import pytest
 
 from asciidoxy.parser.doxygen.cpp import CppTypeParser
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
 from asciidoxy.parser.doxygen.type_parser import Token, TypeParseError
-from tests.unit.matchers import IsEmpty, m_typeref
-from tests.unit.shared import assert_equal_or_none_if_empty, sub_element
+from tests.unit.matchers import IsEmpty, IsNone, m_parameter, m_typeref
+from tests.unit.shared import sub_element
 
 from .test_type_parser import arg_name, args_end, args_start, name, whitespace
 
@@ -40,55 +39,52 @@ def cpp_type_suffix(request):
     return request.param
 
 
-def test_parse_cpp_type_from_text_simple(cpp_type_prefix, cpp_type_suffix):
+def test_parse_cpp_type_from_text_simple(driver_mock, cpp_type_prefix, cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = f"{cpp_type_prefix}double{cpp_type_suffix}"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()  # built-in type
-
-    assert type_ref is not None
-    assert type_ref.id is None
-    assert type_ref.kind is None
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "double"
-    assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
-    assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
-    assert not type_ref.nested
+    m_typeref(
+        id=IsNone(),
+        kind=IsNone(),
+        language="cpp",
+        name="double",
+        prefix=cpp_type_prefix,
+        suffix=cpp_type_suffix,
+        nested=IsEmpty(),
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()  # built-in type
 
 
-def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(cpp_type_prefix, cpp_type_suffix):
+def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(driver_mock, cpp_type_prefix,
+                                                                cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = (f"{cpp_type_prefix}Coordinate< {cpp_type_prefix}Unit{cpp_type_suffix} "
                          f">{cpp_type_suffix}")
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["Coordinate", "Unit"]))
-
-    assert type_ref is not None
-    assert type_ref.id is None
-    assert type_ref.kind is None
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "Coordinate"
-    assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
-    assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
-
-    assert len(type_ref.nested) == 1
-    nested_ref = type_ref.nested[0]
-    assert nested_ref is not None
-    assert nested_ref.id is None
-    assert nested_ref.kind is None
-    assert nested_ref.language == "cpp"
-    assert nested_ref.name == "Unit"
-    assert_equal_or_none_if_empty(nested_ref.prefix, cpp_type_prefix)
-    assert_equal_or_none_if_empty(nested_ref.suffix, cpp_type_suffix)
+    m_typeref(
+        id=IsNone(),
+        kind=IsNone(),
+        language="cpp",
+        name="Coordinate",
+        prefix=cpp_type_prefix,
+        suffix=cpp_type_suffix,
+        nested=[
+            m_typeref(
+                id=IsNone(),
+                kind=IsNone(),
+                language="cpp",
+                name="Unit",
+                prefix=cpp_type_prefix,
+                suffix=cpp_type_suffix,
+                nested=IsEmpty(),
+            ),
+        ],
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("Coordinate", "Unit")
 
 
-def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_type_suffix):
+def test_parse_cpp_type_from_ref_with_prefix_and_suffix(driver_mock, cpp_type_prefix,
+                                                        cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = cpp_type_prefix
     sub_element(type_element,
@@ -98,21 +94,19 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(cpp_type_prefix, cpp_typ
                 text="Coordinate",
                 tail=cpp_type_suffix)
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
-
-    assert type_ref is not None
-    assert type_ref.id == "cpp-tomtom_coordinate"
-    assert type_ref.kind == "compound"
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "Coordinate"
-    assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
-    assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
-    assert not type_ref.nested
+    m_typeref(
+        id="cpp-tomtom_coordinate",
+        kind="compound",
+        language="cpp",
+        name="Coordinate",
+        prefix=cpp_type_prefix,
+        suffix=cpp_type_suffix,
+        nested=IsEmpty(),
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()  # has_id, so not unresolved
 
 
-def test_parse_cpp_type_from_ref_with_nested_text_type():
+def test_parse_cpp_type_from_ref_with_nested_text_type(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "const "
     sub_element(type_element,
@@ -122,31 +116,28 @@ def test_parse_cpp_type_from_ref_with_nested_text_type():
                 text="Coordinate",
                 tail="< const Unit > &")
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name
-                    for args, _ in driver_mock.unresolved_ref.call_args_list]) == sorted(["Unit"]))
-
-    assert type_ref is not None
-    assert type_ref.id == "cpp-tomtom_coordinate"
-    assert type_ref.kind == "compound"
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "Coordinate"
-    assert type_ref.prefix == "const "
-    assert type_ref.suffix == " &"
-
-    assert len(type_ref.nested) == 1
-    nested_ref = type_ref.nested[0]
-    assert nested_ref is not None
-    assert nested_ref.id is None
-    assert nested_ref.kind is None
-    assert nested_ref.language == "cpp"
-    assert nested_ref.name == "Unit"
-    assert nested_ref.prefix == "const "
-    assert not nested_ref.suffix
+    m_typeref(
+        id="cpp-tomtom_coordinate",
+        kind="compound",
+        language="cpp",
+        name="Coordinate",
+        prefix="const ",
+        suffix=" &",
+        nested=[
+            m_typeref(
+                id=IsNone(),
+                kind=IsNone(),
+                language="cpp",
+                name="Unit",
+                prefix="const ",
+                suffix=IsEmpty(),
+            )
+        ],
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("Unit")
 
 
-def test_parse_cpp_type_from_text_with_nested_ref_type():
+def test_parse_cpp_type_from_text_with_nested_ref_type(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "const std::unique_ptr< const "
     sub_element(type_element,
@@ -156,30 +147,28 @@ def test_parse_cpp_type_from_text_with_nested_ref_type():
                 text="Coordinate",
                 tail=" & > *")
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
-
-    assert type_ref is not None
-    assert not type_ref.id
-    assert not type_ref.kind
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "std::unique_ptr"
-    assert type_ref.prefix == "const "
-    assert type_ref.suffix == " *"
-
-    assert len(type_ref.nested) == 1
-    nested_ref = type_ref.nested[0]
-    assert nested_ref is not None
-    assert nested_ref.id == "cpp-tomtom_coordinate"
-    assert nested_ref.kind == "compound"
-    assert nested_ref.language == "cpp"
-    assert nested_ref.name == "Coordinate"
-    assert nested_ref.prefix == "const "
-    assert nested_ref.suffix == " &"
+    m_typeref(
+        id=IsEmpty(),
+        kind=IsEmpty(),
+        language="cpp",
+        name="std::unique_ptr",
+        prefix="const ",
+        suffix=" *",
+        nested=[
+            m_typeref(
+                id="cpp-tomtom_coordinate",
+                kind="compound",
+                language="cpp",
+                name="Coordinate",
+                prefix="const ",
+                suffix=" &",
+            ),
+        ],
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()  # has id, so not unresolved
 
 
-def test_parse_cpp_type_from_multiple_nested_text_and_ref():
+def test_parse_cpp_type_from_multiple_nested_text_and_ref(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "const "
     sub_element(type_element,
@@ -201,73 +190,70 @@ def test_parse_cpp_type_from_multiple_nested_text_and_ref():
                 text="Point",
                 tail=" < const std::string & > >")
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()  # has id, so not unresolved
+    m_typeref(
+        id="cpp-tomtom_coordinate",
+        kind="compound",
+        language="cpp",
+        name="Coordinate",
+        prefix="const ",
+        suffix=IsEmpty(),
+        nested=[
+            m_typeref(
+                id=IsEmpty(),
+                kind=IsEmpty(),
+                language="cpp",
+                name="std::unique_ptr",
+                prefix=IsEmpty(),
+                suffix=IsEmpty(),
+                nested=[
+                    m_typeref(
+                        id="cpp-tomtom_box",
+                        kind="compound",
+                        language="cpp",
+                        name="Box",
+                        prefix=IsEmpty(),
+                        suffix=IsEmpty(),
+                        nested=IsEmpty(),
+                    ),
+                ],
+            ),
+            m_typeref(
+                id="cpp-tomtom_point",
+                kind="compound",
+                language="cpp",
+                name="Point",
+                prefix=IsEmpty(),
+                suffix=IsEmpty(),
+                nested=[
+                    m_typeref(
+                        id=IsEmpty(),
+                        kind=IsEmpty(),
+                        language="cpp",
+                        name="std::string",
+                        prefix="const ",
+                        suffix=" &",
+                        nested=IsEmpty(),
+                    ),
+                ],
+            ),
+        ],
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()  # has id, so not unresolved
 
-    assert type_ref is not None
-    assert type_ref.id == "cpp-tomtom_coordinate"
-    assert type_ref.kind == "compound"
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "Coordinate"
-    assert type_ref.prefix == "const "
-    assert not type_ref.suffix
 
-    assert len(type_ref.nested) == 2
-    nested_1 = type_ref.nested[0]
-    assert nested_1 is not None
-    assert not nested_1.id
-    assert not nested_1.kind
-    assert nested_1.language == "cpp"
-    assert nested_1.name == "std::unique_ptr"
-    assert not nested_1.prefix
-    assert not nested_1.suffix
-
-    assert len(nested_1.nested) == 1
-    nested_1_1 = nested_1.nested[0]
-    assert nested_1_1 is not None
-    assert nested_1_1.id == "cpp-tomtom_box"
-    assert nested_1_1.kind == "compound"
-    assert nested_1_1.language == "cpp"
-    assert nested_1_1.name == "Box"
-    assert not nested_1_1.prefix
-    assert not nested_1_1.suffix
-
-    nested_2 = type_ref.nested[1]
-    assert nested_2 is not None
-    assert nested_2.id == "cpp-tomtom_point"
-    assert nested_2.kind == "compound"
-    assert nested_2.language == "cpp"
-    assert nested_2.name == "Point"
-    assert not nested_2.prefix
-    assert not nested_2.suffix
-
-    assert len(nested_2.nested) == 1
-    nested_2_1 = nested_2.nested[0]
-    assert nested_2_1 is not None
-    assert not nested_2_1.id
-    assert not nested_2_1.kind
-    assert nested_2_1.language == "cpp"
-    assert nested_2_1.name == "std::string"
-    assert nested_2_1.prefix == "const "
-    assert nested_2_1.suffix == " &"
-
-
-def test_parse_cpp_type_multiple_prefix_and_suffix():
+def test_parse_cpp_type_multiple_prefix_and_suffix(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "mutable volatile std::string * const *"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()  # built-in type
-
-    assert type_ref is not None
-    assert not type_ref.id
-    assert not type_ref.kind
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "std::string"
-    assert type_ref.prefix == "mutable volatile "
-    assert type_ref.suffix == " * const *"
+    m_typeref(
+        id=IsEmpty(),
+        kind=IsEmpty(),
+        language="cpp",
+        name="std::string",
+        prefix="mutable volatile ",
+        suffix=" * const *",
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()  # built-in type
 
 
 @pytest.fixture(params=[
@@ -281,316 +267,303 @@ def cpp_type_with_space(request):
     return request.param
 
 
-def test_parse_cpp_type_with_space(cpp_type_prefix, cpp_type_with_space, cpp_type_suffix):
+def test_parse_cpp_type_with_space(driver_mock, cpp_type_prefix, cpp_type_with_space,
+                                   cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = f"{cpp_type_prefix}{cpp_type_with_space}{cpp_type_suffix}"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()  # built-in type
-
-    assert type_ref is not None
-    assert not type_ref.id
-    assert not type_ref.kind
-    assert type_ref.language == "cpp"
-    assert type_ref.name == cpp_type_with_space
-    assert_equal_or_none_if_empty(type_ref.prefix, cpp_type_prefix)
-    assert_equal_or_none_if_empty(type_ref.suffix, cpp_type_suffix)
+    m_typeref(
+        id=IsEmpty(),
+        kind=IsEmpty(),
+        language="cpp",
+        name=cpp_type_with_space,
+        prefix=cpp_type_prefix,
+        suffix=cpp_type_suffix,
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()  # built-in type
 
 
-def test_parse_cpp_type_with_member():
+def test_parse_cpp_type_with_member(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType<NestedType>::member"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["MyType", "NestedType"]))
+    m_typeref(
+        id=IsEmpty(),
+        kind=IsEmpty(),
+        language="cpp",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="::member",
+        nested=[
+            m_typeref(
+                name="NestedType",
+                prefix=IsEmpty(),
+                suffix=IsEmpty(),
+                nested=IsEmpty(),
+            ),
+        ],
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("MyType", "NestedType")
 
-    assert type_ref is not None
-    assert not type_ref.id
-    assert not type_ref.kind
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "MyType"
-    assert not type_ref.prefix
-    assert type_ref.suffix == "::member"
-    assert len(type_ref.nested) == 1
 
-    assert type_ref.nested[0].name == "NestedType"
-    assert not type_ref.nested[0].prefix
-    assert not type_ref.nested[0].suffix
-    assert not type_ref.nested[0].nested
-
-
-def test_parse_cpp_type_with_function_arguments():
+def test_parse_cpp_type_with_function_arguments(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType(const Message&, ErrorCode code)"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["MyType", "Message", "ErrorCode"]))
+    m_typeref(
+        id=IsEmpty(),
+        kind="closure",
+        language="cpp",
+        name=IsEmpty(),
+        prefix=IsEmpty(),
+        suffix=IsEmpty(),
+        nested=IsEmpty(),
+        args=[
+            m_parameter(
+                name=IsEmpty(),
+                type=m_typeref(
+                    name="Message",
+                    prefix="const ",
+                    suffix="&",
+                    nested=IsEmpty(),
+                ),
+            ),
+            m_parameter(
+                name="code",
+                type=m_typeref(
+                    name="ErrorCode",
+                    prefix=IsEmpty(),
+                    suffix=IsEmpty(),
+                    nested=IsEmpty(),
+                ),
+            ),
+        ],
+        returns=m_typeref(
+            id=IsEmpty(),
+            kind=IsEmpty(),
+            name="MyType",
+            prefix=IsEmpty(),
+            suffix=IsEmpty(),
+            nested=IsEmpty(),
+            args=IsEmpty(),
+        ),
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("MyType", "Message", "ErrorCode")
 
-    assert type_ref is not None
-    assert not type_ref.id
-    assert type_ref.kind == "closure"
-    assert type_ref.language == "cpp"
-    assert not type_ref.name
-    assert not type_ref.prefix
-    assert not type_ref.suffix
-    assert not type_ref.nested
-    assert len(type_ref.args) == 2
 
-    assert type_ref.returns is not None
-    assert not type_ref.returns.id
-    assert not type_ref.returns.kind
-    assert type_ref.returns.language == "cpp"
-    assert type_ref.returns.name == "MyType"
-    assert not type_ref.returns.prefix
-    assert not type_ref.returns.suffix
-    assert not type_ref.returns.nested
-    assert not type_ref.returns.args
-
-    assert not type_ref.args[0].name
-    assert type_ref.args[0].type.name == "Message"
-    assert type_ref.args[0].type.prefix == "const "
-    assert type_ref.args[0].type.suffix == "&"
-    assert not type_ref.args[0].type.nested
-
-    assert type_ref.args[1].name == "code"
-    assert type_ref.args[1].type.name == "ErrorCode"
-    assert not type_ref.args[1].type.prefix
-    assert not type_ref.args[1].type.suffix
-    assert not type_ref.args[1].type.nested
-
-
-def test_parse_cpp_type_with_function_arguments__with_prefix_and_suffix():
+def test_parse_cpp_type_with_function_arguments__with_prefix_and_suffix(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "const MyType&(const Message&, ErrorCode code)"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["MyType", "Message", "ErrorCode"]))
-
-    assert type_ref is not None
-    assert not type_ref.id
-    assert type_ref.kind == "closure"
-    assert type_ref.language == "cpp"
-    assert not type_ref.name
-    assert not type_ref.prefix
-    assert not type_ref.suffix
-    assert not type_ref.nested
-    assert len(type_ref.args) == 2
-
-    assert type_ref.returns is not None
-    assert not type_ref.returns.id
-    assert not type_ref.returns.kind
-    assert type_ref.returns.language == "cpp"
-    assert type_ref.returns.name == "MyType"
-    assert type_ref.returns.prefix == "const "
-    assert type_ref.returns.suffix == "&"
-    assert not type_ref.returns.nested
-    assert not type_ref.returns.args
-
-    assert not type_ref.args[0].name
-    assert type_ref.args[0].type.name == "Message"
-    assert type_ref.args[0].type.prefix == "const "
-    assert type_ref.args[0].type.suffix == "&"
-    assert not type_ref.args[0].type.nested
-
-    assert type_ref.args[1].name == "code"
-    assert type_ref.args[1].type.name == "ErrorCode"
-    assert not type_ref.args[1].type.prefix
-    assert not type_ref.args[1].type.suffix
-    assert not type_ref.args[1].type.nested
+    m_typeref(
+        id=IsEmpty(),
+        kind="closure",
+        language="cpp",
+        name=IsEmpty(),
+        prefix=IsEmpty(),
+        suffix=IsEmpty(),
+        nested=IsEmpty(),
+        args=[
+            m_parameter(
+                name=IsEmpty(),
+                type=m_typeref(
+                    name="Message",
+                    prefix="const ",
+                    suffix="&",
+                    nested=IsEmpty(),
+                ),
+            ),
+            m_parameter(
+                name="code",
+                type=m_typeref(
+                    name="ErrorCode",
+                    prefix=IsEmpty(),
+                    suffix=IsEmpty(),
+                    nested=IsEmpty(),
+                ),
+            ),
+        ],
+        returns=m_typeref(
+            id=IsEmpty(),
+            kind=IsEmpty(),
+            language="cpp",
+            name="MyType",
+            prefix="const ",
+            suffix="&",
+            nested=IsEmpty(),
+            args=IsEmpty(),
+        ),
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("MyType", "Message", "ErrorCode")
 
 
 @pytest.mark.parametrize("arg_name", ["", " value"])
-def test_parse_cpp_type_with_function_arguments_with_space_in_type(cpp_type_with_space, arg_name):
+def test_parse_cpp_type_with_function_arguments_with_space_in_type(driver_mock, cpp_type_with_space,
+                                                                   arg_name):
     type_element = ET.Element("type")
     type_element.text = f"MyType({cpp_type_with_space}{arg_name})"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["MyType"]))
+    m_typeref(
+        id=IsEmpty(),
+        kind="closure",
+        language="cpp",
+        name=IsEmpty(),
+        prefix=IsEmpty(),
+        suffix=IsEmpty(),
+        nested=IsEmpty(),
+        args=[
+            m_parameter(
+                name=arg_name.strip(),
+                type=m_typeref(
+                    name=cpp_type_with_space,
+                    prefix=IsEmpty(),
+                    suffix=IsEmpty(),
+                    nested=IsEmpty(),
+                    args=IsEmpty(),
+                ),
+            ),
+        ],
+        returns=m_typeref(
+            name="MyType",
+            prefix=IsEmpty(),
+            suffix=IsEmpty(),
+            nested=IsEmpty(),
+            args=IsEmpty(),
+        ),
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("MyType")
 
-    assert type_ref is not None
-    assert not type_ref.id
-    assert type_ref.kind == "closure"
-    assert type_ref.language == "cpp"
-    assert not type_ref.name
-    assert not type_ref.prefix
-    assert not type_ref.suffix
-    assert not type_ref.nested
-    assert len(type_ref.args) == 1
 
-    assert type_ref.returns is not None
-    assert type_ref.returns.name == "MyType"
-    assert not type_ref.returns.prefix
-    assert not type_ref.returns.suffix
-    assert not type_ref.returns.nested
-    assert not type_ref.returns.args
-
-    assert_equal_or_none_if_empty(type_ref.args[0].name, arg_name.strip())
-    assert type_ref.args[0].type.name == cpp_type_with_space
-    assert not type_ref.args[0].type.prefix
-    assert not type_ref.args[0].type.suffix
-    assert not type_ref.args[0].type.nested
-
-
-def test_parse_cpp_type__remove_constexpr():
+def test_parse_cpp_type__remove_constexpr(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "constexpr double"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()  # built-in type
+    m_typeref(
+        id=IsEmpty(),
+        kind=IsEmpty(),
+        language="cpp",
+        name="double",
+        prefix=IsEmpty(),
+        suffix=IsEmpty(),
+        nested=IsEmpty(),
+        args=IsEmpty(),
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()  # built-in type
 
-    assert type_ref is not None
-    assert type_ref.id is None
-    assert type_ref.kind is None
-    assert type_ref.language == "cpp"
-    assert type_ref.name == "double"
-    assert not type_ref.prefix
-    assert not type_ref.suffix
-    assert not type_ref.nested
 
-
-def test_parse_cpp_type__remove_constexpr_only():
+def test_parse_cpp_type__remove_constexpr_only(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "constexpr"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()  # built-in type
-
-    assert type_ref is None
+    assert CppTypeParser.parse_xml(type_element, driver=driver_mock) is None
+    driver_mock.assert_unresolved()  # nothing left
 
 
-def test_parse_cpp_type__array():
+def test_parse_cpp_type__array(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType[]"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["MyType"]))
     m_typeref(
         name="MyType",
         prefix=IsEmpty(),
         suffix="[]",
-    ).assert_matches(type_ref)
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__array__with_size():
+def test_parse_cpp_type__array__with_size(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType[16]"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["MyType"]))
     m_typeref(
         name="MyType",
         prefix=IsEmpty(),
         suffix="[16]",
-    ).assert_matches(type_ref)
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__array__with_prefix_and_suffix():
+def test_parse_cpp_type__array__with_prefix_and_suffix(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "const MyType[]*"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["MyType"]))
     m_typeref(
         name="MyType",
         prefix="const ",
         suffix="[]*",
-    ).assert_matches(type_ref)
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__array__as_nested_type():
+def test_parse_cpp_type__array__as_nested_type(driver_mock):
     type_element = ET.Element("type")
     type_element.text = "std::shared_ptr<MyType[]>"
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["MyType"]))
-    m_typeref(name="std::shared_ptr",
-              prefix=IsEmpty(),
-              suffix=IsEmpty(),
-              nested=[
-                  m_typeref(
-                      name="MyType",
-                      prefix=IsEmpty(),
-                      suffix="[]",
-                  ),
-              ]).assert_matches(type_ref)
+    m_typeref(
+        name="std::shared_ptr",
+        prefix=IsEmpty(),
+        suffix=IsEmpty(),
+        nested=[
+            m_typeref(
+                name="MyType",
+                prefix=IsEmpty(),
+                suffix="[]",
+            ),
+        ],
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__array__brackets_inside_name_element():
+def test_parse_cpp_type__array__brackets_inside_name_element(driver_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[]")
     ET.dump(type_element)
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()
     m_typeref(
         id="cpp-tomtom_mytype",
         name="MyType",
         prefix=IsEmpty(),
         suffix="[]",
-    ).assert_matches(type_ref)
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()
 
 
-def test_parse_cpp_type__array__multiple_brackets_inside_name_element():
+def test_parse_cpp_type__array__multiple_brackets_inside_name_element(driver_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[][]")
     ET.dump(type_element)
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()
     m_typeref(
         id="cpp-tomtom_mytype",
         name="MyType",
         prefix=IsEmpty(),
         suffix="[][]",
-    ).assert_matches(type_ref)
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()
 
 
-def test_parse_cpp_type__array__with_size_inside_name_element():
+def test_parse_cpp_type__array__with_size_inside_name_element(driver_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[12]")
     ET.dump(type_element)
 
-    driver_mock = MagicMock()
-    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()
     m_typeref(
         id="cpp-tomtom_mytype",
         name="MyType",
         prefix=IsEmpty(),
         suffix="[12]",
-    ).assert_matches(type_ref)
+    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
+    driver_mock.assert_unresolved()
 
 
-def test_parse_cpp_type__array__end_bracket_without_start_inside_name_element():
+def test_parse_cpp_type__array__end_bracket_without_start_inside_name_element(driver_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType]")
     ET.dump(type_element)
 
-    driver_mock = MagicMock()
     with pytest.raises(TypeParseError):
         CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()
+    driver_mock.assert_unresolved()
 
 
 def namespace_sep(text: str = ":") -> Token:
