@@ -66,6 +66,14 @@ ${insert("asciidoxy::tparam::is_container< std::array< T, N > >", leveloffset="+
 
 ${insert("asciidoxy::wifi::ESP32WiFiProtocol", leveloffset="+2")}
 
+${insert("asciidoxy::arrays::SomeStruct", leveloffset="+2")}
+
+${insert("asciidoxy::arrays::StructArray", leveloffset="+2")}
+
+${insert("asciidoxy::arrays::AnotherArray", leveloffset="+2")}
+
+${insert("asciidoxy::arrays::process", leveloffset="+2")}
+
 == Consumer
 
 ${insert("asciidoxy::positioning::Positioning", leveloffset="+2")}

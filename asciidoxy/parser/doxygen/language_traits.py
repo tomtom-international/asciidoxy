@@ -47,6 +47,9 @@ class TokenCategory(Enum):
         BUILT_IN_NAME:       Type name that is built-in in the language.
         BLOCK:               Token indicating a block definition.
         ANNOTATION:          Token indicating an annotation.
+        ARRAY_START:         Token indicating the start of an array subscript.
+        ARRAY_END:           Token indicating the end of an array subscript.
+        ARRAY_SIZE:          Token indicating the size of an array.
     """
     UNKNOWN = auto()
     WHITESPACE = auto()
@@ -68,6 +71,9 @@ class TokenCategory(Enum):
     BUILT_IN_NAME = auto()
     BLOCK = auto()
     ANNOTATION = auto()
+    ARRAY_START = auto()
+    ARRAY_END = auto()
+    ARRAY_SIZE = auto()
 
 
 class LanguageTraits(ABC):

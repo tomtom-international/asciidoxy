@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="classasciidoxy_1_1arrays_1_1_some_struct" kind="class" language="C++" prot="public">
+    <compoundname>asciidoxy::arrays::SomeStruct</compoundname>
+    <includes refid="arrays_8hpp" local="no">arrays.hpp</includes>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classasciidoxy_1_1arrays_1_1_some_struct_1a8460a04b66b21b5e6bdabba4aa2bad00" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int asciidoxy::arrays::SomeStruct::value</definition>
+        <argsstring></argsstring>
+        <name>value</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="arrays.hpp" line="24" column="7" bodyfile="arrays.hpp" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Some simple struct. </para>
+    </detaileddescription>
+    <location file="arrays.hpp" line="23" column="17" bodyfile="arrays.hpp" bodystart="23" bodyend="25"/>
+    <listofallmembers>
+      <member refid="classasciidoxy_1_1arrays_1_1_some_struct_1a8460a04b66b21b5e6bdabba4aa2bad00" prot="private" virt="non-virtual"><scope>asciidoxy::arrays::SomeStruct</scope><name>value</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

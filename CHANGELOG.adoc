@@ -23,6 +23,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Fixed
 
   * Spaces in `insert` and `link` commands are ignored.
+  * Array types (like `Type[]`) are properly supported for {Cpp}, Java and Objective C.
 
 
 == 0.8.2 (30 Dec 2021)

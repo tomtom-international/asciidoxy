@@ -605,6 +605,35 @@ Do not use this class ever!
               ],
           ),
           id="Function type typedef"),
+    param(
+        dict(name="asciidoxy::arrays::StructArray", lang="cpp"),
+        m_compound(
+            kind="alias",
+            name="StructArray",
+            returns=m_returnvalue(type=m_typeref(name="SomeStruct", prefix=IsEmpty(), suffix="[]")),
+        ),
+        id="Alias for array type"),
+    param(
+        dict(name="asciidoxy::arrays::AnotherArray", lang="cpp"),
+        m_compound(
+            kind="typedef",
+            name="AnotherArray",
+            returns=m_returnvalue(type=m_typeref(name="SomeStruct", prefix=IsEmpty(), suffix="[]")),
+        ),
+        id="Typedef for array type"),
+    param(
+        dict(name="asciidoxy::arrays::process", lang="cpp"),
+        m_compound(
+            kind="function",
+            name="process",
+            returns=m_returnvalue(type=m_typeref(name="SomeStruct", prefix=IsEmpty(), suffix="[]")),
+            params=[m_parameter(type=m_typeref(
+                name="SomeStruct",
+                prefix="const ",
+                suffix="[]",
+            ))],
+        ),
+        id="Function with array types"),
 ])
 def test_parse_cpp(api_reference, search_params, matcher):
     matcher.assert_matches(api_reference.find(**search_params))

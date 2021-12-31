@@ -20,8 +20,9 @@ import pytest
 
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
 from asciidoxy.parser.doxygen.objc import ObjectiveCTypeParser
-from asciidoxy.parser.doxygen.type_parser import Token
-from tests.unit.shared import assert_equal_or_none_if_empty
+from asciidoxy.parser.doxygen.type_parser import Token, TypeParseError
+from tests.unit.matchers import IsEmpty, m_typeref
+from tests.unit.shared import assert_equal_or_none_if_empty, sub_element
 
 from .test_type_parser import (
     arg_name,
@@ -115,6 +116,130 @@ def test_parse_objc_type_with_space(type_with_space):
     assert type_ref.name == type_with_space
     assert not type_ref.prefix
     assert not type_ref.suffix
+
+
+def test_parse_objc_type__array():
+    type_element = ET.Element("type")
+    type_element.text = "MyType[]"
+
+    driver_mock = MagicMock()
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_objc_type__array__with_size():
+    type_element = ET.Element("type")
+    type_element.text = "MyType[16]"
+
+    driver_mock = MagicMock()
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[16]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_objc_type__array__with_prefix_and_suffix():
+    type_element = ET.Element("type")
+    type_element.text = "const MyType[]*"
+
+    driver_mock = MagicMock()
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(
+        name="MyType",
+        prefix="const ",
+        suffix="[]*",
+    ).assert_matches(type_ref)
+
+
+def test_parse_objc_type__array__as_nested_type():
+    type_element = ET.Element("type")
+    type_element.text = "id<MyType[]>"
+
+    driver_mock = MagicMock()
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(name="id",
+              prefix=IsEmpty(),
+              suffix=IsEmpty(),
+              nested=[
+                  m_typeref(
+                      name="MyType",
+                      prefix=IsEmpty(),
+                      suffix="[]",
+                  ),
+              ]).assert_matches(type_ref)
+
+
+def test_parse_objc_type__array__brackets_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+    m_typeref(
+        id="objc-tomtom_mytype",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_objc_type__array__multiple_brackets_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[][]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+    m_typeref(
+        id="objc-tomtom_mytype",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[][]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_objc_type__array__with_size_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[12]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    type_ref = ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+    m_typeref(
+        id="objc-tomtom_mytype",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[12]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_objc_type__array__end_bracket_without_start_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    with pytest.raises(TypeParseError):
+        ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
 
 
 def block(text: str = "^") -> Token:

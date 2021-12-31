@@ -21,7 +21,8 @@ import pytest
 from asciidoxy.parser.doxygen.java import JavaTypeParser
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
 from asciidoxy.parser.doxygen.type_parser import Token
-from tests.unit.shared import assert_equal_or_none_if_empty
+from tests.unit.matchers import IsEmpty, m_typeref
+from tests.unit.shared import assert_equal_or_none_if_empty, sub_element
 
 
 @pytest.fixture(params=["", "final ", "synchronized ", "synchronized final "])
@@ -155,6 +156,53 @@ def test_parse_java_type_with_separate_wildcard_bounds():
     assert not type_ref.nested
 
     driver_mock.unresolved_ref.assert_not_called()
+
+
+def test_parse_java_type__array():
+    type_element = ET.Element("type")
+    type_element.text = "MyType[]"
+
+    driver_mock = MagicMock()
+    type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_java_type__array__brackets_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+    m_typeref(
+        id="java-tomtom_mytype",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_java_type__array__multiple_brackets_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[][]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    type_ref = JavaTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+    m_typeref(
+        id="java-tomtom_mytype",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[][]",
+    ).assert_matches(type_ref)
 
 
 @pytest.mark.parametrize("tokens,expected", [

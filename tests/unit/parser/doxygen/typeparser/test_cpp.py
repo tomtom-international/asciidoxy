@@ -20,7 +20,8 @@ import pytest
 
 from asciidoxy.parser.doxygen.cpp import CppTypeParser
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
-from asciidoxy.parser.doxygen.type_parser import Token
+from asciidoxy.parser.doxygen.type_parser import Token, TypeParseError
+from tests.unit.matchers import IsEmpty, m_typeref
 from tests.unit.shared import assert_equal_or_none_if_empty, sub_element
 
 from .test_type_parser import arg_name, args_end, args_start, name, whitespace
@@ -466,6 +467,130 @@ def test_parse_cpp_type__remove_constexpr_only():
     driver_mock.unresolved_ref.assert_not_called()  # built-in type
 
     assert type_ref is None
+
+
+def test_parse_cpp_type__array():
+    type_element = ET.Element("type")
+    type_element.text = "MyType[]"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_cpp_type__array__with_size():
+    type_element = ET.Element("type")
+    type_element.text = "MyType[16]"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[16]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_cpp_type__array__with_prefix_and_suffix():
+    type_element = ET.Element("type")
+    type_element.text = "const MyType[]*"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(
+        name="MyType",
+        prefix="const ",
+        suffix="[]*",
+    ).assert_matches(type_ref)
+
+
+def test_parse_cpp_type__array__as_nested_type():
+    type_element = ET.Element("type")
+    type_element.text = "std::shared_ptr<MyType[]>"
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
+                    ]) == sorted(["MyType"]))
+    m_typeref(name="std::shared_ptr",
+              prefix=IsEmpty(),
+              suffix=IsEmpty(),
+              nested=[
+                  m_typeref(
+                      name="MyType",
+                      prefix=IsEmpty(),
+                      suffix="[]",
+                  ),
+              ]).assert_matches(type_ref)
+
+
+def test_parse_cpp_type__array__brackets_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+    m_typeref(
+        id="cpp-tomtom_mytype",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_cpp_type__array__multiple_brackets_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[][]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+    m_typeref(
+        id="cpp-tomtom_mytype",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[][]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_cpp_type__array__with_size_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[12]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    type_ref = CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
+    m_typeref(
+        id="cpp-tomtom_mytype",
+        name="MyType",
+        prefix=IsEmpty(),
+        suffix="[12]",
+    ).assert_matches(type_ref)
+
+
+def test_parse_cpp_type__array__end_bracket_without_start_inside_name_element():
+    type_element = ET.Element("type")
+    sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType]")
+    ET.dump(type_element)
+
+    driver_mock = MagicMock()
+    with pytest.raises(TypeParseError):
+        CppTypeParser.parse_xml(type_element, driver=driver_mock)
+    driver_mock.unresolved_ref.assert_not_called()
 
 
 def namespace_sep(text: str = ":") -> Token:
