@@ -101,9 +101,9 @@ def multipage_toc(doc: Document, side: str = "left") -> str:
     if doc is not None:
         _toc(parent=toc, doc=doc, current_doc=current_doc, level=1, breadcrumbs=breadcrumbs)
 
-    script = _toc_script(side)
+    style = _toc_style(side)
 
-    return _pretty_html(toc) + _pretty_html(script)
+    return _pretty_html(toc) + _pretty_html(style)
 
 
 def _toc(parent: ET.Element, doc: Document, current_doc: Document, level: int,
@@ -123,10 +123,14 @@ def _toc(parent: ET.Element, doc: Document, current_doc: Document, level: int,
                      breadcrumbs=breadcrumbs)
 
 
-def _toc_script(side: str = "left") -> ET.Element:
-    script = ET.Element("script")
-    script.text = f"document.body.style = 'padding-{side}: 20em'"
-    return script
+def _toc_style(side: str = "left") -> ET.Element:
+    style = ET.Element("style")
+    style.text = f"""
+body {{
+    padding-{side}: 20em !important;
+}}
+"""
+    return style
 
 
 def _relative_html_link(current_doc: Document, target_doc: Document) -> str:
