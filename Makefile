@@ -141,18 +141,19 @@ $(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call GENERATE_TEST_XML_template,$
 generate-test-xml: $(ALL_GENERATE_TEST_XML) ## generate Doxygen XML files required for test cases
 
 # Generate output for visual inspection tests
-VISUAL_TEST_CASES := $(wildcard tests/visual/*.adoc)
+VISUAL_TEST_CASES := $(wildcard tests/visual/*.toml)
 VISUAL_TEST_CASE_BUILD_DIR := build/visual-test
 
 define VISUAL_TEST_template
-visual-test-$(notdir $(basename $(1))): $(1)
-	asciidoxy $(1) \
+visual-test-$(notdir $(basename $(1))): $(patsubst %.toml,%.adoc,$(1))
+	asciidoxy $(patsubst %.toml,%.adoc,$(1)) \
 		--build-dir $(VISUAL_TEST_CASE_BUILD_DIR) \
-		--spec-file $(patsubst %.adoc,%.toml,$(1)) \
+		--spec-file $(1) \
 		--warnings-are-errors \
 		--debug \
 		--require asciidoctor-diagram \
-		--failure-level ERROR
+		--failure-level ERROR \
+		--multipage
 	mv $(VISUAL_TEST_CASE_BUILD_DIR)/debug.json $(VISUAL_TEST_CASE_BUILD_DIR)/$(notdir $(basename $(1))).debug.json
 
 ALL_VISUAL_TEST_CASES := $$(ALL_VISUAL_TEST_CASES) visual-test-$(notdir $(basename $(1)))
