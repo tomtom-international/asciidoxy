@@ -37,12 +37,23 @@ def build_dir(tmp_path):
 def simple_package(tmp_path, xml_data):
     package_dir = tmp_path / "package"
     (package_dir / "xml").mkdir(parents=True)
+
     shutil.copy(
         xml_data / "cpp" / "default" / "xml" / "classasciidoxy_1_1geometry_1_1_coordinate.xml",
         package_dir / "xml")
     shutil.copy(
         xml_data / "cpp" / "default" / "xml" /
         "classasciidoxy_1_1geometry_1_1_invalid_coordinate.xml", package_dir / "xml")
+
+    (package_dir / "contents.toml").write_text("""\
+[package]
+name = "package"
+
+[reference]
+type = "doxygen"
+dir = "xml"
+""")
+
     return package_dir
 
 
@@ -61,8 +72,6 @@ def spec_file(tmp_path, simple_package):
 [packages]
 [packages.package]
 type= "local"
-xml_subdir = "xml"
-include_subdir = "include"
 package_dir = "{simple_package}"
 """)
     return spec_file
