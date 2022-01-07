@@ -15,10 +15,12 @@
 /* Extension of the AsciiDoctor CSS for AsciiDoxy.
  * Adding:
  * - Support a multipage TOC to the right, forcing normal TOC to the left.
+ * - Floating multipage navigation.
  */
 @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";
 @import "https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor@2.0/data/stylesheets/asciidoctor-default.css";
 
+/* Multipage TOC right */
 @media screen and (min-width: 768px) {
     body {
         padding-right: 15em;
@@ -55,5 +57,32 @@
     body.toc2.toc-right {
         padding-left: 20em;
         padding-right: 20em;
+    }
+}
+
+/* Multipage navigation */
+div#navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+}
+div#navigation table {
+    margin-bottom: 0;
+}
+@media screen and (min-width: 768px) {
+    div#navigation {
+        right: 15em;
+    }
+    body.toc2 div#navigation {
+        left: 15em;
+    }
+}
+@media screen and (min-width: 1280px) {
+    div#navigation {
+        right: 20em;
+    }
+    body.toc2 div#navigation {
+        left: 20em;
     }
 }

@@ -25,6 +25,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   * AsciiDoxy now uses its own stylesheets for added functionality like multipage TOC and multipage
     navigation. These stylesheets are extensions of the default AsciiDoctor stylesheet. They can 
     still be overridden from the command line.
+  * The multipage navigation bar now floats at the bottom of the screen filling the full width of
+    the document body.
 
 
 === Fixed

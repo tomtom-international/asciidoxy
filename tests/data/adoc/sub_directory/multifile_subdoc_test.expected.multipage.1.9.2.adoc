@@ -472,6 +472,11 @@ Reference to main-document:
 Link to sub-document API:
 xref:../multifile_test.input.adoc#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9[++Severity++]
 
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
 [frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===
 |<<../multifile_test.input.adoc#,Prev>>
@@ -481,3 +486,8 @@ xref:../multifile_test.input.adoc#cpp-classasciidoxy_1_1traffic_1_1_traffic_even
 
 |<<multifile_subdoc_in_table_test.input.adoc#,Next>>
 |===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]

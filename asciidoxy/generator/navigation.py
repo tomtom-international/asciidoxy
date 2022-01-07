@@ -38,14 +38,25 @@ def navigation_bar(doc: Document) -> str:
         return f"<<{origin.relative_path_to(doc)}#,{link_text}>>"
 
     home_row = f" +\n{_xref_string(doc, root_doc, 'Home')}" if root_doc != doc else ''
-    return (f"""[frame=none, grid=none, cols="<.^,^.^,>.^"]
+    return f"""\
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
+[frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===
 |{_xref_string(doc, prev_doc, 'Prev')}
 
 |{_xref_string(doc, up_doc, 'Up')}{home_row}
 
 |{_xref_string(doc, next_doc, 'Next')}
-|===""")
+|===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]"""
 
 
 def _toc_div(side: str = "left") -> ET.Element:
