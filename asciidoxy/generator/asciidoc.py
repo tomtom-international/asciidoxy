@@ -16,6 +16,7 @@
 import functools
 import inspect
 import logging
+import warnings
 from abc import ABC, abstractmethod
 from functools import wraps
 from pathlib import Path
@@ -917,6 +918,9 @@ class ApiProxy:
         self._api = api
 
     def __getattr__(self, name: str):
+        warnings.warn("Using the api. prefix is deprecated and will be removed in 0.9.0.",
+                      FutureWarning)
+
         if name in ("link", "insert"):
             return _proxy_stackframe(getattr(self._api, name), name=f"api.{name}", _other_self=self)
         elif name in SUPPORTED_COMMANDS:
@@ -936,6 +940,9 @@ class ApiProxy:
                            file_name: Optional[str] = None,
                            anchor: Optional[str] = None,
                            link_text: Optional[str] = None) -> str:
+        warnings.warn("Using the api. prefix is deprecated and will be removed in 0.9.0.",
+                      FutureWarning)
+
         return self._api.cross_document_ref(file_name, anchor=anchor, link_text=link_text)
 
     @_proxy_stackframe
@@ -947,6 +954,9 @@ class ApiProxy:
                 multipage_link: bool = True,
                 always_embed: bool = False,
                 **asciidoc_options) -> str:
+        warnings.warn("Using the api. prefix is deprecated and will be removed in 0.9.0.",
+                      FutureWarning)
+
         return self._api.include(file_name,
                                  leveloffset=leveloffset,
                                  link_text=link_text,

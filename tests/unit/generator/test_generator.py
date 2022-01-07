@@ -422,7 +422,8 @@ def test_link_from_proxy_stores_stack_trace_with_proxy_name(preprocessing_api, c
     document.original_file.touch()
     include_doc = document.with_relative_path("include.adoc")
     include_doc.original_file.write_text("""${api.link_class("asciidoxy::geometry::Coordinate")}""")
-    preprocessing_api.include(include_doc.relative_path.name)
+    with pytest.warns(FutureWarning):
+        preprocessing_api.include(include_doc.relative_path.name)
 
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
     traces = context.linked["cpp-classasciidoxy_1_1geometry_1_1_coordinate"]
@@ -1589,8 +1590,10 @@ def test_context_link_to_element_element_not_inserted(context, single_and_multip
 
 def test_api_proxy__filter(generating_api):
     api = ApiProxy(generating_api)
-    api.filter(members="-SharedData")
-    result = api.insert("asciidoxy::traffic::TrafficEvent")
+    with pytest.warns(FutureWarning):
+        api.filter(members="-SharedData")
+    with pytest.warns(FutureWarning):
+        result = api.insert("asciidoxy::traffic::TrafficEvent")
     assert "SharedData" not in result
     assert "Update" in result
     assert "CalculateDelay" in result
@@ -1598,25 +1601,29 @@ def test_api_proxy__filter(generating_api):
 
 def test_api_proxy__insert(generating_api):
     api = ApiProxy(generating_api)
-    result = api.insert("asciidoxy::geometry::Coordinate")
+    with pytest.warns(FutureWarning):
+        result = api.insert("asciidoxy::geometry::Coordinate")
     assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_api_proxy__insert_class(generating_api):
     api = ApiProxy(generating_api)
-    result = api.insert_class("asciidoxy::geometry::Coordinate")
+    with pytest.warns(FutureWarning):
+        result = api.insert_class("asciidoxy::geometry::Coordinate")
     assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_api_proxy__link(generating_api):
     api = ApiProxy(generating_api)
-    result = api.link("asciidoxy::geometry::Coordinate")
+    with pytest.warns(FutureWarning):
+        result = api.link("asciidoxy::geometry::Coordinate")
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]")
 
 
 def test_api_proxy__link_class(generating_api):
     api = ApiProxy(generating_api)
-    result = api.link_class("asciidoxy::geometry::Coordinate")
+    with pytest.warns(FutureWarning):
+        result = api.link_class("asciidoxy::geometry::Coordinate")
     assert result == ("xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]")
 
 
@@ -1626,7 +1633,8 @@ def test_api_proxy__cross_document_ref(file_builder, tdb_single_and_multipage):
 
     for api in file_builder.apis():
         proxy = ApiProxy(api)
-        result = proxy.cross_document_ref("includes/other_file.adoc", anchor="anchor")
+        with pytest.warns(FutureWarning):
+            result = proxy.cross_document_ref("includes/other_file.adoc", anchor="anchor")
         if isinstance(api, GeneratingApi):
             assert result == "<<includes/other_file.adoc#anchor,anchor>>"
 
@@ -1637,7 +1645,8 @@ def test_api_proxy__cross_document_ref__old_syntax(file_builder, tdb_single_and_
 
     for api in file_builder.apis():
         proxy = ApiProxy(api)
-        result = proxy.cross_document_ref("includes/other_file.adoc", "anchor")
+        with pytest.warns(FutureWarning):
+            result = proxy.cross_document_ref("includes/other_file.adoc", "anchor")
         if isinstance(api, GeneratingApi):
             assert result == "<<includes/other_file.adoc#anchor,anchor>>"
 
@@ -1648,7 +1657,8 @@ def test_api_proxy__include(file_builder):
 
     for api in file_builder.apis():
         proxy = ApiProxy(api)
-        result = proxy.include("includes/another_file.adoc")
+        with pytest.warns(FutureWarning):
+            result = proxy.include("includes/another_file.adoc")
         lines = result.splitlines()
         assert len(lines) == 2
 
@@ -1669,7 +1679,8 @@ def test_api_proxy__include__old_syntax(file_builder):
 
     for api in file_builder.apis():
         proxy = ApiProxy(api)
-        result = proxy.include("includes/another_file.adoc", "+2")
+        with pytest.warns(FutureWarning):
+            result = proxy.include("includes/another_file.adoc", "+2")
         lines = result.splitlines()
         assert len(lines) == 2
 
@@ -1690,24 +1701,30 @@ def test_api_proxy__language(generating_api):
     assert len(exception.value.candidates) == 2
 
     api = ApiProxy(generating_api)
-    api.language("java")
+    with pytest.warns(FutureWarning):
+        api.language("java")
     result = generating_api.insert("Logger")
     assert "class Logger" in result
 
 
 def test_api_proxy__namespace(generating_api):
     api = ApiProxy(generating_api)
-    api.namespace("asciidoxy::geometry::")
-    result = api.insert("Coordinate", lang="cpp")
+    with pytest.warns(FutureWarning):
+        api.namespace("asciidoxy::geometry::")
+    with pytest.warns(FutureWarning):
+        result = api.insert("Coordinate", lang="cpp")
     assert "class asciidoxy::geometry::Coordinate" in result
 
 
 def test_api_proxy__require_version(preprocessing_api):
-    ApiProxy(preprocessing_api).require_version(f"=={__version__}")
+    with pytest.warns(FutureWarning):
+        ApiProxy(preprocessing_api).require_version(f"=={__version__}")
 
 
 def test_api_proxy__multipage_toc(generating_api, document, multipage):
-    result = generating_api.multipage_toc()
+    api = ApiProxy(generating_api)
+    with pytest.warns(FutureWarning):
+        result = api.multipage_toc()
     assert result == """\
 :docinfo: private
 :stylesheet: asciidoxy-toc-left.css"""
