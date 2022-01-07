@@ -1222,9 +1222,44 @@ ${include("third.adoc", always_embed=True)}""")
 
 def test_multipage_toc__default(generating_api, document, multipage):
     result = generating_api.multipage_toc()
-    assert result == ":docinfo: private"
+    assert result == """\
+:docinfo: private
+:stylesheet: asciidoxy-toc-left.css"""
 
     assert document.docinfo_footer_file.is_file()
+    assert document.stylesheet == "asciidoxy-toc-left.css"
+
+
+def test_multipage_toc__left(generating_api, document, multipage):
+    result = generating_api.multipage_toc(side="left")
+    assert result == """\
+:docinfo: private
+:stylesheet: asciidoxy-toc-left.css"""
+
+    assert document.docinfo_footer_file.is_file()
+    assert document.stylesheet == "asciidoxy-toc-left.css"
+
+
+def test_multipage_toc__right(generating_api, document, multipage):
+    result = generating_api.multipage_toc(side="right")
+    assert result == """\
+:docinfo: private
+:stylesheet: asciidoxy-toc-right.css"""
+
+    assert document.docinfo_footer_file.is_file()
+    assert document.stylesheet == "asciidoxy-toc-right.css"
+
+
+def test_multipage_toc__in_subdir(context, generating_api, document, multipage):
+    context.document = document.with_relative_path("dir/subdir/document.adoc")
+    context.document.work_file.parent.mkdir(parents=True)
+    result = generating_api.multipage_toc()
+    assert result == """\
+:docinfo: private
+:stylesheet: ../../asciidoxy-toc-left.css"""
+
+    assert context.document.docinfo_footer_file.is_file()
+    assert context.document.stylesheet == "asciidoxy-toc-left.css"
 
 
 def test_multipage_toc__multipage_off(generating_api, document):
@@ -1262,6 +1297,8 @@ def test_process_adoc_single_file(warnings_are_errors, test_file_name, single_an
                               config=default_config,
                               progress=progress_mock)[0]
     assert output_doc.work_file.is_file()
+    assert output_doc.stylesheet == "asciidoxy-no-toc.css"
+    assert output_doc.stylesheet_file.is_file()
 
     content = output_doc.work_file.read_text()
     if update_expected_results:
@@ -1288,6 +1325,8 @@ def test_process_adoc_multi_file(single_and_multipage, api_reference, package_ma
     assert len(output_docs) == 3
     for doc in output_docs:
         assert doc.work_file.is_file()
+        assert doc.stylesheet == "asciidoxy-no-toc.css"
+        assert doc.stylesheet_file.is_file()
         expected_output_file = adoc_data_expected_result_file(doc.work_file, single_and_multipage,
                                                               doxygen_version)
         expected_output_file = adoc_data / expected_output_file.relative_to(main_doc.work_dir)
@@ -1669,6 +1708,8 @@ def test_api_proxy__require_version(preprocessing_api):
 
 def test_api_proxy__multipage_toc(generating_api, document, multipage):
     result = generating_api.multipage_toc()
-    assert result == ":docinfo: private"
+    assert result == """\
+:docinfo: private
+:stylesheet: asciidoxy-toc-left.css"""
 
     assert document.docinfo_footer_file.is_file()

@@ -35,16 +35,19 @@ from typing import (
 from mako.template import Template
 from tqdm import tqdm
 
+import asciidoxy.generator
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
 from .._version import __version__
 from ..api_reference import AmbiguousLookupError, ApiReference
+from ..compat import importlib_resources
 from ..config import Configuration
 from ..document import Document
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError, UnknownPackageError
 from ..parser.doxygen import safe_language_tag
+from ..path_utils import relative_path
 from ..transcoder import TranscoderBase
 from .context import Context, stacktrace
 from .errors import (
@@ -797,7 +800,10 @@ class GeneratingApi(Api):
         toc_content = multipage_toc(self._context.output_document, side)
         with self._context.docinfo_footer_file().open(mode="w", encoding="utf-8") as f:
             f.write(toc_content)
-        return ":docinfo: private"
+        self._context.output_document.stylesheet = f"asciidoxy-toc-{side}.css"
+        stylesheet_rel_path = relative_path(self._context.output_document.work_file,
+                                            self._context.output_document.stylesheet_file)
+        return f":docinfo: private\n:stylesheet: {stylesheet_rel_path}"
 
     def cross_document_ref(self,
                            file_name: Optional[str] = None,
@@ -888,8 +894,19 @@ class GeneratingApi(Api):
                 if nav_bar:
                     print(nav_bar, file=f)
 
+        self._copy_stylesheet()
+
         if self._context.progress is not None:
             self._context.progress.update()
+
+    def _copy_stylesheet(self):
+        if self._context.document.stylesheet is None:
+            self._context.document.stylesheet = "asciidoxy-no-toc.css"
+        css_source_file = importlib_resources.files(asciidoxy.generator).joinpath(
+            self._context.document.stylesheet)
+        assert css_source_file.is_file()
+        self._context.document.stylesheet_file.write_text(
+            css_source_file.read_text(encoding="utf-8"), encoding="utf-8")
 
 
 class ApiProxy:

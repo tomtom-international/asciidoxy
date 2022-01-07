@@ -15,7 +15,7 @@
 ${multipage_toc(side="left")}
 :toc: right
 
-This demonstrates the multipage TOC to the right and the normal TOC to the left.
+This demonstrates the multipage TOC to the left and the normal TOC to the right.
 
 == Point
 

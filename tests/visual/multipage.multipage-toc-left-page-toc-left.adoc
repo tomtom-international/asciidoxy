@@ -11,11 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-= Multipage TOC without page TOC
+= Multipage TOC to the left forcing page TOC to the right
 ${multipage_toc(side="left")}
+:toc: left
 
-This demonstrates the multipage TOC to the left and no normal TOC.
+This demonstrates the multipage TOC to the left and the normal TOC being forced to the right.
 
-== Errors
+== Logger
 
-${insert("asciidoxy::geometry::InvalidCoordinate", leveloffset="+2")}
+${insert("Logger", leveloffset="+2")}

@@ -24,3 +24,5 @@ ${insert("asciidoxy::geometry::Coordinate", leveloffset="+2")}
 ${include("multipage.multipage-toc-left.adoc")}
 
 ${include("multipage.no-page-toc.adoc")}
+
+${include("multipage.multipage-toc-left-page-toc-left.adoc")}

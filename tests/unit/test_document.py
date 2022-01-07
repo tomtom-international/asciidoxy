@@ -151,10 +151,12 @@ def test_document__file_paths(tmp_path):
     pkg = Package("my-package")
     pkg.adoc_src_dir = pkg_dir
     doc = Document(Path("dir/index.adoc"), pkg, work_dir)
+    doc.stylesheet = "style.css"
 
     assert doc.original_file == pkg_dir / "dir/index.adoc"
     assert doc.work_file == work_dir / "dir/index.adoc"
     assert doc.docinfo_footer_file == work_dir / "dir/index-docinfo-footer.html"
+    assert doc.stylesheet_file == work_dir / "style.css"
 
 
 def test_document__relative_path_to__same_dir(tmp_path):

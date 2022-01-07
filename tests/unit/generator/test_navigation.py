@@ -76,11 +76,6 @@ def test_multipage_toc__root_level(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-left: 20em !important;
-}
-</style>
 """
 
 
@@ -110,11 +105,6 @@ def test_multipage_toc__level1__child0(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-left: 20em !important;
-}
-</style>
 """
 
 
@@ -136,11 +126,6 @@ def test_multipage_toc__level1__child1(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-left: 20em !important;
-}
-</style>
 """
 
 
@@ -170,11 +155,6 @@ def test_multipage_toc__level1__child2(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-left: 20em !important;
-}
-</style>
 """
 
 
@@ -204,11 +184,6 @@ def test_multipage_toc__level2__child0(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-left: 20em !important;
-}
-</style>
 """
 
 
@@ -246,11 +221,6 @@ def test_multipage_toc__level2__child1(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-left: 20em !important;
-}
-</style>
 """
 
 
@@ -288,11 +258,6 @@ def test_multipage_toc__level3(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-left: 20em !important;
-}
-</style>
 """
 
 
@@ -314,11 +279,6 @@ def test_multipage_toc__left_side(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-left: 20em !important;
-}
-</style>
 """
 
 
@@ -340,9 +300,4 @@ def test_multipage_toc__right_side(document_tree):
     </li>
   </ul>
 </div>
-<style>
-body {
-    padding-right: 20em !important;
-}
-</style>
 """
