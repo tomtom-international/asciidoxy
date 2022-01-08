@@ -94,7 +94,7 @@ def test_insert_class_explicit_all(generating_api):
 
 def test_insert_cpp_class_with_leveloffset(generating_api):
     result = generating_api.insert("asciidoxy::geometry::Coordinate", leveloffset="+3")
-    assert "==== [[" in result
+    assert "==== Coordinate" in result
     assert "===== Members" in result
 
 
@@ -792,7 +792,7 @@ def test_anchor(file_builder, tdb_single_and_multipage):
         if isinstance(api, PreprocessingApi):
             assert result == ""
         else:
-            assert result == "[[my-anchor,anchor text]]"
+            assert result == "[#my-anchor,reftext='anchor text']"
 
 
 def test_anchor__no_link_text(file_builder, tdb_single_and_multipage):
@@ -803,7 +803,7 @@ def test_anchor__no_link_text(file_builder, tdb_single_and_multipage):
         if isinstance(api, PreprocessingApi):
             assert result == ""
         else:
-            assert result == "[[my-anchor]]"
+            assert result == "[#my-anchor]"
 
 
 def test_cross_document_ref__flexible_anchor__same_package(file_builder, tdb_single_and_multipage):
@@ -897,7 +897,7 @@ def test_include__relative_path(file_builder):
         lines = result.splitlines()
         assert len(lines) == 2
 
-        assert lines[0] == "[[top-includes-another_file-top]]"
+        assert lines[0] == "[#top-includes-another_file-top]"
 
         assert lines[1].startswith("include::")
         assert lines[1].endswith("[leveloffset=+1]")
@@ -917,7 +917,7 @@ def test_include__relative_path__parent_directory(file_builder):
         lines = result.splitlines()
         assert len(lines) == 2
 
-        assert lines[0] == "[[top-includes-another_file-top]]"
+        assert lines[0] == "[#top-includes-another_file-top]"
 
         assert lines[1].startswith("include::")
         assert lines[1].endswith("[leveloffset=+1]")
@@ -957,7 +957,7 @@ def test_include__from_package(file_builder):
         lines = result.splitlines()
         assert len(lines) == 2
 
-        assert lines[0] == "[[top-another_file-top]]"
+        assert lines[0] == "[#top-another_file-top]"
 
         assert lines[1].startswith("include::")
         assert lines[1].endswith("[leveloffset=+1]")
@@ -984,7 +984,7 @@ ${include("yet_another_file.adoc")}
         lines = result.splitlines()
         assert len(lines) == 2
 
-        assert lines[0] == "[[top-another_file-top]]"
+        assert lines[0] == "[#top-another_file-top]"
 
         assert lines[1].startswith("include::")
         assert lines[1].endswith("[leveloffset=+1]")
@@ -1030,7 +1030,7 @@ def test_include__direct_access_to_other_package_for_old_style_packages(file_bui
         lines = result.splitlines()
         assert len(lines) == 2
 
-        assert lines[0] == "[[top-another_file-top]]"
+        assert lines[0] == "[#top-another_file-top]"
 
         assert lines[1].startswith("include::")
         assert lines[1].endswith("[leveloffset=+1]")
@@ -1662,7 +1662,7 @@ def test_api_proxy__include(file_builder):
         lines = result.splitlines()
         assert len(lines) == 2
 
-        assert lines[0] == "[[top-includes-another_file-top]]"
+        assert lines[0] == "[#top-includes-another_file-top]"
 
         assert lines[1].startswith("include::")
         assert lines[1].endswith("[leveloffset=+1]")
@@ -1684,7 +1684,7 @@ def test_api_proxy__include__old_syntax(file_builder):
         lines = result.splitlines()
         assert len(lines) == 2
 
-        assert lines[0] == "[[top-includes-another_file-top]]"
+        assert lines[0] == "[#top-includes-another_file-top]"
 
         assert lines[1].startswith("include::")
         assert lines[1].endswith("[leveloffset=+2]")

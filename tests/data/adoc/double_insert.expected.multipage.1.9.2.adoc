@@ -3,7 +3,8 @@
 
 
 
-== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy::geometry::Coordinate]]Coordinate
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate,reftext='asciidoxy::geometry::Coordinate']
+== Coordinate
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -63,7 +64,8 @@ Update from separate values.
 
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,asciidoxy::geometry::Coordinate::Coordinate]]Coordinate
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,reftext='asciidoxy::geometry::Coordinate::Coordinate']
+==== Coordinate
 
 
 [%autofit]
@@ -82,7 +84,8 @@ Default constructor.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,asciidoxy::geometry::Coordinate::~Coordinate]]~Coordinate
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,reftext='asciidoxy::geometry::Coordinate::~Coordinate']
+==== ~Coordinate
 
 
 [%autofit]
@@ -101,7 +104,8 @@ Destructor.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,asciidoxy::geometry::Coordinate::operator+]]operator+
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,reftext='asciidoxy::geometry::Coordinate::operator+']
+==== operator+
 
 
 [%autofit]
@@ -133,7 +137,8 @@ Coordinates can be added.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,asciidoxy::geometry::Coordinate::Latitude]]Latitude
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,reftext='asciidoxy::geometry::Coordinate::Latitude']
+==== Latitude
 
 
 [%autofit]
@@ -160,7 +165,8 @@ The latitude in degrees.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,asciidoxy::geometry::Coordinate::Longitude]]Longitude
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,reftext='asciidoxy::geometry::Coordinate::Longitude']
+==== Longitude
 
 
 [%autofit]
@@ -187,7 +193,8 @@ The longitude in degrees.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483,asciidoxy::geometry::Coordinate::Altitude]]Altitude
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483,reftext='asciidoxy::geometry::Coordinate::Altitude']
+==== Altitude
 
 
 [%autofit]
@@ -214,7 +221,8 @@ The altitude in meters.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,asciidoxy::geometry::Coordinate::IsValid]]IsValid
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,reftext='asciidoxy::geometry::Coordinate::IsValid']
+==== IsValid
 
 
 [%autofit]
@@ -241,7 +249,8 @@ True if valid, false if not.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -273,7 +282,8 @@ The input coordinate is invalid.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -300,7 +310,8 @@ Update from a tuple of latitude, longitude and altitue.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -327,7 +338,8 @@ Update from a tuple of only latitude and longitude.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -358,7 +370,8 @@ Altitude remains unchanged.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -404,7 +417,8 @@ Update from separate values.
 
 
 
-== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate,asciidoxy::geometry::Coordinate]]Coordinate
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate,reftext='asciidoxy::geometry::Coordinate']
+== Coordinate
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -464,7 +478,8 @@ Update from separate values.
 
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,asciidoxy::geometry::Coordinate::Coordinate]]Coordinate
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a69ac21cad618c0c033815f2cbdc86318,reftext='asciidoxy::geometry::Coordinate::Coordinate']
+==== Coordinate
 
 
 [%autofit]
@@ -483,7 +498,8 @@ Default constructor.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,asciidoxy::geometry::Coordinate::~Coordinate]]~Coordinate
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aad0a9a7429eff544b8ef33a38b9143a0,reftext='asciidoxy::geometry::Coordinate::~Coordinate']
+==== ~Coordinate
 
 
 [%autofit]
@@ -502,7 +518,8 @@ Destructor.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,asciidoxy::geometry::Coordinate::operator+]]operator+
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a38491700348537d6a2515998d8b35038,reftext='asciidoxy::geometry::Coordinate::operator+']
+==== operator+
 
 
 [%autofit]
@@ -534,7 +551,8 @@ Coordinates can be added.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,asciidoxy::geometry::Coordinate::Latitude]]Latitude
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a06db90972597c0e3274e6b02059cfa11,reftext='asciidoxy::geometry::Coordinate::Latitude']
+==== Latitude
 
 
 [%autofit]
@@ -561,7 +579,8 @@ The latitude in degrees.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,asciidoxy::geometry::Coordinate::Longitude]]Longitude
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1af6ea724ca7a0f7e4babbbdcdcf3e14e1,reftext='asciidoxy::geometry::Coordinate::Longitude']
+==== Longitude
 
 
 [%autofit]
@@ -588,7 +607,8 @@ The longitude in degrees.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483,asciidoxy::geometry::Coordinate::Altitude]]Altitude
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1ac882f1d28e823052fecb79041048a483,reftext='asciidoxy::geometry::Coordinate::Altitude']
+==== Altitude
 
 
 [%autofit]
@@ -615,7 +635,8 @@ The altitude in meters.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,asciidoxy::geometry::Coordinate::IsValid]]IsValid
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac,reftext='asciidoxy::geometry::Coordinate::IsValid']
+==== IsValid
 
 
 [%autofit]
@@ -642,7 +663,8 @@ True if valid, false if not.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9b48646ff0d71173ffb50bb63cb03a4a,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -674,7 +696,8 @@ The input coordinate is invalid.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1aab2cddb7bd2bca54f8c26844d502ad45,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -701,7 +724,8 @@ Update from a tuple of latitude, longitude and altitue.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0685687ef05b0749b1e95205cc8cb779,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -728,7 +752,8 @@ Update from a tuple of only latitude and longitude.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a9374867d80d929726933a146ddbe5ba3,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]
@@ -759,7 +784,8 @@ Altitude remains unchanged.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,asciidoxy::geometry::Coordinate::Update]]Update
+[#cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a0671d16a083d785878eac6a712afa891,reftext='asciidoxy::geometry::Coordinate::Update']
+==== Update
 
 
 [%autofit]

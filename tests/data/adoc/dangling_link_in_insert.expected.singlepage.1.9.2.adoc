@@ -5,7 +5,8 @@ The class reference:
 
 
 
-== [[cpp-classasciidoxy_1_1positioning_1_1_positioning,asciidoxy::positioning::Positioning]]Positioning
+[#cpp-classasciidoxy_1_1positioning_1_1_positioning,reftext='asciidoxy::positioning::Positioning']
+== Positioning
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -42,7 +43,8 @@ Are we currently in the given traffic event?
 
 
 
-==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1a247800ba0e71099b54c958f764f29917,asciidoxy::positioning::Positioning::CurrentPosition]]CurrentPosition
+[#cpp-classasciidoxy_1_1positioning_1_1_positioning_1a247800ba0e71099b54c958f764f29917,reftext='asciidoxy::positioning::Positioning::CurrentPosition']
+==== CurrentPosition
 
 
 [%autofit]
@@ -69,7 +71,8 @@ Coordinates of the current position.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1a8f374afbae18da9cbb1198f99d9f0cc8,asciidoxy::positioning::Positioning::IsNearby]]IsNearby
+[#cpp-classasciidoxy_1_1positioning_1_1_positioning_1a8f374afbae18da9cbb1198f99d9f0cc8,reftext='asciidoxy::positioning::Positioning::IsNearby']
+==== IsNearby
 
 
 [%autofit]
@@ -101,7 +104,8 @@ True if the coordinates are nearby.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1af0fb232aa368c066236edf2bab3fa323,asciidoxy::positioning::Positioning::Override]]Override
+[#cpp-classasciidoxy_1_1positioning_1_1_positioning_1af0fb232aa368c066236edf2bab3fa323,reftext='asciidoxy::positioning::Positioning::Override']
+==== Override
 
 
 [%autofit]
@@ -133,7 +137,8 @@ Thrown if the given coordinates are not valid.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1a54a97f78ce8d74dfa4e993393bf360cb,asciidoxy::positioning::Positioning::TrafficNearby]]TrafficNearby
+[#cpp-classasciidoxy_1_1positioning_1_1_positioning_1a54a97f78ce8d74dfa4e993393bf360cb,reftext='asciidoxy::positioning::Positioning::TrafficNearby']
+==== TrafficNearby
 
 
 [%autofit]
@@ -165,7 +170,8 @@ Thrown if the current position is not valid.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1positioning_1_1_positioning_1af799f1baf9c2ea33f106a9484d2ce2ea,asciidoxy::positioning::Positioning::InTraffic]]InTraffic
+[#cpp-classasciidoxy_1_1positioning_1_1_positioning_1af799f1baf9c2ea33f106a9484d2ce2ea,reftext='asciidoxy::positioning::Positioning::InTraffic']
+==== InTraffic
 
 
 [%autofit]

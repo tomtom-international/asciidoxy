@@ -7,7 +7,8 @@ Main document text.
 
 
 
-== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,asciidoxy::traffic::TrafficEvent::Severity]]Severity
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,reftext='asciidoxy::traffic::TrafficEvent::Severity']
+== Severity
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -64,7 +65,7 @@ xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate[++Coordinate++]
 Link to sub-document API member:
 xref:cpp-classasciidoxy_1_1geometry_1_1_coordinate_1a8d7e0eac29549fa4666093e36914deac[++IsValid++]
 
-[[top-sub_directory-multifile_subdoc_test.input-top]]
+[#top-sub_directory-multifile_subdoc_test.input-top]
 include::sub_directory/multifile_subdoc_test.input.adoc[leveloffset=+1]
 
 Reference in a table to a sub-document:
@@ -75,6 +76,6 @@ Reference in a table to a sub-document:
 |---
 
 Hidden link in multi-page, embedded in single-page:
-[[top-sub_directory-multifile_subdoc_in_table_test.input-top]]
+[#top-sub_directory-multifile_subdoc_in_table_test.input-top]
 include::sub_directory/multifile_subdoc_in_table_test.input.adoc[leveloffset=+1]
 

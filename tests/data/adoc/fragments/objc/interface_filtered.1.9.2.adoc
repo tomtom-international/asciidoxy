@@ -1,7 +1,8 @@
 
 
 
-== [[objc-interface_a_d_coordinate,ADCoordinate]]ADCoordinate
+[#objc-interface_a_d_coordinate,reftext='ADCoordinate']
+== ADCoordinate
 
 
 [source,objectivec,subs="-specialchars,macros+"]
@@ -31,7 +32,7 @@ The altitude in meters.
 
 
 === Members
-[[objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]
+[#objc-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,reftext='latitude']
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
@@ -43,7 +44,7 @@ The latitude in degrees.
 
 
 '''
-[[objc-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e,longitude]]
+[#objc-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e,reftext='longitude']
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----
@@ -55,7 +56,7 @@ The longitude in degrees.
 
 
 '''
-[[objc-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2,altitude]]
+[#objc-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2,reftext='altitude']
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----

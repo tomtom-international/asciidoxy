@@ -469,7 +469,7 @@ class Api(ABC):
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
         rel_path = self._context.document.relative_path_to(doc)
-        return f"[[{self._file_top_anchor(doc)}]]\ninclude::{rel_path}[{attributes}]"
+        return f"[#{self._file_top_anchor(doc)}]\ninclude::{rel_path}[{attributes}]"
 
     def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
@@ -860,9 +860,9 @@ class GeneratingApi(Api):
 
     def anchor(self, name: str, *, link_text: Optional[str] = None) -> str:
         if link_text:
-            return f"[[{name},{link_text}]]"
+            return f"[#{name},reftext='{link_text}']"
         else:
-            return f"[[{name}]]"
+            return f"[#{name}]"
 
     @_api_stackframe(name="insert", show_args=("element", ), internal=True)
     def insert_fragment(self,

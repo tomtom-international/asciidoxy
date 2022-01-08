@@ -21,7 +21,7 @@ from html import escape
 <%
 helper = ObjcTemplateHelper(api, element, insert_filter)
 %>
-[[${element.id},${element.name}]]
+[#${element.id},reftext='${element.name}']
 ${api.inserted(element)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----

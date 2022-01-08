@@ -4,7 +4,7 @@
 
 42
 
-[[top-env_variables_include.input-top]]
+[#top-env_variables_include.input-top]
 include::env_variables_include.input.adoc[leveloffset=+1]
 
 42

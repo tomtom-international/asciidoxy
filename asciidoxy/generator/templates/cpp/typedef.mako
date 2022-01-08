@@ -20,7 +20,8 @@ from html import escape
 <%
 helper = CppTemplateHelper(api, element, insert_filter)
 %>
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]

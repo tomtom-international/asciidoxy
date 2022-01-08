@@ -1,7 +1,8 @@
 
 
 
-== [[cpp-structasciidoxy_1_1tparam_1_1_mapping,asciidoxy::tparam::Mapping]]Mapping
+[#cpp-structasciidoxy_1_1tparam_1_1_mapping,reftext='asciidoxy::tparam::Mapping']
+== Mapping
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -39,7 +40,8 @@ Value type.
 
 
 
-==== [[cpp-structasciidoxy_1_1tparam_1_1_mapping_1af24de4264210fda5952988c1c7b60ad8,asciidoxy::tparam::Mapping::Insert]]Insert
+[#cpp-structasciidoxy_1_1tparam_1_1_mapping_1af24de4264210fda5952988c1c7b60ad8,reftext='asciidoxy::tparam::Mapping::Insert']
+==== Insert
 
 
 [%autofit]

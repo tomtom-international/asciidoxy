@@ -1,7 +1,8 @@
 
 
 
-== [[objc-protocol_a_d_traffic_event-p,ADTrafficEvent]]ADTrafficEvent
+[#objc-protocol_a_d_traffic_event-p,reftext='ADTrafficEvent']
+== ADTrafficEvent
 
 
 [source,objectivec,subs="-specialchars,macros+"]
@@ -30,7 +31,7 @@ Update the traffic event data.
 
 
 
-[[objc-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,updateWithCause:andDelay:]]
+[#objc-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,reftext='updateWithCause:andDelay:']
 
 [source,objectivec,subs="-specialchars,macros+"]
 ----

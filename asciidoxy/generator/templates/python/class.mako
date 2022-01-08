@@ -22,7 +22,8 @@ from html import escape
 helper = PythonTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,python,subs="-specialchars,macros+"]
@@ -119,7 +120,7 @@ ${api.insert_fragment(constructor, insert_filter, leveloffset=leveloffset + 2)}
 % endfor
 ###################################################################################### Variables ##
 % for variable in helper.variables(prot="public"):
-[[${variable.id},${variable.name}]]
+[#${variable.id},reftext='${variable.name}']
 ${api.inserted(variable)}
 
 [source,python,subs="-specialchars,macros+"]

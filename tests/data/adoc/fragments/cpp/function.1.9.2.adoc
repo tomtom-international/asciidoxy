@@ -1,6 +1,7 @@
 
 
-== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a32257b791bf6854f154c8608d6ea5b4b,asciidoxy::traffic::TrafficEvent::SharedData]]SharedData
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a32257b791bf6854f154c8608d6ea5b4b,reftext='asciidoxy::traffic::TrafficEvent::SharedData']
+== SharedData
 
 
 [%autofit]

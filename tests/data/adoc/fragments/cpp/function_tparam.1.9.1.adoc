@@ -1,6 +1,7 @@
 
 
-== [[cpp-template-parameters_8hpp_1a15cc38ed136c5c6000549d504fa442df,asciidoxy::tparam::IsEven]]IsEven
+[#cpp-template-parameters_8hpp_1a15cc38ed136c5c6000549d504fa442df,reftext='asciidoxy::tparam::IsEven']
+== IsEven
 
 
 [%autofit]

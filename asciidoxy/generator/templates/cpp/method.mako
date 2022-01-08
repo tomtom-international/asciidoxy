@@ -17,7 +17,8 @@ from asciidoxy.generator.templates.cpp.helpers import CppTemplateHelper
 from html import escape
 %>
 
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [%autofit]

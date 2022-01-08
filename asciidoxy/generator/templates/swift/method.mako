@@ -22,7 +22,7 @@ from html import escape
 helper = SwiftTemplateHelper(api, element, insert_filter)
 %>
 
-[[${element.id},${element.name}]]
+[#${element.id},reftext='${element.name}']
 ${api.inserted(element)}
 [source,swift,subs="-specialchars,macros+"]
 ----

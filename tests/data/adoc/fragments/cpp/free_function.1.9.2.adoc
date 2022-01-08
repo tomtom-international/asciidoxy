@@ -1,6 +1,7 @@
 
 
-== [[cpp-service_8hpp_1aca59c7047f1b7025c1102003fb144fb9,asciidoxy::system::CreateService]]CreateService
+[#cpp-service_8hpp_1aca59c7047f1b7025c1102003fb144fb9,reftext='asciidoxy::system::CreateService']
+== CreateService
 
 
 [%autofit]

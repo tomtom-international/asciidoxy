@@ -23,7 +23,8 @@ from itertools import chain
 helper = CppTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -192,7 +193,7 @@ ${api.insert_fragment(operator, insert_filter, kind_override="method", leveloffs
 % endfor
 ###################################################################################### Variables ##
 % for variable in helper.variables(prot=prot):
-[[${variable.id},${variable.name}]]
+[#${variable.id},reftext='${variable.name}']
 ${api.inserted(variable)}
 
 [source,cpp,subs="-specialchars,macros+"]
