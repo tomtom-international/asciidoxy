@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.generator.templates.helpers import has, has_any, h1, h2, tc
+from asciidoxy.generator.templates.helpers import has, has_any, h1, h2, tc, param_filter
 from asciidoxy.generator.templates.cpp.helpers import CppTemplateHelper
 from html import escape
 from itertools import chain
@@ -32,6 +32,9 @@ ${api.inserted(element)}
 #include &lt;${element.include}&gt;
 
 % endif
+% if has(param_filter(element.params, kind="tparam")):
+${helper.type_list(element.params, kind="tparam", start="template<", end=">") | escape}
+%endif
 ${"struct" if element.kind == "struct" else "class"} ${element.full_name}
 ----
 ${element.brief}
@@ -40,7 +43,8 @@ ${element.description}
 
 <%
 for prot in ("public", "protected", "private"):
-    if has_any(helper.simple_enclosed_types(prot=prot),
+    if has_any(param_filter(element.params, kind="tparam"),
+               helper.simple_enclosed_types(prot=prot),
                helper.complex_enclosed_types(prot=prot),
                helper.constructors(prot=prot),
                helper.destructors(prot=prot),
@@ -56,6 +60,19 @@ else:
 ################################################################################# Overview table ##
 [cols='h,5a']
 |===
+% if has(param_filter(element.params, kind="tparam")):
+| Template Parameters
+|
+% for param in param_filter(element.params, kind="tparam"):
+`${helper.parameter(param)}`::
+${param.description | tc}
+% if param.default_value:
++
+*Default value*: `${param.default_value | tc}`
+% endif
+
+% endfor
+% endif
 % for section_title, section_text in element.sections.items():
 | ${section_title}
 | ${section_text | tc}

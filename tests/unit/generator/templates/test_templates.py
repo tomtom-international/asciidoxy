@@ -29,6 +29,8 @@ import pytest
     ("asciidoxy::traffic::TrafficEvent::SharedData", "cpp", "fragments/cpp/function.adoc"),
     ("asciidoxy::system::CreateService", "cpp", "fragments/cpp/free_function.adoc"),
     ("asciidoxy::geometry::Point::increment", "cpp", "fragments/cpp/function_default_value.adoc"),
+    ("asciidoxy::tparam::IsEven", "cpp", "fragments/cpp/function_tparam.adoc"),
+    ("asciidoxy::tparam::Mapping", "cpp", "fragments/cpp/class_tparam.adoc"),
     ("com.asciidoxy.geometry.Coordinate", "java", "fragments/java/class.adoc"),
     ("com.asciidoxy.traffic.TrafficEvent.Severity", "java", "fragments/java/enum.adoc"),
     ("com.asciidoxy.system.Service", "java", "fragments/java/interface.adoc"),

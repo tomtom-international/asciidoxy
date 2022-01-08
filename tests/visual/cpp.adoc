@@ -64,6 +64,10 @@ ${insert("asciidoxy::tparam::is_container", leveloffset="+2")}
 
 ${insert("asciidoxy::tparam::is_container< std::array< T, N > >", leveloffset="+2")}
 
+${insert("asciidoxy::tparam::IsEven", leveloffset="+2")}
+
+${insert("asciidoxy::tparam::Mapping", leveloffset="+2")}
+
 ${insert("asciidoxy::wifi::ESP32WiFiProtocol", leveloffset="+2")}
 
 ${insert("asciidoxy::arrays::SomeStruct", leveloffset="+2")}

@@ -101,23 +101,42 @@ class ParserBase(ABC):
         self._driver = driver
 
     def parse_parameters(self, memberdef_element: ET.Element, parent: Compound,
-                         descriptions: Optional[ParameterList]) -> List[Parameter]:
-        params = []
-        for param_element in memberdef_element.iterfind("param"):
-            param = Parameter()
-            param.type = self.parse_type(param_element.find("type"),
-                                         param_element.find("array"),
-                                         namespace=parent.namespace)
-            param.name = param_element.findtext("declname", "")
-            param.default_value = param_element.findtext("defval", "")
-
-            if descriptions:
-                documentation = _find_parameter_documentation(descriptions, param.name)
-                if documentation:
-                    param.description = _to_asciidoc_or_empty(documentation.description())
-
-            params.append(param)
+                         descriptions: Optional[ParameterList],
+                         tparam_descriptions: Optional[ParameterList]) -> List[Parameter]:
+        params = [
+            self.parse_parameter(param_element, parent, descriptions, "param")
+            for param_element in memberdef_element.iterfind("param")
+        ]
+        tparamlist_element = memberdef_element.find("templateparamlist")
+        if tparamlist_element is not None:
+            tparams = [
+                self.parse_parameter(param_element, parent, tparam_descriptions, "tparam")
+                for param_element in tparamlist_element.iterfind("param")
+            ]
+            return params + tparams
         return params
+
+    def parse_parameter(self, param_element: ET.Element, parent: Compound,
+                        descriptions: Optional[ParameterList], kind: str) -> Parameter:
+        param = Parameter()
+        param.type = self.parse_type(param_element.find("type"),
+                                     param_element.find("array"),
+                                     namespace=parent.namespace)
+        param.name = param_element.findtext("declname", "")
+        param.default_value = param_element.findtext("defval", "")
+        param.kind = kind
+
+        if descriptions:
+            if kind == "param":
+                documentation = _find_parameter_documentation(descriptions, param.name)
+            elif param.type is not None:
+                documentation = _find_parameter_documentation(descriptions, param.type.name)
+            else:
+                documentation = None
+            if documentation:
+                param.description = _to_asciidoc_or_empty(documentation.description())
+
+        return param
 
     def parse_type(self,
                    type_element: Optional[ET.Element],
@@ -220,7 +239,8 @@ class ParserBase(ABC):
         member.returns = self.parse_returns(memberdef_element, member,
                                             detailed.pop_section(Admonition, "return"))
         member.params = self.parse_parameters(memberdef_element, member,
-                                              detailed.pop_section(ParameterList, "param"))
+                                              detailed.pop_section(ParameterList, "param"),
+                                              detailed.pop_section(ParameterList, "templateparam"))
         member.exceptions = self.parse_exceptions(memberdef_element, member,
                                                   detailed.pop_section(ParameterList, "exception"))
         member.sections = _pop_sections(detailed)
@@ -271,6 +291,9 @@ class ParserBase(ABC):
 
         # First extract other descriptions
         compound.sections = _pop_sections(detailed)
+        compound.params = self.parse_parameters(
+            compounddef_element, compound, detailed.pop_section(ParameterList, "param"),
+            detailed.pop_section(ParameterList, "templateparam"))
 
         # Then generate description with unused sections
         compound.brief, compound.description = select_descriptions(brief, detailed)

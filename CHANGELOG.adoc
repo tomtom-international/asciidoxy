@@ -20,6 +20,11 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == Unreleased
 
+=== Added
+
+  * {Cpp}: Support template parameter descriptions for functions/methods and classes.
+
+
 === Changed
 
   * AsciiDoxy now uses its own stylesheets for added functionality like multipage TOC and multipage

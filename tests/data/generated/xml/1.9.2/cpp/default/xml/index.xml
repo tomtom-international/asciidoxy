@@ -76,6 +76,9 @@
   <compound refid="class_logger" kind="class"><name>Logger</name>
     <member refid="class_logger_1adfed6b5c5cb7fab63527144e705c1fa8" kind="function"><name>Log</name></member>
   </compound>
+  <compound refid="structasciidoxy_1_1tparam_1_1_mapping" kind="struct"><name>asciidoxy::tparam::Mapping</name>
+    <member refid="structasciidoxy_1_1tparam_1_1_mapping_1af24de4264210fda5952988c1c7b60ad8" kind="function"><name>Insert</name></member>
+  </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_mark_down" kind="class"><name>asciidoxy::descriptions::MarkDown</name>
   </compound>
   <compound refid="classasciidoxy_1_1system_1_1_move_only" kind="class"><name>asciidoxy::system::MoveOnly</name>
@@ -153,6 +156,7 @@
     <member refid="service_8hpp_1aca59c7047f1b7025c1102003fb144fb9" kind="function"><name>CreateService</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1tparam" kind="namespace"><name>asciidoxy::tparam</name>
+    <member refid="template__parameters_8hpp_1a15cc38ed136c5c6000549d504fa442df" kind="function"><name>IsEven</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
     <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>

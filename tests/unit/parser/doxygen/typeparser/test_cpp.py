@@ -28,7 +28,7 @@ from .test_type_parser import arg_name, args_end, args_start, name, whitespace
 
 @pytest.fixture(params=[
     "", "const ", "volatile ", "mutable ", "enum ", "class ", "const class ",
-    "mutable volatile enum "
+    "mutable volatile enum ", "typename "
 ])
 def cpp_type_prefix(request):
     return request.param

@@ -307,6 +307,7 @@ def test_parameter__init__default():
     assert param.description == ""
     assert param.default_value is None
     assert param.prefix is None
+    assert param.kind == "param"
 
 
 def test_parameter__init__keywords():
@@ -314,13 +315,15 @@ def test_parameter__init__keywords():
                       name="name",
                       description="description",
                       default_value="default_value",
-                      prefix="prefix")
+                      prefix="prefix",
+                      kind="kind")
     assert param.type is not None
     assert param.type.name == "type"
     assert param.name == "name"
     assert param.description == "description"
     assert param.default_value == "default_value"
     assert param.prefix == "prefix"
+    assert param.kind == "kind"
 
 
 def test_parameter__eq__none():
@@ -345,17 +348,19 @@ def test_parameter__eq__full():
                       name="name",
                       description="description",
                       default_value="default_value",
-                      prefix="prefix")
+                      prefix="prefix",
+                      kind="kind")
     second = Parameter(type=TypeRef(name="type"),
                        name="name",
                        description="description",
                        default_value="default_value",
-                       prefix="prefix")
+                       prefix="prefix",
+                       kind="kind")
 
     assert first == second
     assert second == first
 
-    for attr_name in ("name", "description", "default_value", "prefix"):
+    for attr_name in ("name", "description", "default_value", "prefix", "kind"):
         setattr(second, attr_name, "other")
         assert first != second
         assert second != first

@@ -158,6 +158,7 @@ class TranscoderBase(ABC):
         transcoded.description = parameter.description
         transcoded.default_value = parameter.default_value
         transcoded.prefix = parameter.prefix
+        transcoded.kind = parameter.kind
 
         return transcoded
 

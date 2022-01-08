@@ -125,11 +125,25 @@ class TemplateHelper:
 
         return f"{prefix}{type_and_name}{defval}".strip()
 
-    def argument_list(self, params: Sequence[Parameter], *, link: bool = True) -> str:
-        return f"({', '.join(self.parameter(p, link=link) for p in params)})"
+    def argument_list(self,
+                      params: Sequence[Parameter],
+                      *,
+                      link: bool = True,
+                      kind: str = "param",
+                      start: str = "(",
+                      end: str = ")") -> str:
+        joined = ', '.join(self.parameter(p, link=link) for p in params if p.kind == kind)
+        return f"{start}{joined}{end}"
 
-    def type_list(self, params: Sequence[Parameter], *, link: bool = False) -> str:
-        return f"({', '.join(self.print_ref(p.type, link=link) for p in params)})"
+    def type_list(self,
+                  params: Sequence[Parameter],
+                  *,
+                  link: bool = False,
+                  kind: str = "param",
+                  start: str = "(",
+                  end: str = ")") -> str:
+        joined = ', '.join(self.print_ref(p.type, link=link) for p in params if p.kind == kind)
+        return f"{start}{joined}{end}"
 
     def method_signature(self, method: Compound, max_width: int = 80) -> str:
         method_without_params = self._method_join(self._method_prefix(method), method.name)
@@ -139,11 +153,12 @@ class TemplateHelper:
             return (f"{method_without_params}(){suffix}")
 
         method_without_params_length = len(
-            self._method_join(self._method_prefix(method, link=False), method.name))
+            self._method_join(self._method_prefix(method, link=False).split("\n")[-1], method.name))
         suffix_length = len(self._method_suffix(method, link=False))
 
         param_sizes = [
             len(self.parameter(p, link=False, default_value=True)) for p in method.params
+            if p.kind == "param"
         ]
         indent_size = method_without_params_length + 1
         first_indent = ""
@@ -154,7 +169,7 @@ class TemplateHelper:
 
         param_separator = f",\n{' ' * indent_size}"
         formatted_params = param_separator.join(
-            self.parameter(p, default_value=True) for p in method.params)
+            self.parameter(p, default_value=True) for p in method.params if p.kind == "param")
 
         return (f"{method_without_params}({first_indent}{formatted_params}){suffix}")
 
@@ -171,7 +186,7 @@ class TemplateHelper:
 
     @staticmethod
     def _method_join(*parts: str) -> str:
-        return " ".join(part for part in parts if part)
+        return " ".join(part for part in parts if part).replace("\n ", "\n")
 
     def static_methods(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
@@ -254,3 +269,8 @@ def h2(leveloffset: int, title: str) -> str:
 def tc(text: str) -> str:
     """Filter for table cell content."""
     return text.replace("|", "{vbar}")
+
+
+def param_filter(params: Sequence[Parameter], kind: str = "param") -> Iterator[Parameter]:
+    """Return only parameters of a specific kind."""
+    return (p for p in params if p.kind == kind)

@@ -15,7 +15,7 @@
 
 from typing import Iterator
 
-from asciidoxy.generator.templates.helpers import TemplateHelper
+from asciidoxy.generator.templates.helpers import TemplateHelper, has, param_filter
 from asciidoxy.model import Compound
 
 
@@ -44,5 +44,13 @@ class CppTemplateHelper(TemplateHelper):
                 if (m.name.startswith("operator") and not m.default and not m.deleted))
 
     def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
+        if has(param_filter(method.params, kind="tparam")):
+            template = self.type_list(method.params,
+                                      link=link,
+                                      kind="tparam",
+                                      start="template<",
+                                      end=">\n")
+        else:
+            template = ""
         constexpr = "constexpr" if method.constexpr else ""
-        return self._method_join(constexpr, super()._method_prefix(method, link=link))
+        return self._method_join(template, constexpr, super()._method_prefix(method, link=link))

@@ -47,7 +47,7 @@ class CppTraits(LanguageTraits):
     SEPARATORS = ",",
     NAMESPACE_SEPARATORS = ":",
     OPERATORS = "*", "&", "...",
-    QUALIFIERS = "const", "volatile", "mutable", "enum", "class",
+    QUALIFIERS = "const", "volatile", "mutable", "enum", "class", "typename",
     BUILT_IN_NAMES = ("void", "bool", "signed", "unsigned", "char", "wchar_t", "char16_t",
                       "char32_t", "char8_t", "float", "double", "long", "short", "int")
     # constexpr should not be part of the return type

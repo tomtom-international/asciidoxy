@@ -22,6 +22,7 @@
     </incdepgraph>
     <innerclass refid="structasciidoxy_1_1tparam_1_1is__container" prot="public">asciidoxy::tparam::is_container</innerclass>
     <innerclass refid="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4" prot="public">asciidoxy::tparam::is_container&lt; std::array&lt; T, N &gt; &gt;</innerclass>
+    <innerclass refid="structasciidoxy_1_1tparam_1_1_mapping" prot="public">asciidoxy::tparam::Mapping</innerclass>
     <innernamespace refid="namespaceasciidoxy">asciidoxy</innernamespace>
     <innernamespace refid="namespaceasciidoxy_1_1tparam">asciidoxy::tparam</innernamespace>
     <briefdescription>
@@ -59,8 +60,16 @@
 <codeline lineno="28" refid="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structasciidoxy_1_1tparam_1_1is__container" kindref="compound">is_container</ref>&lt;std::array&lt;T,<sp/>N&gt;&gt;<sp/>:<sp/>std::true_type<sp/>{</highlight></codeline>
 <codeline lineno="29"><highlight class="normal">};</highlight></codeline>
 <codeline lineno="30"><highlight class="normal"></highlight></codeline>
-<codeline lineno="31"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>tparam</highlight><highlight class="normal"></highlight></codeline>
-<codeline lineno="32"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>T&gt;</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>IsEven(T<sp/>value);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="keyword">template</highlight><highlight class="normal">&lt;</highlight><highlight class="keyword">typename</highlight><highlight class="normal"><sp/>K,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>V&gt;</highlight></codeline>
+<codeline lineno="48" refid="structasciidoxy_1_1tparam_1_1_mapping" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structasciidoxy_1_1tparam_1_1_mapping" kindref="compound">Mapping</ref><sp/>{</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>Insert(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>K&amp;<sp/>key,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>V&amp;<sp/>value);</highlight></codeline>
+<codeline lineno="50"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="52"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>tparam</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>asciidoxy</highlight><highlight class="normal"></highlight></codeline>
     </programlisting>
     <location file="template_parameters.hpp"/>
   </compounddef>

@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="structasciidoxy_1_1tparam_1_1_mapping" kind="struct" language="C++" prot="public">
+    <compoundname>asciidoxy::tparam::Mapping</compoundname>
+    <includes refid="template__parameters_8hpp" local="no">template_parameters.hpp</includes>
+    <templateparamlist>
+      <param>
+        <type>typename K</type>
+      </param>
+      <param>
+        <type>class V</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="structasciidoxy_1_1tparam_1_1_mapping_1af24de4264210fda5952988c1c7b60ad8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void asciidoxy::tparam::Mapping&lt; K, V &gt;::Insert</definition>
+        <argsstring>(const K &amp;key, const V &amp;value)</argsstring>
+        <name>Insert</name>
+        <param>
+          <type>const K &amp;</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const V &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="template_parameters.hpp" line="49" column="8"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Simple mapping between keys and values.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>K</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Key type. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>V</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Value type. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+    </detaileddescription>
+    <location file="template_parameters.hpp" line="48" column="1" bodyfile="template_parameters.hpp" bodystart="48" bodyend="50"/>
+    <listofallmembers>
+      <member refid="structasciidoxy_1_1tparam_1_1_mapping_1af24de4264210fda5952988c1c7b60ad8" prot="public" virt="non-virtual"><scope>asciidoxy::tparam::Mapping</scope><name>Insert</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

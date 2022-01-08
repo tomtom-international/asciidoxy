@@ -172,6 +172,7 @@ from tests.unit.matchers import (
                         suffix=IsEmpty(),
                         nested=IsEmpty(),
                     ),
+                    kind="param",
                 ),
                 m_parameter(
                     name="delay",
@@ -187,6 +188,7 @@ from tests.unit.matchers import (
                         suffix=IsEmpty(),
                         nested=IsEmpty(),
                     ),
+                    kind="param",
                 ),
             ],
             returns=m_returnvalue(
@@ -344,6 +346,7 @@ from tests.unit.matchers import (
                             ),
                         ],
                     ),
+                    kind="param",
                 ),
             ],
         ),
@@ -355,6 +358,7 @@ from tests.unit.matchers import (
               m_parameter(
                   name="text",
                   type=m_typeref(),
+                  kind="param",
               ),
               m_parameter(
                   name="success_callback",
@@ -386,6 +390,7 @@ from tests.unit.matchers import (
                           ),
                       ],
                   ),
+                  kind="param",
               ),
               m_parameter(
                   name="error_callback",
@@ -409,6 +414,7 @@ from tests.unit.matchers import (
                       ],
                       args=IsNone(),
                   ),
+                  kind="param",
               ),
           ], ),
           id="Method with complex std::function argument"),
@@ -434,10 +440,12 @@ from tests.unit.matchers import (
               m_parameter(
                   name="x",
                   default_value="0",
+                  kind="param",
               ),
               m_parameter(
                   name="y",
                   default_value="1",
+                  kind="param",
               ),
           ], ),
           id="Constructor with default parameter values"),
@@ -446,10 +454,12 @@ from tests.unit.matchers import (
               m_parameter(
                   name="x",
                   default_value="2",
+                  kind="param",
               ),
               m_parameter(
                   name="y",
                   default_value="3",
+                  kind="param",
               ),
           ], ),
           id="Method with default parameter values"),
@@ -480,27 +490,36 @@ from tests.unit.matchers import (
                   "Postcondition": "New values are used for the coordinate.",
               },
               params=[
-                  m_parameter(name="latitude",
-                              default_value="",
-                              type=m_typeref(name="double",
-                                             language="cpp",
-                                             namespace="asciidoxy::geometry::Coordinate",
-                                             prefix=IsEmpty(),
-                                             suffix=IsEmpty())),
-                  m_parameter(name="longitude",
-                              default_value="",
-                              type=m_typeref(name="double",
-                                             language="cpp",
-                                             namespace="asciidoxy::geometry::Coordinate",
-                                             prefix=IsEmpty(),
-                                             suffix=IsEmpty())),
-                  m_parameter(name="altitude",
-                              default_value="",
-                              type=m_typeref(name="double",
-                                             language="cpp",
-                                             namespace="asciidoxy::geometry::Coordinate",
-                                             prefix=IsEmpty(),
-                                             suffix=IsEmpty())),
+                  m_parameter(
+                      name="latitude",
+                      default_value="",
+                      type=m_typeref(name="double",
+                                     language="cpp",
+                                     namespace="asciidoxy::geometry::Coordinate",
+                                     prefix=IsEmpty(),
+                                     suffix=IsEmpty()),
+                      kind="param",
+                  ),
+                  m_parameter(
+                      name="longitude",
+                      default_value="",
+                      type=m_typeref(name="double",
+                                     language="cpp",
+                                     namespace="asciidoxy::geometry::Coordinate",
+                                     prefix=IsEmpty(),
+                                     suffix=IsEmpty()),
+                      kind="param",
+                  ),
+                  m_parameter(
+                      name="altitude",
+                      default_value="",
+                      type=m_typeref(name="double",
+                                     language="cpp",
+                                     namespace="asciidoxy::geometry::Coordinate",
+                                     prefix=IsEmpty(),
+                                     suffix=IsEmpty()),
+                      kind="param",
+                  ),
               ],
               returns=m_returnvalue(type=m_typeref(name="void",
                                                    language="cpp",
@@ -634,6 +653,70 @@ Do not use this class ever!
             ))],
         ),
         id="Function with array types"),
+    param(dict(name="asciidoxy::tparam::IsEven", lang="cpp"),
+          m_compound(
+              kind="function",
+              name="IsEven",
+              returns=m_returnvalue(type=m_typeref(name="bool")),
+              params=[
+                  m_parameter(
+                      name="value",
+                      type=m_typeref(
+                          name="T",
+                          prefix=IsEmpty(),
+                          suffix=IsEmpty(),
+                      ),
+                      description="The value to check.",
+                      kind="param",
+                  ),
+                  m_parameter(
+                      name=IsEmpty(),
+                      type=m_typeref(
+                          name="T",
+                          prefix="typename ",
+                          suffix=IsEmpty(),
+                      ),
+                      description="A numeric type.",
+                      kind="tparam",
+                  ),
+              ],
+          ),
+          id="Function with template parameters"),
+    param(dict(name="asciidoxy::tparam::Mapping", lang="cpp"),
+          m_compound(
+              kind="struct",
+              brief="Simple mapping between keys and values.",
+              description=IsEmpty(),
+              params=[
+                  m_parameter(
+                      name=IsEmpty(),
+                      type=m_typeref(
+                          prefix="typename ",
+                          name="K",
+                          suffix=IsEmpty(),
+                      ),
+                      description="Key type.",
+                      kind="tparam",
+                  ),
+                  m_parameter(
+                      name=IsEmpty(),
+                      type=m_typeref(
+                          prefix="class ",
+                          name="V",
+                          suffix=IsEmpty(),
+                      ),
+                      description="Value type.",
+                      kind="tparam",
+                  ),
+              ],
+              members=[
+                  m_compound(
+                      name="Insert",
+                      kind="function",
+                  ),
+              ],
+          ),
+          id="Class with template parameters"),
 ])
 def test_parse_cpp(api_reference, search_params, matcher):
     matcher.assert_matches(api_reference.find(**search_params))
