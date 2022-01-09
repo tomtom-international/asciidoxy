@@ -16,6 +16,7 @@
 from typing import List, Optional
 
 from .._version import __version__
+from ..document import Document
 from ..model import Compound, ReferableElement
 
 
@@ -237,3 +238,26 @@ class UnknownAnchorError(AsciiDocError):
 
     def __str__(self) -> str:
         return f"Anchor with name `{self.anchor_name}` does not exist."
+
+
+class DuplicateIncludeError(AsciiDocError):
+    """A file has been included multiple times or has been both included and embedded.
+
+    Args:
+        document: The offending document.
+        embedded: Is the file also embedded.
+    """
+    document: Document
+    embedded: bool
+
+    def __init__(self, document: Document, embedded: bool):
+        self.document = document
+        self.embedded = embedded
+
+    def __str__(self) -> str:
+        if self.embedded:
+            return (f"{self.document} has been both included and embedded."
+                    " This can lead to unexpected results with links and TOCs.")
+        else:
+            return (f"{self.document} has been included multiple times."
+                    " This can lead to unexpected results with links and TOCs.")

@@ -26,6 +26,7 @@ from asciidoxy.generator.context import InsertData, StackFrame
 from asciidoxy.generator.errors import (
     AmbiguousReferenceError,
     ConsistencyError,
+    DuplicateIncludeError,
     IncludeFileNotFoundError,
     IncompatibleVersionError,
     InvalidApiCallError,
@@ -1219,6 +1220,54 @@ ${include("third.adoc", always_embed=True)}""")
         assert include_doc in third_doc.embedded_in
         assert third_doc.parent() is include_doc
         assert len(third_doc.children) == 0
+
+
+def test_include__duplicate_include(file_builder, tdb_warnings_are_and_are_not_errors):
+    file_builder.add_input_file("input.adoc")
+    file_builder.add_package_file("package-a", "another_file.adoc", register=False)
+
+    for api in file_builder.apis():
+        api.include("another_file.adoc", package_name="package-a")
+        if tdb_warnings_are_and_are_not_errors and isinstance(api, PreprocessingApi):
+            with pytest.raises(DuplicateIncludeError):
+                api.include("another_file.adoc", package_name="package-a")
+        else:
+            api.include("another_file.adoc", package_name="package-a")
+
+
+def test_include__embed_and_include(file_builder, tdb_warnings_are_and_are_not_errors):
+    file_builder.add_input_file("input.adoc")
+    file_builder.add_package_file("package-a", "another_file.adoc", register=False)
+
+    for api in file_builder.apis():
+        api.include("another_file.adoc", package_name="package-a", always_embed=True)
+        if tdb_warnings_are_and_are_not_errors and isinstance(api, PreprocessingApi):
+            with pytest.raises(DuplicateIncludeError):
+                api.include("another_file.adoc", package_name="package-a")
+        else:
+            api.include("another_file.adoc", package_name="package-a")
+
+
+def test_include__include_and_embed(file_builder, tdb_warnings_are_and_are_not_errors):
+    file_builder.add_input_file("input.adoc")
+    file_builder.add_package_file("package-a", "another_file.adoc", register=False)
+
+    for api in file_builder.apis():
+        api.include("another_file.adoc", package_name="package-a")
+        if tdb_warnings_are_and_are_not_errors and isinstance(api, PreprocessingApi):
+            with pytest.raises(DuplicateIncludeError):
+                api.include("another_file.adoc", package_name="package-a", always_embed=True)
+        else:
+            api.include("another_file.adoc", package_name="package-a", always_embed=True)
+
+
+def test_include__duplicate_embed(file_builder, tdb_warnings_are_and_are_not_errors):
+    file_builder.add_input_file("input.adoc")
+    file_builder.add_package_file("package-a", "another_file.adoc", register=False)
+
+    for api in file_builder.apis():
+        api.include("another_file.adoc", package_name="package-a", always_embed=True)
+        api.include("another_file.adoc", package_name="package-a", always_embed=True)
 
 
 def test_multipage_toc__default(generating_api, document, multipage):

@@ -32,6 +32,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     still be overridden from the command line.
   * The multipage navigation bar now floats at the bottom of the screen filling the full width of
     the document body.
+  * Including a document multiple times or both including and embedding the same document is now a
+    warning or error.
 
 
 === Fixed

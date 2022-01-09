@@ -54,6 +54,7 @@ from .context import Context, stacktrace
 from .errors import (
     AmbiguousReferenceError,
     ConsistencyError,
+    DuplicateIncludeError,
     IncludeFileNotFoundError,
     IncompatibleVersionError,
     InvalidApiCallError,
@@ -731,6 +732,9 @@ class Api(ABC):
 class PreprocessingApi(Api):
     def _sub_api(self, document: Document, embedded: bool = False) -> "Api":
         sub_context = self._context.sub_context(document)
+
+        if document.is_included or (not embedded and document.is_embedded):
+            self._warning_or_error(DuplicateIncludeError(document, embedded))
 
         if embedded:
             self._context.document.embed(document)
