@@ -1,7 +1,8 @@
 
 
 
-== [[swift-protocol_a_d_traffic_event-p,ADTrafficEvent]]ADTrafficEvent
+[#swift-protocol_a_d_traffic_event-p,reftext='ADTrafficEvent']
+== ADTrafficEvent
 
 
 [source,swift,subs="-specialchars,macros+"]
@@ -32,7 +33,7 @@ Update the traffic event data.
 === Members
 
 
-[[swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,data]]
+[#swift-protocol_a_d_traffic_event-p_1a5a6d6782afcd9a6ee29c71499802bc1b,reftext='data']
 
 [source,swift,subs="-specialchars,macros+"]
 ----
@@ -48,7 +49,7 @@ Traffic event details.
 
 
 
-[[swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,update]]
+[#swift-protocol_a_d_traffic_event-p_1aaa32145fd9b5ebec01740ac078738262,reftext='update']
 
 [source,swift,subs="-specialchars,macros+"]
 ----

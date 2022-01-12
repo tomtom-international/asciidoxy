@@ -40,6 +40,8 @@ class ObjectiveCTraits(LanguageTraits):
     NESTED_ENDS = ">",
     ARGS_STARTS = "(",
     ARGS_ENDS = ")",
+    ARRAY_STARTS = "[",
+    ARRAY_ENDS = "]",
     SEPARATORS = ",",
     OPERATORS = "*",
     QUALIFIERS = ("nullable", "const", "__weak", "__strong", "__nonnull", "_Nullable", "_Nonnull",
@@ -53,14 +55,16 @@ class ObjectiveCTraits(LanguageTraits):
         TokenCategory.NESTED_END: NESTED_ENDS,
         TokenCategory.ARGS_START: ARGS_STARTS,
         TokenCategory.ARGS_END: ARGS_ENDS,
+        TokenCategory.ARRAY_START: ARRAY_STARTS,
+        TokenCategory.ARRAY_END: ARRAY_ENDS,
         TokenCategory.SEPARATOR: SEPARATORS,
         TokenCategory.OPERATOR: OPERATORS,
         TokenCategory.QUALIFIER: QUALIFIERS,
         TokenCategory.BUILT_IN_NAME: BUILT_IN_NAMES,
         TokenCategory.BLOCK: BLOCKS,
     }
-    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + SEPARATORS +
-                        OPERATORS + BLOCKS + tuple(string.whitespace))
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + ARRAY_STARTS +
+                        ARRAY_ENDS + SEPARATORS + OPERATORS + BLOCKS + tuple(string.whitespace))
     SEPARATOR_TOKENS_OVERLAP = True
 
     ALLOWED_PREFIXES = TokenCategory.WHITESPACE, TokenCategory.QUALIFIER,
@@ -114,7 +118,16 @@ class ObjectiveCTypeParser(TypeParser):
                      tokens: List[Token],
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
         tokens = super().adapt_tokens(tokens, array_tokens)
+        tokens = cls.remove_block_prefix(tokens)
+        tokens = cls.classify_arg_names(tokens, list(cls.TRAITS.ALLOWED_SUFFIXES))
+        tokens = cls.remove_invalid(tokens)
+        tokens = cls.move_array_definition(tokens)
+        tokens = cls.classify_array_size(tokens)
+        return tokens
 
+    @staticmethod
+    def remove_block_prefix(tokens: List[Token]) -> List[Token]:
+        """Remove `(^)` from blocks."""
         for match in find_tokens(tokens, [
             [TokenCategory.ARGS_START],
             [TokenCategory.WHITESPACE, None],
@@ -124,27 +137,6 @@ class ObjectiveCTypeParser(TypeParser):
         ]):
             for t in match:
                 t.category = TokenCategory.INVALID
-
-        for match in find_tokens(tokens, [
-            (TokenCategory.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
-                cls.TRAITS.ALLOWED_SUFFIXES,
-                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
-                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
-                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
-                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
-                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
-                cls.TRAITS.ALLOWED_SUFFIXES + (None, ),
-            [TokenCategory.NAME],
-            [TokenCategory.WHITESPACE, None],
-            [TokenCategory.ARGS_END, TokenCategory.ARGS_SEPARATOR],
-        ]):
-            if match[-2].category == TokenCategory.NAME:
-                match[-2].category = TokenCategory.ARG_NAME
-            elif match[-3].category == TokenCategory.NAME:
-                match[-3].category = TokenCategory.ARG_NAME
-
-        tokens = [t for t in tokens if t.category != TokenCategory.INVALID]
-
         return tokens
 
 

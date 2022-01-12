@@ -25,6 +25,7 @@ import logging
 import os
 import shutil
 import tarfile
+import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Type, TypeVar, Union
@@ -170,6 +171,9 @@ class PackageSpec(ABC):
                     "non-existing adoc root document.")
 
         elif self.xml_subdir or self.include_subdir:
+            warnings.warn(
+                "Packages without contents.toml are deprecated and will no longer be"
+                " supported from 0.9.0.", FutureWarning)
             if self.xml_subdir:
                 xml_dir = package_dir / self.xml_subdir
                 if xml_dir.is_dir():

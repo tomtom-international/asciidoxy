@@ -1,7 +1,8 @@
 
 
 
-== [[swift-interface_a_d_coordinate,ADCoordinate]]ADCoordinate
+[#swift-interface_a_d_coordinate,reftext='ADCoordinate']
+== ADCoordinate
 
 
 [source,swift,subs="-specialchars,macros+"]
@@ -45,7 +46,7 @@ Check if the coordinate is valid.
 
 
 
-[[swift-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22,init]]
+[#swift-interface_a_d_coordinate_1a623f6da1230c0ffd789ae18c87903d22,reftext='init']
 
 [source,swift,subs="-specialchars,macros+"]
 ----
@@ -58,7 +59,7 @@ Default constructor.
 
 
 '''
-[[swift-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,latitude]]
+[#swift-interface_a_d_coordinate_1a81bf3cba232405700c0613e7cf04dc94,reftext='latitude']
 
 [source,swift,subs="-specialchars,macros+"]
 ----
@@ -70,7 +71,7 @@ The latitude in degrees.
 
 
 '''
-[[swift-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e,longitude]]
+[#swift-interface_a_d_coordinate_1aad29474c1645b1c58df37c28e7e63b6e,reftext='longitude']
 
 [source,swift,subs="-specialchars,macros+"]
 ----
@@ -82,7 +83,7 @@ The longitude in degrees.
 
 
 '''
-[[swift-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2,altitude]]
+[#swift-interface_a_d_coordinate_1a625a1d21202854193d36bb75ce8133d2,reftext='altitude']
 
 [source,swift,subs="-specialchars,macros+"]
 ----
@@ -98,7 +99,7 @@ The altitude in meters.
 
 
 
-[[swift-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321,isValid]]
+[#swift-interface_a_d_coordinate_1ade3be7be115078f61135826a9edb4321,reftext='isValid']
 
 [source,swift,subs="-specialchars,macros+"]
 ----

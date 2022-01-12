@@ -1,6 +1,7 @@
 
 
-== [[objc-_a_d_traffic_event_8h_1ac1569299203e247cb766d015774a764e,OnTrafficEventCallback]]OnTrafficEventCallback
+[#objc-_a_d_traffic_event_8h_1ac1569299203e247cb766d015774a764e,reftext='OnTrafficEventCallback']
+== OnTrafficEventCallback
 
 
 [source,objectivec,subs="-specialchars,macros+"]

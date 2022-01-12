@@ -38,14 +38,25 @@ def navigation_bar(doc: Document) -> str:
         return f"<<{origin.relative_path_to(doc)}#,{link_text}>>"
 
     home_row = f" +\n{_xref_string(doc, root_doc, 'Home')}" if root_doc != doc else ''
-    return (f"""[frame=none, grid=none, cols="<.^,^.^,>.^"]
+    return f"""\
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
+[frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===
 |{_xref_string(doc, prev_doc, 'Prev')}
 
 |{_xref_string(doc, up_doc, 'Up')}{home_row}
 
 |{_xref_string(doc, next_doc, 'Next')}
-|===""")
+|===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]"""
 
 
 def _toc_div(side: str = "left") -> ET.Element:
@@ -101,9 +112,7 @@ def multipage_toc(doc: Document, side: str = "left") -> str:
     if doc is not None:
         _toc(parent=toc, doc=doc, current_doc=current_doc, level=1, breadcrumbs=breadcrumbs)
 
-    script = _toc_script(side)
-
-    return _pretty_html(toc) + _pretty_html(script)
+    return _pretty_html(toc)
 
 
 def _toc(parent: ET.Element, doc: Document, current_doc: Document, level: int,
@@ -121,12 +130,6 @@ def _toc(parent: ET.Element, doc: Document, current_doc: Document, level: int,
                      current_doc=current_doc,
                      level=level + 1,
                      breadcrumbs=breadcrumbs)
-
-
-def _toc_script(side: str = "left") -> ET.Element:
-    script = ET.Element("script")
-    script.text = f"document.body.style = 'padding-{side}: 20em'"
-    return script
 
 
 def _relative_html_link(current_doc: Document, target_doc: Document) -> str:

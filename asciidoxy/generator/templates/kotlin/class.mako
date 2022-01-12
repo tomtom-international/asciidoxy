@@ -25,7 +25,8 @@ helper = KotlinTemplateHelper(api, element, insert_filter)
 java_helper = JavaTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,kotlin,subs="-specialchars,macros+"]
@@ -150,7 +151,7 @@ ${h2(leveloffset, "Members")}
 % for prot in ("public", "protected", "internal", "private"):
 ###################################################################################### Constants ##
 % for constant in helper.constants(prot=prot):
-[[${constant.id},${constant.name}]]
+[#${constant.id},reftext='${constant.name}']
 ${api.inserted(constant)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
@@ -170,7 +171,7 @@ ${api.insert_fragment(constructor, insert_filter, kind_override="method", levelo
 % endfor
 ##################################################################################### Properties ##
 % for prop in helper.properties(prot=prot):
-[[${prop.id},${prop.name}]]
+[#${prop.id},reftext='${prop.name}']
 ${api.inserted(prop)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----

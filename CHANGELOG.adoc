@@ -18,6 +18,32 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.8.3 (12 Jan 2022)
+
+=== Added
+
+  * {Cpp}: Support template parameter descriptions for functions/methods and classes.
+
+
+=== Changed
+
+  * AsciiDoxy now uses its own stylesheets for added functionality like multipage TOC and multipage
+    navigation. These stylesheets are extensions of the default AsciiDoctor stylesheet. They can 
+    still be overridden from the command line.
+  * The multipage navigation bar now floats at the bottom of the screen filling the full width of
+    the document body.
+  * Including a document multiple times or both including and embedding the same document is now a
+    warning or error.
+
+
+=== Fixed
+
+  * Spaces in `insert` and `link` commands are ignored.
+  * Array types (like `Type[]`) are properly supported for {Cpp}, Java and Objective C.
+  * Use CSS directly to update margins to accommodate the multipage toc. No more JavaScript causing
+    jumping pages.
+
+
 == 0.8.2 (30 Dec 2021)
 
 === Fixed

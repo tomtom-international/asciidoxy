@@ -1,7 +1,8 @@
 
 
 
-== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event,asciidoxy::traffic::TrafficEvent]]TrafficEvent
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event,reftext='asciidoxy::traffic::TrafficEvent']
+== TrafficEvent
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -51,7 +52,8 @@ Register a callback to receive updates for the traffic event.
 
 
 
-=== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,asciidoxy::traffic::TrafficEvent::Severity]]Severity
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,reftext='asciidoxy::traffic::TrafficEvent::Severity']
+=== Severity
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -104,7 +106,8 @@ Severity unknown.
 
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41,asciidoxy::traffic::TrafficEvent::TrafficEvent]]TrafficEvent
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41,reftext='asciidoxy::traffic::TrafficEvent::TrafficEvent']
+==== TrafficEvent
 
 
 [%autofit]
@@ -123,7 +126,8 @@ Default constructor.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc,asciidoxy::traffic::TrafficEvent::TrafficEvent]]TrafficEvent
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc,reftext='asciidoxy::traffic::TrafficEvent::TrafficEvent']
+==== TrafficEvent
 
 
 [%autofit]
@@ -150,7 +154,8 @@ The data to contain.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28,asciidoxy::traffic::TrafficEvent::Data]]Data
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a8573ce8e432ca9831f9441ec31653c28,reftext='asciidoxy::traffic::TrafficEvent::Data']
+==== Data
 
 
 [%autofit]
@@ -177,7 +182,8 @@ Traffic event details.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b,asciidoxy::traffic::TrafficEvent::Update]]Update
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b,reftext='asciidoxy::traffic::TrafficEvent::Update']
+==== Update
 
 
 [%autofit]
@@ -213,7 +219,8 @@ True if the update is valid.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,asciidoxy::traffic::TrafficEvent::SharedData]]SharedData
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add924f17b33ae36301cf42f1233951cf,reftext='asciidoxy::traffic::TrafficEvent::SharedData']
+==== SharedData
 
 
 [%autofit]
@@ -248,7 +255,8 @@ Thrown when the event data is invalid.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17,asciidoxy::traffic::TrafficEvent::CalculateDelay]]CalculateDelay
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17,reftext='asciidoxy::traffic::TrafficEvent::CalculateDelay']
+==== CalculateDelay
 
 
 [%autofit]
@@ -280,7 +288,8 @@ Thrown when the update encounters a critical error.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0,asciidoxy::traffic::TrafficEvent::RegisterTrafficCallback]]RegisterTrafficCallback
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0,reftext='asciidoxy::traffic::TrafficEvent::RegisterTrafficCallback']
+==== RegisterTrafficCallback
 
 
 [%autofit]
@@ -306,7 +315,7 @@ A function to call on updates.
 
 
 '''
-[[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad,data_]]
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a93fd5356b283261ffbaccfccfa7164ad,reftext='data_']
 
 
 [source,cpp,subs="-specialchars,macros+"]

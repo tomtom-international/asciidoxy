@@ -1,6 +1,7 @@
 
 
-== [[swift-_a_d_traffic_event_8h_1a929385fc78158cf2be0d44416a5df884,TpegCauseCode]]TpegCauseCode
+[#swift-_a_d_traffic_event_8h_1a929385fc78158cf2be0d44416a5df884,reftext='TpegCauseCode']
+== TpegCauseCode
 
 
 

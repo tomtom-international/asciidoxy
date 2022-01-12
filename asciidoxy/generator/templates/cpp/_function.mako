@@ -12,7 +12,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from asciidoxy.generator.templates.helpers import has, has_any, tc
+from asciidoxy.generator.templates.helpers import has, has_any, tc, param_filter
 from asciidoxy.generator.templates.cpp.helpers import CppTemplateHelper
 %>
 <%
@@ -30,10 +30,23 @@ ${element.description}
 | ${section_text | tc}
 
 % endfor
-% if has(element.params):
+% if has(param_filter(element.params)):
 | Parameters
 |
-% for param in element.params:
+% for param in param_filter(element.params):
+`${helper.parameter(param)}`::
+${param.description | tc}
+% if param.default_value:
++
+*Default value*: `${param.default_value | tc}`
+% endif
+
+% endfor
+% endif
+% if has(param_filter(element.params, kind="tparam")):
+| Template Parameters
+|
+% for param in param_filter(element.params, kind="tparam"):
 `${helper.parameter(param)}`::
 ${param.description | tc}
 % if param.default_value:

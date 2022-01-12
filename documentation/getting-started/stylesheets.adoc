@@ -1,0 +1,43 @@
+// Copyright (C) 2019, TomTom (http://tomtom.com).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+= Stylesheets
+${include("../_header.adoc", always_embed=True, leveloffset=None)}
+
+AsciiDoctor allows you to provide a 
+https://docs.asciidoctor.org/asciidoctor/latest/html-backend/custom-stylesheet/[custom stylesheet] 
+to change the way the generated HTML looks. AsciiDoxy has its own stylesheets that enable 
+additional functionality like multipage tables of contents and multipage navigation. In order to 
+use your own custom stylesheet with AsciiDoxy, there are a few points of attention.
+
+== AsciiDoxy stylesheets
+
+To use all functionality offered by AsciiDoxy, it is recommended to base your custom stylesheets on 
+the AsciiDoxy stylesheets. Depending on the features used, AsciiDoxy uses the following stylesheet:
+
+* With a multipage TOC on the left:
+  https://github.com/tomtom-international/asciidoxy/blob/master/asciidoxy/generator/asciidoxy-toc-left.css[asciidoxy-toc-left.css].
+* With a multipage TOC on the right:
+  https://github.com/tomtom-international/asciidoxy/blob/master/asciidoxy/generator/asciidoxy-toc-right.css[asciidoxy-toc-right.css].
+* Without a multipage TOC:
+  https://github.com/tomtom-international/asciidoxy/blob/master/asciidoxy/generator/asciidoxy-no-toc.css[asciidoxy-no-toc.css].
+
+== Overriding the stylesheet
+
+To override the stylesheet used by AsciiDoxy, provide the `stylesheet` attribute on the command 
+line:
+
+[source,bash]
+----
+asciidoxy -a stylesheet=mystyle.css myfile.adoc
+----

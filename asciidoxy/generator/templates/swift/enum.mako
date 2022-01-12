@@ -21,7 +21,8 @@ from asciidoxy.generator.templates.swift.helpers import SwiftTemplateHelper
 helper = SwiftTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,swift,subs="-specialchars,macros+"]

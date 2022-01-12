@@ -1,7 +1,8 @@
 
 
 
-== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event,asciidoxy::traffic::TrafficEvent]]TrafficEvent
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event,reftext='asciidoxy::traffic::TrafficEvent']
+== TrafficEvent
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -49,7 +50,8 @@ Register a callback to receive updates for the traffic event.
 
 
 
-=== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,asciidoxy::traffic::TrafficEvent::Severity]]Severity
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,reftext='asciidoxy::traffic::TrafficEvent::Severity']
+=== Severity
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -102,7 +104,8 @@ Severity unknown.
 
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41,asciidoxy::traffic::TrafficEvent::TrafficEvent]]TrafficEvent
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a952be8e7ea9c0dd57bc10915d34c0e41,reftext='asciidoxy::traffic::TrafficEvent::TrafficEvent']
+==== TrafficEvent
 
 
 [%autofit]
@@ -121,7 +124,8 @@ Default constructor.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc,asciidoxy::traffic::TrafficEvent::TrafficEvent]]TrafficEvent
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1aa2020f2d39c1d843ab3a4ff33ae68fbc,reftext='asciidoxy::traffic::TrafficEvent::TrafficEvent']
+==== TrafficEvent
 
 
 [%autofit]
@@ -148,7 +152,8 @@ The data to contain.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add56f2e8976dcd2a26c2159c330c7f0f,asciidoxy::traffic::TrafficEvent::Data]]Data
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1add56f2e8976dcd2a26c2159c330c7f0f,reftext='asciidoxy::traffic::TrafficEvent::Data']
+==== Data
 
 
 [%autofit]
@@ -175,7 +180,8 @@ Traffic event details.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b,asciidoxy::traffic::TrafficEvent::Update]]Update
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a829eda83200a17d2d2f8a5fced5f000b,reftext='asciidoxy::traffic::TrafficEvent::Update']
+==== Update
 
 
 [%autofit]
@@ -211,7 +217,8 @@ True if the update is valid.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a32257b791bf6854f154c8608d6ea5b4b,asciidoxy::traffic::TrafficEvent::SharedData]]SharedData
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a32257b791bf6854f154c8608d6ea5b4b,reftext='asciidoxy::traffic::TrafficEvent::SharedData']
+==== SharedData
 
 
 [%autofit]
@@ -246,7 +253,8 @@ Thrown when the event data is invalid.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17,asciidoxy::traffic::TrafficEvent::CalculateDelay]]CalculateDelay
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1ae6a810b8b8cc273707c65b8f0deaab17,reftext='asciidoxy::traffic::TrafficEvent::CalculateDelay']
+==== CalculateDelay
 
 
 [%autofit]
@@ -278,7 +286,8 @@ Thrown when the update encounters a critical error.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0,asciidoxy::traffic::TrafficEvent::RegisterTrafficCallback]]RegisterTrafficCallback
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a0c01e73a5c19c5ebaf6a27cf4a6f2da0,reftext='asciidoxy::traffic::TrafficEvent::RegisterTrafficCallback']
+==== RegisterTrafficCallback
 
 
 [%autofit]
@@ -309,7 +318,8 @@ A function to call on updates.
 
 
 
-=== [[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,asciidoxy::traffic::TrafficEvent::TrafficEventData]]TrafficEventData
+[#cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,reftext='asciidoxy::traffic::TrafficEvent::TrafficEventData']
+=== TrafficEventData
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -339,7 +349,7 @@ Severity of the event.
 
 ==== Members
 
-[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,cause]]
+[#cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,reftext='cause']
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -352,7 +362,7 @@ TPEG cause code.
 
 
 '''
-[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af2d0e5eae81af06962dd53271c8dc70d,delay]]
+[#cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af2d0e5eae81af06962dd53271c8dc70d,reftext='delay']
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -365,7 +375,7 @@ Delay caused by the traffic event in seconds.
 
 
 '''
-[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,severity]]
+[#cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,reftext='severity']
 
 
 [source,cpp,subs="-specialchars,macros+"]

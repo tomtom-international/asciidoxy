@@ -1,0 +1,39 @@
+
+
+[#cpp-template-parameters_8hpp_1a15cc38ed136c5c6000549d504fa442df,reftext='asciidoxy::tparam::IsEven']
+== IsEven
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;template_parameters.hpp&gt;
+
+template&lt;typename T&gt;
+bool IsEven(T value)
+----
+
+
+Check if the value is even.
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`T value`::
+The value to check.
+
+| Template Parameters
+|
+`typename T`::
+A numeric type.
+
+| Returns
+|
+`bool`::
+True if the value is even, false if it is not.
+
+|===
+

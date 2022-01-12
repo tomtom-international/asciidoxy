@@ -94,6 +94,7 @@ class Document:
         work_dir:      Root of the workspace for temporary files.
         children:      Other documents included in this document.
         included_in:   Document including this document, if present.
+        stylesheet:    Name of the stylesheet to apply.
     """
     relative_path: Path
     package: Package
@@ -103,6 +104,7 @@ class Document:
     included_in: Optional["Document"]
     embedded_in: List["Document"]
     is_root: bool
+    stylesheet: Optional[str]
 
     _title: Optional[str] = None
 
@@ -115,6 +117,7 @@ class Document:
         self.included_in = None
         self.embedded_in = []
         self.is_root = False
+        self.stylesheet = None
 
     @property
     def original_file(self) -> Path:
@@ -131,6 +134,11 @@ class Document:
     def docinfo_footer_file(self) -> Path:
         """The absolute path to the file containing the docinfo footer."""
         return self.work_file.with_name(f"{self.relative_path.stem}-docinfo-footer.html")
+
+    @property
+    def stylesheet_file(self) -> Path:
+        assert self.stylesheet
+        return self.work_dir / self.stylesheet
 
     @property
     def is_used(self) -> bool:

@@ -136,7 +136,8 @@ async def test_http_package__old__xml_only(aiohttp_server, tmp_path):
     spec.xml_subdir = "xml"
     spec.file_names = ["xml"]
 
-    packages = await collect([spec], tmp_path)
+    with pytest.warns(FutureWarning):
+        packages = await collect([spec], tmp_path)
 
     assert len(packages) == 1
     pkg = packages[0]
@@ -162,7 +163,8 @@ async def test_http_package__old__include_only(aiohttp_server, tmp_path):
     spec.include_subdir = "adoc"
     spec.file_names = ["include"]
 
-    packages = await collect([spec], tmp_path)
+    with pytest.warns(FutureWarning):
+        packages = await collect([spec], tmp_path)
 
     assert len(packages) == 1
     pkg = packages[0]
@@ -191,7 +193,8 @@ async def test_http_package__old__xml_and_include(aiohttp_server, tmp_path):
     spec.include_subdir = "adoc"
     spec.file_names = ["include", "xml"]
 
-    packages = await collect([spec], tmp_path)
+    with pytest.warns(FutureWarning):
+        packages = await collect([spec], tmp_path)
 
     assert len(packages) == 1
     pkg = packages[0]

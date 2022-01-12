@@ -1,6 +1,7 @@
 
 
-== [[python-classasciidoxy_1_1default-values_1_1_point_1a7afa9cd9fcbec61efa64cb0f3108c17b,asciidoxy.default_values.Point.increment]]increment
+[#python-classasciidoxy_1_1default-values_1_1_point_1a7afa9cd9fcbec61efa64cb0f3108c17b,reftext='asciidoxy.default_values.Point.increment']
+== increment
 
 
 [source,python,subs="-specialchars,macros+"]

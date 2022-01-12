@@ -19,7 +19,7 @@ import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
 from asciidoxy.generator.templates.cpp.helpers import CppTemplateHelper
-from asciidoxy.model import Compound, ReturnValue, TypeRef
+from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 
 
 @pytest.fixture
@@ -161,3 +161,36 @@ def test_method_signature__constexpr(helper):
     method.returns.type = TypeRef("cpp", "void")
 
     assert helper.method_signature(method) == "constexpr void ShortMethod()"
+
+
+def test_method_signature__template_params(helper):
+    method = Compound(
+        "cpp",
+        name="ShortMethod",
+        returns=ReturnValue(type=TypeRef("cpp", "V")),
+        params=[
+            Parameter(
+                kind="tparam",
+                type=TypeRef("cpp", "K", prefix="typename "),
+            ),
+            Parameter(
+                kind="tparam",
+                type=TypeRef("cpp", "V", prefix="class "),
+            ),
+            Parameter(
+                name="key",
+                kind="param",
+                type=TypeRef("cpp", "K"),
+            ),
+            Parameter(
+                name="default",
+                kind="param",
+                type=TypeRef("cpp", "V"),
+            )
+        ],
+    )
+
+    assert (helper.method_signature(method) == """\
+template<typename K, class V>
+V ShortMethod(K key,
+              V default)""")

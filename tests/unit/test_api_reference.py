@@ -241,6 +241,41 @@ def test_find_only_by_name(api_reference):
     assert api_reference.find("asciidoxy::geometry::Coordinate") is not None
 
 
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_by_name_with_spaces(api_reference):
+    assert api_reference.find("asciidoxy::tparam::is_container< std::array< T, N> >") is not None
+    assert api_reference.find("asciidoxy::tparam::is_container<std::array<T,N>>") is not None
+    assert api_reference.find("asciidoxy ::tparam::is_container<std::array<T,N>>") is not None
+    assert api_reference.find("asciidoxy:: tparam::is_container<std::array<T,N>>") is not None
+    assert api_reference.find("asciidoxy::tparam ::is_container<std::array<T,N>>") is not None
+    assert api_reference.find("asciidoxy::tparam:: is_container<std::array<T,N>>") is not None
+    assert api_reference.find("asciidoxy::tparam::is_container <std::array<T,N>>") is not None
+    assert api_reference.find("asciidoxy::tparam::is_container< std::array<T,N>>") is not None
+    assert api_reference.find("asciidoxy::tparam::is_container<std::array <T,N>>") is not None
+    assert api_reference.find("asciidoxy::tparam::is_container<std::array<T,N >>") is not None
+
+    assert api_reference.find("is_container<std::array<T,N>>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find(" is_container<std::array<T,N>>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find("is_container <std::array<T,N>>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find("is_container< std::array<T,N>>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find("is_container<std::array <T,N>>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find("is_container<std::array< T,N>>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find("is_container<std::array<T ,N>>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find("is_container<std::array<T, N>>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find("is_container<std::array<T,N >>",
+                              namespace="asciidoxy::tparam") is not None
+    assert api_reference.find("is_container<std::array<T,N> >",
+                              namespace="asciidoxy::tparam") is not None
+
+
 def test_find_by_name_and_kind(test_data):
     parser = ParserDriver()
     parser.parse(test_data / "ambiguous_names.xml")
@@ -436,4 +471,30 @@ def test_find_method__select_based_on_args_2(api_reference):
     assert element is not None
 
     element = api_reference.find("asciidoxy::geometry::Coordinate::Update(double, double, double)")
+    assert element is not None
+
+
+@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
+def test_find_method__select_based_on_args_2__spaces_dont_matter(api_reference):
+    with pytest.raises(AmbiguousLookupError):
+        api_reference.find("asciidoxy::geometry::Coordinate::Update")
+
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Update( )")
+    assert element is None
+
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Update(const Coordinate &)")
+    assert element is not None
+
+    element = api_reference.find(
+        "asciidoxy::geometry::Coordinate::Update(std::tuple<double,double,double>)")
+    assert element is not None
+
+    element = api_reference.find(
+        "asciidoxy::geometry::Coordinate::Update( std::tuple<double,double> )")
+    assert element is not None
+
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Update(double,double)")
+    assert element is not None
+
+    element = api_reference.find("asciidoxy::geometry::Coordinate::Update(double,double,double)")
     assert element is not None

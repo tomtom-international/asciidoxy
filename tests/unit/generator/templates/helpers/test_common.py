@@ -20,7 +20,16 @@ from unittest.mock import Mock, call
 import pytest
 
 from asciidoxy.generator.filters import InsertionFilter
-from asciidoxy.generator.templates.helpers import TemplateHelper, h1, h2, has, has_any, header, tc
+from asciidoxy.generator.templates.helpers import (
+    TemplateHelper,
+    h1,
+    h2,
+    has,
+    has_any,
+    header,
+    param_filter,
+    tc,
+)
 from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 
 
@@ -414,65 +423,65 @@ def test_argument_list__empty(empty_generating_api):
 
 
 def test_argument_list(empty_generating_api):
-    type1 = TypeRef("lang")
-    type1.prefix = "const "
-    type1.name = "Type1"
+    type1 = TypeRef("lang", prefix="const ", name="Type1")
+    type2 = TypeRef("lang", name="Type2", suffix=" &", id="lang-type2")
+    type3 = TypeRef("lang", name="Type3", nested=[type1, type2])
 
-    type2 = TypeRef("lang")
-    type2.name = "Type2"
-    type2.suffix = " &"
-    type2.id = "lang-type2"
-
-    type3 = TypeRef("lang")
-    type3.name = "Type3"
-    type3.nested = [type1, type2]
-
-    param1 = Parameter()
-    param1.type = type1
-
-    param2 = Parameter()
-    param2.type = type2
-    param2.name = "arg2"
-
-    param3 = Parameter()
-    param3.type = type3
-    param3.name = "arg3"
+    params = [
+        Parameter(type=type1, kind="param"),
+        Parameter(type=type2, name="arg2", kind="param"),
+        Parameter(type=type3, name="arg3", kind="param"),
+    ]
 
     helper = TemplateHelper(empty_generating_api)
-    assert (helper.argument_list([param1, param2,
-                                  param3]) == "(const Type1, xref:lang-type2[++Type2++] & arg2, "
+    assert (helper.argument_list(params) == "(const Type1, xref:lang-type2[++Type2++] & arg2, "
             "Type3<const Type1, xref:lang-type2[++Type2++] &> arg3)")
 
 
-def test_type_list(empty_generating_api):
-    type1 = TypeRef("lang")
-    type1.prefix = "const "
-    type1.name = "Type1"
+def test_argument_list__skip_tparam(empty_generating_api):
+    type1 = TypeRef("lang", prefix="typename ", name="Type1")
+    type2 = TypeRef("lang", name="Type2", suffix=" &", id="lang-type2")
+    type3 = TypeRef("lang", name="Type3", nested=[type1, type2])
 
-    type2 = TypeRef("lang")
-    type2.name = "Type2"
-    type2.suffix = " &"
-    type2.id = "lang-type2"
-
-    type3 = TypeRef("lang")
-    type3.name = "Type3"
-    type3.nested = [type1, type2]
-
-    param1 = Parameter()
-    param1.type = type1
-    param1.name = "arg1"
-
-    param2 = Parameter()
-    param2.type = type2
-    param2.name = "arg2"
-
-    param3 = Parameter()
-    param3.type = type3
-    param3.name = "arg3"
+    params = [
+        Parameter(type=type1, kind="tparam"),
+        Parameter(type=type2, name="arg2", kind="param"),
+        Parameter(type=type3, name="arg3", kind="param"),
+    ]
 
     helper = TemplateHelper(empty_generating_api)
-    assert (helper.type_list([param1, param2,
-                              param3]) == "(const Type1, Type2 &, Type3<const Type1, Type2 &>)")
+    assert (helper.argument_list(params) == "(xref:lang-type2[++Type2++] & arg2, "
+            "Type3<typename Type1, xref:lang-type2[++Type2++] &> arg3)")
+
+
+def test_type_list(empty_generating_api):
+    type1 = TypeRef("lang", prefix="const ", name="Type1")
+    type2 = TypeRef("lang", name="Type2", suffix=" &", id="lang-type2")
+    type3 = TypeRef("lang", name="Type3", nested=[type1, type2])
+
+    params = [
+        Parameter(type=type1, kind="param"),
+        Parameter(type=type2, name="arg2", kind="param"),
+        Parameter(type=type3, name="arg3", kind="param"),
+    ]
+
+    helper = TemplateHelper(empty_generating_api)
+    assert (helper.type_list(params) == "(const Type1, Type2 &, Type3<const Type1, Type2 &>)")
+
+
+def test_type_list__skip_tparam(empty_generating_api):
+    type1 = TypeRef("lang", prefix="typename ", name="Type1")
+    type2 = TypeRef("lang", name="Type2", suffix=" &", id="lang-type2")
+    type3 = TypeRef("lang", name="Type3", nested=[type1, type2])
+
+    params = [
+        Parameter(type=type1, kind="tparam"),
+        Parameter(type=type2, name="arg2", kind="param"),
+        Parameter(type=type3, name="arg3", kind="param"),
+    ]
+
+    helper = TemplateHelper(empty_generating_api)
+    assert (helper.type_list(params) == "(Type2 &, Type3<typename Type1, Type2 &>)")
 
 
 def test_has__list():
@@ -720,13 +729,12 @@ def test_method_signature__const(empty_generating_api):
 def test_method_signature__single_param(empty_generating_api):
     method = Compound("lang")
     method.name = "ShortMethod"
-
-    method.returns = ReturnValue()
-    method.returns.type = TypeRef("lang", "void")
-
-    method.params = [Parameter()]
-    method.params[0].name = "value"
-    method.params[0].type = TypeRef("lang", "int")
+    method.returns = ReturnValue(type=TypeRef("lang", "void"))
+    method.params = [Parameter(
+        kind="param",
+        name="value",
+        type=TypeRef("lang", "int"),
+    )]
 
     helper = TemplateHelper(empty_generating_api)
     assert helper.method_signature(method) == "void ShortMethod(int value)"
@@ -735,13 +743,14 @@ def test_method_signature__single_param(empty_generating_api):
 def test_method_signature__single_param__too_wide(empty_generating_api):
     method = Compound("lang")
     method.name = "ShortMethod"
-
-    method.returns = ReturnValue()
-    method.returns.type = TypeRef("lang", "void")
-
-    method.params = [Parameter()]
-    method.params[0].name = "value"
-    method.params[0].type = TypeRef("lang", "int")
+    method.returns = ReturnValue(type=TypeRef("lang", "void"))
+    method.params = [
+        Parameter(
+            name="value",
+            type=TypeRef("lang", "int"),
+            kind="param",
+        ),
+    ]
 
     helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
@@ -756,13 +765,23 @@ def test_method_signature__multiple_params(empty_generating_api):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("lang", "void")
 
-    method.params = [Parameter(), Parameter(), Parameter()]
-    method.params[0].name = "value"
-    method.params[0].type = TypeRef("lang", "int")
-    method.params[1].name = "other_value"
-    method.params[1].type = TypeRef("lang", "double")
-    method.params[2].name = "text"
-    method.params[2].type = TypeRef("lang", "std::string")
+    method.params = [
+        Parameter(
+            name="value",
+            kind="param",
+            type=TypeRef("lang", "int"),
+        ),
+        Parameter(
+            name="other_value",
+            kind="param",
+            type=TypeRef("lang", "double"),
+        ),
+        Parameter(
+            name="text",
+            kind="param",
+            type=TypeRef("lang", "std::string"),
+        )
+    ]
 
     helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method) == """\
@@ -778,13 +797,23 @@ def test_method_signature__multiple_params__first_param_too_wide(empty_generatin
     method.returns = ReturnValue()
     method.returns.type = TypeRef("lang", "void")
 
-    method.params = [Parameter(), Parameter(), Parameter()]
-    method.params[0].name = "value"
-    method.params[0].type = TypeRef("lang", "int")
-    method.params[1].name = "other_value"
-    method.params[1].type = TypeRef("lang", "double")
-    method.params[2].name = "text"
-    method.params[2].type = TypeRef("lang", "std::string")
+    method.params = [
+        Parameter(
+            kind="param",
+            name="value",
+            type=TypeRef("lang", "int"),
+        ),
+        Parameter(
+            kind="param",
+            name="other_value",
+            type=TypeRef("lang", "double"),
+        ),
+        Parameter(
+            kind="param",
+            name="text",
+            type=TypeRef("lang", "std::string"),
+        )
+    ]
 
     helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
@@ -795,19 +824,28 @@ void ShortMethod(
 
 
 def test_method_signature__multiple_params__last_param_too_wide(empty_generating_api):
-    method = Compound("lang")
-    method.name = "ShortMethod"
-
-    method.returns = ReturnValue()
-    method.returns.type = TypeRef("lang", "void")
-
-    method.params = [Parameter(), Parameter(), Parameter()]
-    method.params[0].name = "value"
-    method.params[0].type = TypeRef("lang", "int")
-    method.params[1].name = "other_value"
-    method.params[1].type = TypeRef("lang", "double")
-    method.params[2].name = "text" * 10
-    method.params[2].type = TypeRef("lang", "std::string")
+    method = Compound(
+        "lang",
+        name="ShortMethod",
+        returns=ReturnValue(type=TypeRef("lang", "void")),
+        params=[
+            Parameter(
+                name="value",
+                kind="param",
+                type=TypeRef("lang", "int"),
+            ),
+            Parameter(
+                name="other_value",
+                kind="param",
+                type=TypeRef("lang", "double"),
+            ),
+            Parameter(
+                name="text" * 10,
+                kind="param",
+                type=TypeRef("lang", "std::string"),
+            ),
+        ],
+    )
 
     helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method, max_width=40) == f"""\
@@ -818,16 +856,12 @@ void ShortMethod(
 
 
 def test_method_signature__ignore_return_type_xref_length(empty_generating_api):
-    method = Compound("lang")
-    method.name = "ShortMethod"
-
-    method.returns = ReturnValue()
-    method.returns.type = TypeRef("lang", "void")
-    method.returns.type.id = "ab" * 80
-
-    method.params = [Parameter()]
-    method.params[0].name = "value"
-    method.params[0].type = TypeRef("lang", "int")
+    method = Compound(
+        "lang",
+        name="ShortMethod",
+        returns=ReturnValue(type=TypeRef("lang", "void", id="ab" * 80)),
+        params=[Parameter(name="value", type=TypeRef("lang", "int"), kind="param")],
+    )
 
     helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method) == f"xref:{'ab' * 80}[++void++] ShortMethod(int "
@@ -835,20 +869,49 @@ def test_method_signature__ignore_return_type_xref_length(empty_generating_api):
 
 
 def test_method_signature__ignore_param_type_xref_length(empty_generating_api):
-    method = Compound("lang")
-    method.name = "ShortMethod"
-
-    method.returns = ReturnValue()
-    method.returns.type = TypeRef("lang", "void")
-
-    method.params = [Parameter()]
-    method.params[0].name = "value"
-    method.params[0].type = TypeRef("lang", "int")
-    method.params[0].type.id = "ab" * 80
+    method = Compound(
+        "lang",
+        name="ShortMethod",
+        returns=ReturnValue(type=TypeRef("lang", "void")),
+        params=[Parameter(kind="param", name="value", type=TypeRef("lang", "int", id="ab" * 80))],
+    )
 
     helper = TemplateHelper(empty_generating_api)
     assert (helper.method_signature(method) == f"void ShortMethod(xref:{'ab' * 80}[++int++] "
             "value)")
+
+
+def test_method_signature__template_params(empty_generating_api):
+    method = Compound(
+        "lang",
+        name="ShortMethod",
+        returns=ReturnValue(type=TypeRef("lang", "V")),
+        params=[
+            Parameter(
+                kind="tparam",
+                type=TypeRef("lang", "K", prefix="typename "),
+            ),
+            Parameter(
+                kind="tparam",
+                type=TypeRef("lang", "V", prefix="class "),
+            ),
+            Parameter(
+                name="key",
+                kind="param",
+                type=TypeRef("lang", "K"),
+            ),
+            Parameter(
+                name="default",
+                kind="param",
+                type=TypeRef("lang", "V"),
+            )
+        ],
+    )
+
+    helper = TemplateHelper(empty_generating_api)
+    assert (helper.method_signature(method) == """\
+V ShortMethod(K key,
+              V default)""")
 
 
 def test_public_static_methods__no_filter(helper):
@@ -1071,3 +1134,33 @@ def test_tc():
     assert tc("") == ""
     assert tc("Bla\nbla\nbla") == "Bla\nbla\nbla"
     assert tc("Bla\nbla | bla\nbla") == "Bla\nbla {vbar} bla\nbla"
+
+
+def test_param_filter():
+    params = [
+        Parameter(
+            kind="tparam",
+            type=TypeRef("lang", "K", prefix="typename "),
+        ),
+        Parameter(
+            kind="tparam",
+            type=TypeRef("lang", "V", prefix="class "),
+        ),
+        Parameter(
+            name="key",
+            kind="param",
+            type=TypeRef("lang", "K"),
+        ),
+        Parameter(
+            name="default",
+            kind="param",
+            type=TypeRef("lang", "V"),
+        )
+    ]
+    assert list(param_filter(params)) == params[2:]
+    assert list(param_filter(params, kind="param")) == params[2:]
+    assert list(param_filter(params, kind="tparam")) == params[:2]
+
+    assert has(param_filter(params)) is True
+    assert has(param_filter(params, kind="param")) is True
+    assert has(param_filter(params, kind="tparam")) is True

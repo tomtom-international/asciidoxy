@@ -22,7 +22,8 @@ from asciidoxy.generator.templates.objc.helpers import ObjcTemplateHelper
 helper = ObjcTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]

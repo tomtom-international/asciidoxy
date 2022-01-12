@@ -16,6 +16,7 @@
 import functools
 import inspect
 import logging
+import warnings
 from abc import ABC, abstractmethod
 from functools import wraps
 from pathlib import Path
@@ -35,21 +36,25 @@ from typing import (
 from mako.template import Template
 from tqdm import tqdm
 
+import asciidoxy.generator
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
 from .._version import __version__
 from ..api_reference import AmbiguousLookupError, ApiReference
+from ..compat import importlib_resources
 from ..config import Configuration
 from ..document import Document
 from ..model import ReferableElement
 from ..packaging import PackageManager, UnknownFileError, UnknownPackageError
 from ..parser.doxygen import safe_language_tag
+from ..path_utils import relative_path
 from ..transcoder import TranscoderBase
 from .context import Context, stacktrace
 from .errors import (
     AmbiguousReferenceError,
     ConsistencyError,
+    DuplicateIncludeError,
     IncludeFileNotFoundError,
     IncompatibleVersionError,
     InvalidApiCallError,
@@ -465,7 +470,7 @@ class Api(ABC):
         attributes = ",".join(f"{str(key)}={str(value)}" for key, value in asciidoc_options.items())
 
         rel_path = self._context.document.relative_path_to(doc)
-        return f"[[{self._file_top_anchor(doc)}]]\ninclude::{rel_path}[{attributes}]"
+        return f"[#{self._file_top_anchor(doc)}]\ninclude::{rel_path}[{attributes}]"
 
     def language(self, lang: Optional[str], *, source: Optional[str] = None) -> str:
         """Set the default language for all following commands.
@@ -728,6 +733,9 @@ class PreprocessingApi(Api):
     def _sub_api(self, document: Document, embedded: bool = False) -> "Api":
         sub_context = self._context.sub_context(document)
 
+        if document.is_included or (not embedded and document.is_embedded):
+            self._warning_or_error(DuplicateIncludeError(document, embedded))
+
         if embedded:
             self._context.document.embed(document)
         else:
@@ -797,7 +805,10 @@ class GeneratingApi(Api):
         toc_content = multipage_toc(self._context.output_document, side)
         with self._context.docinfo_footer_file().open(mode="w", encoding="utf-8") as f:
             f.write(toc_content)
-        return ":docinfo: private"
+        self._context.output_document.stylesheet = f"asciidoxy-toc-{side}.css"
+        stylesheet_rel_path = relative_path(self._context.output_document.work_file,
+                                            self._context.output_document.stylesheet_file)
+        return f":docinfo: private\n:stylesheet: {stylesheet_rel_path}"
 
     def cross_document_ref(self,
                            file_name: Optional[str] = None,
@@ -853,9 +864,9 @@ class GeneratingApi(Api):
 
     def anchor(self, name: str, *, link_text: Optional[str] = None) -> str:
         if link_text:
-            return f"[[{name},{link_text}]]"
+            return f"[#{name},reftext='{link_text}']"
         else:
-            return f"[[{name}]]"
+            return f"[#{name}]"
 
     @_api_stackframe(name="insert", show_args=("element", ), internal=True)
     def insert_fragment(self,
@@ -888,8 +899,19 @@ class GeneratingApi(Api):
                 if nav_bar:
                     print(nav_bar, file=f)
 
+        self._copy_stylesheet()
+
         if self._context.progress is not None:
             self._context.progress.update()
+
+    def _copy_stylesheet(self):
+        if self._context.document.stylesheet is None:
+            self._context.document.stylesheet = "asciidoxy-no-toc.css"
+        css_source_file = importlib_resources.files(asciidoxy.generator).joinpath(
+            self._context.document.stylesheet)
+        assert css_source_file.is_file()
+        self._context.document.stylesheet_file.write_text(
+            css_source_file.read_text(encoding="utf-8"), encoding="utf-8")
 
 
 class ApiProxy:
@@ -900,6 +922,9 @@ class ApiProxy:
         self._api = api
 
     def __getattr__(self, name: str):
+        warnings.warn("Using the api. prefix is deprecated and will be removed in 0.9.0.",
+                      FutureWarning)
+
         if name in ("link", "insert"):
             return _proxy_stackframe(getattr(self._api, name), name=f"api.{name}", _other_self=self)
         elif name in SUPPORTED_COMMANDS:
@@ -919,6 +944,9 @@ class ApiProxy:
                            file_name: Optional[str] = None,
                            anchor: Optional[str] = None,
                            link_text: Optional[str] = None) -> str:
+        warnings.warn("Using the api. prefix is deprecated and will be removed in 0.9.0.",
+                      FutureWarning)
+
         return self._api.cross_document_ref(file_name, anchor=anchor, link_text=link_text)
 
     @_proxy_stackframe
@@ -930,6 +958,9 @@ class ApiProxy:
                 multipage_link: bool = True,
                 always_embed: bool = False,
                 **asciidoc_options) -> str:
+        warnings.warn("Using the api. prefix is deprecated and will be removed in 0.9.0.",
+                      FutureWarning)
+
         return self._api.include(file_name,
                                  leveloffset=leveloffset,
                                  link_text=link_text,

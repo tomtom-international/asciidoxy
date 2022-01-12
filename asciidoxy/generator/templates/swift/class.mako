@@ -23,7 +23,8 @@ from itertools import chain
 helper = SwiftTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,swift,subs="-specialchars,macros+"]
@@ -137,7 +138,7 @@ ${api.insert_fragment(constructor, insert_filter, kind_override="method", levelo
 % endfor
 ##################################################################################### Properties ##
 % for prop in helper.properties(prot=prot):
-[[${prop.id},${prop.name}]]
+[#${prop.id},reftext='${prop.name}']
 ${api.inserted(prop)}
 [source,swift,subs="-specialchars,macros+"]
 ----

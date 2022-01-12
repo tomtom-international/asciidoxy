@@ -21,7 +21,7 @@ from html import escape
 <%
 helper = JavaTemplateHelper(api, element, insert_filter)
 %>
-[[${element.id},${element.name}]]
+[#${element.id},reftext='${element.name}']
 ${api.inserted(element)}
 [source,java,subs="-specialchars,macros+"]
 ----

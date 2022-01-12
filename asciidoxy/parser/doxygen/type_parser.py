@@ -476,6 +476,85 @@ class TypeParser:
         raise TypeParseError("Unexpected end of nested types:"
                              f" `{''.join(t.text for t in original_tokens)}`")
 
+    @classmethod
+    def move_array_definition(cls, tokens: List[Token]) -> List[Token]:
+        """Doxygen adds the array definition to the name inside a known reference. Move it out of
+        the name so it ends up in the suffix.
+        """
+        assert TokenCategory.ARRAY_START in cls.TRAITS.TOKENS
+        assert TokenCategory.ARRAY_END in cls.TRAITS.TOKENS
+        array_starts = cls.TRAITS.TOKENS[TokenCategory.ARRAY_START]
+        array_ends = cls.TRAITS.TOKENS[TokenCategory.ARRAY_END]
+
+        modified_tokens = []
+        for token in tokens:
+            modified_tokens.append(token)
+            if (token.category == TokenCategory.NAME and token.text
+                    and token.text[-1] in array_ends):
+
+                # Chop off name
+                for i, c in enumerate(token.text):
+                    if c in array_starts:
+                        chars = list(token.text[i:])
+                        token.text = token.text[:i]
+                        break
+                else:
+                    raise TypeParseError("Found array end token without array start token in: "
+                                         f"{token.text}")
+
+                # Go over each array with optional size
+                for c in chars:
+                    if c in array_starts:
+                        modified_tokens.append(Token(c, TokenCategory.ARRAY_START))
+                    elif c in array_ends:
+                        modified_tokens.append(Token(c, TokenCategory.ARRAY_END))
+                    elif modified_tokens[-1].category == TokenCategory.ARRAY_SIZE:
+                        modified_tokens[-1].text += c
+                    else:
+                        modified_tokens.append(Token(c, TokenCategory.ARRAY_SIZE))
+        return modified_tokens
+
+    @staticmethod
+    def classify_array_size(tokens: List[Token]) -> List[Token]:
+        for match in find_tokens(tokens, [
+            (TokenCategory.ARRAY_START, ),
+            (TokenCategory.WHITESPACE, None),
+            (TokenCategory.NAME, ),
+            (TokenCategory.WHITESPACE, None),
+            (TokenCategory.ARRAY_END, ),
+        ]):
+            if match[1].category == TokenCategory.NAME:
+                match[1].category = TokenCategory.ARRAY_SIZE
+            else:
+                match[2].category = TokenCategory.ARRAY_SIZE
+        return tokens
+
+    @staticmethod
+    def remove_invalid(tokens: List[Token]) -> List[Token]:
+        return [t for t in tokens if t.category != TokenCategory.INVALID]
+
+    @classmethod
+    def classify_arg_names(cls, tokens: List[Token],
+                           suffixes: List[Optional[TokenCategory]]) -> List[Token]:
+        for match in find_tokens(tokens, [
+            [TokenCategory.NESTED_END] + list(cls.TRAITS.ALLOWED_NAMES),
+                suffixes,
+                suffixes + [None],
+                suffixes + [None],
+                suffixes + [None],
+                suffixes + [None],
+                suffixes + [None],
+                suffixes + [None],
+            [TokenCategory.NAME],
+            [TokenCategory.WHITESPACE, None],
+            [TokenCategory.ARGS_END, TokenCategory.ARGS_SEPARATOR],
+        ]):
+            if match[-2].category == TokenCategory.NAME:
+                match[-2].category = TokenCategory.ARG_NAME
+            elif match[-3].category == TokenCategory.NAME:
+                match[-3].category = TokenCategory.ARG_NAME
+        return tokens
+
 
 def find_tokens(
         tokens: Sequence[Token],

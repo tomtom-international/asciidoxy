@@ -366,7 +366,7 @@ _custom_types = {
     ], ["members", "params", "exceptions", "returns"]),
     TypeRef: (["id", "name", "language", "namespace", "kind", "prefix",
                "suffix"], ["nested", "args", "returns"]),
-    Parameter: (["name", "description", "default_value", "prefix"], ["type"]),
+    Parameter: (["name", "description", "default_value", "prefix", "kind"], ["type"]),
     ReturnValue: (["description"], ["type"]),
     ThrowsClause: (["description"], ["type"]),
 }

@@ -18,6 +18,11 @@ from asciidoxy.generator.navigation import multipage_toc, navigation_bar
 
 def test_navigation_bar_first_document(document_tree):
     assert navigation_bar(document_tree["root"]) == """\
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
 [frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===
 |
@@ -25,11 +30,21 @@ def test_navigation_bar_first_document(document_tree):
 |
 
 |<<a.adoc#,Next>>
-|==="""
+|===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]"""
 
 
 def test_navigation_bar_middle_document(document_tree):
     assert navigation_bar(document_tree["a/a_b"]) == """\
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
 [frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===
 |<<a_a.adoc#,Prev>>
@@ -38,11 +53,21 @@ def test_navigation_bar_middle_document(document_tree):
 <<../root.adoc#,Home>>
 
 |<<b/a_b_a.adoc#,Next>>
-|==="""
+|===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]"""
 
 
 def test_navigation_bar_last_document(document_tree):
     assert navigation_bar(document_tree["c/c_b"]) == """\
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
 [frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===
 |<<c_a.adoc#,Prev>>
@@ -51,7 +76,12 @@ def test_navigation_bar_last_document(document_tree):
 <<../root.adoc#,Home>>
 
 |
-|==="""
+|===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]"""
 
 
 def test_navigation_bar_single_document(document):
@@ -76,7 +106,6 @@ def test_multipage_toc__root_level(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-left: 20em'</script>
 """
 
 
@@ -106,7 +135,6 @@ def test_multipage_toc__level1__child0(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-left: 20em'</script>
 """
 
 
@@ -128,7 +156,6 @@ def test_multipage_toc__level1__child1(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-left: 20em'</script>
 """
 
 
@@ -158,7 +185,6 @@ def test_multipage_toc__level1__child2(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-left: 20em'</script>
 """
 
 
@@ -188,7 +214,6 @@ def test_multipage_toc__level2__child0(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-left: 20em'</script>
 """
 
 
@@ -226,7 +251,6 @@ def test_multipage_toc__level2__child1(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-left: 20em'</script>
 """
 
 
@@ -264,7 +288,6 @@ def test_multipage_toc__level3(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-left: 20em'</script>
 """
 
 
@@ -286,7 +309,6 @@ def test_multipage_toc__left_side(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-left: 20em'</script>
 """
 
 
@@ -308,5 +330,4 @@ def test_multipage_toc__right_side(document_tree):
     </li>
   </ul>
 </div>
-<script>document.body.style = 'padding-right: 20em'</script>
 """

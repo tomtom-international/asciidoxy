@@ -1,7 +1,8 @@
 
 
 
-== [[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,asciidoxy::traffic::TrafficEvent::TrafficEventData]]TrafficEventData
+[#cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data,reftext='asciidoxy::traffic::TrafficEvent::TrafficEventData']
+== TrafficEventData
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -29,7 +30,7 @@ Severity of the event.
 
 === Members
 
-[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,cause]]
+[#cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1af38f7b179a0860da774cd004fc7ac675,reftext='cause']
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -42,7 +43,7 @@ TPEG cause code.
 
 
 '''
-[[cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,severity]]
+[#cpp-structasciidoxy_1_1traffic_1_1_traffic_event_1_1_traffic_event_data_1a555b2ad8652b54fcf11edcc2364a5f68,reftext='severity']
 
 
 [source,cpp,subs="-specialchars,macros+"]

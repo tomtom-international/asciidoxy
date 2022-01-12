@@ -18,7 +18,8 @@ from asciidoxy.generator.templates.helpers import h1, tc
 from asciidoxy.generator.templates.java.helpers import JavaTemplateHelper
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,java,subs="-specialchars,macros+"]

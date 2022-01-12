@@ -6,6 +6,11 @@
 
 13
 
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
 [frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===
 |<<env_variables.input.adoc#,Prev>>
@@ -15,3 +20,8 @@
 
 |
 |===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]

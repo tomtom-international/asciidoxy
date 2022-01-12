@@ -24,7 +24,7 @@ if element.static:
 else:
   helper = KotlinTemplateHelper(api, element, insert_filter)
 %>
-[[${element.id},${element.name}]]
+[#${element.id},reftext='${element.name}']
 ${api.inserted(element)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----

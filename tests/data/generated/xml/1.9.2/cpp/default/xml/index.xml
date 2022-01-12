@@ -76,6 +76,9 @@
   <compound refid="class_logger" kind="class"><name>Logger</name>
     <member refid="class_logger_1adfed6b5c5cb7fab63527144e705c1fa8" kind="function"><name>Log</name></member>
   </compound>
+  <compound refid="structasciidoxy_1_1tparam_1_1_mapping" kind="struct"><name>asciidoxy::tparam::Mapping</name>
+    <member refid="structasciidoxy_1_1tparam_1_1_mapping_1af24de4264210fda5952988c1c7b60ad8" kind="function"><name>Insert</name></member>
+  </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_mark_down" kind="class"><name>asciidoxy::descriptions::MarkDown</name>
   </compound>
   <compound refid="classasciidoxy_1_1system_1_1_move_only" kind="class"><name>asciidoxy::system::MoveOnly</name>
@@ -101,6 +104,9 @@
   <compound refid="classasciidoxy_1_1system_1_1_service_starter" kind="class"><name>asciidoxy::system::ServiceStarter</name>
     <member refid="classasciidoxy_1_1system_1_1_service_starter_1a6474ceb8669761e879329b39c3afb899" kind="friend"><name>Service</name></member>
     <member refid="classasciidoxy_1_1system_1_1_service_starter_1a8923b0ad14de8aa8768a1e36318b0924" kind="function"><name>Register</name></member>
+  </compound>
+  <compound refid="classasciidoxy_1_1arrays_1_1_some_struct" kind="class"><name>asciidoxy::arrays::SomeStruct</name>
+    <member refid="classasciidoxy_1_1arrays_1_1_some_struct_1a8460a04b66b21b5e6bdabba4aa2bad00" kind="variable"><name>value</name></member>
   </compound>
   <compound refid="classasciidoxy_1_1descriptions_1_1_special_characters" kind="class"><name>asciidoxy::descriptions::SpecialCharacters</name>
   </compound>
@@ -130,6 +136,11 @@
     <member refid="overloads_8hpp_1afbbb1c0274b5a0d90b2d1d39f1269027" kind="function"><name>to_string</name></member>
     <member refid="overloads_8hpp_1a8eebbc44a7bed882754da89a49139680" kind="function"><name>to_string</name></member>
   </compound>
+  <compound refid="namespaceasciidoxy_1_1arrays" kind="namespace"><name>asciidoxy::arrays</name>
+    <member refid="arrays_8hpp_1afdb318e862c7b5b7ef372c0fd16fda37" kind="typedef"><name>StructArray</name></member>
+    <member refid="arrays_8hpp_1aeef46dbe1bacbfce308fc1762b08e344" kind="typedef"><name>AnotherArray</name></member>
+    <member refid="arrays_8hpp_1a13b59beed3e810c4ec5b7d448a643d58" kind="function"><name>process</name></member>
+  </compound>
   <compound refid="namespaceasciidoxy_1_1descriptions" kind="namespace"><name>asciidoxy::descriptions</name>
     <member refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kind="function"><name>FunctionDocumentation</name></member>
     <member refid="descriptions_8hpp_1a62a2737ae4848855d3f8e5dc575e5118" kind="function"><name>ParBlock</name></member>
@@ -145,6 +156,7 @@
     <member refid="service_8hpp_1aca59c7047f1b7025c1102003fb144fb9" kind="function"><name>CreateService</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1tparam" kind="namespace"><name>asciidoxy::tparam</name>
+    <member refid="template__parameters_8hpp_1a15cc38ed136c5c6000549d504fa442df" kind="function"><name>IsEven</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1traffic" kind="namespace"><name>asciidoxy::traffic</name>
     <member refid="traffic__event_8hpp_1aadd656922dd873c8ab5de7c891b557e1" kind="typedef"><name>TpegCauseCode</name></member>
@@ -165,6 +177,8 @@
     <member refid="enums_8hpp_1ab949dfee06a9db33f670260c1c4f5c14" kind="variable"><name>WIFI_PROTOCOL_LR</name></member>
   </compound>
   <compound refid="namespacestd" kind="namespace"><name>std</name>
+  </compound>
+  <compound refid="arrays_8hpp" kind="file"><name>arrays.hpp</name>
   </compound>
   <compound refid="constexpr_8hpp" kind="file"><name>constexpr.hpp</name>
   </compound>

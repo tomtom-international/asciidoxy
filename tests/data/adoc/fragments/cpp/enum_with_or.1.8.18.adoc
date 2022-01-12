@@ -1,7 +1,8 @@
 
 
 
-== [[cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757d,asciidoxy::wifi::ESP32WiFiProtocol]]ESP32WiFiProtocol
+[#cpp-enums_8hpp_1a4991f0f57db1f25ffff935a6befd757d,reftext='asciidoxy::wifi::ESP32WiFiProtocol']
+== ESP32WiFiProtocol
 
 
 [source,cpp,subs="-specialchars,macros+"]

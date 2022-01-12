@@ -7,7 +7,8 @@ Main document text.
 
 
 
-== [[cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,asciidoxy::traffic::TrafficEvent::Severity]]Severity
+[#cpp-classasciidoxy_1_1traffic_1_1_traffic_event_1a47c51b1f1f014cb943377fb67ad903b9,reftext='asciidoxy::traffic::TrafficEvent::Severity']
+== Severity
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -76,6 +77,11 @@ Reference in a table to a sub-document:
 Hidden link in multi-page, embedded in single-page:
 
 
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
 [frame=none, grid=none, cols="<.^,^.^,>.^"]
 |===
 |
@@ -84,3 +90,8 @@ Hidden link in multi-page, embedded in single-page:
 
 |<<sub_directory/multifile_subdoc_test.input.adoc#,Next>>
 |===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]

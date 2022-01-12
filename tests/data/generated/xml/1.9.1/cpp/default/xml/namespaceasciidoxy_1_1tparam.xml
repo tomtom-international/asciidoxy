@@ -4,6 +4,53 @@
     <compoundname>asciidoxy::tparam</compoundname>
     <innerclass refid="structasciidoxy_1_1tparam_1_1is__container" prot="public">asciidoxy::tparam::is_container</innerclass>
     <innerclass refid="structasciidoxy_1_1tparam_1_1is__container_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4" prot="public">asciidoxy::tparam::is_container&lt; std::array&lt; T, N &gt; &gt;</innerclass>
+    <innerclass refid="structasciidoxy_1_1tparam_1_1_mapping" prot="public">asciidoxy::tparam::Mapping</innerclass>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="template__parameters_8hpp_1a15cc38ed136c5c6000549d504fa442df" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>typename T</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>bool asciidoxy::tparam::IsEven</definition>
+        <argsstring>(T value)</argsstring>
+        <name>IsEven</name>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Check if the value is even.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The value to check. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A numeric type. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>True if the value is even, false if it is not. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="template_parameters.hpp" line="39" column="6" declfile="template_parameters.hpp" declline="39" declcolumn="6"/>
+      </memberdef>
+      </sectiondef>
     <briefdescription>
     </briefdescription>
     <detaileddescription>

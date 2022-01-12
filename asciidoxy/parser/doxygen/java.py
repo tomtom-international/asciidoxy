@@ -32,6 +32,8 @@ class JavaTraits(LanguageTraits):
     NESTED_STARTS = "<",
     NESTED_ENDS = ">",
     NESTED_SEPARATORS = ",",
+    ARRAY_STARTS = "[",
+    ARRAY_ENDS = "]",
     QUALIFIERS = "final", "synchronized", "transient",
     WILDCARD_BOUNDS = "extends", "super",
     INVALID = "private",
@@ -40,17 +42,26 @@ class JavaTraits(LanguageTraits):
         TokenCategory.NESTED_START: NESTED_STARTS,
         TokenCategory.NESTED_END: NESTED_ENDS,
         TokenCategory.NESTED_SEPARATOR: NESTED_SEPARATORS,
+        TokenCategory.ARRAY_START: ARRAY_STARTS,
+        TokenCategory.ARRAY_END: ARRAY_ENDS,
         TokenCategory.QUALIFIER: QUALIFIERS,
         TokenCategory.WILDCARD_BOUNDS: WILDCARD_BOUNDS,
         TokenCategory.INVALID: INVALID,
     }
 
-    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + tuple(string.whitespace))
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + NESTED_SEPARATORS + ARRAY_STARTS +
+                        ARRAY_ENDS + tuple(string.whitespace))
 
-    ALLOWED_PREFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
-                        TokenCategory.WILDCARD, TokenCategory.WILDCARD_BOUNDS,
-                        TokenCategory.UNKNOWN, TokenCategory.ANNOTATION)
-    ALLOWED_SUFFIXES = TokenCategory.WHITESPACE,
+    ALLOWED_PREFIXES = (
+        TokenCategory.WHITESPACE,
+        TokenCategory.OPERATOR,
+        TokenCategory.QUALIFIER,
+        TokenCategory.WILDCARD,
+        TokenCategory.WILDCARD_BOUNDS,
+        TokenCategory.UNKNOWN,
+        TokenCategory.ANNOTATION,
+    )
+    ALLOWED_SUFFIXES = TokenCategory.WHITESPACE, TokenCategory.ARRAY_START, TokenCategory.ARRAY_END,
     ALLOWED_NAMES = TokenCategory.WHITESPACE, TokenCategory.NAME,
 
     NESTING_BOUNDARY = "<"
@@ -79,6 +90,7 @@ class JavaTypeParser(TypeParser):
         tokens = cls.mark_separate_wildcard_bounds(tokens)
         tokens = cls.detect_wildcards(tokens)
         tokens = cls.detect_annotations(tokens)
+        tokens = cls.move_array_definition(tokens)
         return tokens
 
     @staticmethod

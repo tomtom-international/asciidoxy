@@ -23,7 +23,8 @@ from itertools import chain
 helper = ObjcTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,objectivec,subs="-specialchars,macros+"]
@@ -124,7 +125,7 @@ ${h2(leveloffset, "Members")}
 % for prot in ("public", "protected", "private"):
 ##################################################################################### Properties ##
 % for prop in helper.properties(prot=prot):
-[[${prop.id},${prop.name}]]
+[#${prop.id},reftext='${prop.name}']
 ${api.inserted(prop)}
 [source,objectivec,subs="-specialchars,macros+"]
 ----

@@ -28,5 +28,26 @@ template<typename T, typename N>
 struct is_container<std::array<T, N>> : std::true_type {
 };
 
+/**
+ * Check if the value is even.
+ *
+ * @param value The value to check.
+ * @tparam T A numeric type.
+ * @returns True if the value is even, false if it is not.
+ */
+template<typename T>
+bool IsEven(T value);
+
+/**
+ * Simple mapping between keys and values.
+ *
+ * @tparam K Key type.
+ * @tparam V Value type.
+ */
+template<typename K, class V>
+struct Mapping {
+  void Insert(const K& key, const V& value);
+};
+
 }  // namespace tparam
 }  // namespace asciidoxy

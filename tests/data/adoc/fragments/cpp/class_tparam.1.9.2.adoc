@@ -1,0 +1,74 @@
+
+
+
+[#cpp-structasciidoxy_1_1tparam_1_1_mapping,reftext='asciidoxy::tparam::Mapping']
+== Mapping
+
+
+[source,cpp,subs="-specialchars,macros+"]
+----
+#include &lt;template_parameters.hpp&gt;
+
+template&lt;typename K, class V&gt;
+struct asciidoxy::tparam::Mapping
+----
+Simple mapping between keys and values.
+
+
+
+
+[cols='h,5a']
+|===
+| Template Parameters
+|
+`typename K`::
+Key type.
+
+`class V`::
+Value type.
+
+|*Public Methods*
+|
+`<<cpp-structasciidoxy_1_1tparam_1_1_mapping_1af24de4264210fda5952988c1c7b60ad8,++void Insert(const K &, const V &)++>>`::
+
+
+|===
+
+
+
+=== Members
+
+
+
+[#cpp-structasciidoxy_1_1tparam_1_1_mapping_1af24de4264210fda5952988c1c7b60ad8,reftext='asciidoxy::tparam::Mapping::Insert']
+==== Insert
+
+
+[%autofit]
+[source,cpp,subs="-specialchars,macros+"]
+----
+void Insert(const K &amp; key,
+            const V &amp; value)
+----
+
+
+
+
+
+
+[cols='h,5a']
+|===
+| Parameters
+|
+`const K & key`::
+
+
+`const V & value`::
+
+
+|===
+
+
+'''
+
+

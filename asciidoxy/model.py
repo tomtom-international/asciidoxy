@@ -136,21 +136,22 @@ class Parameter(ModelBase):
         description:   Explanation of the parameter.
         default_value: Default value for the parameter.
         prefix:        Prefix for the parameter declaration.
+        kind:          The kind of parameter.
     """
 
-    # doxygen based fields
     type: Optional[TypeRef] = None
     name: str = ""
     description: str = ""
     default_value: Optional[str] = None
     prefix: Optional[str] = None
+    kind: str = "param"
 
     def __eq__(self, other) -> bool:
         if other is None:
             return False
-        return ((self.type, self.name, self.description, self.default_value,
-                 self.prefix) == (other.type, other.name, other.description, other.default_value,
-                                  other.prefix))
+        return ((self.type, self.name, self.description, self.default_value, self.prefix,
+                 self.kind) == (other.type, other.name, other.description, other.default_value,
+                                other.prefix, other.kind))
 
 
 class ReturnValue(ModelBase):

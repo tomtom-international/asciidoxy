@@ -23,7 +23,8 @@ from itertools import chain
 helper = JavaTemplateHelper(api, element, insert_filter)
 %>
 ######################################################################## Header and introduction ##
-${h1(leveloffset, f"[[{element.id},{element.full_name}]]{element.name}")}
+[#${element.id},reftext='${element.full_name}']
+${h1(leveloffset, element.name)}
 ${api.inserted(element)}
 
 [source,java,subs="-specialchars,macros+"]
@@ -132,7 +133,7 @@ ${h2(leveloffset, "Members")}
 % for prot in ("public", "protected", "private"):
 ###################################################################################### Constants ##
 % for constant in helper.constants(prot=prot):
-[[${constant.id},${constant.name}]]
+[#${constant.id},reftext=${constant.name}']
 ${api.inserted(constant)}
 [source,java,subs="-specialchars,macros+"]
 ----

@@ -21,7 +21,7 @@ from typing import List, Optional
 from ...model import Compound, Parameter
 from .language_traits import LanguageTraits, TokenCategory
 from .parser_base import ParserBase
-from .type_parser import Token, TypeParser, find_tokens
+from .type_parser import Token, TypeParser
 
 
 class CppTraits(LanguageTraits):
@@ -42,10 +42,12 @@ class CppTraits(LanguageTraits):
     NESTED_ENDS = ">",
     ARGS_STARTS = "(",
     ARGS_ENDS = ")",
+    ARRAY_STARTS = "[",
+    ARRAY_ENDS = "]",
     SEPARATORS = ",",
     NAMESPACE_SEPARATORS = ":",
     OPERATORS = "*", "&", "...",
-    QUALIFIERS = "const", "volatile", "mutable", "enum", "class",
+    QUALIFIERS = "const", "volatile", "mutable", "enum", "class", "typename",
     BUILT_IN_NAMES = ("void", "bool", "signed", "unsigned", "char", "wchar_t", "char16_t",
                       "char32_t", "char8_t", "float", "double", "long", "short", "int")
     # constexpr should not be part of the return type
@@ -56,23 +58,42 @@ class CppTraits(LanguageTraits):
         TokenCategory.NESTED_END: NESTED_ENDS,
         TokenCategory.ARGS_START: ARGS_STARTS,
         TokenCategory.ARGS_END: ARGS_ENDS,
+        TokenCategory.ARRAY_START: ARRAY_STARTS,
+        TokenCategory.ARRAY_END: ARRAY_ENDS,
         TokenCategory.SEPARATOR: SEPARATORS,
         TokenCategory.OPERATOR: OPERATORS,
         TokenCategory.QUALIFIER: QUALIFIERS,
         TokenCategory.BUILT_IN_NAME: BUILT_IN_NAMES,
         TokenCategory.INVALID: INVALID,
     }
-    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + SEPARATORS +
-                        OPERATORS + NAMESPACE_SEPARATORS + INVALID + tuple(string.whitespace))
+    TOKEN_BOUNDARIES = (NESTED_STARTS + NESTED_ENDS + ARGS_STARTS + ARGS_ENDS + ARRAY_STARTS +
+                        ARRAY_ENDS + SEPARATORS + OPERATORS + NAMESPACE_SEPARATORS + INVALID +
+                        tuple(string.whitespace))
     SEPARATOR_TOKENS_OVERLAP = True
 
-    ALLOWED_PREFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
-                        TokenCategory.INVALID)
-    ALLOWED_SUFFIXES = (TokenCategory.WHITESPACE, TokenCategory.OPERATOR, TokenCategory.QUALIFIER,
-                        TokenCategory.NAME, TokenCategory.NAMESPACE_SEPARATOR,
-                        TokenCategory.INVALID)
-    ALLOWED_NAMES = (TokenCategory.WHITESPACE, TokenCategory.NAME,
-                     TokenCategory.NAMESPACE_SEPARATOR, TokenCategory.BUILT_IN_NAME)
+    ALLOWED_PREFIXES = (
+        TokenCategory.WHITESPACE,
+        TokenCategory.OPERATOR,
+        TokenCategory.QUALIFIER,
+        TokenCategory.INVALID,
+    )
+    ALLOWED_SUFFIXES = (
+        TokenCategory.WHITESPACE,
+        TokenCategory.OPERATOR,
+        TokenCategory.QUALIFIER,
+        TokenCategory.NAME,
+        TokenCategory.NAMESPACE_SEPARATOR,
+        TokenCategory.INVALID,
+        TokenCategory.ARRAY_START,
+        TokenCategory.ARRAY_END,
+        TokenCategory.ARRAY_SIZE,
+    )
+    ALLOWED_NAMES = (
+        TokenCategory.WHITESPACE,
+        TokenCategory.NAME,
+        TokenCategory.NAMESPACE_SEPARATOR,
+        TokenCategory.BUILT_IN_NAME,
+    )
 
     NESTING_BOUNDARY = "<"
     NAMESPACE_SEPARATOR = "::"
@@ -96,37 +117,25 @@ class CppTypeParser(TypeParser):
                      tokens: List[Token],
                      array_tokens: Optional[List[Token]] = None) -> List[Token]:
         tokens = super().adapt_tokens(tokens, array_tokens)
-        tokens = [t for t in tokens if t.category != TokenCategory.INVALID]
-
+        tokens = cls.remove_invalid(tokens)
         suffixes_without_name: List[Optional[TokenCategory]] = list(cls.TRAITS.ALLOWED_SUFFIXES)
         suffixes_without_name.remove(TokenCategory.NAME)
         suffixes_without_name.remove(TokenCategory.NAMESPACE_SEPARATOR)
-        for match in find_tokens(tokens, [
-            (TokenCategory.NESTED_END, ) + cls.TRAITS.ALLOWED_NAMES,
-                suffixes_without_name,
-                suffixes_without_name + [None],
-                suffixes_without_name + [None],
-                suffixes_without_name + [None],
-                suffixes_without_name + [None],
-                suffixes_without_name + [None],
-                suffixes_without_name + [None],
-            [TokenCategory.NAME],
-            [TokenCategory.WHITESPACE, None],
-            [TokenCategory.ARGS_END, TokenCategory.ARGS_SEPARATOR],
-        ]):
-            if match[-2].category == TokenCategory.NAME:
-                match[-2].category = TokenCategory.ARG_NAME
-            elif match[-3].category == TokenCategory.NAME:
-                match[-3].category = TokenCategory.ARG_NAME
+        tokens = cls.classify_arg_names(tokens, suffixes_without_name)
+        tokens = cls.fix_function_typedefs(tokens)
+        tokens = cls.move_array_definition(tokens)
+        tokens = cls.classify_array_size(tokens)
+        return tokens
 
-        # Typedefs for function types can leave a trailing (*
+    @staticmethod
+    def fix_function_typedefs(tokens: List[Token]) -> List[Token]:
+        """Typedefs for function types can leave a trailing (*"""
         if (len(tokens) > 2 and tokens[-2].category == TokenCategory.ARGS_START
                 and tokens[-1].category == TokenCategory.OPERATOR):
             tokens = tokens[:-2]
         if (len(tokens) > 3 and tokens[-3].category == TokenCategory.ARGS_START
                 and tokens[-2].category == TokenCategory.OPERATOR):
             tokens = tokens[:-3]
-
         return tokens
 
 

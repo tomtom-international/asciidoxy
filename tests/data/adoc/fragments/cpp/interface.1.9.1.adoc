@@ -1,7 +1,8 @@
 
 
 
-== [[cpp-classasciidoxy_1_1system_1_1_service,asciidoxy::system::Service]]Service
+[#cpp-classasciidoxy_1_1system_1_1_service,reftext='asciidoxy::system::Service']
+== Service
 
 
 [source,cpp,subs="-specialchars,macros+"]
@@ -32,7 +33,8 @@ Stop the service.
 
 
 
-==== [[cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8,asciidoxy::system::Service::Start]]Start
+[#cpp-classasciidoxy_1_1system_1_1_service_1ada64288caea9dce04e995ce5880633c8,reftext='asciidoxy::system::Service::Start']
+==== Start
 
 
 [%autofit]
@@ -54,7 +56,8 @@ Start the service.
 '''
 
 
-==== [[cpp-classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0,asciidoxy::system::Service::Stop]]Stop
+[#cpp-classasciidoxy_1_1system_1_1_service_1af2fbfbeaf73bffc204129f8d70725fc0,reftext='asciidoxy::system::Service::Stop']
+==== Stop
 
 
 [%autofit]

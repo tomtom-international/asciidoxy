@@ -24,9 +24,28 @@ from .packaging import PackageManager
 from .path_utils import relative_path
 
 
+def has_attribute(name: str, config: Configuration) -> bool:
+    for attribute in config.attribute:
+        if (attribute.strip() == name or attribute.startswith(f"{name}=")
+                or attribute.startswith(f"{name}@=")):
+            return True
+    else:
+        return False
+
+
+def default_css_attribute(doc: Document) -> str:
+    css = "asciidoxy-no-toc.css"
+    css_work_file = doc.work_dir / css
+    css_relative_path = relative_path(doc.work_file, css_work_file)
+    return f"stylesheet@=''{css_relative_path}''"
+
+
 def generate_attributes(doc: Document, config: Configuration, pkg_mgr: PackageManager) -> str:
     image_dir = relative_path(doc.work_file, pkg_mgr.image_work_dir)
-    values = [f"imagesdir@={image_dir}"]
+    values = [f"imagesdir@=''{image_dir}''"]
+
+    if not has_attribute("stylesheet", config):
+        values.append(default_css_attribute(doc))
 
     if config.multipage:
         values.append("multipage")

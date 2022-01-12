@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.17">
+  <compounddef id="namespaceasciidoxy_1_1arrays" kind="namespace" language="C++">
+    <compoundname>asciidoxy::arrays</compoundname>
+    <innerclass refid="classasciidoxy_1_1arrays_1_1_some_struct" prot="public">asciidoxy::arrays::SomeStruct</innerclass>
+      <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="arrays_8hpp_1afdb318e862c7b5b7ef372c0fd16fda37" prot="public" static="no">
+        <type><ref refid="classasciidoxy_1_1arrays_1_1_some_struct" kindref="compound">SomeStruct</ref>[]</type>
+        <definition>using asciidoxy::arrays::StructArray = typedef SomeStruct[]</definition>
+        <argsstring></argsstring>
+        <name>StructArray</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>A simple array of simple structs. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="arrays.hpp" line="30" column="1" bodyfile="arrays.hpp" bodystart="30" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="arrays_8hpp_1aeef46dbe1bacbfce308fc1762b08e344" prot="public" static="no">
+        <type><ref refid="classasciidoxy_1_1arrays_1_1_some_struct" kindref="compound">SomeStruct</ref>[]</type>
+        <definition>typedef SomeStruct [] asciidoxy::arrays::AnotherArray</definition>
+        <argsstring></argsstring>
+        <name>AnotherArray</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Another simple array of simple structs. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="arrays.hpp" line="35" column="20" bodyfile="arrays.hpp" bodystart="35" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="arrays_8hpp_1a61331f6e6f4f1de129dd7ff3af4d8578" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classasciidoxy_1_1arrays_1_1_some_struct" kindref="compound">SomeStruct</ref>[]</type>
+        <definition>SomeStruct [] asciidoxy::arrays::process</definition>
+        <argsstring>(const SomeStruct[] input)</argsstring>
+        <name>process</name>
+        <param>
+          <type>const <ref refid="classasciidoxy_1_1arrays_1_1_some_struct" kindref="compound">SomeStruct</ref>[]</type>
+          <declname>input</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>A function accepting and returning an array.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>input</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The input array. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Another array. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="arrays.hpp" line="43" column="12" declfile="arrays.hpp" declline="43" declcolumn="12"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="arrays.hpp" line="18" column="16"/>
+  </compounddef>
+</doxygen>
