@@ -269,3 +269,69 @@ ${"""
 ${config.build_dir}
 """}
 ----
+
+== Comments
+
+AsciiDoc supports adding comments to your AsciiDoc files that are not carried over into the 
+published documents. Most commonly `//` is used for single line comments and `////` for multiline 
+comments. AsciiDoxy carries over these comments like any other text in the AsciiDoc file. It is 
+AsciiDoctor (or any other AsciiDoc tool chain) that makes sure the comments do not end up in the 
+published document.
+
+When an AsciiDoc comment contains any special AsciiDoxy or Mako directive, it is *not* ignored by 
+AsciiDoxy. Any code or directive is still executed. This can lead to unexpected results.
+
+For example the following:
+
+[source]
+----
+${"""
+// ${link("MyClass")}
+"""}
+----
+
+Results in the following generated AsciiDoc:
+
+[source]
+----
+// <<somefile.adoc#myclass,MyClass">>
+----
+
+AsciiDoctor will still ignore it and it will not be part of the published documents. However, some 
+commands like `insert` result in larger blocks of generated AsciiDoc. Then only the first line is 
+commented out, but the rest will become part of the published document.  Some commands can also 
+cause an error during generation, e.g. when `MyClass` does not exist or is not included anywhere.
+
+To prevent this, use Mako comments instead: `##`. These comments will be ignored completely by 
+AsciiDoxy. They will not end up in the published document either.
+
+[source]
+----
+${"""
+## ${link("MyClass")}
+"""}
+----
+
+For multiline comments use `${"""<%doc>"""}` and `${"""</%doc>"""}`:
+
+[source]
+----
+${"""
+<%doc>
+${link("MyClass")}
+</%doc>
+"""}
+----
+
+It is also possible to include verbatim Mako and AsciiDoxy directives in the generated 
+documentation. They need special handling to be ignored by AsciiDoxy, but still end up in the 
+published document:
+
+[source]
+----
+${'''
+${"""
+${link("MyClass")}
+"""}
+'''}
+----
