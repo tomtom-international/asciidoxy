@@ -108,6 +108,7 @@ install: clean ## install the package to the active Python's site-packages
 virtualenv: ## set up a development environment
 	python3 -m venv .venv
 	. .venv/bin/activate && pip install wheel
+	. .venv/bin/activate && pip install -r requirements_test.txt
 	. .venv/bin/activate && pip install -r requirements_dev.txt
 	. .venv/bin/activate && python3 setup.py develop
 

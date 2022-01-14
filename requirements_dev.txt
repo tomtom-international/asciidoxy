@@ -8,14 +8,8 @@ isort==5.10.1
 mypy==0.931
 pip==21.3.1
 pip-upgrader==1.4.15
-pytest-aiohttp==0.3.0
-pytest-asyncio==0.16.0
-pytest-randomly==3.10.3
-pytest-runner==5.3.1
-pytest-sugar==0.9.4
-pytest-xdist==2.5.0
-pytest==6.2.5
 tox==3.24.5
+tox-wheel==0.7.0
 twine==3.7.1
 types-toml==0.10.2
 watchdog==2.1.6
