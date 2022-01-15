@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONY: clean clean-test clean-pyc clean-build docs help
+.PHONY: clean clean-test clean-pyc clean-build docs help generate-test-data generate-test-data-doxygen generate-test-data-dokka
 .DEFAULT_GOAL := help
 .SUFFIXES:
 
@@ -133,15 +133,22 @@ $(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call DOXYGEN_template,$(version))
 
 doxygen: doxygen-$(LATEST_DOXYGEN_VERSION) ## Install the latest doxygen version
 
-define GENERATE_TEST_XML_template
-generate-test-xml-$(1): doxygen-$(1)
+define GENERATE_TEST_DATA_DOXYGEN_template
+generate-test-data-doxygen-$(1): doxygen-$(1)
 	. build/doxygen-$(1)/activate_run.sh; cd tests/data/source_code; python3 generate_xml.py doxygen
 
-ALL_GENERATE_TEST_XML := $$(ALL_GENERATE_TEST_XML) generate-test-xml-$(1)
+ALL_GENERATE_TEST_DATA_DOXYGEN := $$(ALL_GENERATE_TEST_DATA_DOXYGEN) generate-test-data-doxygen-$(1)
 endef
-$(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call GENERATE_TEST_XML_template,$(version))))
+$(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call GENERATE_TEST_DATA_DOXYGEN_template,$(version))))
 
-generate-test-xml: $(ALL_GENERATE_TEST_XML) ## generate Doxygen XML files required for test cases
+generate-test-data-doxygen: $(ALL_GENERATE_TEST_DATA_DOXYGEN) ## generate Doxygen XML files required for test cases
+
+generate-test-data-dokka:
+	cd tests/data/source_code/kotlin/default; ./gradlew dokkaHtml
+	mkdir -p tests/data/generated/dokka/kotlin/default
+	cp tests/data/source_code/kotlin/default/build/dokka/asciidoxy.json tests/data/generated/dokka/kotlin/default/
+
+generate-test-data: generate-test-data-doxygen generate-test-data-dokka
 
 # Generate output for visual inspection tests
 VISUAL_TEST_CASES := $(wildcard tests/visual/*.toml)
