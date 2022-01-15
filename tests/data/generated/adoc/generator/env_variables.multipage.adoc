@@ -1,0 +1,28 @@
+= Test document
+
+
+
+42
+
+<<env_variables_include.adoc#,Included document>>
+
+42
+
+ifdef::backend-html5[]
+++++
+<div id="navigation">
+++++
+endif::[]
+[frame=none, grid=none, cols="<.^,^.^,>.^"]
+|===
+|
+
+|
+
+|<<env_variables_include.adoc#,Next>>
+|===
+ifdef::backend-html5[]
+++++
+</div>
+++++
+endif::[]

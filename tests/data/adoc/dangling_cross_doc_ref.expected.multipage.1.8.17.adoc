@@ -1,7 +1,0 @@
-= Test document
-
-This is some generic text.
-
-A link: 
-
-

@@ -20,6 +20,7 @@ from pathlib import Path
 import pytest
 
 from asciidoxy import __version__
+from asciidoxy.document import Document
 from asciidoxy.generator.asciidoc import ApiProxy, GeneratingApi, PreprocessingApi, process_adoc
 from asciidoxy.generator.cache import TemplateCache
 from asciidoxy.generator.context import InsertData, StackFrame
@@ -62,10 +63,16 @@ def adoc_data_document(adoc_data, package_manager):
     return prepare
 
 
-def adoc_data_expected_result_file(input_file, multipage, doxygen_version):
-    assert input_file.suffixes == [".input", ".adoc"]
-    mode = "multipage" if multipage else "singlepage"
-    return input_file.with_suffix("").with_suffix(f".expected.{mode}.{doxygen_version}.adoc")
+@pytest.fixture
+def check_adoc_expected_result(compare_to_file):
+    def check(doc: Document, *, multipage: bool) -> None:
+        assert doc.work_file.is_file()
+        base_file = Path("generator") / doc.relative_path.with_suffix("")
+        mode = "multipage" if multipage else "singlepage"
+        actual_content = doc.work_file.read_text(encoding="utf-8")
+        compare_to_file(base_file, actual_content, mode)
+
+    return check
 
 
 def test_insert__preprocessing(preprocessing_api):
@@ -1330,12 +1337,9 @@ def test_multipage_toc__preprocessing_run(preprocessing_api, document, multipage
                          ids=["warnings-are-errors", "warnings-are-not-errors"])
 @pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
 def test_process_adoc_single_file(warnings_are_errors, test_file_name, single_and_multipage,
-                                  adoc_data, api_reference, package_manager,
-                                  update_expected_results, doxygen_version, default_config):
-    input_file = adoc_data / f"{test_file_name}.input.adoc"
-    expected_output_file = adoc_data_expected_result_file(input_file, single_and_multipage,
-                                                          doxygen_version)
-
+                                  adoc_data, api_reference, package_manager, default_config,
+                                  check_adoc_expected_result):
+    input_file = adoc_data / f"{test_file_name}.adoc"
     package_manager.set_input_files(input_file)
     doc = package_manager.prepare_work_directory(input_file)
 
@@ -1346,23 +1350,18 @@ def test_process_adoc_single_file(warnings_are_errors, test_file_name, single_an
                               package_manager,
                               config=default_config,
                               progress=progress_mock)[0]
-    assert output_doc.work_file.is_file()
+    check_adoc_expected_result(output_doc, multipage=single_and_multipage)
     assert output_doc.stylesheet == "asciidoxy-no-toc.css"
     assert output_doc.stylesheet_file.is_file()
-
-    content = output_doc.work_file.read_text()
-    if update_expected_results:
-        expected_output_file.write_text(content)
-    assert content == expected_output_file.read_text()
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == 2
 
 
 def test_process_adoc_multi_file(single_and_multipage, api_reference, package_manager,
-                                 adoc_data_document, update_expected_results, adoc_data,
-                                 doxygen_version, default_config):
-    main_doc = adoc_data_document("multifile_test.input.adoc")
+                                 adoc_data_document, adoc_data, default_config,
+                                 check_adoc_expected_result):
+    main_doc = adoc_data_document("multifile_test.adoc")
 
     progress_mock = ProgressMock()
     default_config.warnings_are_errors = True
@@ -1374,23 +1373,14 @@ def test_process_adoc_multi_file(single_and_multipage, api_reference, package_ma
                                progress=progress_mock)
     assert len(output_docs) == 3
     for doc in output_docs:
-        assert doc.work_file.is_file()
+        check_adoc_expected_result(doc, multipage=single_and_multipage)
         assert doc.stylesheet == "asciidoxy-no-toc.css"
         assert doc.stylesheet_file.is_file()
-        expected_output_file = adoc_data_expected_result_file(doc.work_file, single_and_multipage,
-                                                              doxygen_version)
-        expected_output_file = adoc_data / expected_output_file.relative_to(main_doc.work_dir)
-        content = doc.work_file.read_text()
-
-        if update_expected_results:
-            expected_output_file.write_text(content)
-
-        assert content == expected_output_file.read_text()
 
     assert sorted([doc.relative_path for doc in output_docs]) == sorted([
-        Path("multifile_test.input.adoc"),
-        Path("sub_directory/multifile_subdoc_test.input.adoc"),
-        Path("sub_directory/multifile_subdoc_in_table_test.input.adoc")
+        Path("multifile_test.adoc"),
+        Path("sub_directory/multifile_subdoc_test.adoc"),
+        Path("sub_directory/multifile_subdoc_in_table_test.adoc")
     ])
 
     assert progress_mock.ready == progress_mock.total
@@ -1398,9 +1388,9 @@ def test_process_adoc_multi_file(single_and_multipage, api_reference, package_ma
 
 
 def test_process_adoc_env_variables(single_and_multipage, api_reference, package_manager,
-                                    adoc_data_document, doxygen_version, update_expected_results,
-                                    adoc_data, default_config):
-    main_doc = adoc_data_document("env_variables.input.adoc")
+                                    adoc_data_document, adoc_data, default_config,
+                                    check_adoc_expected_result):
+    main_doc = adoc_data_document("env_variables.adoc")
 
     progress_mock = ProgressMock()
     default_config.warnings_are_errors = True
@@ -1412,20 +1402,11 @@ def test_process_adoc_env_variables(single_and_multipage, api_reference, package
                                progress=progress_mock)
     assert len(output_docs) == 2
     for doc in output_docs:
-        assert doc.work_file.is_file()
-        expected_output_file = adoc_data_expected_result_file(doc.work_file, single_and_multipage,
-                                                              doxygen_version)
-        expected_output_file = adoc_data / expected_output_file.relative_to(main_doc.work_dir)
-        content = doc.work_file.read_text()
-
-        if update_expected_results:
-            expected_output_file.write_text(content)
-
-        assert content == expected_output_file.read_text()
+        check_adoc_expected_result(doc, multipage=single_and_multipage)
 
     assert sorted([doc.relative_path for doc in output_docs]) == sorted([
-        Path("env_variables.input.adoc"),
-        Path("env_variables_include.input.adoc"),
+        Path("env_variables.adoc"),
+        Path("env_variables_include.adoc"),
     ])
 
     assert progress_mock.ready == progress_mock.total
@@ -1434,7 +1415,7 @@ def test_process_adoc_env_variables(single_and_multipage, api_reference, package
 
 def test_process_adoc__embedded_doc_included(single_and_multipage, api_reference, package_manager,
                                              adoc_data_document, default_config):
-    main_doc = adoc_data_document("embeddedfile_test.input.adoc")
+    main_doc = adoc_data_document("embeddedfile_test.adoc")
 
     progress_mock = ProgressMock()
     default_config.warnings_are_errors = True
@@ -1446,8 +1427,8 @@ def test_process_adoc__embedded_doc_included(single_and_multipage, api_reference
                                progress=progress_mock)
     assert len(output_docs) == 2
     assert sorted([doc.relative_path for doc in output_docs]) == sorted([
-        Path("embeddedfile_test.input.adoc"),
-        Path("sub_directory/embeddedfile_subdoc_test.input.adoc"),
+        Path("embeddedfile_test.adoc"),
+        Path("sub_directory/embeddedfile_subdoc_test.adoc"),
     ])
 
     assert progress_mock.ready == progress_mock.total
@@ -1455,17 +1436,14 @@ def test_process_adoc__embedded_doc_included(single_and_multipage, api_reference
 
 
 def test_process_adoc_custom_templates(warnings_are_errors, single_and_multipage, adoc_data,
-                                       api_reference, package_manager, update_expected_results,
-                                       doxygen_version, tmp_path, default_config):
+                                       api_reference, package_manager, tmp_path, default_config,
+                                       check_adoc_expected_result):
     template_dir = tmp_path / "templates"
     (template_dir / "cpp").mkdir(parents=True)
     (template_dir / "cpp" / "class.mako").write_text("Custom class template")
     (template_dir / "cpp" / "myclass.mako").write_text("My class template")
 
-    input_file = adoc_data / "custom_templates.input.adoc"
-    expected_output_file = adoc_data_expected_result_file(input_file, single_and_multipage,
-                                                          doxygen_version)
-
+    input_file = adoc_data / "custom_templates.adoc"
     package_manager.set_input_files(input_file)
     doc = package_manager.prepare_work_directory(input_file)
 
@@ -1477,20 +1455,12 @@ def test_process_adoc_custom_templates(warnings_are_errors, single_and_multipage
                               package_manager,
                               config=default_config,
                               progress=progress_mock)[0]
-    assert output_doc.work_file.is_file()
-
-    content = output_doc.work_file.read_text()
-    if update_expected_results:
-        expected_output_file.write_text(content)
-    assert content == expected_output_file.read_text()
+    check_adoc_expected_result(output_doc, multipage=single_and_multipage)
 
 
 def test_process_adoc_access_config(warnings_are_errors, single_and_multipage, adoc_data,
-                                    api_reference, package_manager, update_expected_results,
-                                    doxygen_version, tmp_path, default_config):
-    input_file = adoc_data / "access_config.input.adoc"
-    adoc_data_expected_result_file(input_file, single_and_multipage, doxygen_version)
-
+                                    api_reference, package_manager, tmp_path, default_config):
+    input_file = adoc_data / "access_config.adoc"
     package_manager.set_input_files(input_file)
     doc = package_manager.prepare_work_directory(input_file)
 
@@ -1512,22 +1482,13 @@ def test_process_adoc_access_config(warnings_are_errors, single_and_multipage, a
     "test_file_name",
     ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
 def test_process_adoc_file_warning(test_file_name, single_and_multipage, adoc_data, api_reference,
-                                   package_manager, update_expected_results, doxygen_version,
-                                   default_config):
-    input_file = adoc_data / f"{test_file_name}.input.adoc"
+                                   package_manager, default_config, check_adoc_expected_result):
+    input_file = adoc_data / f"{test_file_name}.adoc"
     package_manager.set_input_files(input_file)
     doc = package_manager.prepare_work_directory(input_file)
-
-    expected_output_file = adoc_data_expected_result_file(input_file, single_and_multipage,
-                                                          doxygen_version)
-
     default_config.multipage = single_and_multipage
     output_doc = process_adoc(doc, api_reference, package_manager, config=default_config)[0]
-    assert output_doc.work_file.is_file()
-    content = output_doc.work_file.read_text()
-    if update_expected_results:
-        expected_output_file.write_text(content)
-    assert content == expected_output_file.read_text()
+    check_adoc_expected_result(output_doc, multipage=single_and_multipage)
 
 
 @pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
@@ -1538,7 +1499,7 @@ def test_process_adoc_file_warning(test_file_name, single_and_multipage, adoc_da
                           ("dangling_link_in_insert", ConsistencyError)])
 def test_process_adoc_file_warning_as_error(test_file_name, error, single_and_multipage, adoc_data,
                                             api_reference, package_manager, default_config):
-    input_file = adoc_data / f"{test_file_name}.input.adoc"
+    input_file = adoc_data / f"{test_file_name}.adoc"
     package_manager.set_input_files(input_file)
     doc = package_manager.prepare_work_directory(input_file)
 

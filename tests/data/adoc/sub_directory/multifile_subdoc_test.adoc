@@ -1,0 +1,16 @@
+= Test sub-document
+
+Sub-document document text.
+
+== Sub-document chapter [[sub-document-chapter]]
+
+${insert("asciidoxy::geometry::Coordinate")}
+
+${insert("asciidoxy::geometry::InvalidCoordinate")}
+
+Reference to main-document:
+${cross_document_ref("../multifile_test.adoc", anchor="main-document-chapter",
+                     link_text="Reference to main-document")}
+
+Link to sub-document API:
+${link("asciidoxy::traffic::TrafficEvent::Severity", kind="enum")}
