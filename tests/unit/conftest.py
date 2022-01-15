@@ -29,8 +29,8 @@ from asciidoxy.parser.doxygen import Driver as ParserDriver
 from .builders import SimpleClassBuilder
 from .file_builder import FileBuilder
 
-_test_data_dir = Path(__file__).parent.parent / "data"
-_xml_dir = _test_data_dir / "generated" / "xml"
+test_data_dir = Path(__file__).parent.parent / "data"
+_xml_dir = test_data_dir / "generated" / "xml"
 
 
 def pytest_addoption(parser):
@@ -38,11 +38,6 @@ def pytest_addoption(parser):
         "--update-expected-results",
         action="store_true",
         help="Update the expected results for template tests with the current results.")
-
-
-@pytest.fixture
-def update_expected_results(request):
-    return request.config.getoption("update_expected_results")
 
 
 def _doxygen_versions():
@@ -75,12 +70,12 @@ def parser_driver_factory(xml_data):
 
 @pytest.fixture
 def adoc_data():
-    return _test_data_dir / "adoc"
+    return test_data_dir / "adoc"
 
 
 @pytest.fixture
 def test_data():
-    return _test_data_dir
+    return test_data_dir
 
 
 @pytest.fixture

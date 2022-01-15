@@ -1,8 +1,0 @@
-= Test document
-
-The class reference:
-
-Custom class template
-
-My class template
-
