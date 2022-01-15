@@ -108,7 +108,7 @@ def test_help():
 
 def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, adoc_data,
                       event_loop):
-    in_file = adoc_data / "simple_test.input.adoc"
+    in_file = adoc_data / "simple_test.adoc"
 
     main([
         str(in_file), "--spec-file",
@@ -117,8 +117,8 @@ def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, a
         str(build_dir)
     ])
 
-    output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    output_file = destination_dir / "simple_test.html"
+    processed_file = build_dir / "intermediate" / "simple_test.adoc"
     runner = read_asciidoctor_runner(asciidoctor_mock)
     assert f"to_file: '{output_file}'" in runner
     assert f"convert_file '{processed_file}'" in runner
@@ -128,7 +128,7 @@ def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, a
 
 def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destination_dir,
                                   adoc_data, event_loop):
-    in_file = adoc_data / "simple_test.input.adoc"
+    in_file = adoc_data / "simple_test.adoc"
 
     main([
         str(in_file),
@@ -142,8 +142,8 @@ def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destin
         "pdf",
     ])
 
-    output_file = destination_dir / "simple_test.input.pdf"
-    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    output_file = destination_dir / "simple_test.pdf"
+    processed_file = build_dir / "intermediate" / "simple_test.adoc"
     runner = read_asciidoctor_runner(asciidoctor_mock)
     assert f"to_file: '{output_file}'" in runner
     assert f"convert_file '{processed_file}'" in runner
@@ -153,7 +153,7 @@ def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destin
 
 def test_process_file_backend_adoc(asciidoctor_mock, build_dir, spec_file, destination_dir,
                                    adoc_data, event_loop):
-    in_file = adoc_data / "simple_test.input.adoc"
+    in_file = adoc_data / "simple_test.adoc"
 
     main([
         str(in_file),
@@ -168,13 +168,13 @@ def test_process_file_backend_adoc(asciidoctor_mock, build_dir, spec_file, desti
     ])
 
     asciidoctor_mock.assert_not_called()
-    output_file = destination_dir / "simple_test.input.adoc"
+    output_file = destination_dir / "simple_test.adoc"
     assert output_file.is_file()
 
 
 def test_process_custom_file_template_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
                                           adoc_data, event_loop, tmp_path):
-    in_file = adoc_data / "custom_templates.input.adoc"
+    in_file = adoc_data / "custom_templates.adoc"
     template_dir = tmp_path / "templates"
     (template_dir / "cpp").mkdir(parents=True)
     (template_dir / "cpp" / "class.mako").write_text("Custom class template")
@@ -189,13 +189,13 @@ def test_process_custom_file_template_dir(asciidoctor_mock, build_dir, spec_file
     ])
 
     asciidoctor_mock.assert_not_called()
-    output_file = destination_dir / "custom_templates.input.adoc"
+    output_file = destination_dir / "custom_templates.adoc"
     assert output_file.is_file()
 
 
 def test_process_default_cache_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
                                    adoc_data, event_loop):
-    in_file = adoc_data / "simple_test.input.adoc"
+    in_file = adoc_data / "simple_test.adoc"
 
     main([
         str(in_file), "--spec-file",
@@ -210,7 +210,7 @@ def test_process_default_cache_dir(asciidoctor_mock, build_dir, spec_file, desti
 
 def test_process_custom_cache_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
                                   adoc_data, event_loop, tmp_path):
-    in_file = adoc_data / "simple_test.input.adoc"
+    in_file = adoc_data / "simple_test.adoc"
     cache_dir = tmp_path / "my-cache"
 
     main([
@@ -231,7 +231,7 @@ def test_process_custom_cache_dir(asciidoctor_mock, build_dir, spec_file, destin
 
 def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
                      adoc_data, event_loop, tmp_path):
-    in_file = adoc_data / "simple_test.input.adoc"
+    in_file = adoc_data / "simple_test.adoc"
     image_dir = tmp_path / "images"
     image_dir.mkdir()
 
@@ -259,8 +259,8 @@ def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, desti
         "WARNING",
     ])
 
-    output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    output_file = destination_dir / "simple_test.html"
+    processed_file = build_dir / "intermediate" / "simple_test.adoc"
     runner = read_asciidoctor_runner(asciidoctor_mock)
     assert f"to_file: '{output_file}'" in runner
     assert f"convert_file '{processed_file}'" in runner
@@ -270,7 +270,7 @@ def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, desti
 
 def test_forward_asciidoctor_options(asciidoctor_mock, build_dir, spec_file, destination_dir,
                                      adoc_data, event_loop):
-    in_file = adoc_data / "simple_test.input.adoc"
+    in_file = adoc_data / "simple_test.adoc"
 
     main([
         str(in_file), "--spec-file",
@@ -280,8 +280,8 @@ def test_forward_asciidoctor_options(asciidoctor_mock, build_dir, spec_file, des
         "-r", "asciidoctor-diagram"
     ])
 
-    output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    output_file = destination_dir / "simple_test.html"
+    processed_file = build_dir / "intermediate" / "simple_test.adoc"
     runner = read_asciidoctor_runner(asciidoctor_mock)
     assert f"to_file: '{output_file}'" in runner
     assert f"convert_file '{processed_file}'" in runner
@@ -296,7 +296,7 @@ def test_forward_asciidoctor_options(asciidoctor_mock, build_dir, spec_file, des
 
 def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
                            adoc_data, event_loop):
-    in_file = adoc_data / "simple_test.input.adoc"
+    in_file = adoc_data / "simple_test.adoc"
 
     main([
         str(in_file),
@@ -318,8 +318,8 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
         str(build_dir),
     ])
 
-    output_file = destination_dir / "simple_test.input.html"
-    processed_file = build_dir / "intermediate" / "simple_test.input.adoc"
+    output_file = destination_dir / "simple_test.html"
+    processed_file = build_dir / "intermediate" / "simple_test.adoc"
     runner = read_asciidoctor_runner(asciidoctor_mock)
     assert f"to_file: '{output_file}'" in runner
     assert f"convert_file '{processed_file}'" in runner
@@ -328,12 +328,12 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
 
 
 def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_data, event_loop):
-    in_file = adoc_data / "no_api_reference.input.adoc"
+    in_file = adoc_data / "no_api_reference.adoc"
 
     main([str(in_file), "--destination-dir", str(destination_dir), "--build-dir", str(build_dir)])
 
-    output_file = destination_dir / "no_api_reference.input.html"
-    processed_file = build_dir / "intermediate" / "no_api_reference.input.adoc"
+    output_file = destination_dir / "no_api_reference.html"
+    processed_file = build_dir / "intermediate" / "no_api_reference.adoc"
     runner = read_asciidoctor_runner(asciidoctor_mock)
     assert f"to_file: '{output_file}'" in runner
     assert f"convert_file '{processed_file}'" in runner
