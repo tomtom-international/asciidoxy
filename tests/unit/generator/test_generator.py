@@ -642,21 +642,6 @@ def test_cross_document_ref__package_must_be_explicit(file_builder, tdb_single_a
             assert result == ""
 
 
-def test_cross_document_ref__direct_access_to_other_package_for_old_style_packages(
-        file_builder, tdb_single_and_multipage, tdb_warnings_are_and_are_not_errors):
-    file_builder.add_input_file("input.adoc")
-    file_builder.add_package_file("package", "include.adoc")
-    file_builder.package_manager.input_package().scoped = False
-
-    for api in file_builder.apis():
-        result = api.cross_document_ref("include.adoc", link_text="bla")
-        if isinstance(api, GeneratingApi):
-            if tdb_single_and_multipage:
-                assert result == "<<include.adoc#,bla>>"
-            else:
-                assert result == "<<include.adoc#top-include-top,bla>>"
-
-
 def test_cross_document_ref__with_link_text(file_builder, tdb_single_and_multipage):
     file_builder.add_input_file("input.adoc")
     file_builder.add_include_file("includes/other_file.adoc")
@@ -994,27 +979,6 @@ def test_include__package_does_not_exist(file_builder, tdb_warnings_are_and_are_
                 api.include("the_right_file.adoc", package_name="package-b")
         else:
             assert api.include("the_right_file.adoc", package_name="package-b") == ""
-
-
-def test_include__direct_access_to_other_package_for_old_style_packages(file_builder):
-    input_file = file_builder.add_input_file("input.adoc")
-    file_builder.add_package_file("package-a", "another_file.adoc")
-    file_builder.package_manager.input_package().scoped = False
-
-    for api in file_builder.apis():
-        result = api.include("another_file.adoc")
-        lines = result.splitlines()
-        assert len(lines) == 2
-
-        assert lines[0] == "[#top-another_file-top]"
-
-        assert lines[1].startswith("include::")
-        assert lines[1].endswith("[leveloffset=+1]")
-
-        file_name = input_file.work_dir / lines[1][9:-16]
-        assert file_name.is_file()
-        assert file_name.name == "another_file.adoc"
-        assert file_name.is_absolute()
 
 
 def test_include__with_leveloffset(file_builder):

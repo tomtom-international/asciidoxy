@@ -50,8 +50,13 @@ async def package_file_response(request):
     return web.FileResponse(Path(__file__).parent.parent.parent / "data" / "package.tar.gz")
 
 
-async def currupt_package_file_response(request):
+async def corrupt_package_file_response(request):
     return web.FileResponse(Path(__file__).parent.parent.parent / "data" / "corrupt_package.tar.gz")
+
+
+async def old_style_package_file_response(request):
+    return web.FileResponse(
+        Path(__file__).parent.parent.parent / "data" / "old_style_package.tar.gz")
 
 
 async def error404_response(request):
@@ -75,7 +80,6 @@ async def test_http_package__contents_toml(aiohttp_server, tmp_path):
     assert len(packages) == 1
     pkg = packages[0]
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
 
     assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
@@ -101,15 +105,12 @@ async def test_http_package__contents_toml__spec_dirs_ignored(aiohttp_server, tm
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
     spec.file_names = ["package"]
-    spec.xml_subdir = "thereisnoxmlhere"
-    spec.include_subdir = "adocissomewhereelse"
 
     packages = await collect([spec], tmp_path)
 
     assert len(packages) == 1
     pkg = packages[0]
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
 
     assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
@@ -128,98 +129,22 @@ async def test_http_package__contents_toml__spec_dirs_ignored(aiohttp_server, tm
     assert pkg.adoc_root_doc.is_file()
 
 
-async def test_http_package__old__xml_only(aiohttp_server, tmp_path):
-    server = await start_server(aiohttp_server, web.get("/test/1.0.0/xml", xml_file_response))
+async def test_http_package__contents_toml__missing(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/package", old_style_package_file_response))
 
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.xml_subdir = "xml"
-    spec.file_names = ["xml"]
+    spec.file_names = ["package"]
 
-    with pytest.warns(FutureWarning):
-        packages = await collect([spec], tmp_path)
-
-    assert len(packages) == 1
-    pkg = packages[0]
-    assert pkg.name == "test"
-    assert pkg.scoped is False
-    assert pkg.reference_dir is not None
-    assert pkg.reference_type == "doxygen"
-    assert pkg.adoc_src_dir is None
-
-    assert pkg.reference_dir.is_dir()
-    assert (pkg.reference_dir / "content.xml").is_file()
-
-    assert (tmp_path / "test" / "1.0.0" / "xml").is_dir()
-    assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
-
-
-async def test_http_package__old__include_only(aiohttp_server, tmp_path):
-    server = await start_server(aiohttp_server, web.get("/test/1.0.0/include",
-                                                        include_file_response))
-
-    spec = HttpPackageSpec("test", "1.0.0",
-                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.include_subdir = "adoc"
-    spec.file_names = ["include"]
-
-    with pytest.warns(FutureWarning):
-        packages = await collect([spec], tmp_path)
-
-    assert len(packages) == 1
-    pkg = packages[0]
-    assert pkg.name == "test"
-    assert pkg.scoped is False
-    assert pkg.reference_dir is None
-    assert pkg.adoc_src_dir is not None
-
-    assert pkg.adoc_src_dir.is_dir()
-    assert (pkg.adoc_src_dir / "content.adoc").is_file()
-
-    assert (tmp_path / "test" / "1.0.0" / "adoc").is_dir()
-    assert (tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc").is_file()
-
-
-async def test_http_package__old__xml_and_include(aiohttp_server, tmp_path):
-    server = await start_server(
-        aiohttp_server,
-        web.get("/test/1.0.0/include", include_file_response),
-        web.get("/test/1.0.0/xml", xml_file_response),
-    )
-
-    spec = HttpPackageSpec("test", "1.0.0",
-                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
-    spec.file_names = ["include", "xml"]
-
-    with pytest.warns(FutureWarning):
-        packages = await collect([spec], tmp_path)
-
-    assert len(packages) == 1
-    pkg = packages[0]
-    assert pkg.name == "test"
-    assert pkg.scoped is False
-    assert pkg.reference_dir is not None
-    assert pkg.reference_type == "doxygen"
-    assert pkg.adoc_src_dir is not None
-
-    assert pkg.reference_dir.is_dir()
-    assert (pkg.reference_dir / "content.xml").is_file()
-
-    assert (tmp_path / "test" / "1.0.0" / "xml").is_dir()
-    assert (tmp_path / "test" / "1.0.0" / "xml" / "content.xml").is_file()
-
-    assert pkg.adoc_src_dir.is_dir()
-    assert (pkg.adoc_src_dir / "content.adoc").is_file()
-
-    assert (tmp_path / "test" / "1.0.0" / "adoc").is_dir()
-    assert (tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc").is_file()
+    with pytest.raises(InvalidPackageError):
+        await collect([spec], tmp_path)
+    assert not (tmp_path / "test" / "1.0.0").exists()
 
 
 async def test_http_package__contents_toml__corrupt(aiohttp_server, tmp_path):
     server = await start_server(aiohttp_server,
-                                web.get("/test/1.0.0/package", currupt_package_file_response))
+                                web.get("/test/1.0.0/package", corrupt_package_file_response))
 
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
@@ -246,7 +171,6 @@ async def test_http_package__cache_corrupt(aiohttp_server, tmp_path):
     assert len(packages) == 1
     pkg = packages[0]
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
 
     assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
@@ -263,40 +187,6 @@ async def test_http_package__cache_corrupt(aiohttp_server, tmp_path):
 
     assert pkg.adoc_root_doc == tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc"
     assert pkg.adoc_root_doc.is_file()
-
-
-async def test_http_package__old__subdirs_not_specified(aiohttp_server, tmp_path):
-    server = await start_server(
-        aiohttp_server,
-        web.get("/test/1.0.0/include", include_file_response),
-        web.get("/test/1.0.0/xml", xml_file_response),
-    )
-
-    spec = HttpPackageSpec("test", "1.0.0",
-                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.file_names = ["include", "xml"]
-
-    with pytest.raises(InvalidPackageError):
-        await collect([spec], tmp_path)
-    assert not (tmp_path / "test" / "1.0.0").exists()
-
-
-async def test_http_package__old__subdirs_not_matched(aiohttp_server, tmp_path):
-    server = await start_server(
-        aiohttp_server,
-        web.get("/test/1.0.0/include", include_file_response),
-        web.get("/test/1.0.0/xml", xml_file_response),
-    )
-
-    spec = HttpPackageSpec("test", "1.0.0",
-                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.xml_subdir = "doxygen"
-    spec.include_subdir = "include"
-    spec.file_names = ["include", "xml"]
-
-    with pytest.raises(InvalidPackageError):
-        await collect([spec], tmp_path)
-    assert not (tmp_path / "test" / "1.0.0").exists()
 
 
 async def test_http_package_error404(aiohttp_server, tmp_path):
@@ -327,8 +217,6 @@ async def test_http_package_name_interpolation_in_file_names(aiohttp_server, tmp
 
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
     spec.file_names = ["{name}"]
 
     await collect([spec], tmp_path)
@@ -342,8 +230,6 @@ async def test_http_package_version_interpolation_in_file_names(aiohttp_server, 
 
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
     spec.file_names = ["documentation-{version}"]
 
     await collect([spec], tmp_path)
@@ -357,8 +243,6 @@ async def test_http_package_version_and_name_interpolation_in_file_names(aiohttp
 
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
     spec.file_names = ["{name}-{version}"]
 
     await collect([spec], tmp_path)
@@ -388,110 +272,17 @@ image_dir = "images"
 """)
 
     spec = LocalPackageSpec("test", input_dir)
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
 
     packages = await collect([spec], output_dir)
     assert len(packages) == 1
 
     pkg = packages[0]
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
 
     assert pkg.reference_dir == input_dir / "xml"
     assert pkg.adoc_src_dir == input_dir / "adoc"
     assert pkg.adoc_image_dir == input_dir / "images"
-
-
-async def test_local_package__old__xml_and_include(tmp_path):
-    output_dir = tmp_path / "output"
-    input_dir = tmp_path / "input"
-
-    input_dir.mkdir(parents=True, exist_ok=True)
-    (input_dir / "xml").mkdir()
-    (input_dir / "adoc").mkdir()
-
-    spec = LocalPackageSpec("test", input_dir)
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
-
-    packages = await collect([spec], output_dir)
-    assert len(packages) == 1
-
-    pkg = packages[0]
-    assert pkg.name == "test"
-    assert pkg.scoped is False
-    assert pkg.reference_dir is not None
-    assert pkg.reference_type == "doxygen"
-    assert pkg.adoc_src_dir is not None
-
-    assert pkg.reference_dir == input_dir / "xml"
-    assert pkg.adoc_src_dir == input_dir / "adoc"
-
-
-async def test_local_package__old__include_only(tmp_path):
-    output_dir = tmp_path / "output"
-    input_dir = tmp_path / "input"
-
-    input_dir.mkdir(parents=True, exist_ok=True)
-    (input_dir / "adoc").mkdir()
-
-    spec = LocalPackageSpec("test", input_dir)
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
-
-    packages = await collect([spec], output_dir)
-    assert len(packages) == 1
-
-    pkg = packages[0]
-    assert pkg.name == "test"
-    assert pkg.scoped is False
-    assert pkg.reference_dir is None
-    assert pkg.adoc_src_dir is not None
-
-    assert pkg.adoc_src_dir == input_dir / "adoc"
-
-
-async def test_local_package__old__xml_only(tmp_path):
-    output_dir = tmp_path / "output"
-    input_dir = tmp_path / "input"
-
-    input_dir.mkdir(parents=True, exist_ok=True)
-    (input_dir / "xml").mkdir()
-
-    spec = LocalPackageSpec("test", input_dir)
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
-
-    packages = await collect([spec], output_dir)
-    assert len(packages) == 1
-
-    pkg = packages[0]
-    assert pkg.name == "test"
-    assert pkg.scoped is False
-    assert pkg.reference_dir is not None
-    assert pkg.reference_type == "doxygen"
-    assert pkg.adoc_src_dir is None
-
-    assert pkg.reference_dir == input_dir / "xml"
-
-
-async def test_local_package__old__subdirs_not_matched(tmp_path):
-    output_dir = tmp_path / "output"
-    input_dir = tmp_path / "input"
-
-    input_dir.mkdir(parents=True, exist_ok=True)
-    (input_dir / "doxygen").mkdir()
-    (input_dir / "include").mkdir()
-
-    spec = LocalPackageSpec("test", input_dir)
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
-
-    with pytest.raises(InvalidPackageError):
-        await collect([spec], output_dir)
-    assert input_dir.exists()
 
 
 async def test_progress_report(tmp_path):
@@ -500,11 +291,16 @@ async def test_progress_report(tmp_path):
 
     input_dir.mkdir(parents=True, exist_ok=True)
     (input_dir / "xml").mkdir()
+    (input_dir / "contents.toml").write_text("""\
+[package]
+name = "package"
+
+[reference]
+type = "doxygen"
+dir = "xml"
+""")
 
     spec = LocalPackageSpec("test", input_dir)
-    spec.xml_subdir = "xml"
-    spec.include_subdir = "adoc"
-
     progress_mock = ProgressMock()
 
     packages = await collect([spec, spec, spec], output_dir, progress=progress_mock)
@@ -531,8 +327,6 @@ def test_specs_from_file__http_package(tmp_path):
 
 [packages.test]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = [ "xml.tar.gz" ]
 version = "1.0.0"
@@ -544,8 +338,6 @@ version = "1.0.0"
     spec = specs[0]
     assert spec.name == "test"
     assert isinstance(spec, HttpPackageSpec)
-    assert spec.xml_subdir == "xml"
-    assert spec.include_subdir == "include"
     assert spec.url_template == "https://example.com/{version}"
     assert spec.file_names == ["xml.tar.gz"]
     assert spec.version == "1.0.0"
@@ -558,8 +350,6 @@ def test_specs_from_file__http_package__with_version_file(tmp_path):
 
 [packages.test]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = [ "xml.tar.gz" ]
 """)
@@ -577,8 +367,6 @@ test43,1.2.3
     spec = specs[0]
     assert spec.name == "test"
     assert isinstance(spec, HttpPackageSpec)
-    assert spec.xml_subdir == "xml"
-    assert spec.include_subdir == "include"
     assert spec.url_template == "https://example.com/{version}"
     assert spec.file_names == ["xml.tar.gz"]
     assert spec.version == "1.5.8"
@@ -591,8 +379,6 @@ def test_specs_from_file__http_package__with_version_file__spec_override(tmp_pat
 
 [packages.test]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = [ "xml.tar.gz" ]
 version = "15.2.1"
@@ -611,8 +397,6 @@ test43,1.2.3
     spec = specs[0]
     assert spec.name == "test"
     assert isinstance(spec, HttpPackageSpec)
-    assert spec.xml_subdir == "xml"
-    assert spec.include_subdir == "include"
     assert spec.url_template == "https://example.com/{version}"
     assert spec.file_names == ["xml.tar.gz"]
     assert spec.version == "15.2.1"
@@ -625,8 +409,6 @@ def test_specs_from_file__http_package__with_version_file__version_missing(tmp_p
 
 [packages.test]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = [ "xml.tar.gz" ]
 """)
@@ -641,58 +423,6 @@ test43,1.2.3
         specs_from_file(spec_file, version_file)
 
 
-def test_specs_from_file__http_package__no_xml_subdir(tmp_path):
-    spec_file = tmp_path / "spec.toml"
-    spec_file.write_text("""
-[packages]
-
-[packages.test]
-type = "http"
-include_subdir = "include"
-url_template = "https://example.com/{version}"
-file_names = [ "xml.tar.gz" ]
-version = "1.0.0"
-""")
-
-    specs = specs_from_file(spec_file)
-    assert len(specs) == 1
-
-    spec = specs[0]
-    assert spec.name == "test"
-    assert isinstance(spec, HttpPackageSpec)
-    assert spec.xml_subdir is None
-    assert spec.include_subdir == "include"
-    assert spec.url_template == "https://example.com/{version}"
-    assert spec.file_names == ["xml.tar.gz"]
-    assert spec.version == "1.0.0"
-
-
-def test_specs_from_file__http_package__no_include_subdir(tmp_path):
-    spec_file = tmp_path / "spec.toml"
-    spec_file.write_text("""
-[packages]
-
-[packages.test]
-type = "http"
-xml_subdir = "xml"
-url_template = "https://example.com/{version}"
-file_names = [ "xml.tar.gz" ]
-version = "1.0.0"
-""")
-
-    specs = specs_from_file(spec_file)
-    assert len(specs) == 1
-
-    spec = specs[0]
-    assert spec.name == "test"
-    assert isinstance(spec, HttpPackageSpec)
-    assert spec.xml_subdir == "xml"
-    assert spec.include_subdir is None
-    assert spec.url_template == "https://example.com/{version}"
-    assert spec.file_names == ["xml.tar.gz"]
-    assert spec.version == "1.0.0"
-
-
 def test_specs_from_file__http_package__no_url_template(tmp_path):
     spec_file = tmp_path / "spec.toml"
     spec_file.write_text("""
@@ -700,8 +430,6 @@ def test_specs_from_file__http_package__no_url_template(tmp_path):
 
 [packages.test]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 file_names = [ "xml.tar.gz" ]
 version = "1.0.0"
 """)
@@ -717,8 +445,6 @@ def test_specs_from_file__http_package__no_file_names(tmp_path):
 
 [packages.test]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 version = "1.0.0"
 """)
@@ -734,8 +460,6 @@ def test_specs_from_file__http_package__invalid_file_names(tmp_path):
 
 [packages.test]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = "xml.tar.gz"
 version = "1.0.0"
@@ -752,8 +476,6 @@ def test_specs_from_file__http_package__no_version(tmp_path):
 
 [packages.test]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = [ "xml.tar.gz" ]
 """)
@@ -770,8 +492,6 @@ def test_specs_from_file__local_package(tmp_path):
 
 [packages.test]
 type = "local"
-xml_subdir = "xml"
-include_subdir = "include"
 package_dir = "{package_dir}"
 """)
 
@@ -781,54 +501,6 @@ package_dir = "{package_dir}"
     spec = specs[0]
     assert spec.name == "test"
     assert isinstance(spec, LocalPackageSpec)
-    assert spec.xml_subdir == "xml"
-    assert spec.include_subdir == "include"
-    assert spec.package_dir == package_dir
-
-
-def test_specs_from_file__local_package_no_xml_subdir(tmp_path):
-    spec_file = tmp_path / "spec.toml"
-    package_dir = tmp_path / "package"
-    spec_file.write_text(f"""
-[packages]
-
-[packages.test]
-type = "local"
-include_subdir = "include"
-package_dir = "{package_dir}"
-""")
-
-    specs = specs_from_file(spec_file)
-    assert len(specs) == 1
-
-    spec = specs[0]
-    assert spec.name == "test"
-    assert isinstance(spec, LocalPackageSpec)
-    assert spec.xml_subdir is None
-    assert spec.include_subdir == "include"
-    assert spec.package_dir == package_dir
-
-
-def test_specs_from_file__local_package_no_include_subdir(tmp_path):
-    spec_file = tmp_path / "spec.toml"
-    package_dir = tmp_path / "package"
-    spec_file.write_text(f"""
-[packages]
-
-[packages.test]
-type = "local"
-xml_subdir = "xml"
-package_dir = "{package_dir}"
-""")
-
-    specs = specs_from_file(spec_file)
-    assert len(specs) == 1
-
-    spec = specs[0]
-    assert spec.name == "test"
-    assert isinstance(spec, LocalPackageSpec)
-    assert spec.xml_subdir == "xml"
-    assert spec.include_subdir is None
     assert spec.package_dir == package_dir
 
 
@@ -839,8 +511,6 @@ def test_specs_from_file__local_package_no_package_dir(tmp_path):
 
 [packages.test]
 type = "local"
-xml_subdir = "xml"
-include_subdir = "include"
 """)
 
     with pytest.raises(SpecificationError):
@@ -854,8 +524,6 @@ def test_specs_from_file__no_type(tmp_path):
 [packages]
 
 [packages.test]
-xml_subdir = "xml"
-include_subdir = "include"
 file_names = [ "xml.tar.gz" ]
 url_template = "https://example.com/{{version}}"
 version = "1.0.0"
@@ -873,8 +541,6 @@ def test_specs_from_file__source(tmp_path):
 
 [sources.http]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = [ "xml.tar.gz" ]
 
@@ -892,8 +558,6 @@ version = "1.0.0"
     spec = specs[0]
     assert spec.name == "test"
     assert isinstance(spec, HttpPackageSpec)
-    assert spec.xml_subdir == "xml"
-    assert spec.include_subdir == "include"
     assert spec.url_template == "https://example.com/{version}"
     assert spec.file_names == ["xml.tar.gz"]
     assert spec.version == "1.0.0"
@@ -906,8 +570,6 @@ def test_specs_from_file__source__override_partial(tmp_path):
 
 [sources.http]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = [ "xml.tar.gz" ]
 
@@ -916,8 +578,6 @@ file_names = [ "xml.tar.gz" ]
 
 [packages.test]
 source = "http"
-xml_subdir = "doxygen"
-include_subdir = "adoc"
 version = "1.0.0"
 """)
 
@@ -927,8 +587,6 @@ version = "1.0.0"
     spec = specs[0]
     assert spec.name == "test"
     assert isinstance(spec, HttpPackageSpec)
-    assert spec.xml_subdir == "doxygen"
-    assert spec.include_subdir == "adoc"
     assert spec.url_template == "https://example.com/{version}"
     assert spec.file_names == ["xml.tar.gz"]
     assert spec.version == "1.0.0"
@@ -958,8 +616,6 @@ def test_specs_from_file__name_and_version_interpolation(tmp_path):
 
 [sources.http]
 type = "http"
-xml_subdir = "xml"
-include_subdir = "include"
 url_template = "https://example.com/{version}"
 file_names = [ "{name}-{version}.tar.gz" ]
 
@@ -968,8 +624,6 @@ file_names = [ "{name}-{version}.tar.gz" ]
 
 [packages.test]
 source = "http"
-xml_subdir = "xml"
-include_subdir = "adoc"
 version = "1.0.0"
 """)
 
@@ -979,8 +633,6 @@ version = "1.0.0"
     spec = specs[0]
     assert spec.name == "test"
     assert isinstance(spec, HttpPackageSpec)
-    assert spec.xml_subdir == "xml"
-    assert spec.include_subdir == "adoc"
     assert spec.url_template == "https://example.com/{version}"
     assert spec.file_names == ["{name}-{version}.tar.gz"]
     assert spec.version == "1.0.0"

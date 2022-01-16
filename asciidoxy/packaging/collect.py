@@ -25,7 +25,6 @@ import logging
 import os
 import shutil
 import tarfile
-import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Type, TypeVar, Union
@@ -89,13 +88,8 @@ class PackageSpec(ABC):
 
     Attributes:
         name: Name of the package.
-        xml_subdir: Subdirectory in the package containing XML descriptions of the API.
-        include_subdir: Subdirectory in the package containing files for inclusion.
     """
     name: str
-
-    xml_subdir: Optional[str] = None
-    include_subdir: Optional[str] = None
 
     def __init__(self, name: str, **kwargs):
         self.name = name
@@ -129,11 +123,7 @@ class PackageSpec(ABC):
         Raises:
             SpecificationError: The specification in TOML is invalid.
         """
-        get = cls._make_getter(name, raw_spec)
-
         spec = cls(name, **init_args)
-        spec.xml_subdir = get("xml_subdir", optional=True)
-        spec.include_subdir = get("include_subdir", optional=True)
         return spec
 
     @staticmethod
@@ -170,26 +160,8 @@ class PackageSpec(ABC):
                     self.name, "Packaged `contents.toml` specifies a "
                     "non-existing adoc root document.")
 
-        elif self.xml_subdir or self.include_subdir:
-            warnings.warn(
-                "Packages without contents.toml are deprecated and will no longer be"
-                " supported from 0.9.0.", FutureWarning)
-            if self.xml_subdir:
-                xml_dir = package_dir / self.xml_subdir
-                if xml_dir.is_dir():
-                    logger.debug(f"{self.name} has XML subdirectory, considering doxygen type")
-                    pkg.reference_type = "doxygen"
-                    pkg.reference_dir = xml_dir
-            if self.include_subdir:
-                include_dir = package_dir / self.include_subdir
-                if include_dir.is_dir():
-                    logger.debug(f"{self.name} has include subdirectory")
-                    pkg.adoc_src_dir = include_dir
         else:
-            raise InvalidPackageError(
-                self.name, "Package does not contain `contents.toml` and package"
-                " specification does not specify the XML or include"
-                " directory.")
+            raise InvalidPackageError(self.name, "Package does not contain `contents.toml`.")
 
         if pkg.reference_dir is None and pkg.adoc_src_dir is None:
             raise InvalidPackageError(self.name, "Package does not contain XML or include files.")

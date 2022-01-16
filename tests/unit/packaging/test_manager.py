@@ -84,8 +84,6 @@ def create_package_spec(parent: Path, *names: str) -> Path:
         "sources": {
             "local": {
                 "type": "local",
-                "xml_subdir": "xml",
-                "include_subdir": "adoc"
             }
         },
     }

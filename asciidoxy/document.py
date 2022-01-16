@@ -42,7 +42,6 @@ class Package:
         adoc_image_dir:    Directory containing images to include in the documentation.
         adoc_root_doc:     Entry point document for the package. To be linked to if no specific file
                                in the package is mentioned.
-        scoped:            True if this is a new-style, scoped package.
         copy_adoc_src_dir: True if the content of `adoc_src_dir` should be copied to the working
                                directory.
     """
@@ -54,7 +53,6 @@ class Package:
     adoc_src_dir: Optional[Path] = None
     adoc_image_dir: Optional[Path] = None
     adoc_root_doc: Optional[Path] = None
-    scoped: bool = False
     copy_adoc_src_dir: bool = True
 
     def __init__(self, name: str):
@@ -81,8 +79,6 @@ class Package:
             self.adoc_image_dir = path_from_toml(adoc, "image_dir", pkg_root)
             if self.adoc_src_dir is not None:
                 self.adoc_root_doc = path_from_toml(adoc, "root_doc", self.adoc_src_dir)
-
-        self.scoped = True
 
 
 class Document:

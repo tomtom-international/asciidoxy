@@ -16,8 +16,6 @@
 
 [sources.local]
 type = "local"
-xml_subdir = "xml"
-include_subdir = "adoc"
 
 [packages]
 

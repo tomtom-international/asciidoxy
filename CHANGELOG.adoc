@@ -23,6 +23,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Removed
 
   * The `api.` prefix for commands is no longer supported.
+  * Old style packages without `contents.toml` are no longer supported. The `xml_subdir` and
+    `include_subdir` entries in the package specification file are now ignored.
 
 
 == 0.8.5 (25 Feb 2022)
