@@ -99,7 +99,6 @@ class PackageManager:
         pkg = Package(Package.INPUT_PACKAGE_NAME)
         pkg.adoc_src_dir = include_dir
         pkg.adoc_root_doc = in_file
-        pkg.scoped = True
 
         if image_dir is not None:
             pkg.adoc_image_dir = image_dir

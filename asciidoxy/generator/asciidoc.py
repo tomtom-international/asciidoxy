@@ -652,11 +652,6 @@ class Api(ABC):
             rel_file_name: Optional[Path]
             if package_name and file_name:
                 rel_file_name = Path(file_name)
-            elif file_name and not self._context.document.package.scoped:
-                # and not package_name
-                # Deprecated support for old style packages
-                package_name, rel_file_name = self._context.package_manager.find_original_file(
-                    (self._context.document.work_file.parent / file_name).resolve())
             elif file_name:  # and not package_name
                 rel_file_name = self._context.document.resolve_relative_path(file_name)
                 package_name = self._context.document.package.name

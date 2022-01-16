@@ -1,0 +1,6 @@
+[package]
+name = "javaexamples"
+
+[reference]
+type = "doxygen"
+dir = "xml"

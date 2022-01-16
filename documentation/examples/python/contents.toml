@@ -1,0 +1,6 @@
+[package]
+name = "pythonexamples"
+
+[reference]
+type = "doxygen"
+dir = "xml"
