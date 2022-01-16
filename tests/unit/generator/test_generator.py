@@ -1533,7 +1533,7 @@ def test_require_version__exact_match(preprocessing_api):
 
 
 def test_require_version__exact_match__fail(preprocessing_api):
-    base_version, _, _ = __version__.partition("-")
+    base_version, _, _ = __version__.partition("+")
     version_parts = base_version.split(".")
     version_parts[2] = str(int(version_parts[2]) + 1)
     version = ".".join(version_parts)
@@ -1542,11 +1542,13 @@ def test_require_version__exact_match__fail(preprocessing_api):
 
 
 def test_require_version__current_is_minimum(preprocessing_api):
-    preprocessing_api.require_version(f">={__version__}")
+    base_version, _, _ = __version__.partition("+")
+    preprocessing_api.require_version(f">={base_version}")
 
 
 def test_require_version__current_is_below_minimum(preprocessing_api):
-    version_parts = __version__.split(".")
+    base_version, _, _ = __version__.partition("+")
+    version_parts = base_version.split(".")
     version_parts[1] = str(int(version_parts[1]) + 1)
     version = ".".join(version_parts)
     with pytest.raises(IncompatibleVersionError):
@@ -1554,11 +1556,13 @@ def test_require_version__current_is_below_minimum(preprocessing_api):
 
 
 def test_require_version__current_is_minimum_optimistic(preprocessing_api):
-    preprocessing_api.require_version(f"~={__version__}")
+    base_version, _, _ = __version__.partition("+")
+    preprocessing_api.require_version(f"~={base_version}")
 
 
 def test_require_version__current_is_below_minimum_optimistic(preprocessing_api):
-    version_parts = __version__.split(".")
+    base_version, _, _ = __version__.partition("+")
+    version_parts = base_version.split(".")
     version_parts[1] = str(int(version_parts[1]) + 1)
     version = ".".join(version_parts)
     with pytest.raises(IncompatibleVersionError):
@@ -1566,14 +1570,16 @@ def test_require_version__current_is_below_minimum_optimistic(preprocessing_api)
 
 
 def test_require_version__allow_minor_increase(preprocessing_api):
-    version_parts = __version__.split(".")
+    base_version, _, _ = __version__.partition("+")
+    version_parts = base_version.split(".")
     version_parts[1] = str(int(version_parts[1]) - 1)
     version = ".".join(version_parts)
     preprocessing_api.require_version(f">={version}")
 
 
 def test_require_version__optimistic_no_minor_increase(preprocessing_api):
-    version_parts = __version__.split(".")
+    base_version, _, _ = __version__.partition("+")
+    version_parts = base_version.split(".")
     version_parts[1] = str(int(version_parts[1]) - 1)
     version = ".".join(version_parts)
     with pytest.raises(IncompatibleVersionError):
