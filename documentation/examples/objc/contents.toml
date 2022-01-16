@@ -1,0 +1,6 @@
+[package]
+name = "objcexamples"
+
+[reference]
+type = "doxygen"
+dir = "xml"

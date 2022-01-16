@@ -43,7 +43,6 @@ dir = "py"
     pkg.load_from_toml(tmp_path, toml.loads(contents))
 
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
     assert pkg.reference_dir == tmp_path / "xml"
     assert pkg.adoc_src_dir == tmp_path / "adoc"
@@ -70,7 +69,6 @@ root_doc = "index.adoc"
     pkg.load_from_toml(tmp_path, toml.loads(contents))
 
     assert pkg.name == "my-package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
     assert pkg.reference_dir == tmp_path / "xml"
     assert pkg.adoc_src_dir == tmp_path / "adoc"
@@ -93,7 +91,6 @@ root_doc = "index.adoc"
     pkg.load_from_toml(tmp_path, toml.loads(contents))
 
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type is None
     assert pkg.reference_dir is None
     assert pkg.adoc_src_dir == tmp_path / "adoc"
@@ -115,7 +112,6 @@ dir = "xml"
     pkg.load_from_toml(tmp_path, toml.loads(contents))
 
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
     assert pkg.reference_dir == tmp_path / "xml"
     assert pkg.adoc_src_dir is None
@@ -140,7 +136,6 @@ root_doc = "index.adoc"
     pkg.load_from_toml(tmp_path, toml.loads(contents))
 
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
     assert pkg.reference_dir == tmp_path / "xml"
     assert pkg.adoc_src_dir is None
@@ -167,7 +162,6 @@ root_doc = "index.adoc"
     pkg.load_from_toml(tmp_path, toml.loads(contents))
 
     assert pkg.name == "package"
-    assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
     assert pkg.reference_dir == tmp_path / "xml"
     assert pkg.adoc_src_dir == tmp_path / "adoc"

@@ -33,7 +33,10 @@ $(DOC_BUILD_DIR)/asciidoxy: $(DOC_BUILD_DIR)
 $(DOXYGEN_BUILD_DIR)/asciidoxy: $(DOXYGEN_BUILD_DIR)
 	mkdir -p $(DOXYGEN_BUILD_DIR)/asciidoxy
 
-$(DOXYGEN_BUILD_DIR)/asciidoxy/xml: $(DOXYGEN_BUILD_DIR)/asciidoxy
+$(DOXYGEN_BUILD_DIR)/asciidoxy/contents.toml: contents.toml $(DOXYGEN_BUILD_DIR)/asciidoxy
+	cp $< $@
+
+$(DOXYGEN_BUILD_DIR)/asciidoxy/xml: $(DOXYGEN_BUILD_DIR)/asciidoxy $(DOXYGEN_BUILD_DIR)/asciidoxy/contents.toml
 	. $(BUILD_DIR)/doxygen-$(LATEST_DOXYGEN_VERSION)/activate_run.sh; doxygen
 
 $(CURDIR)/copy: $(ROOT_DIR)/CHANGELOG.adoc
@@ -45,9 +48,12 @@ EXAMPLE_OUTPUTS := $(addprefix $(DOXYGEN_BUILD_DIR)/,$(addsuffix xml,$(EXAMPLE_D
 
 define EXAMPLE_template
 $(DOXYGEN_BUILD_DIR)/$(1): $(DOXYGEN_BUILD_DIR)
-	mkdir -p $(DOXYGEN_BUILD_DIR)/$(1)
+	mkdir -p $$@
 
-$(DOXYGEN_BUILD_DIR)/$(1)xml: $(DOXYGEN_BUILD_DIR)/$(1) $(filter-out %.adoc,$(wildcard $(1)/*))
+$(DOXYGEN_BUILD_DIR)/$(1)/contents.toml: $(1)/contents.toml $(DOXYGEN_BUILD_DIR)/$(1)
+	cp $$< $$@
+
+$(DOXYGEN_BUILD_DIR)/$(1)xml: $(DOXYGEN_BUILD_DIR)/$(1) $(DOXYGEN_BUILD_DIR)/$(1)/contents.toml $(filter-out %.adoc,$(wildcard $(1)/*))
 	. $(BUILD_DIR)/doxygen-$(LATEST_DOXYGEN_VERSION)/activate_run.sh; cd $(1) && OUTPUT_DIR=$(DOXYGEN_BUILD_DIR)/$(1) doxygen
 endef
 

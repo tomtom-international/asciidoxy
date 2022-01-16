@@ -84,7 +84,6 @@ class FileBuilder:
             pkg.adoc_src_dir = self.packages_dir / package_name
             if default_file:
                 pkg.adoc_root_doc = pkg.adoc_src_dir / default_file
-            pkg.scoped = True
             self.package_manager.packages[package_name] = pkg
         return pkg
 

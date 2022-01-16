@@ -63,16 +63,8 @@ types of packages the following key/value pairs are required:
 
 `type`:: The type of the package.
 
-For old-style packages the following key/value pairs are required. For backwards compatibility they
-can always be specified, even for new-style packages. But in case of new-style packages, they are
-ignored. New-style packages use <<_package_content_files>> to specify the contents.
-
-`xml_subdir`:: Subdirectory in the root of the package in which all Doxygen XML files are stored.
-`include_subdir`:: Subdirectory in the root of the package in which all other include files are
-stored.
-
-Packages of type `local` refer to a local directory. They require the following additional key/value
-pairs:
+Packages of type `local` refer to a local directory. They require the following additional 
+key/value pairs:
 
 `package_dir`:: Absolute or relative path to the directory containing the package.
 
@@ -82,8 +74,6 @@ Example:
 ----
 [packages.local_package]
 type = "local"
-xml_subdir = "xml"
-include_subdir = "adoc"
 package_dir = "/path/to/my/package/"
 ----
 
@@ -132,8 +122,6 @@ Example:
 [packages.package1]
 type = "http"
 url_template = "https://example.com/{name}/{version}/{file_name}"
-xml_subdir = "xml"
-include_subdir = "adoc"
 version = "12.3.4"
 login = "asciidoxy"
 password_env = "ASCIIDOXY_PASSWORD"
@@ -174,8 +162,6 @@ Example:
 [sources.remote_server]
 type = "http"
 url_template = "https://example.com/{name}/{version}/{file_name}"
-xml_subdir = "xml"
-include_subdir = "adoc"
 
 [packages]
 

@@ -1,0 +1,6 @@
+[package]
+name = "cppexamples"
+
+[reference]
+type = "doxygen"
+dir = "xml"

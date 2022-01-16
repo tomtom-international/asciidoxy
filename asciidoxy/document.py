@@ -45,7 +45,6 @@ class Package:
         python_dir:        Directory containing Python code to include in the documentation. This
                                directory will be added to the Python path for documents in this
                                package
-        scoped:            True if this is a new-style, scoped package.
         copy_adoc_src_dir: True if the content of `adoc_src_dir` should be copied to the working
                                directory.
     """
@@ -58,7 +57,6 @@ class Package:
     adoc_image_dir: Optional[Path] = None
     adoc_root_doc: Optional[Path] = None
     python_dir: Optional[Path] = None
-    scoped: bool = False
     copy_adoc_src_dir: bool = True
 
     def __init__(self, name: str):
@@ -89,8 +87,6 @@ class Package:
         python = data.get("python", None)
         if python is not None:
             self.python_dir = path_from_toml(python, "dir", pkg_root)
-
-        self.scoped = True
 
 
 class Document:
