@@ -38,6 +38,6 @@ def parser_factory(reference_type: str, api_reference: ApiReference,
                    config: Configuration) -> ReferenceParserBase:
     """Create a parser for the given type of API reference documentation."""
     if reference_type == "doxygen":
-        return DoxygenParser(api_reference, force_language=config.force_language)
+        return DoxygenParser(api_reference)
     else:
         raise UnsupportedReferenceTypeError(reference_type)

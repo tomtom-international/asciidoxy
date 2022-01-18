@@ -74,7 +74,6 @@ class Configuration(argparse.Namespace):
     warnings_are_errors: bool
     debug: bool
     log_level: str
-    force_language: Optional[str] = None
     multipage: bool
 
     safe_mode: str
@@ -158,11 +157,6 @@ def parse_args(argv):
                                 "--warnings-are-errors",
                                 action="store_true",
                                 help="Stop processing input files when a warning is encountered.")
-    behavior_group.add_argument(
-        "--force-language",
-        metavar="LANGUAGE",
-        help="Force language used when parsing doxygen XML files. Ignores the"
-        " language specified in the XML files.")
     behavior_group.add_argument(
         "--cache-dir",
         metavar="CACHE_DIR",
