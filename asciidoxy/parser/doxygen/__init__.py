@@ -13,6 +13,6 @@
 # limitations under the License.
 """Parser for Doxygen XML output."""
 
-from .driver import Driver, safe_language_tag
+from .parser import Parser, safe_language_tag
 
-__all__ = ["Driver", "safe_language_tag"]
+__all__ = ["Parser", "safe_language_tag"]

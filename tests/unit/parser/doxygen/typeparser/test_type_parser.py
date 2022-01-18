@@ -611,11 +611,11 @@ def _match_type(actual,
         assert not actual.args
 
 
-def test_type_parser__type_from_tokens(prefixes, names, nested_types, arg_types, suffixes):
-    driver_mock = MagicMock()
+def test_type_parser__type_from_tokens(prefixes, names, nested_types, arg_types, suffixes,
+                                       reference_mock):
     type_ref = TestParser.type_from_tokens(prefixes + names.tokens + nested_types.tokens +
                                            suffixes + arg_types.tokens,
-                                           driver=driver_mock)
+                                           api_reference=reference_mock)
     assert type_ref is not None
 
     if arg_types.expected_types:
@@ -647,8 +647,7 @@ def test_type_parser__type_from_tokens(prefixes, names, nested_types, arg_types,
     for expected_type in arg_types.expected_types:
         if not expected_type.refid:
             unresolved_types.append(expected_type.name)
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(unresolved_types))
+    reference_mock.assert_unresolved(*unresolved_types)
 
 
 @pytest.mark.parametrize("tokens,expected_type", [
@@ -757,7 +756,7 @@ def test_type_parser__type_from_tokens__no_namespace():
     assert type_ref.nested[1].namespace is None
 
 
-def test_type_parser__type_from_tokens__do_not_register_builtin_types():
+def test_type_parser__type_from_tokens__do_not_register_builtin_types(reference_mock):
     tokens = [
         name("BuiltinType"),
         nested_start(),
@@ -772,11 +771,9 @@ def test_type_parser__type_from_tokens__do_not_register_builtin_types():
         nested_end()
     ]
 
-    driver_mock = MagicMock()
-    type_ref = TestParser.type_from_tokens(tokens, driver=driver_mock)
+    type_ref = TestParser.type_from_tokens(tokens, api_reference=reference_mock)
     assert type_ref.name == "BuiltinType"
-    assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(["OtherType", "MyType", "OtherType"]))
+    reference_mock.assert_unresolved("OtherType", "MyType", "OtherType")
 
 
 @pytest.mark.parametrize("tokens,expected", [
@@ -1030,9 +1027,9 @@ def test_type_parser__parse_xml__unresolved_ref_with_driver():
     element = ET.Element("type")
     element.text = "MyType"
 
-    driver_mock = MagicMock()
-    type_ref = TestParser.parse_xml(element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_called_once_with(type_ref)
+    reference_mock = MagicMock()
+    type_ref = TestParser.parse_xml(element, api_reference=reference_mock)
+    reference_mock.add_unresolved_reference.assert_called_once_with(type_ref)
 
     assert type_ref is not None
     assert type_ref.name == "MyType"
@@ -1045,9 +1042,9 @@ def test_type_parser__parse_xml__do_not_register_ref_with_id():
     element = ET.Element("type")
     sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
 
-    driver_mock = MagicMock()
-    type_ref = TestParser.parse_xml(element, driver=driver_mock)
-    driver_mock.unresolved_ref.assert_not_called()
+    reference_mock = MagicMock()
+    type_ref = TestParser.parse_xml(element, api_reference=reference_mock)
+    reference_mock.add_unresolved_reference.assert_not_called()
 
     assert type_ref is not None
     assert type_ref.name == "MyType"
@@ -1060,9 +1057,11 @@ def test_type_parser__parse_xml__namespace():
     element = ET.Element("type")
     sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
 
-    driver_mock = MagicMock()
-    type_ref = TestParser.parse_xml(element, driver=driver_mock, namespace="asciidoxy::test")
-    driver_mock.unresolved_ref.assert_not_called()
+    reference_mock = MagicMock()
+    type_ref = TestParser.parse_xml(element,
+                                    api_reference=reference_mock,
+                                    namespace="asciidoxy::test")
+    reference_mock.add_unresolved_reference.assert_not_called()
 
     assert type_ref is not None
     assert type_ref.name == "MyType"

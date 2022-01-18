@@ -17,10 +17,10 @@ import string
 import xml.etree.ElementTree as ET
 from typing import List, Optional, Tuple
 
-from ...model import Compound
-from .language_traits import LanguageTraits, TokenCategory
-from .parser_base import ParserBase
-from .type_parser import Token, TypeParser, find_tokens
+from ....model import Compound
+from ..language_parser import LanguageParser
+from ..language_traits import LanguageTraits, TokenCategory
+from ..type_parser import Token, TypeParser, find_tokens
 
 
 class ObjectiveCTraits(LanguageTraits):
@@ -140,7 +140,7 @@ class ObjectiveCTypeParser(TypeParser):
         return tokens
 
 
-class ObjectiveCParser(ParserBase):
+class ObjectiveCParser(LanguageParser):
     """Parser for Objective C documentation."""
     TRAITS = ObjectiveCTraits
     TYPE_PARSER = ObjectiveCTypeParser

@@ -14,11 +14,13 @@
 """Tests for managing packages."""
 
 from pathlib import Path
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 import toml
 
+from asciidoxy.api_reference import ApiReference
+from asciidoxy.config import Configuration
 from asciidoxy.document import Package
 from asciidoxy.packaging.manager import (
     FileCollisionError,
@@ -132,17 +134,23 @@ def test_collect(package_manager, tmp_path, build_dir):
     assert pkg_b.adoc_image_dir.is_dir()
 
 
-def test_load_reference(package_manager, tmp_path, build_dir):
+@pytest.fixture
+def parser_mock():
+    with patch("asciidoxy.packaging.manager.parser_factory") as mock:
+        parser_mock = MagicMock()
+        mock.return_value = parser_mock
+        yield parser_mock
+
+
+def test_load_reference(package_manager, tmp_path, parser_mock):
     pkg_a_dir = create_package_dir(tmp_path, "a")
     pkg_b_dir = create_package_dir(tmp_path, "b")
     spec_file = create_package_spec(tmp_path, "a", "b")
     package_manager.collect(spec_file)
 
-    parser_mock = MagicMock()
-    package_manager.load_reference(parser_mock)
+    package_manager.load_reference(ApiReference(), Configuration())
     parser_mock.parse.assert_has_calls(
-        [call(pkg_a_dir / "xml" / "a.xml"),
-         call(pkg_b_dir / "xml" / "b.xml")], any_order=True)
+        [call(pkg_a_dir / "xml"), call(pkg_b_dir / "xml")], any_order=True)
 
 
 def test_prepare_work_directory(package_manager, tmp_path, build_dir):

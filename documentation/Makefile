@@ -18,6 +18,7 @@
 export DOC_BUILD_DIR := $(BUILD_DIR)/doc
 export DOXYGEN_BUILD_DIR := $(DOC_BUILD_DIR)/doxygen
 MULTIPAGE ?= --multipage
+LOG_LEVEL ?= WARNING
 
 docs: $(DOC_BUILD_DIR)/output/index.html
 
@@ -69,4 +70,5 @@ $(ADOC_OUT_FILES): $(ADOC_IN_FILES) $(DOC_BUILD_DIR)/asciidoxy $(CURDIR)/asciido
 		--destination-dir $(DOC_BUILD_DIR)/output \
 		--spec-file asciidoxy.toml \
 		--debug $(MULTIPAGE) \
+		--log $(LOG_LEVEL) \
 		-a linkcss

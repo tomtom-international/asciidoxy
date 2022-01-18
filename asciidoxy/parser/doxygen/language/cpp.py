@@ -18,10 +18,10 @@ import string
 import xml.etree.ElementTree as ET
 from typing import List, Optional
 
-from ...model import Compound, Parameter
-from .language_traits import LanguageTraits, TokenCategory
-from .parser_base import ParserBase
-from .type_parser import Token, TypeParser
+from ....model import Compound, Parameter
+from ..language_parser import LanguageParser
+from ..language_traits import LanguageTraits, TokenCategory
+from ..type_parser import Token, TypeParser
 
 
 class CppTraits(LanguageTraits):
@@ -139,7 +139,7 @@ class CppTypeParser(TypeParser):
         return tokens
 
 
-class CppParser(ParserBase):
+class CppParser(LanguageParser):
     """Parser for C++ documentation."""
     TRAITS = CppTraits
     TYPE_PARSER = CppTypeParser
@@ -184,7 +184,8 @@ class CppParser(ParserBase):
                 tokens.pop(0)
 
             if type_tokens:
-                ref = self.TYPE_PARSER.type_from_tokens(type_tokens, self._driver, member.full_name)
+                ref = self.TYPE_PARSER.type_from_tokens(type_tokens, self._api_reference,
+                                                        member.full_name)
                 if ref is not None:
                     member.params.append(Parameter(type=ref))
 

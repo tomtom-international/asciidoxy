@@ -13,12 +13,17 @@
 # limitations under the License.
 """API reference storage and search."""
 
+import logging
 import re
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple, TypeVar
+from typing import Dict, List, Optional, Set, Tuple, TypeVar
 
-from .model import Compound, ReferableElement
+from tqdm import tqdm
+
+from .model import Compound, ReferableElement, TypeRef
+
+logger = logging.getLogger(__name__)
 
 
 class AmbiguousLookupError(Exception):
@@ -359,11 +364,19 @@ class ApiReference:
     elements: List[ReferableElement]
     _id_index: Dict[str, ReferableElement]
     _name_index: Dict[str, List[ReferableElement]]
+    _unresolved_refs: List[TypeRef]
+    _inner_type_refs: List[Tuple[Compound, TypeRef]]
 
     def __init__(self):
         self.elements = []
         self._id_index = {}
         self._name_index = defaultdict(list)
+        self._unresolved_refs = []
+        self._inner_type_refs = []
+
+    @property
+    def unresolved_ref_count(self):
+        return len(self._unresolved_refs) + len(self._inner_type_refs)
 
     def append(self, element: ReferableElement) -> None:
         self.elements.append(element)
@@ -447,6 +460,62 @@ class ApiReference:
             return matches[0]
 
         raise AmbiguousLookupError(matches)
+
+    def add_unresolved_reference(self, ref: TypeRef) -> None:
+        self._unresolved_refs.append(ref)
+
+    def add_inner_type_reference(self, parent: Compound, ref: TypeRef) -> None:
+        self._inner_type_refs.append((parent, ref))
+
+    def resolve_references(self, progress: Optional[tqdm] = None) -> None:
+        """Resolve all references between objects from different XML files."""
+
+        unresolved_names: Set[str] = set()
+        if progress is not None:
+            progress.total = len(self._unresolved_refs) + len(self._inner_type_refs)
+
+        still_unresolved_refs = []
+        for ref in self._unresolved_refs:
+            if progress is not None:
+                progress.update()
+            assert ref.name
+            element = self.resolve_reference(ref)
+            if element is not None:
+                ref.resolve(element)
+            else:
+                still_unresolved_refs.append(ref)
+                unresolved_names.add(ref.name)
+
+        still_unresolved_inner_type_refs: List[Tuple[Compound, TypeRef]] = []
+        for parent, ref in self._inner_type_refs:
+            if progress is not None:
+                progress.update()
+            assert ref.name
+            element = self.resolve_reference(ref)
+            if element is not None:
+                assert isinstance(element, Compound)
+                if ref.prot:
+                    element.prot = ref.prot
+                parent.members.append(element)
+            else:
+                still_unresolved_inner_type_refs.append((parent, ref))
+                unresolved_names.add(ref.name)
+
+        resolved_ref_count = len(self._unresolved_refs) - len(still_unresolved_refs)
+        resolved_inner_type_ref_count = (len(self._inner_type_refs) -
+                                         len(still_unresolved_inner_type_refs))
+        unresolved_ref_count = len(still_unresolved_refs) + len(still_unresolved_inner_type_refs)
+        logger.debug(f"Resolved refs: {resolved_ref_count + resolved_inner_type_ref_count}")
+        logger.debug(f"Still unresolved: {unresolved_ref_count}: {', '.join(unresolved_names)}")
+
+        self._unresolved_refs = still_unresolved_refs
+        self._inner_type_refs = still_unresolved_inner_type_refs
+
+    def resolve_reference(self, ref: TypeRef) -> Optional[ReferableElement]:
+        try:
+            return self.find(ref.name, target_id=ref.id, lang=ref.language, namespace=ref.namespace)
+        except AmbiguousLookupError:
+            return None
 
 
 MaybeOptionalStr = TypeVar("MaybeOptionalStr", str, Optional[str])

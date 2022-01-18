@@ -35,6 +35,7 @@ def assert_equal_or_none_if_empty(value: Optional[str], text: str) -> None:
         assert value == text
 
 
+# TODO: Make fixture
 class ProgressMock:
     def __init__(self):
         self.total = 0

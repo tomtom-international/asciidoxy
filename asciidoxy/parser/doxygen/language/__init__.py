@@ -11,19 +11,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Fixtures for type parser tests."""
-
-from unittest.mock import MagicMock
-
-import pytest
-
-
-class ReferenceMock(MagicMock):
-    def assert_unresolved(self, *names):
-        assert (sorted([args[0].name for args, _ in self.add_unresolved_reference.call_args_list
-                        ]) == sorted(names))
-
-
-@pytest.fixture
-def reference_mock():
-    return ReferenceMock()
+"""Supported programming languages for the Doxygen parser."""

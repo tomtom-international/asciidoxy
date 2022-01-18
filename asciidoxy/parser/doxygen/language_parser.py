@@ -18,6 +18,7 @@ import xml.etree.ElementTree as ET
 from abc import ABC
 from typing import Dict, List, Optional, Type
 
+from ...api_reference import ApiReference
 from ...model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 from .description_parser import (
     Admonition,
@@ -29,7 +30,6 @@ from .description_parser import (
     parse_description,
     select_descriptions,
 )
-from .driver_base import DriverBase
 from .language_traits import LanguageTraits
 from .type_parser import TypeParseError, TypeParser
 
@@ -83,7 +83,7 @@ def _find_parameter_documentation(descriptions: ParameterList,
     return None
 
 
-class ParserBase(ABC):
+class LanguageParser(ABC):
     """Base functionality for language parsers.
 
     The parser is mostly anemic by design: there is no internal state that changes during parsing.
@@ -95,10 +95,10 @@ class ParserBase(ABC):
     TRAITS: Type[LanguageTraits]
     TYPE_PARSER: Type[TypeParser]
 
-    _driver: DriverBase
+    _api_reference: ApiReference
 
-    def __init__(self, driver: DriverBase):
-        self._driver = driver
+    def __init__(self, api_reference: ApiReference):
+        self._api_reference = api_reference
 
     def parse_parameters(self, memberdef_element: ET.Element, parent: Compound,
                          descriptions: Optional[ParameterList],
@@ -148,7 +148,7 @@ class ParserBase(ABC):
         try:
             return self.TYPE_PARSER.parse_xml(type_element,
                                               array_element,
-                                              driver=self._driver,
+                                              api_reference=self._api_reference,
                                               namespace=namespace)
         except TypeParseError:
             logger.exception(
@@ -183,7 +183,7 @@ class ParserBase(ABC):
 
                 exceptions.append(exception)
                 if not exception.type.id:
-                    self._driver.unresolved_ref(exception.type)
+                    self._api_reference.add_unresolved_reference(exception.type)
         return exceptions
 
     def parse_returns(self, memberdef_element: ET.Element, parent: Compound,
@@ -216,7 +216,7 @@ class ParserBase(ABC):
             parse_description(enumvalue_element.find("briefdescription"), self.TRAITS.TAG),
             parse_description(enumvalue_element.find("detaileddescription"), self.TRAITS.TAG))
 
-        self._driver.register(enumvalue)
+        self._api_reference.append(enumvalue)
         return enumvalue
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
@@ -255,7 +255,7 @@ class ParserBase(ABC):
         member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
         member.constexpr = _yes_no_to_bool(memberdef_element.get("constexpr", "no"))
 
-        self._driver.register(member)
+        self._api_reference.append(member)
         return member
 
     def parse_innerclass(self, parent: Compound, innerclass_element: ET.Element) -> None:
@@ -266,7 +266,7 @@ class ParserBase(ABC):
         inner_type.namespace = parent.full_name
         inner_type.prot = innerclass_element.get("prot", "")
 
-        self._driver.inner_type_ref(parent, inner_type)
+        self._api_reference.add_inner_type_reference(parent, inner_type)
 
     def parse_compounddef(self, compounddef_element: ET.Element) -> None:
         compound = Compound(self.TRAITS.TAG)
@@ -301,7 +301,7 @@ class ParserBase(ABC):
         for innerclass_element in compounddef_element.iterfind("innerclass"):
             self.parse_innerclass(compound, innerclass_element)
 
-        self._driver.register(compound)
+        self._api_reference.append(compound)
 
     def find_include(self, element: ET.Element) -> Optional[str]:
         include = element.findtext("includes")
