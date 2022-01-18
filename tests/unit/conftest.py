@@ -120,22 +120,11 @@ def api_reference_set():
     return "cpp/default", "java/default", "objc/default", "python/default"
 
 
-@pytest.fixture
-def forced_language():
-    """Default value for `force_language` when using the `api_reference` fixture.
-
-    By default the language is not forced. Override this using `pytest.mark.parametrize` to force
-    the language.
-    """
-    return None
-
-
 # TODO: rename and rework
 @pytest.fixture
 def parser_driver_factory(xml_data):
-    def factory(*test_dirs, force_language=None):
+    def factory(*test_dirs):
         config = Configuration()
-        config.force_language = force_language
         parser = parser_factory("doxygen", ApiReference(), config)
 
         for test_dir in test_dirs:
@@ -148,8 +137,8 @@ def parser_driver_factory(xml_data):
 
 # TODO: rework
 @pytest.fixture
-def api_reference(parser_driver_factory, api_reference_set, forced_language):
-    driver = parser_driver_factory(*api_reference_set, force_language=forced_language)
+def api_reference(parser_driver_factory, api_reference_set):
+    driver = parser_driver_factory(*api_reference_set)
     driver.api_reference.resolve_references()
     return driver.api_reference
 

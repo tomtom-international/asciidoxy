@@ -32,14 +32,11 @@ logger = logging.getLogger(__name__)
 class Parser(ReferenceParserBase):
     """Parser Doxygen XML output."""
     api_reference: ApiReference
-    _force_language: Optional[str]
 
     _parsers: Mapping[str, LanguageParser]
 
-    def __init__(self, api_reference: ApiReference, force_language: Optional[str] = None):
+    def __init__(self, api_reference: ApiReference):
         ReferenceParserBase.__init__(self, api_reference)
-
-        self._force_language = safe_language_tag(force_language)
 
         self._parsers = {
             CppParser.TRAITS.TAG: CppParser(api_reference),
@@ -48,23 +45,13 @@ class Parser(ReferenceParserBase):
             PythonParser.TRAITS.TAG: PythonParser(api_reference),
         }
 
-        if not self._force_language:
-            self._force_language = None
-        elif self._force_language not in self._parsers:
-            logger.error(f"Unknown forced language: {self._force_language}. Falling back to auto"
-                         " detection.")
-            self._force_language = None
-
     def _parse_element(self, xml_element: ET.Element) -> None:
-        if self._force_language is not None:
-            language_tag = self._force_language
-        else:
-            language_tag = safe_language_tag(xml_element.get("language"))
-            if not language_tag:
-                return
-            if language_tag not in self._parsers:
-                logger.debug(f"Unknown language: {language_tag}")
-                return
+        language_tag = safe_language_tag(xml_element.get("language"))
+        if not language_tag:
+            return
+        if language_tag not in self._parsers:
+            logger.debug(f"Unknown language: {language_tag}")
+            return
 
         if xml_element.tag == "compounddef":
             self._parsers[language_tag].parse_compounddef(xml_element)
