@@ -21,8 +21,10 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from tqdm import tqdm
 
+from ..api_reference import ApiReference
+from ..config import Configuration
 from ..document import Document, Package
-from ..parser.doxygen import Driver
+from ..parser import parser_factory
 from .collect import CollectError, collect, specs_from_file
 
 logger = logging.getLogger(__name__)
@@ -141,21 +143,24 @@ class PackageManager:
         packages = loop.run_until_complete(collect(specs, download_dir, progress))
         self.packages.update({pkg.name: pkg for pkg in packages})
 
-    def load_reference(self, parser: Driver, progress: Optional[tqdm] = None) -> None:
+    def load_reference(self,
+                       api_reference: ApiReference,
+                       config: Configuration,
+                       progress: Optional[tqdm] = None) -> None:
         """Load API reference from available packages.
 
         Args:
-            parser:   Parser to feed the API reference.
-            progress: Optional progress reporting.
+            api_reference: API reference collection to store loaded reference in.
+            config:        Application configuration.
+            progress:      Optional progress reporting.
         """
         if progress is not None:
             progress.total = len(self.packages)
             progress.update(0)
 
         for pkg in self.packages.values():
-            if pkg.reference_dir is not None:
-                for xml_file in pkg.reference_dir.glob("**/*.xml"):
-                    parser.parse(xml_file)
+            if pkg.reference_type and pkg.reference_dir is not None:
+                parser_factory(pkg.reference_type, api_reference, config).parse(pkg.reference_dir)
             if progress is not None:
                 progress.update()
 

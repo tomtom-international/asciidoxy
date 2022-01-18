@@ -16,9 +16,9 @@
 import string
 from typing import List, Optional
 
-from .language_traits import LanguageTraits, TokenCategory
-from .parser_base import ParserBase
-from .type_parser import Token, TypeParser, find_tokens
+from ..language_parser import LanguageParser
+from ..language_traits import LanguageTraits, TokenCategory
+from ..type_parser import Token, TypeParser, find_tokens
 
 
 class JavaTraits(LanguageTraits):
@@ -138,7 +138,7 @@ class JavaTypeParser(TypeParser):
         return tokens
 
 
-class JavaParser(ParserBase):
+class JavaParser(LanguageParser):
     """Parser for Java documentation."""
     TRAITS = JavaTraits
     TYPE_PARSER = JavaTypeParser

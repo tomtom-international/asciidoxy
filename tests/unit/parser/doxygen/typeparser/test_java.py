@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from asciidoxy.parser.doxygen.java import JavaTypeParser
+from asciidoxy.parser.doxygen.language.java import JavaTypeParser
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
 from asciidoxy.parser.doxygen.type_parser import Token
 from tests.unit.matchers import IsEmpty, IsNone, m_typeref
@@ -29,7 +29,7 @@ def java_type_prefix(request):
     return request.param
 
 
-def test_parse_java_type_from_text_simple(driver_mock, java_type_prefix):
+def test_parse_java_type_from_text_simple(reference_mock, java_type_prefix):
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}double"
 
@@ -41,11 +41,11 @@ def test_parse_java_type_from_text_simple(driver_mock, java_type_prefix):
         prefix=java_type_prefix,
         suffix=IsEmpty(),
         nested=IsEmpty(),
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # built-in type
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # built-in type
 
 
-def test_parse_java_type_with_mangled_annotation(driver_mock, java_type_prefix):
+def test_parse_java_type_with_mangled_annotation(reference_mock, java_type_prefix):
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}__AT__Nullable__ Data"
 
@@ -57,11 +57,11 @@ def test_parse_java_type_with_mangled_annotation(driver_mock, java_type_prefix):
         prefix=f"{java_type_prefix}@Nullable ",
         suffix=IsEmpty(),
         nested=IsEmpty(),
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("Data")
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("Data")
 
 
-def test_parse_java_type_with_original_annotation(driver_mock, java_type_prefix):
+def test_parse_java_type_with_original_annotation(reference_mock, java_type_prefix):
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}@Nullable Data"
 
@@ -73,14 +73,15 @@ def test_parse_java_type_with_original_annotation(driver_mock, java_type_prefix)
         prefix=f"{java_type_prefix}@Nullable ",
         suffix=IsEmpty(),
         nested=IsEmpty(),
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("Data")
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("Data")
 
 
 @pytest.mark.parametrize("generic_prefix, generic_name",
                          [("? extends ", "Unit"), ("T extends ", "Unit"), ("T extends ", "Unit "),
                           ("? super ", "Unit"), ("T super ", "Unit"), ("", "T "), ("", "T")])
-def test_parse_java_type_with_generic(driver_mock, java_type_prefix, generic_prefix, generic_name):
+def test_parse_java_type_with_generic(reference_mock, java_type_prefix, generic_prefix,
+                                      generic_name):
     type_element = ET.Element("type")
     type_element.text = f"{java_type_prefix}Position<{generic_prefix or ''}{generic_name}>"
 
@@ -98,16 +99,16 @@ def test_parse_java_type_with_generic(driver_mock, java_type_prefix, generic_pre
                 suffix=IsEmpty(),
             ),
         ],
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
 
     if generic_name.strip() == "T":
-        driver_mock.assert_unresolved("Position")
-        assert driver_mock.unresolved_ref.call_count == 1
+        reference_mock.assert_unresolved("Position")
+        assert reference_mock.add_unresolved_reference.call_count == 1
     else:
-        driver_mock.assert_unresolved("Position", generic_name.strip())
+        reference_mock.assert_unresolved("Position", generic_name.strip())
 
 
-def test_parse_java_type_with_nested_wildcard_generic(driver_mock):
+def test_parse_java_type_with_nested_wildcard_generic(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "Position<? extends Getter<?>>"
 
@@ -132,11 +133,11 @@ def test_parse_java_type_with_nested_wildcard_generic(driver_mock):
                 ],
             ),
         ],
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("Position", "Getter")
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("Position", "Getter")
 
 
-def test_parse_java_type_with_separate_wildcard_bounds(driver_mock):
+def test_parse_java_type_with_separate_wildcard_bounds(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "<T extends Getter<?>> T"
 
@@ -148,11 +149,11 @@ def test_parse_java_type_with_separate_wildcard_bounds(driver_mock):
         prefix="<T extends Getter<?>> ",
         suffix=IsEmpty(),
         nested=IsEmpty(),
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
-def test_parse_java_type__array(driver_mock):
+def test_parse_java_type__array(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType[]"
 
@@ -160,11 +161,11 @@ def test_parse_java_type__array(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[]",
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_java_type__array__brackets_inside_name_element(driver_mock):
+def test_parse_java_type__array__brackets_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[]")
     ET.dump(type_element)
@@ -174,11 +175,11 @@ def test_parse_java_type__array__brackets_inside_name_element(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[]",
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
-def test_parse_java_type__array__multiple_brackets_inside_name_element(driver_mock):
+def test_parse_java_type__array__multiple_brackets_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[][]")
     ET.dump(type_element)
@@ -188,8 +189,8 @@ def test_parse_java_type__array__multiple_brackets_inside_name_element(driver_mo
         name="MyType",
         prefix=IsEmpty(),
         suffix="[][]",
-    ).assert_matches(JavaTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(JavaTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
 @pytest.mark.parametrize("tokens,expected", [

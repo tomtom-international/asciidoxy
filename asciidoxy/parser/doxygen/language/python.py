@@ -16,9 +16,9 @@
 import string
 from typing import List, Optional
 
-from .language_traits import LanguageTraits, TokenCategory
-from .parser_base import ParserBase
-from .type_parser import Token, TypeParser
+from ..language_parser import LanguageParser
+from ..language_traits import LanguageTraits, TokenCategory
+from ..type_parser import Token, TypeParser
 
 
 class PythonTraits(LanguageTraits):
@@ -77,7 +77,7 @@ class PythonTypeParser(TypeParser):
         return tokens
 
 
-class PythonParser(ParserBase):
+class PythonParser(LanguageParser):
     """Parser for python documentation."""
     TRAITS = PythonTraits
     TYPE_PARSER = PythonTypeParser

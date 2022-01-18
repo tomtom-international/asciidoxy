@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from asciidoxy.parser.doxygen.cpp import CppTypeParser
+from asciidoxy.parser.doxygen.language.cpp import CppTypeParser
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
 from asciidoxy.parser.doxygen.type_parser import Token, TypeParseError
 from tests.unit.matchers import IsEmpty, IsNone, m_parameter, m_typeref
@@ -39,7 +39,7 @@ def cpp_type_suffix(request):
     return request.param
 
 
-def test_parse_cpp_type_from_text_simple(driver_mock, cpp_type_prefix, cpp_type_suffix):
+def test_parse_cpp_type_from_text_simple(reference_mock, cpp_type_prefix, cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = f"{cpp_type_prefix}double{cpp_type_suffix}"
 
@@ -51,11 +51,11 @@ def test_parse_cpp_type_from_text_simple(driver_mock, cpp_type_prefix, cpp_type_
         prefix=cpp_type_prefix,
         suffix=cpp_type_suffix,
         nested=IsEmpty(),
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # built-in type
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # built-in type
 
 
-def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(driver_mock, cpp_type_prefix,
+def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(reference_mock, cpp_type_prefix,
                                                                 cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = (f"{cpp_type_prefix}Coordinate< {cpp_type_prefix}Unit{cpp_type_suffix} "
@@ -79,11 +79,11 @@ def test_parse_cpp_type_from_text_nested_with_prefix_and_suffix(driver_mock, cpp
                 nested=IsEmpty(),
             ),
         ],
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("Coordinate", "Unit")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("Coordinate", "Unit")
 
 
-def test_parse_cpp_type_from_ref_with_prefix_and_suffix(driver_mock, cpp_type_prefix,
+def test_parse_cpp_type_from_ref_with_prefix_and_suffix(reference_mock, cpp_type_prefix,
                                                         cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = cpp_type_prefix
@@ -102,11 +102,11 @@ def test_parse_cpp_type_from_ref_with_prefix_and_suffix(driver_mock, cpp_type_pr
         prefix=cpp_type_prefix,
         suffix=cpp_type_suffix,
         nested=IsEmpty(),
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # has_id, so not unresolved
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # has_id, so not unresolved
 
 
-def test_parse_cpp_type_from_ref_with_nested_text_type(driver_mock):
+def test_parse_cpp_type_from_ref_with_nested_text_type(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "const "
     sub_element(type_element,
@@ -133,11 +133,11 @@ def test_parse_cpp_type_from_ref_with_nested_text_type(driver_mock):
                 suffix=IsEmpty(),
             )
         ],
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("Unit")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("Unit")
 
 
-def test_parse_cpp_type_from_text_with_nested_ref_type(driver_mock):
+def test_parse_cpp_type_from_text_with_nested_ref_type(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "const std::unique_ptr< const "
     sub_element(type_element,
@@ -164,11 +164,11 @@ def test_parse_cpp_type_from_text_with_nested_ref_type(driver_mock):
                 suffix=" &",
             ),
         ],
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # has id, so not unresolved
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # has id, so not unresolved
 
 
-def test_parse_cpp_type_from_multiple_nested_text_and_ref(driver_mock):
+def test_parse_cpp_type_from_multiple_nested_text_and_ref(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "const "
     sub_element(type_element,
@@ -237,11 +237,11 @@ def test_parse_cpp_type_from_multiple_nested_text_and_ref(driver_mock):
                 ],
             ),
         ],
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # has id, so not unresolved
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # has id, so not unresolved
 
 
-def test_parse_cpp_type_multiple_prefix_and_suffix(driver_mock):
+def test_parse_cpp_type_multiple_prefix_and_suffix(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "mutable volatile std::string * const *"
 
@@ -252,8 +252,8 @@ def test_parse_cpp_type_multiple_prefix_and_suffix(driver_mock):
         name="std::string",
         prefix="mutable volatile ",
         suffix=" * const *",
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # built-in type
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # built-in type
 
 
 @pytest.fixture(params=[
@@ -267,7 +267,7 @@ def cpp_type_with_space(request):
     return request.param
 
 
-def test_parse_cpp_type_with_space(driver_mock, cpp_type_prefix, cpp_type_with_space,
+def test_parse_cpp_type_with_space(reference_mock, cpp_type_prefix, cpp_type_with_space,
                                    cpp_type_suffix):
     type_element = ET.Element("type")
     type_element.text = f"{cpp_type_prefix}{cpp_type_with_space}{cpp_type_suffix}"
@@ -279,11 +279,11 @@ def test_parse_cpp_type_with_space(driver_mock, cpp_type_prefix, cpp_type_with_s
         name=cpp_type_with_space,
         prefix=cpp_type_prefix,
         suffix=cpp_type_suffix,
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # built-in type
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # built-in type
 
 
-def test_parse_cpp_type_with_member(driver_mock):
+def test_parse_cpp_type_with_member(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType<NestedType>::member"
 
@@ -302,11 +302,11 @@ def test_parse_cpp_type_with_member(driver_mock):
                 nested=IsEmpty(),
             ),
         ],
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType", "NestedType")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType", "NestedType")
 
 
-def test_parse_cpp_type_with_function_arguments(driver_mock):
+def test_parse_cpp_type_with_function_arguments(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType(const Message&, ErrorCode code)"
 
@@ -347,11 +347,11 @@ def test_parse_cpp_type_with_function_arguments(driver_mock):
             nested=IsEmpty(),
             args=IsEmpty(),
         ),
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType", "Message", "ErrorCode")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType", "Message", "ErrorCode")
 
 
-def test_parse_cpp_type_with_function_arguments__with_prefix_and_suffix(driver_mock):
+def test_parse_cpp_type_with_function_arguments__with_prefix_and_suffix(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "const MyType&(const Message&, ErrorCode code)"
 
@@ -393,13 +393,13 @@ def test_parse_cpp_type_with_function_arguments__with_prefix_and_suffix(driver_m
             nested=IsEmpty(),
             args=IsEmpty(),
         ),
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType", "Message", "ErrorCode")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType", "Message", "ErrorCode")
 
 
 @pytest.mark.parametrize("arg_name", ["", " value"])
-def test_parse_cpp_type_with_function_arguments_with_space_in_type(driver_mock, cpp_type_with_space,
-                                                                   arg_name):
+def test_parse_cpp_type_with_function_arguments_with_space_in_type(reference_mock,
+                                                                   cpp_type_with_space, arg_name):
     type_element = ET.Element("type")
     type_element.text = f"MyType({cpp_type_with_space}{arg_name})"
 
@@ -430,11 +430,11 @@ def test_parse_cpp_type_with_function_arguments_with_space_in_type(driver_mock, 
             nested=IsEmpty(),
             args=IsEmpty(),
         ),
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__remove_constexpr(driver_mock):
+def test_parse_cpp_type__remove_constexpr(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "constexpr double"
 
@@ -447,19 +447,19 @@ def test_parse_cpp_type__remove_constexpr(driver_mock):
         suffix=IsEmpty(),
         nested=IsEmpty(),
         args=IsEmpty(),
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # built-in type
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # built-in type
 
 
-def test_parse_cpp_type__remove_constexpr_only(driver_mock):
+def test_parse_cpp_type__remove_constexpr_only(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "constexpr"
 
-    assert CppTypeParser.parse_xml(type_element, driver=driver_mock) is None
-    driver_mock.assert_unresolved()  # nothing left
+    assert CppTypeParser.parse_xml(type_element, api_reference=reference_mock) is None
+    reference_mock.assert_unresolved()  # nothing left
 
 
-def test_parse_cpp_type__array(driver_mock):
+def test_parse_cpp_type__array(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType[]"
 
@@ -467,11 +467,11 @@ def test_parse_cpp_type__array(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[]",
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__array__with_size(driver_mock):
+def test_parse_cpp_type__array__with_size(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType[16]"
 
@@ -479,11 +479,11 @@ def test_parse_cpp_type__array__with_size(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[16]",
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__array__with_prefix_and_suffix(driver_mock):
+def test_parse_cpp_type__array__with_prefix_and_suffix(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "const MyType[]*"
 
@@ -491,11 +491,11 @@ def test_parse_cpp_type__array__with_prefix_and_suffix(driver_mock):
         name="MyType",
         prefix="const ",
         suffix="[]*",
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__array__as_nested_type(driver_mock):
+def test_parse_cpp_type__array__as_nested_type(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "std::shared_ptr<MyType[]>"
 
@@ -510,11 +510,11 @@ def test_parse_cpp_type__array__as_nested_type(driver_mock):
                 suffix="[]",
             ),
         ],
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_cpp_type__array__brackets_inside_name_element(driver_mock):
+def test_parse_cpp_type__array__brackets_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[]")
     ET.dump(type_element)
@@ -524,11 +524,11 @@ def test_parse_cpp_type__array__brackets_inside_name_element(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[]",
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
-def test_parse_cpp_type__array__multiple_brackets_inside_name_element(driver_mock):
+def test_parse_cpp_type__array__multiple_brackets_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[][]")
     ET.dump(type_element)
@@ -538,11 +538,11 @@ def test_parse_cpp_type__array__multiple_brackets_inside_name_element(driver_moc
         name="MyType",
         prefix=IsEmpty(),
         suffix="[][]",
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
-def test_parse_cpp_type__array__with_size_inside_name_element(driver_mock):
+def test_parse_cpp_type__array__with_size_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[12]")
     ET.dump(type_element)
@@ -552,18 +552,18 @@ def test_parse_cpp_type__array__with_size_inside_name_element(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[12]",
-    ).assert_matches(CppTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(CppTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
-def test_parse_cpp_type__array__end_bracket_without_start_inside_name_element(driver_mock):
+def test_parse_cpp_type__array__end_bracket_without_start_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType]")
     ET.dump(type_element)
 
     with pytest.raises(TypeParseError):
-        CppTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.assert_unresolved()
+        CppTypeParser.parse_xml(type_element, api_reference=reference_mock)
+    reference_mock.assert_unresolved()
 
 
 def namespace_sep(text: str = ":") -> Token:
