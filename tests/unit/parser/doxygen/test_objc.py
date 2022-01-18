@@ -18,7 +18,7 @@ Tests for parsing Objective C from Doxygen XML files.
 import pytest
 from pytest import param
 
-from asciidoxy.parser.doxygen.objc import ObjectiveCTraits
+from asciidoxy.parser.doxygen.language.objc import ObjectiveCTraits
 from tests.unit.matchers import (
     IsEmpty,
     IsFalse,

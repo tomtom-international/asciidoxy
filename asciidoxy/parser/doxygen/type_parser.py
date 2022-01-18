@@ -17,8 +17,8 @@ import logging
 import xml.etree.ElementTree as ET
 from typing import Iterator, List, Optional, Sequence, Tuple, Type
 
+from ...api_reference import ApiReference
 from ...model import Parameter, TypeRef
-from .driver_base import DriverBase
 from .language_traits import LanguageTraits, TokenCategory
 
 logger = logging.getLogger(__name__)
@@ -88,7 +88,7 @@ class TypeParser:
     def parse_xml(cls,
                   type_element: ET.Element,
                   array_element: Optional[ET.Element] = None,
-                  driver: Optional[DriverBase] = None,
+                  api_reference: Optional[ApiReference] = None,
                   namespace: Optional[str] = None) -> Optional[TypeRef]:
         """Parse a type from an XML element.
 
@@ -97,7 +97,7 @@ class TypeParser:
         Arguments:
             type_element:  The `<type>` element from Doxygen.
             array_element: The `<array>` element from Doxygen, if available.
-            driver:        Driver to register types without refids with.
+            api_reference:        API reference to register types without refids with.
             namespace:     Namespace containing the type.
         Returns:
             A `TypeRef` for the type, or None if there is no type information.
@@ -107,7 +107,7 @@ class TypeParser:
         tokens = cls.adapt_tokens(tokens, array_tokens)
         if len(tokens) == 0 or all(token.category == TokenCategory.WHITESPACE for token in tokens):
             return None
-        return cls.type_from_tokens(tokens, driver, namespace)
+        return cls.type_from_tokens(tokens, api_reference, namespace)
 
     @classmethod
     def adapt_tokens(cls,
@@ -231,7 +231,7 @@ class TypeParser:
     @classmethod
     def type_from_tokens(cls,
                          tokens: List[Token],
-                         driver: Optional[DriverBase] = None,
+                         api_reference: Optional[ApiReference] = None,
                          namespace: Optional[str] = None) -> Optional[TypeRef]:
         """Create a `TypeRef` from a sequence of tokens.
 
@@ -260,7 +260,7 @@ class TypeParser:
 
         nested_types: Optional[List[TypeRef]] = []
         try:
-            nested_types, tokens = cls.nested_types(tokens, driver, namespace)
+            nested_types, tokens = cls.nested_types(tokens, api_reference, namespace)
         except TypeParseError as e:
             log_parse_warning()
             logger.debug(f"Failed to parse nested types: {e}")
@@ -271,7 +271,7 @@ class TypeParser:
 
         arg_types: Optional[List[Parameter]] = []
         try:
-            arg_types, tokens = cls.arg_types(tokens, driver, namespace)
+            arg_types, tokens = cls.arg_types(tokens, api_reference, namespace)
         except TypeParseError as e:
             log_parse_warning()
             logger.debug(f"Failed to parse args: {e}")
@@ -311,19 +311,19 @@ class TypeParser:
         type_ref.args = arg_types
         type_ref.namespace = namespace
 
-        if driver is not None:
+        if api_reference is not None:
             if type_ref.id:
-                driver.unchecked_ref(type_ref)
+                api_reference.add_unchecked_reference(type_ref)
             elif (type_ref.name and not type_ref.id
                   and not cls.TRAITS.is_language_standard_type(type_ref.name)):
-                driver.unresolved_ref(type_ref)
+                api_reference.add_unresolved_reference(type_ref)
 
             if type_ref.returns is not None:
                 if type_ref.returns.id:
-                    driver.unchecked_ref(type_ref.returns)
+                    api_reference.add_unchecked_reference(type_ref.returns)
                 elif (type_ref.returns.name and not type_ref.returns.id
                       and not cls.TRAITS.is_language_standard_type(type_ref.returns.name)):
-                    driver.unresolved_ref(type_ref.returns)
+                    api_reference.add_unresolved_reference(type_ref.returns)
 
         return type_ref
 
@@ -372,7 +372,7 @@ class TypeParser:
     def nested_types(
             cls,
             tokens: List[Token],
-            driver: Optional[DriverBase] = None,
+            api_reference: Optional[ApiReference] = None,
             namespace: Optional[str] = None) -> Tuple[Optional[List[TypeRef]], List[Token]]:
         """Parse nested types from tokens if present.
 
@@ -386,13 +386,13 @@ class TypeParser:
                                                               TokenCategory.NESTED_SEPARATOR)
         if nested_type_tokens is None:
             return None, tokens
-        types = (cls.type_from_tokens(ntt, driver, namespace) for ntt in nested_type_tokens)
+        types = (cls.type_from_tokens(ntt, api_reference, namespace) for ntt in nested_type_tokens)
         return [t for t in types if t is not None], tokens
 
     @classmethod
     def arg_types(cls,
                   tokens: List[Token],
-                  driver: Optional[DriverBase] = None,
+                  api_reference: Optional[ApiReference] = None,
                   namespace: Optional[str] = None) -> Tuple[Optional[List[Parameter]], List[Token]]:
         """Parse function argument types from tokens if present.
 
@@ -407,13 +407,13 @@ class TypeParser:
         if nested_type_tokens is None:
             return None, tokens
 
-        args = (cls.arg_from_tokens(ntt, driver, namespace) for ntt in nested_type_tokens)
+        args = (cls.arg_from_tokens(ntt, api_reference, namespace) for ntt in nested_type_tokens)
         return [a for a in args if a is not None], tokens
 
     @classmethod
     def arg_from_tokens(cls,
                         tokens: List[Token],
-                        driver: Optional[DriverBase] = None,
+                        api_reference: Optional[ApiReference] = None,
                         namespace: Optional[str] = None) -> Optional[Parameter]:
         """Parse an argument definition from a sequence of tokens.
 
@@ -428,7 +428,7 @@ class TypeParser:
             name_tokens.insert(0, tokens.pop(-1))
 
         arg = Parameter()
-        arg.type = cls.type_from_tokens(tokens, driver, namespace)
+        arg.type = cls.type_from_tokens(tokens, api_reference, namespace)
         arg.name = "".join(t.text for t in name_tokens)
         return arg
 

@@ -50,6 +50,7 @@ export LATEST_DOXYGEN_VERSION := 1.9.2
 DOCKER_IMAGE_NAME ?= silvester747/asciidoxy
 DOCKER_IMAGE_VERSION ?= testing
 DOCKER_IMAGE_PLATFORM ?= linux/amd64
+LOG_LEVEL ?= WARNING
 
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
@@ -161,6 +162,7 @@ visual-test-$(notdir $(basename $(1))): $(patsubst %.toml,%.adoc,$(1))
 		--debug \
 		--require asciidoctor-diagram \
 		--failure-level ERROR \
+		--log $(LOG_LEVEL) \
 		--multipage
 	mv $(VISUAL_TEST_CASE_BUILD_DIR)/debug.json $(VISUAL_TEST_CASE_BUILD_DIR)/$(notdir $(basename $(1))).debug.json
 

@@ -28,7 +28,6 @@ from .config import parse_args
 from .generator import process_adoc
 from .model import json_repr
 from .packaging import CollectError, PackageManager, SpecificationError
-from .parser.doxygen import Driver as DoxygenDriver
 
 
 def error(*args, **kwargs) -> None:
@@ -54,6 +53,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     logger = logging.getLogger(__name__)
 
     pkg_mgr = PackageManager(config.build_dir, config.warnings_are_errors)
+    api_reference = ApiReference()
     if config.spec_file is not None:
         try:
             with tqdm(desc="Collecting packages     ", unit="pkg") as progress:
@@ -65,24 +65,19 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             logger.exception("Failed to collect packages.")
             sys.exit(1)
 
-        xml_parser = DoxygenDriver(force_language=config.force_language)
         with tqdm(desc="Loading API reference   ", unit="pkg") as progress:
-            pkg_mgr.load_reference(xml_parser, progress)
+            pkg_mgr.load_reference(api_reference, config, progress)
 
         with tqdm(desc="Resolving references    ", unit="ref") as progress:
-            xml_parser.resolve_references(progress)
+            api_reference.resolve_references(progress)
 
         with tqdm(desc="Checking references     ", unit="ref") as progress:
-            xml_parser.check_references(progress)
+            api_reference.check_references(progress)
 
         if config.debug:
             logger.info("Writing debug data, sorry for the delay!")
             with (config.build_dir / "debug.json").open("w", encoding="utf-8") as f:
-                json.dump(xml_parser.api_reference.elements, f, default=json_repr, indent=2)
-
-        api_reference = xml_parser.api_reference
-    else:
-        api_reference = ApiReference()
+                json.dump(api_reference.elements, f, default=json_repr, indent=2)
 
     if config.backend == "adoc":
         pkg_mgr.work_dir = config.destination_dir

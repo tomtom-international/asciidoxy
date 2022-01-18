@@ -17,8 +17,8 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
+from asciidoxy.parser.doxygen.language.objc import ObjectiveCTypeParser
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
-from asciidoxy.parser.doxygen.objc import ObjectiveCTypeParser
 from asciidoxy.parser.doxygen.type_parser import Token, TypeParseError
 from tests.unit.matchers import IsEmpty, IsNone, m_typeref
 from tests.unit.shared import sub_element
@@ -58,7 +58,7 @@ def objc_type_suffix(request):
     return request.param
 
 
-def test_parse_objc_type_from_text_simple(driver_mock, objc_type_prefix, objc_type_suffix):
+def test_parse_objc_type_from_text_simple(reference_mock, objc_type_prefix, objc_type_suffix):
     type_element = ET.Element("type")
     type_element.text = f"{objc_type_prefix}NSInteger{objc_type_suffix}"
 
@@ -70,8 +70,8 @@ def test_parse_objc_type_from_text_simple(driver_mock, objc_type_prefix, objc_ty
         prefix=objc_type_prefix,
         suffix=objc_type_suffix,
         nested=IsEmpty(),
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # built-in type
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # built-in type
 
 
 @pytest.mark.parametrize("type_with_space", [
@@ -98,7 +98,7 @@ def test_parse_objc_type_from_text_simple(driver_mock, objc_type_prefix, objc_ty
     "unsigned char",
     "signed char",
 ])
-def test_parse_objc_type_with_space(driver_mock, type_with_space):
+def test_parse_objc_type_with_space(reference_mock, type_with_space):
     type_element = ET.Element("type")
     type_element.text = type_with_space
 
@@ -110,11 +110,11 @@ def test_parse_objc_type_with_space(driver_mock, type_with_space):
         prefix=IsEmpty(),
         suffix=IsEmpty(),
         nested=IsEmpty(),
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()  # built-in type
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()  # built-in type
 
 
-def test_parse_objc_type__array(driver_mock):
+def test_parse_objc_type__array(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType[]"
 
@@ -122,11 +122,11 @@ def test_parse_objc_type__array(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[]",
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_objc_type__array__with_size(driver_mock):
+def test_parse_objc_type__array__with_size(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "MyType[16]"
 
@@ -134,11 +134,11 @@ def test_parse_objc_type__array__with_size(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[16]",
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_objc_type__array__with_prefix_and_suffix(driver_mock):
+def test_parse_objc_type__array__with_prefix_and_suffix(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "const MyType[]*"
 
@@ -146,11 +146,11 @@ def test_parse_objc_type__array__with_prefix_and_suffix(driver_mock):
         name="MyType",
         prefix="const ",
         suffix="[]*",
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_objc_type__array__as_nested_type(driver_mock):
+def test_parse_objc_type__array__as_nested_type(reference_mock):
     type_element = ET.Element("type")
     type_element.text = "id<MyType[]>"
 
@@ -165,11 +165,11 @@ def test_parse_objc_type__array__as_nested_type(driver_mock):
                 suffix="[]",
             ),
         ],
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved("MyType")
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved("MyType")
 
 
-def test_parse_objc_type__array__brackets_inside_name_element(driver_mock):
+def test_parse_objc_type__array__brackets_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[]")
     ET.dump(type_element)
@@ -179,11 +179,11 @@ def test_parse_objc_type__array__brackets_inside_name_element(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[]",
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
-def test_parse_objc_type__array__multiple_brackets_inside_name_element(driver_mock):
+def test_parse_objc_type__array__multiple_brackets_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[][]")
     ET.dump(type_element)
@@ -193,11 +193,11 @@ def test_parse_objc_type__array__multiple_brackets_inside_name_element(driver_mo
         name="MyType",
         prefix=IsEmpty(),
         suffix="[][]",
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
-def test_parse_objc_type__array__with_size_inside_name_element(driver_mock):
+def test_parse_objc_type__array__with_size_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType[12]")
     ET.dump(type_element)
@@ -207,18 +207,18 @@ def test_parse_objc_type__array__with_size_inside_name_element(driver_mock):
         name="MyType",
         prefix=IsEmpty(),
         suffix="[12]",
-    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock))
-    driver_mock.assert_unresolved()
+    ).assert_matches(ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock))
+    reference_mock.assert_unresolved()
 
 
-def test_parse_objc_type__array__end_bracket_without_start_inside_name_element(driver_mock):
+def test_parse_objc_type__array__end_bracket_without_start_inside_name_element(reference_mock):
     type_element = ET.Element("type")
     sub_element(type_element, "ref", refid="tomtom_mytype", kindref="compound", text="MyType]")
     ET.dump(type_element)
 
     with pytest.raises(TypeParseError):
-        ObjectiveCTypeParser.parse_xml(type_element, driver=driver_mock)
-    driver_mock.assert_unresolved()
+        ObjectiveCTypeParser.parse_xml(type_element, api_reference=reference_mock)
+    reference_mock.assert_unresolved()
 
 
 def block(text: str = "^") -> Token:

@@ -18,12 +18,16 @@ from unittest.mock import MagicMock
 import pytest
 
 
-class DriverMock(MagicMock):
+class ReferenceMock(MagicMock):
     def assert_unresolved(self, *names):
-        assert (sorted([args[0].name
-                        for args, _ in self.unresolved_ref.call_args_list]) == sorted(names))
+        assert (sorted([args[0].name for args, _ in self.add_unresolved_reference.call_args_list
+                        ]) == sorted(names))
+
+    def assert_unchecked(self, *ids):
+        assert (sorted([args[0].id
+                        for args, _ in self.add_unchecked_reference.call_args_list]) == sorted(ids))
 
 
 @pytest.fixture
-def driver_mock():
-    return DriverMock()
+def reference_mock():
+    return ReferenceMock()

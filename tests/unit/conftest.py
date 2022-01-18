@@ -24,7 +24,7 @@ from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
 from asciidoxy.model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 from asciidoxy.packaging import PackageManager
-from asciidoxy.parser.doxygen import Driver as ParserDriver
+from asciidoxy.parser import parser_factory
 
 from .builders import SimpleClassBuilder
 from .file_builder import FileBuilder
@@ -52,20 +52,6 @@ def doxygen_version(request):
 @pytest.fixture
 def xml_data(doxygen_version):
     return Path(__file__).parent.parent / "data" / "generated" / "xml" / doxygen_version
-
-
-@pytest.fixture
-def parser_driver_factory(xml_data):
-    def factory(*test_dirs, force_language=None):
-        parser_driver = ParserDriver(force_language=force_language)
-
-        for test_dir in test_dirs:
-            for xml_file in (xml_data / test_dir).glob("**/*.xml"):
-                parser_driver.parse(xml_file)
-
-        return parser_driver
-
-    return factory
 
 
 @pytest.fixture
@@ -144,10 +130,27 @@ def forced_language():
     return None
 
 
+# TODO: rename and rework
+@pytest.fixture
+def parser_driver_factory(xml_data):
+    def factory(*test_dirs, force_language=None):
+        config = Configuration()
+        config.force_language = force_language
+        parser = parser_factory("doxygen", ApiReference(), config)
+
+        for test_dir in test_dirs:
+            parser.parse(xml_data / test_dir)
+
+        return parser
+
+    return factory
+
+
+# TODO: rework
 @pytest.fixture
 def api_reference(parser_driver_factory, api_reference_set, forced_language):
     driver = parser_driver_factory(*api_reference_set, force_language=forced_language)
-    driver.resolve_references()
+    driver.api_reference.resolve_references()
     return driver.api_reference
 
 

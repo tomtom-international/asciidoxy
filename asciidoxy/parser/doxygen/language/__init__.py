@@ -11,8 +11,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Parser for Doxygen XML output."""
-
-from .parser import Parser, safe_language_tag
-
-__all__ = ["Parser", "safe_language_tag"]
+"""Supported programming languages for the Doxygen parser."""

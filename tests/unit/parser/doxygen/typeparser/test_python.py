@@ -13,8 +13,8 @@
 # limitations under the License.
 """Tests for parsing python types."""
 
+from asciidoxy.parser.doxygen.language.python import PythonTypeParser
 from asciidoxy.parser.doxygen.language_traits import TokenCategory
-from asciidoxy.parser.doxygen.python import PythonTypeParser
 from asciidoxy.parser.doxygen.type_parser import Token
 
 
