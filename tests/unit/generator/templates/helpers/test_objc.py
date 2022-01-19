@@ -50,8 +50,8 @@ def objc_class():
 
 
 @pytest.fixture
-def helper(empty_generating_api, objc_class):
-    return ObjcTemplateHelper(empty_generating_api, objc_class, InsertionFilter())
+def helper(generating_api, objc_class):
+    return ObjcTemplateHelper(generating_api, objc_class, InsertionFilter())
 
 
 def test_public_class_methods__no_filter(helper):

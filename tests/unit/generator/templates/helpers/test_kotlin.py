@@ -60,8 +60,8 @@ def kotlin_class():
 
 
 @pytest.fixture
-def helper(empty_generating_api, kotlin_class):
-    return KotlinTemplateHelper(empty_generating_api, kotlin_class, InsertionFilter())
+def helper(generating_api, kotlin_class):
+    return KotlinTemplateHelper(generating_api, kotlin_class, InsertionFilter())
 
 
 def test_public_constants__no_filter(helper):

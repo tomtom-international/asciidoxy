@@ -34,16 +34,18 @@ def build_dir(tmp_path):
 
 
 @pytest.fixture
-def simple_package(tmp_path, xml_data):
+def simple_package(tmp_path, generated_test_data, latest_doxygen_version):
     package_dir = tmp_path / "package"
     (package_dir / "xml").mkdir(parents=True)
 
     shutil.copy(
-        xml_data / "cpp" / "default" / "xml" / "classasciidoxy_1_1geometry_1_1_coordinate.xml",
-        package_dir / "xml")
+        generated_test_data("doxygen",
+                            "cpp/default/xml/classasciidoxy_1_1geometry_1_1_coordinate.xml",
+                            latest_doxygen_version), package_dir / "xml")
     shutil.copy(
-        xml_data / "cpp" / "default" / "xml" /
-        "classasciidoxy_1_1geometry_1_1_invalid_coordinate.xml", package_dir / "xml")
+        generated_test_data(
+            "doxygen", "cpp/default/xml/classasciidoxy_1_1geometry_1_1_invalid_coordinate.xml",
+            latest_doxygen_version), package_dir / "xml")
 
     (package_dir / "contents.toml").write_text("""\
 [package]

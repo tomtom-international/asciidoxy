@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Fixtures for testing AsciiDoxy."""
+from __future__ import annotations
 
 from pathlib import Path
 
@@ -29,10 +30,10 @@ from asciidoxy.parser import parser_factory
 from .builders import SimpleClassBuilder
 from .file_builder import FileBuilder
 
-test_data_dir = Path(__file__).parent.parent / "data"
-_xml_dir = test_data_dir / "generated" / "xml"
 
-
+#
+# Extra command line options for test execution
+#
 def pytest_addoption(parser):
     parser.addoption(
         "--update-expected-results",
@@ -40,30 +41,9 @@ def pytest_addoption(parser):
         help="Update the expected results for template tests with the current results.")
 
 
-def _doxygen_versions():
-    return [str(version.name) for version in _xml_dir.glob("*")]
-
-
-@pytest.fixture(params=_doxygen_versions())
-def doxygen_version(request):
-    return request.param
-
-
-@pytest.fixture
-def xml_data(doxygen_version):
-    return Path(__file__).parent.parent / "data" / "generated" / "xml" / doxygen_version
-
-
-@pytest.fixture
-def adoc_data():
-    return test_data_dir / "adoc"
-
-
-@pytest.fixture
-def test_data():
-    return test_data_dir
-
-
+#
+# Input and output file structure
+#
 @pytest.fixture
 def build_dir(tmp_path):
     d = tmp_path / "build"
@@ -111,36 +91,131 @@ def document(package_manager, original_file, work_file):
                     package_manager.work_dir)
 
 
+#
+# Test data files
+#
+test_data_dir = Path(__file__).parent.parent / "data"
+generated_test_data_dir = test_data_dir / "generated"
+# TODO: use doxygen instead of xml and use in factory method
+_xml_dir = test_data_dir / "generated" / "xml"
+
+
 @pytest.fixture
-def api_reference_set():
-    """Default set of API references to load when using the `api_reference` fixture.
-
-    Override this using `pytest.mark.parametrize` to load other API references.
-    """
-    return "cpp/default", "java/default", "objc/default", "python/default"
+def adoc_data():
+    return test_data_dir / "adoc"
 
 
-# TODO: rename and rework
 @pytest.fixture
-def parser_driver_factory(xml_data):
-    def factory(*test_dirs):
-        config = Configuration()
-        parser = parser_factory("doxygen", ApiReference(), config)
+def test_data():
+    return test_data_dir
 
-        for test_dir in test_dirs:
-            parser.parse(xml_data / test_dir)
 
-        return parser
+def _doxygen_versions():
+    return [str(version.name) for version in _xml_dir.glob("*")]
+
+
+@pytest.fixture(scope="session", params=_doxygen_versions())
+def all_doxygen_versions(request):
+    return request.param
+
+
+@pytest.fixture(scope="session")
+def latest_doxygen_version():
+    return sorted(_doxygen_versions())[-1]
+
+
+@pytest.fixture(scope="session")
+def generated_test_data():
+    def factory(reference_type: str, name: str, version: str = None):
+        assert reference_type == "doxygen"
+        assert version is not None
+        return generated_test_data_dir / "xml" / version / name
 
     return factory
 
 
-# TODO: rework
 @pytest.fixture
-def api_reference(parser_driver_factory, api_reference_set):
-    driver = parser_driver_factory(*api_reference_set)
-    driver.api_reference.resolve_references()
-    return driver.api_reference
+def _api_reference():
+    """Prevent circular fixture references when overriding `api_reference` and using
+    `api_reference_loader`.
+    """
+    return ApiReference()
+
+
+@pytest.fixture
+def api_reference(_api_reference):
+    return _api_reference
+
+
+@pytest.fixture
+def api_reference_loader(_api_reference, default_config, latest_doxygen_version):
+    api_reference_set = [
+        ("doxygen", "cpp/default"),
+        ("doxygen", "java/default"),
+        ("doxygen", "objc/default"),
+        ("doxygen", "python/default"),
+    ]
+
+    class Loader:
+        def __init__(self):
+            self._version = latest_doxygen_version
+
+        def version(self, version: str) -> Loader:
+            self._version = version
+            return self
+
+        def load_all(self) -> ApiReference:
+            for reference_type, reference_set_name in api_reference_set:
+                self.add(reference_type, reference_set_name)
+            return self.load()
+
+        def add(self, reference_type: str, reference_set_name: str) -> Loader:
+            parser = parser_factory(reference_type, _api_reference, default_config)
+            if reference_type == "doxygen":
+                data_path = generated_test_data_dir / "xml" / self._version
+            else:
+                assert False, "Not supported yet"
+            parser.parse(data_path / reference_set_name)
+            return self
+
+        def load(self, resolve_references: bool = True) -> ApiReference:
+            if resolve_references:
+                _api_reference.resolve_references()
+            return _api_reference
+
+    return Loader()
+
+
+#
+# Environment
+#
+@pytest.fixture
+def warnings_are_errors(default_config):
+    default_config.warnings_are_errors = True
+    return True
+
+
+@pytest.fixture(params=[True, False], ids=["warnings-are-errors", "warnings-are-not-errors"])
+def warnings_are_and_are_not_errors(request, default_config):
+    default_config.warnings_are_errors = request.param
+    return request.param
+
+
+@pytest.fixture
+def multipage(default_config):
+    default_config.multipage = True
+    return True
+
+
+@pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
+def single_and_multipage(request, default_config):
+    default_config.multipage = request.param
+    return request.param
+
+
+@pytest.fixture
+def file_builder(tmp_path, build_dir):
+    return FileBuilder(tmp_path, build_dir)
 
 
 @pytest.fixture
@@ -182,6 +257,9 @@ def generating_api(context):
     return GeneratingApi(context)
 
 
+#
+# Generated test data
+#
 @pytest.fixture
 def cpp_class():
     builder = SimpleClassBuilder("cpp")
@@ -222,53 +300,6 @@ def cpp_class():
                                 static=True)
 
     return builder.compound
-
-
-@pytest.fixture
-def warnings_are_errors(default_config):
-    default_config.warnings_are_errors = True
-    return True
-
-
-@pytest.fixture(params=[True, False], ids=["warnings-are-errors", "warnings-are-not-errors"])
-def warnings_are_and_are_not_errors(request, default_config):
-    default_config.warnings_are_errors = request.param
-    return request.param
-
-
-@pytest.fixture
-def multipage(default_config):
-    default_config.multipage = True
-    return True
-
-
-@pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
-def single_and_multipage(request, default_config):
-    default_config.multipage = request.param
-    return request.param
-
-
-@pytest.fixture
-def empty_context(document, package_manager, default_config):
-    return Context(reference=ApiReference(),
-                   package_manager=package_manager,
-                   document=document,
-                   config=default_config)
-
-
-@pytest.fixture
-def empty_preprocessing_api(empty_context):
-    return PreprocessingApi(empty_context)
-
-
-@pytest.fixture
-def empty_generating_api(empty_context):
-    return GeneratingApi(empty_context)
-
-
-@pytest.fixture
-def file_builder(tmp_path, build_dir):
-    return FileBuilder(tmp_path, build_dir)
 
 
 @pytest.fixture
@@ -329,6 +360,9 @@ def document_tree(tmp_path):
     return tree
 
 
+#
+# Result formatting
+#
 _custom_types = {
     Compound: ([
         "id",

@@ -25,6 +25,17 @@ from asciidoxy.parser import parser_factory
 from tests.unit.shared import ProgressMock
 
 
+@pytest.fixture
+def api_reference(api_reference_loader, latest_doxygen_version):
+    return api_reference_loader.version(latest_doxygen_version).add("doxygen", "cpp/default").load()
+
+
+@pytest.fixture
+def unresolved_api_reference(api_reference_loader):
+    return api_reference_loader.add("doxygen", "cpp/default").add(
+        "doxygen", "cpp/consumer").load(resolve_references=False)
+
+
 def test_function_matcher__parse__no_arguments():
     ptm = ParameterTypeMatcher("method")
     assert ptm.name == "method"
@@ -226,7 +237,6 @@ def test_name_filter__namespace__nested_name():
     assert nf(FullNameObject("asciidoxy::geometry::Coordinate<geometry::Dot>")) is False
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_complete_match(api_reference):
     assert api_reference.find("asciidoxy::geometry::Coordinate", kind="function",
                               lang="cpp") is None
@@ -237,17 +247,14 @@ def test_find_complete_match(api_reference):
                               lang="cpp") is not None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_only_by_id(api_reference):
     assert api_reference.find(target_id="cpp-classasciidoxy_1_1geometry_1_1_coordinate") is not None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_only_by_name(api_reference):
     assert api_reference.find("asciidoxy::geometry::Coordinate") is not None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_by_name_with_spaces(api_reference):
     assert api_reference.find("asciidoxy::tparam::is_container< std::array< T, N> >") is not None
     assert api_reference.find("asciidoxy::tparam::is_container<std::array<T,N>>") is not None
@@ -312,7 +319,6 @@ def test_find_by_name_and_lang(test_data, default_config):
     assert parser.api_reference.find("BoundingBox", lang="cpp") is None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_by_name_and_namespace(api_reference):
     assert api_reference.find("asciidoxy::geometry::Coordinate", namespace="asciidoxy") is not None
     assert api_reference.find("geometry::Coordinate", namespace="asciidoxy") is not None
@@ -327,7 +333,6 @@ def test_find_by_name_and_namespace(api_reference):
     assert api_reference.find("geometry::Coordinate", namespace="asciidoxy::traffic") is not None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_by_name__prefer_exact_match(api_reference):
     assert api_reference.find("asciidoxy::geometry::Coordinate::Coordinate",
                               namespace="asciidoxy").namespace == "asciidoxy::geometry::Coordinate"
@@ -355,7 +360,6 @@ def test_find_by_name_ambiguous(test_data, default_config):
     assert len(exception2.value.candidates) == 2
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_by_name__overload_set(api_reference):
     element = api_reference.find("asciidoxy::to_string", allow_overloads=True)
     assert element is not None
@@ -383,7 +387,6 @@ def test_find_by_name__overload_set(api_reference):
     assert element.namespace == "asciidoxy"
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_by_name__overload_set__multiple_namespaces_are_ambiguous(api_reference):
     with pytest.raises(AmbiguousLookupError) as exception:
         api_reference.find("to_string",
@@ -430,19 +433,16 @@ def test_find_by_name__overload_set__multiple_languages_are_ambiguous(test_data,
     assert element.language == "objc"
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_method__explicit_no_arguments(api_reference):
     element = api_reference.find("asciidoxy::geometry::Coordinate::Coordinate()")
     assert element is not None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_method__explicit_no_arguments__requires_no_args(api_reference):
     element = api_reference.find("asciidoxy::traffic::TrafficEvent::Update()")
     assert element is None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_method__select_based_on_args(api_reference):
     with pytest.raises(AmbiguousLookupError):
         api_reference.find("asciidoxy::traffic::TrafficEvent::TrafficEvent")
@@ -454,7 +454,6 @@ def test_find_method__select_based_on_args(api_reference):
     assert element is not None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_method__select_based_on_args_2(api_reference):
     with pytest.raises(AmbiguousLookupError):
         api_reference.find("asciidoxy::geometry::Coordinate::Update")
@@ -480,7 +479,6 @@ def test_find_method__select_based_on_args_2(api_reference):
     assert element is not None
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]])
 def test_find_method__select_based_on_args_2__spaces_dont_matter(api_reference):
     with pytest.raises(AmbiguousLookupError):
         api_reference.find("asciidoxy::geometry::Coordinate::Update")
@@ -506,19 +504,16 @@ def test_find_method__select_based_on_args_2__spaces_dont_matter(api_reference):
     assert element is not None
 
 
-def test_resolve_references_for_return_types(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member = parser.api_reference.find("asciidoxy::positioning::Positioning::CurrentPosition",
-                                       kind="function",
-                                       lang="cpp")
+def test_resolve_references_for_return_types(unresolved_api_reference):
+    member = unresolved_api_reference.find("asciidoxy::positioning::Positioning::CurrentPosition",
+                                           kind="function",
+                                           lang="cpp")
     assert member is not None
     assert member.returns
     assert member.returns.type
     assert not member.returns.type.id
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert member.returns
     assert member.returns.type
@@ -526,20 +521,17 @@ def test_resolve_references_for_return_types(parser_driver_factory):
     assert member.returns.type.kind == "class"
 
 
-def test_resolve_partial_references_for_return_types(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member = parser.api_reference.find("asciidoxy::positioning::Positioning::TrafficNearby",
-                                       kind="function",
-                                       lang="cpp")
+def test_resolve_partial_references_for_return_types(unresolved_api_reference):
+    member = unresolved_api_reference.find("asciidoxy::positioning::Positioning::TrafficNearby",
+                                           kind="function",
+                                           lang="cpp")
     assert member is not None
     assert member.returns
     assert member.returns.type
     assert len(member.returns.type.nested) == 1
     assert not member.returns.type.nested[0].id
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert member.returns
     assert member.returns.type
@@ -548,19 +540,16 @@ def test_resolve_partial_references_for_return_types(parser_driver_factory):
     assert member.returns.type.nested[0].kind == "class"
 
 
-def test_resolve_references_for_parameters(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member = parser.api_reference.find("asciidoxy::positioning::Positioning::IsNearby",
-                                       kind="function",
-                                       lang="cpp")
+def test_resolve_references_for_parameters(unresolved_api_reference):
+    member = unresolved_api_reference.find("asciidoxy::positioning::Positioning::IsNearby",
+                                           kind="function",
+                                           lang="cpp")
     assert member is not None
     assert len(member.params) == 1
     assert member.params[0].type
     assert not member.params[0].type.id
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert len(member.params) == 1
     assert member.params[0].type
@@ -568,19 +557,16 @@ def test_resolve_references_for_parameters(parser_driver_factory):
     assert member.params[0].type.kind == "class"
 
 
-def test_resolve_partial_references_for_parameters(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member = parser.api_reference.find("asciidoxy::positioning::Positioning::InTraffic",
-                                       kind="function",
-                                       lang="cpp")
+def test_resolve_partial_references_for_parameters(unresolved_api_reference):
+    member = unresolved_api_reference.find("asciidoxy::positioning::Positioning::InTraffic",
+                                           kind="function",
+                                           lang="cpp")
     assert member is not None
     assert len(member.params) == 1
     assert member.params[0].type
     assert not member.params[0].type.id
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert len(member.params) == 1
     assert member.params[0].type
@@ -588,17 +574,14 @@ def test_resolve_partial_references_for_parameters(parser_driver_factory):
     assert member.params[0].type.kind == "class"
 
 
-def test_resolve_references_for_typedefs(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member = parser.api_reference.find("asciidoxy::positioning::Traffic", kind="alias")
+def test_resolve_references_for_typedefs(unresolved_api_reference):
+    member = unresolved_api_reference.find("asciidoxy::positioning::Traffic", kind="alias")
     assert member is not None
     assert member.returns
     assert member.returns.type
     assert not member.returns.type.id
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert member.returns
     assert member.returns.type
@@ -606,18 +589,15 @@ def test_resolve_references_for_typedefs(parser_driver_factory):
     assert member.returns.type.kind == "class"
 
 
-def test_resolve_references_for_inner_type_reference(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default")
-
-    parent_class = parser.api_reference.find("asciidoxy::traffic::TrafficEvent",
-                                             kind="class",
-                                             lang="cpp")
+def test_resolve_references_for_inner_type_reference(unresolved_api_reference):
+    parent_class = unresolved_api_reference.find("asciidoxy::traffic::TrafficEvent",
+                                                 kind="class",
+                                                 lang="cpp")
     assert parent_class is not None
     inner_classes = [m for m in parent_class.members if m.kind == "struct"]
     assert len(inner_classes) == 0
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     inner_classes = [m for m in parent_class.members if m.kind == "struct"]
     assert len(inner_classes) > 0
@@ -626,18 +606,15 @@ def test_resolve_references_for_inner_type_reference(parser_driver_factory):
     assert nested_class.full_name == "asciidoxy::traffic::TrafficEvent::TrafficEventData"
 
 
-def test_resolve_references_for_exceptions(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member = parser.api_reference.find("asciidoxy::positioning::Positioning::Override",
-                                       kind="function")
+def test_resolve_references_for_exceptions(unresolved_api_reference):
+    member = unresolved_api_reference.find("asciidoxy::positioning::Positioning::Override",
+                                           kind="function")
     assert member is not None
     assert len(member.exceptions) == 1
     assert member.exceptions[0].type
     assert not member.exceptions[0].type.id
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert member.returns
     assert len(member.exceptions) == 1
@@ -646,18 +623,15 @@ def test_resolve_references_for_exceptions(parser_driver_factory):
     assert member.exceptions[0].type.kind == "class"
 
 
-def test_resolve_partial_references_for_exceptions(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member = parser.api_reference.find("asciidoxy::positioning::Positioning::TrafficNearby",
-                                       kind="function")
+def test_resolve_partial_references_for_exceptions(unresolved_api_reference):
+    member = unresolved_api_reference.find("asciidoxy::positioning::Positioning::TrafficNearby",
+                                           kind="function")
     assert member is not None
     assert len(member.exceptions) == 1
     assert member.exceptions[0].type
     assert not member.exceptions[0].type.id
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert member.returns
     assert len(member.exceptions) == 1
@@ -666,36 +640,35 @@ def test_resolve_partial_references_for_exceptions(parser_driver_factory):
     assert member.exceptions[0].type.kind == "class"
 
 
-def test_resolve_references_prefer_same_namespace(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member_a_t = parser.api_reference.find("asciidoxy::traffic::CreateConvertor",
-                                           kind="function",
-                                           lang="cpp")
+def test_resolve_references_prefer_same_namespace(unresolved_api_reference):
+    member_a_t = unresolved_api_reference.find("asciidoxy::traffic::CreateConvertor",
+                                               kind="function",
+                                               lang="cpp")
     assert member_a_t is not None
     assert member_a_t.returns
     assert member_a_t.returns.type
     assert not member_a_t.returns.type.id
     assert not member_a_t.returns.type.kind
 
-    member_a = parser.api_reference.find("asciidoxy::CreateConvertor", kind="function", lang="cpp")
+    member_a = unresolved_api_reference.find("asciidoxy::CreateConvertor",
+                                             kind="function",
+                                             lang="cpp")
     assert member_a is not None
     assert member_a.returns
     assert member_a.returns.type
     assert not member_a.returns.type.id
     assert not member_a.returns.type.kind
 
-    member_a_g = parser.api_reference.find("asciidoxy::geometry::CreateConvertor",
-                                           kind="function",
-                                           lang="cpp")
+    member_a_g = unresolved_api_reference.find("asciidoxy::geometry::CreateConvertor",
+                                               kind="function",
+                                               lang="cpp")
     assert member_a_g is not None
     assert member_a_g.returns
     assert member_a_g.returns.type
     assert not member_a_g.returns.type.id
     assert not member_a_g.returns.type.kind
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert member_a_t.returns
     assert member_a_t.returns.type
@@ -716,22 +689,19 @@ def test_resolve_references_prefer_same_namespace(parser_driver_factory):
     assert member_a_g.returns.type.namespace == "asciidoxy::geometry"
 
 
-def test_resolve_references_fails_when_ambiguous(parser_driver_factory):
-    # TODO: Rewrite independent from parser
+def test_resolve_references_fails_when_ambiguous(unresolved_api_reference):
     # When internal resolving fails, the type will not be resolved to the exact type, and will be
     # shown in the documentation as plain text. It should not raise an error.
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-
-    member = parser.api_reference.find("asciidoxy::traffic::geometry::CreateConvertor",
-                                       kind="function",
-                                       lang="cpp")
+    member = unresolved_api_reference.find("asciidoxy::traffic::geometry::CreateConvertor",
+                                           kind="function",
+                                           lang="cpp")
     assert member is not None
     assert member.returns
     assert member.returns.type
     assert not member.returns.type.id
     assert not member.returns.type.kind
 
-    parser.api_reference.resolve_references()
+    unresolved_api_reference.resolve_references()
 
     assert member.returns
     assert member.returns.type
@@ -739,62 +709,54 @@ def test_resolve_references_fails_when_ambiguous(parser_driver_factory):
     assert not member.returns.type.kind
 
 
-def test_resolve_references__report_progress(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-    unresolved_ref_count = parser.api_reference.unresolved_ref_count
+def test_resolve_references__report_progress(unresolved_api_reference):
+    unresolved_ref_count = unresolved_api_reference.unresolved_ref_count
     assert unresolved_ref_count > 70
 
     progress_mock = ProgressMock()
-    parser.api_reference.resolve_references(progress=progress_mock)
+    unresolved_api_reference.resolve_references(progress=progress_mock)
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == unresolved_ref_count
 
 
-def test_check_references__reference_found(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default")
-
-    element = parser.api_reference.find("asciidoxy::geometry::Print")
+def test_check_references__reference_found(unresolved_api_reference):
+    element = unresolved_api_reference.find("asciidoxy::geometry::Print")
     assert element is not None
     assert len(element.params) == 1
     assert element.params[0].type
     assert element.params[0].type.id
 
-    assert parser.api_reference.unchecked_ref_count > 0
-    parser.api_reference.check_references()
-    assert parser.api_reference.unchecked_ref_count == 0
+    assert unresolved_api_reference.unchecked_ref_count > 0
+    unresolved_api_reference.check_references()
+    assert unresolved_api_reference.unchecked_ref_count == 0
 
     assert element.params[0].type.id
 
 
-def test_check_references__remove_missing_refids(xml_data, default_config):
-    # TODO: Rewrite independent from parser
-    parser = parser_factory("doxygen", ApiReference(), default_config)
-    parser.parse(xml_data / "cpp/default/xml/namespaceasciidoxy_1_1geometry.xml")
+def test_check_references__remove_missing_refids(api_reference_loader):
+    api_reference = api_reference_loader.add(
+        "doxygen", "cpp/default/xml/namespaceasciidoxy_1_1geometry.xml").load()
 
-    element = parser.api_reference.find("asciidoxy::geometry::Print")
+    element = api_reference.find("asciidoxy::geometry::Print")
     assert element is not None
     assert len(element.params) == 1
     assert element.params[0].type
     assert element.params[0].type.id
 
-    assert parser.api_reference.unchecked_ref_count > 0
-    parser.api_reference.check_references()
-    assert parser.api_reference.unchecked_ref_count == 0
+    assert api_reference.unchecked_ref_count > 0
+    api_reference.check_references()
+    assert api_reference.unchecked_ref_count == 0
 
     assert not element.params[0].type.id
 
 
-def test_check_references__report_progress(parser_driver_factory):
-    # TODO: Rewrite independent from parser
-    parser = parser_driver_factory("cpp/default", "cpp/consumer")
-    unchecked_ref_count = parser.api_reference.unchecked_ref_count
+def test_check_references__report_progress(unresolved_api_reference):
+    unchecked_ref_count = unresolved_api_reference.unchecked_ref_count
     assert unchecked_ref_count > 0
 
     progress_mock = ProgressMock()
-    parser.api_reference.check_references(progress=progress_mock)
+    unresolved_api_reference.check_references(progress=progress_mock)
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == unchecked_ref_count

@@ -34,7 +34,11 @@ from tests.unit.matchers import (
 )
 
 
-@pytest.mark.parametrize("api_reference_set", [["cpp/default"]], ids=[""])
+@pytest.fixture
+def api_reference(api_reference_loader, all_doxygen_versions):
+    return api_reference_loader.version(all_doxygen_versions).add("doxygen", "cpp/default").load()
+
+
 @pytest.mark.parametrize("search_params,matcher", [
     param(dict(name="asciidoxy::geometry::Coordinate", kind="class", lang="cpp"),
           m_compound(
