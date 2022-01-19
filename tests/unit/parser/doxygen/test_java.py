@@ -29,7 +29,11 @@ from tests.unit.matchers import (
 )
 
 
-@pytest.mark.parametrize("api_reference_set", [["java/default"]], ids=[""])
+@pytest.fixture
+def api_reference(api_reference_loader, all_doxygen_versions):
+    return api_reference_loader.version(all_doxygen_versions).add("doxygen", "java/default").load()
+
+
 @pytest.mark.parametrize("search_params,matcher", [
     param(dict(name="com.asciidoxy.geometry.Coordinate", kind="class", lang="java"),
           m_compound(

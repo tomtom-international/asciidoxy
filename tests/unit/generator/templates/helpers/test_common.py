@@ -34,13 +34,13 @@ from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 
 
 @pytest.fixture
-def api_mock(empty_generating_api):
-    return Mock(wraps=empty_generating_api)
+def api_mock(generating_api):
+    return Mock(wraps=generating_api)
 
 
 @pytest.fixture
-def helper(empty_generating_api, cpp_class):
-    return TemplateHelper(empty_generating_api, cpp_class, InsertionFilter())
+def helper(generating_api, cpp_class):
+    return TemplateHelper(generating_api, cpp_class, InsertionFilter())
 
 
 def test_print_ref__link__empty(api_mock):
@@ -417,12 +417,12 @@ def test_print_ref__no_link__closure_prefix_suffix(api_mock):
     assert helper.print_ref(ref, link=False) == "final (const MyType&(ArgType1, ArgType2 value))*"
 
 
-def test_argument_list__empty(empty_generating_api):
-    helper = TemplateHelper(empty_generating_api)
+def test_argument_list__empty(generating_api):
+    helper = TemplateHelper(generating_api)
     assert helper.argument_list([]) == "()"
 
 
-def test_argument_list(empty_generating_api):
+def test_argument_list(generating_api):
     type1 = TypeRef("lang", prefix="const ", name="Type1")
     type2 = TypeRef("lang", name="Type2", suffix=" &", id="lang-type2")
     type3 = TypeRef("lang", name="Type3", nested=[type1, type2])
@@ -433,12 +433,12 @@ def test_argument_list(empty_generating_api):
         Parameter(type=type3, name="arg3", kind="param"),
     ]
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.argument_list(params) == "(const Type1, xref:lang-type2[++Type2++] & arg2, "
             "Type3<const Type1, xref:lang-type2[++Type2++] &> arg3)")
 
 
-def test_argument_list__skip_tparam(empty_generating_api):
+def test_argument_list__skip_tparam(generating_api):
     type1 = TypeRef("lang", prefix="typename ", name="Type1")
     type2 = TypeRef("lang", name="Type2", suffix=" &", id="lang-type2")
     type3 = TypeRef("lang", name="Type3", nested=[type1, type2])
@@ -449,12 +449,12 @@ def test_argument_list__skip_tparam(empty_generating_api):
         Parameter(type=type3, name="arg3", kind="param"),
     ]
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.argument_list(params) == "(xref:lang-type2[++Type2++] & arg2, "
             "Type3<typename Type1, xref:lang-type2[++Type2++] &> arg3)")
 
 
-def test_type_list(empty_generating_api):
+def test_type_list(generating_api):
     type1 = TypeRef("lang", prefix="const ", name="Type1")
     type2 = TypeRef("lang", name="Type2", suffix=" &", id="lang-type2")
     type3 = TypeRef("lang", name="Type3", nested=[type1, type2])
@@ -465,11 +465,11 @@ def test_type_list(empty_generating_api):
         Parameter(type=type3, name="arg3", kind="param"),
     ]
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.type_list(params) == "(const Type1, Type2 &, Type3<const Type1, Type2 &>)")
 
 
-def test_type_list__skip_tparam(empty_generating_api):
+def test_type_list__skip_tparam(generating_api):
     type1 = TypeRef("lang", prefix="typename ", name="Type1")
     type2 = TypeRef("lang", name="Type2", suffix=" &", id="lang-type2")
     type3 = TypeRef("lang", name="Type3", nested=[type1, type2])
@@ -480,7 +480,7 @@ def test_type_list__skip_tparam(empty_generating_api):
         Parameter(type=type3, name="arg3", kind="param"),
     ]
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.type_list(params) == "(Type2 &, Type3<typename Type1, Type2 &>)")
 
 
@@ -563,7 +563,7 @@ def test_has_any__list_and_generator():
     assert has_any(empty_gen(), [42]) is True
 
 
-def test_parameter(empty_generating_api):
+def test_parameter(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -574,11 +574,11 @@ def test_parameter(empty_generating_api):
     param.type = ref
     param.name = "arg"
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[++MyType++] & arg"
 
 
-def test_parameter__no_link(empty_generating_api):
+def test_parameter__no_link(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -589,11 +589,11 @@ def test_parameter__no_link(empty_generating_api):
     param.type = ref
     param.name = "arg"
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param, link=False) == "const MyType & arg"
 
 
-def test_parameter__no_name(empty_generating_api):
+def test_parameter__no_name(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -604,11 +604,11 @@ def test_parameter__no_name(empty_generating_api):
     param.type = ref
     param.name = ""
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param) == "const xref:lang-tomtom_1_MyType[++MyType++] &"
 
 
-def test_parameter__default_value(empty_generating_api):
+def test_parameter__default_value(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -620,12 +620,12 @@ def test_parameter__default_value(empty_generating_api):
     param.name = "arg"
     param.default_value = "12"
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(
         param, default_value=True) == "const xref:lang-tomtom_1_MyType[++MyType++] & arg = 12"
 
 
-def test_parameter__ignore_default_value(empty_generating_api):
+def test_parameter__ignore_default_value(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -637,13 +637,13 @@ def test_parameter__ignore_default_value(empty_generating_api):
     param.name = "arg"
     param.default_value = "12"
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.parameter(param,
                              default_value=False) == "const xref:lang-tomtom_1_MyType[++MyType++] "
             "& arg")
 
 
-def test_parameter__prefix(empty_generating_api):
+def test_parameter__prefix(generating_api):
     ref = TypeRef("lang")
     ref.name = "MyType"
     ref.prefix = "const "
@@ -655,11 +655,11 @@ def test_parameter__prefix(empty_generating_api):
     param.name = "arg"
     param.prefix = "vararg "
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert helper.parameter(param) == "vararg const xref:lang-tomtom_1_MyType[++MyType++] & arg"
 
 
-def test_parameter__param_name_separator(empty_generating_api):
+def test_parameter__param_name_separator(generating_api):
     class _TemplateHelper(TemplateHelper):
         PARAM_NAME_SEP = "_@_"
 
@@ -675,13 +675,13 @@ def test_parameter__param_name_separator(empty_generating_api):
     param.prefix = "vararg "
     param.default_value = "12"
 
-    helper = _TemplateHelper(empty_generating_api)
+    helper = _TemplateHelper(generating_api)
     assert (helper.parameter(
         param, default_value=True) == "vararg const xref:lang-tomtom_1_MyType[++MyType++] "
             "&_@_arg = 12")
 
 
-def test_parameter__param_name_first(empty_generating_api):
+def test_parameter__param_name_first(generating_api):
     class _TemplateHelper(TemplateHelper):
         PARAM_NAME_FIRST = True
 
@@ -697,24 +697,24 @@ def test_parameter__param_name_first(empty_generating_api):
     param.prefix = "vararg "
     param.default_value = "12"
 
-    helper = _TemplateHelper(empty_generating_api)
+    helper = _TemplateHelper(generating_api)
     assert (helper.parameter(
         param, default_value=True) == "vararg arg const xref:lang-tomtom_1_MyType[++MyType++] "
             "& = 12")
 
 
-def test_method_signature__no_params(empty_generating_api):
+def test_method_signature__no_params(generating_api):
     method = Compound("lang")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
     method.returns.type = TypeRef("lang", "void")
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert helper.method_signature(method) == "void ShortMethod()"
 
 
-def test_method_signature__const(empty_generating_api):
+def test_method_signature__const(generating_api):
     method = Compound("lang")
     method.name = "ShortMethod"
     method.const = True
@@ -722,11 +722,11 @@ def test_method_signature__const(empty_generating_api):
     method.returns = ReturnValue()
     method.returns.type = TypeRef("lang", "void")
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert helper.method_signature(method) == "void ShortMethod() const"
 
 
-def test_method_signature__single_param(empty_generating_api):
+def test_method_signature__single_param(generating_api):
     method = Compound("lang")
     method.name = "ShortMethod"
     method.returns = ReturnValue(type=TypeRef("lang", "void"))
@@ -736,11 +736,11 @@ def test_method_signature__single_param(empty_generating_api):
         type=TypeRef("lang", "int"),
     )]
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert helper.method_signature(method) == "void ShortMethod(int value)"
 
 
-def test_method_signature__single_param__too_wide(empty_generating_api):
+def test_method_signature__single_param__too_wide(generating_api):
     method = Compound("lang")
     method.name = "ShortMethod"
     method.returns = ReturnValue(type=TypeRef("lang", "void"))
@@ -752,13 +752,13 @@ def test_method_signature__single_param__too_wide(empty_generating_api):
         ),
     ]
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
 void ShortMethod(
     int value)""")
 
 
-def test_method_signature__multiple_params(empty_generating_api):
+def test_method_signature__multiple_params(generating_api):
     method = Compound("lang")
     method.name = "ShortMethod"
 
@@ -783,14 +783,14 @@ def test_method_signature__multiple_params(empty_generating_api):
         )
     ]
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method) == """\
 void ShortMethod(int value,
                  double other_value,
                  std::string text)""")
 
 
-def test_method_signature__multiple_params__first_param_too_wide(empty_generating_api):
+def test_method_signature__multiple_params__first_param_too_wide(generating_api):
     method = Compound("lang")
     method.name = "ShortMethod"
 
@@ -815,7 +815,7 @@ def test_method_signature__multiple_params__first_param_too_wide(empty_generatin
         )
     ]
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=20) == """\
 void ShortMethod(
     int value,
@@ -823,7 +823,7 @@ void ShortMethod(
     std::string text)""")
 
 
-def test_method_signature__multiple_params__last_param_too_wide(empty_generating_api):
+def test_method_signature__multiple_params__last_param_too_wide(generating_api):
     method = Compound(
         "lang",
         name="ShortMethod",
@@ -847,7 +847,7 @@ def test_method_signature__multiple_params__last_param_too_wide(empty_generating
         ],
     )
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method, max_width=40) == f"""\
 void ShortMethod(
     int value,
@@ -855,7 +855,7 @@ void ShortMethod(
     std::string {"text" * 10})""")
 
 
-def test_method_signature__ignore_return_type_xref_length(empty_generating_api):
+def test_method_signature__ignore_return_type_xref_length(generating_api):
     method = Compound(
         "lang",
         name="ShortMethod",
@@ -863,12 +863,12 @@ def test_method_signature__ignore_return_type_xref_length(empty_generating_api):
         params=[Parameter(name="value", type=TypeRef("lang", "int"), kind="param")],
     )
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method) == f"xref:{'ab' * 80}[++void++] ShortMethod(int "
             "value)")
 
 
-def test_method_signature__ignore_param_type_xref_length(empty_generating_api):
+def test_method_signature__ignore_param_type_xref_length(generating_api):
     method = Compound(
         "lang",
         name="ShortMethod",
@@ -876,12 +876,12 @@ def test_method_signature__ignore_param_type_xref_length(empty_generating_api):
         params=[Parameter(kind="param", name="value", type=TypeRef("lang", "int", id="ab" * 80))],
     )
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method) == f"void ShortMethod(xref:{'ab' * 80}[++int++] "
             "value)")
 
 
-def test_method_signature__template_params(empty_generating_api):
+def test_method_signature__template_params(generating_api):
     method = Compound(
         "lang",
         name="ShortMethod",
@@ -908,7 +908,7 @@ def test_method_signature__template_params(empty_generating_api):
         ],
     )
 
-    helper = TemplateHelper(empty_generating_api)
+    helper = TemplateHelper(generating_api)
     assert (helper.method_signature(method) == """\
 V ShortMethod(K key,
               V default)""")

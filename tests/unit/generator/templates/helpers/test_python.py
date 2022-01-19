@@ -127,8 +127,8 @@ def test_params__no_type():
 
 
 @pytest.fixture
-def helper(empty_generating_api, python_class):
-    return PythonTemplateHelper(empty_generating_api, python_class, InsertionFilter())
+def helper(generating_api, python_class):
+    return PythonTemplateHelper(generating_api, python_class, InsertionFilter())
 
 
 def test_public_static_methods__no_filter(helper):

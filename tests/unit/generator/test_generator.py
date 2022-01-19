@@ -20,8 +20,7 @@ from pathlib import Path
 import pytest
 
 from asciidoxy import __version__
-from asciidoxy.document import Document
-from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi, process_adoc
+from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.cache import TemplateCache
 from asciidoxy.generator.context import InsertData, StackFrame
 from asciidoxy.generator.errors import (
@@ -38,8 +37,13 @@ from asciidoxy.generator.errors import (
     UnknownAnchorError,
 )
 from asciidoxy.packaging import Package
+from asciidoxy.parser import parser_factory
 
-from ..shared import ProgressMock
+
+@pytest.fixture
+def api_reference(api_reference_loader, latest_doxygen_version):
+    return api_reference_loader.version(latest_doxygen_version).add("doxygen",
+                                                                    "cpp/consumer").load_all()
 
 
 @pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
@@ -52,27 +56,6 @@ def tdb_single_and_multipage(request, file_builder):
 def tdb_warnings_are_and_are_not_errors(request, file_builder):
     file_builder.warnings_are_errors = request.param
     return request.param
-
-
-@pytest.fixture
-def adoc_data_document(adoc_data, package_manager):
-    def prepare(adoc_file):
-        package_manager.set_input_files(adoc_data / adoc_file, adoc_data)
-        return package_manager.prepare_work_directory(adoc_data / adoc_file)
-
-    return prepare
-
-
-@pytest.fixture
-def check_adoc_expected_result(compare_to_file):
-    def check(doc: Document, *, multipage: bool) -> None:
-        assert doc.work_file.is_file()
-        base_file = Path("generator") / doc.relative_path.with_suffix("")
-        mode = "multipage" if multipage else "singlepage"
-        actual_content = doc.work_file.read_text(encoding="utf-8")
-        compare_to_file(base_file, actual_content, mode)
-
-    return check
 
 
 def test_insert__preprocessing(preprocessing_api):
@@ -235,9 +218,10 @@ def test_insert_error_when_reference_not_found(generating_api):
         generating_api.insert("asciidoxy::geometry::Sphere")
 
 
-@pytest.mark.parametrize("xml_data,api_reference_set",
-                         [(Path(__file__).parent.parent.parent / "data", [""])])
-def test_insert_error_when_kind_not_supported(generating_api):
+def test_insert_error_when_kind_not_supported(api_reference, generating_api, default_config,
+                                              test_data):
+    parser = parser_factory("doxygen", api_reference, default_config)
+    parser.parse(test_data / "namespaceasciidoxy_1_1unsupported__kind.xml")
     with pytest.raises(TemplateMissingError):
         generating_api.insert("asciidoxy::unsupported_kind::kUnsupportedKindSample")
 
@@ -254,7 +238,6 @@ def test_insert_error_when_ambiguous(generating_api):
             in exception_message)
 
 
-@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 def test_insert_tracks_all_references(preprocessing_api, context):
     preprocessing_api.insert("asciidoxy::positioning::Positioning")
     assert len(context.linked) == 3
@@ -263,7 +246,6 @@ def test_insert_tracks_all_references(preprocessing_api, context):
     assert "cpp-classasciidoxy_1_1geometry_1_1_invalid_coordinate" in context.linked
 
 
-@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 def test_link_stores_stack_trace(preprocessing_api, context, document):
     preprocessing_api.link("asciidoxy::geometry::Coordinate")
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
@@ -281,7 +263,6 @@ def test_link_stores_stack_trace(preprocessing_api, context, document):
     ]]
 
 
-@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 def test_link_stores_stack_trace_nested_insert(preprocessing_api, context, document):
     preprocessing_api.insert("asciidoxy::positioning::Positioning")
     assert "cpp-classasciidoxy_1_1geometry_1_1_coordinate" in context.linked
@@ -399,7 +380,6 @@ def test_link_stores_stack_trace_nested_insert(preprocessing_api, context, docum
     ]
 
 
-@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
 def test_link_in_include_stores_stack_trace_with_correct_file(preprocessing_api, context, document):
     document.original_file.touch()
     include_doc = document.with_relative_path("include.adoc")
@@ -1263,181 +1243,6 @@ def test_multipage_toc__preprocessing_run(preprocessing_api, document, multipage
     assert not result
 
     assert not document.docinfo_footer_file.exists()
-
-
-@pytest.mark.parametrize("warnings_are_errors", [True, False],
-                         ids=["warnings-are-errors", "warnings-are-not-errors"])
-@pytest.mark.parametrize("test_file_name", ["simple_test", "link_to_member"])
-def test_process_adoc_single_file(warnings_are_errors, test_file_name, single_and_multipage,
-                                  adoc_data, api_reference, package_manager, default_config,
-                                  check_adoc_expected_result):
-    input_file = adoc_data / f"{test_file_name}.adoc"
-    package_manager.set_input_files(input_file)
-    doc = package_manager.prepare_work_directory(input_file)
-
-    progress_mock = ProgressMock()
-    default_config.warnings_are_errors = warnings_are_errors
-    output_doc = process_adoc(doc,
-                              api_reference,
-                              package_manager,
-                              config=default_config,
-                              progress=progress_mock)[0]
-    check_adoc_expected_result(output_doc, multipage=single_and_multipage)
-    assert output_doc.stylesheet == "asciidoxy-no-toc.css"
-    assert output_doc.stylesheet_file.is_file()
-
-    assert progress_mock.ready == progress_mock.total
-    assert progress_mock.total == 2
-
-
-def test_process_adoc_multi_file(single_and_multipage, api_reference, package_manager,
-                                 adoc_data_document, adoc_data, default_config,
-                                 check_adoc_expected_result):
-    main_doc = adoc_data_document("multifile_test.adoc")
-
-    progress_mock = ProgressMock()
-    default_config.warnings_are_errors = True
-    default_config.multipage = single_and_multipage
-    output_docs = process_adoc(main_doc,
-                               api_reference,
-                               package_manager,
-                               config=default_config,
-                               progress=progress_mock)
-    assert len(output_docs) == 3
-    for doc in output_docs:
-        check_adoc_expected_result(doc, multipage=single_and_multipage)
-        assert doc.stylesheet == "asciidoxy-no-toc.css"
-        assert doc.stylesheet_file.is_file()
-
-    assert sorted([doc.relative_path for doc in output_docs]) == sorted([
-        Path("multifile_test.adoc"),
-        Path("sub_directory/multifile_subdoc_test.adoc"),
-        Path("sub_directory/multifile_subdoc_in_table_test.adoc")
-    ])
-
-    assert progress_mock.ready == progress_mock.total
-    assert progress_mock.total == 6
-
-
-def test_process_adoc_env_variables(single_and_multipage, api_reference, package_manager,
-                                    adoc_data_document, adoc_data, default_config,
-                                    check_adoc_expected_result):
-    main_doc = adoc_data_document("env_variables.adoc")
-
-    progress_mock = ProgressMock()
-    default_config.warnings_are_errors = True
-    default_config.multipage = single_and_multipage
-    output_docs = process_adoc(main_doc,
-                               api_reference,
-                               package_manager,
-                               config=default_config,
-                               progress=progress_mock)
-    assert len(output_docs) == 2
-    for doc in output_docs:
-        check_adoc_expected_result(doc, multipage=single_and_multipage)
-
-    assert sorted([doc.relative_path for doc in output_docs]) == sorted([
-        Path("env_variables.adoc"),
-        Path("env_variables_include.adoc"),
-    ])
-
-    assert progress_mock.ready == progress_mock.total
-    assert progress_mock.total == 4
-
-
-def test_process_adoc__embedded_doc_included(single_and_multipage, api_reference, package_manager,
-                                             adoc_data_document, default_config):
-    main_doc = adoc_data_document("embeddedfile_test.adoc")
-
-    progress_mock = ProgressMock()
-    default_config.warnings_are_errors = True
-    default_config.multipage = single_and_multipage
-    output_docs = process_adoc(main_doc,
-                               api_reference,
-                               package_manager,
-                               config=default_config,
-                               progress=progress_mock)
-    assert len(output_docs) == 2
-    assert sorted([doc.relative_path for doc in output_docs]) == sorted([
-        Path("embeddedfile_test.adoc"),
-        Path("sub_directory/embeddedfile_subdoc_test.adoc"),
-    ])
-
-    assert progress_mock.ready == progress_mock.total
-    assert progress_mock.total == 2
-
-
-def test_process_adoc_custom_templates(warnings_are_errors, single_and_multipage, adoc_data,
-                                       api_reference, package_manager, tmp_path, default_config,
-                                       check_adoc_expected_result):
-    template_dir = tmp_path / "templates"
-    (template_dir / "cpp").mkdir(parents=True)
-    (template_dir / "cpp" / "class.mako").write_text("Custom class template")
-    (template_dir / "cpp" / "myclass.mako").write_text("My class template")
-
-    input_file = adoc_data / "custom_templates.adoc"
-    package_manager.set_input_files(input_file)
-    doc = package_manager.prepare_work_directory(input_file)
-
-    progress_mock = ProgressMock()
-    default_config.warnings_are_errors = warnings_are_errors
-    default_config.template_dir = template_dir
-    output_doc = process_adoc(doc,
-                              api_reference,
-                              package_manager,
-                              config=default_config,
-                              progress=progress_mock)[0]
-    check_adoc_expected_result(output_doc, multipage=single_and_multipage)
-
-
-def test_process_adoc_access_config(warnings_are_errors, single_and_multipage, adoc_data,
-                                    api_reference, package_manager, tmp_path, default_config):
-    input_file = adoc_data / "access_config.adoc"
-    package_manager.set_input_files(input_file)
-    doc = package_manager.prepare_work_directory(input_file)
-
-    progress_mock = ProgressMock()
-    default_config.warnings_are_errors = warnings_are_errors
-    output_doc = process_adoc(doc,
-                              api_reference,
-                              package_manager,
-                              config=default_config,
-                              progress=progress_mock)[0]
-    assert output_doc.work_file.is_file()
-
-    content = output_doc.work_file.read_text()
-    assert f"Build dir: {default_config.build_dir}" in content
-
-
-@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
-@pytest.mark.parametrize(
-    "test_file_name",
-    ["dangling_link", "dangling_cross_doc_ref", "double_insert", "dangling_link_in_insert"])
-def test_process_adoc_file_warning(test_file_name, single_and_multipage, adoc_data, api_reference,
-                                   package_manager, default_config, check_adoc_expected_result):
-    input_file = adoc_data / f"{test_file_name}.adoc"
-    package_manager.set_input_files(input_file)
-    doc = package_manager.prepare_work_directory(input_file)
-    default_config.multipage = single_and_multipage
-    output_doc = process_adoc(doc, api_reference, package_manager, config=default_config)[0]
-    check_adoc_expected_result(output_doc, multipage=single_and_multipage)
-
-
-@pytest.mark.parametrize("api_reference_set", [("cpp/default", "cpp/consumer")])
-@pytest.mark.parametrize("test_file_name, error",
-                         [("dangling_link", ConsistencyError),
-                          ("dangling_cross_doc_ref", IncludeFileNotFoundError),
-                          ("double_insert", ConsistencyError),
-                          ("dangling_link_in_insert", ConsistencyError)])
-def test_process_adoc_file_warning_as_error(test_file_name, error, single_and_multipage, adoc_data,
-                                            api_reference, package_manager, default_config):
-    input_file = adoc_data / f"{test_file_name}.adoc"
-    package_manager.set_input_files(input_file)
-    doc = package_manager.prepare_work_directory(input_file)
-
-    default_config.warnings_are_errors = True
-    with pytest.raises(error):
-        process_adoc(doc, api_reference, package_manager, default_config)
 
 
 def test_require_version__exact_match(preprocessing_api):

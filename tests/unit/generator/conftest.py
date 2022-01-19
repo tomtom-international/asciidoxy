@@ -61,7 +61,7 @@ def _find_expected_result_file(name: Path, *specifiers: str) -> Path:
 
 
 @pytest.fixture
-def compare_to_file(request, doxygen_version):
+def compare_to_file(request, all_doxygen_versions):
     """Compare the actual content to the content of the best matching expected result file.
 
     If the command-line option `--update-expected-results` is given, the current content is stored
@@ -71,12 +71,12 @@ def compare_to_file(request, doxygen_version):
         name = Path(name)
         if request.config.getoption("update_expected_results"):
             result_file = _updated_expected_result_file(name, *extra_specifiers,
-                                                        doxygen_version.replace(".", "_"))
+                                                        all_doxygen_versions.replace(".", "_"))
             result_file.parent.mkdir(parents=True, exist_ok=True)
             result_file.write_text(actual_content, encoding="utf-8")
         else:
             expected_content = _find_expected_result_file(name, *extra_specifiers,
-                                                          doxygen_version.replace(
+                                                          all_doxygen_versions.replace(
                                                               ".", "_")).read_text(encoding="utf-8")
             assert actual_content == expected_content
 

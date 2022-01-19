@@ -23,8 +23,8 @@ from asciidoxy.model import Compound, Parameter, ReturnValue, TypeRef
 
 
 @pytest.fixture
-def helper(empty_generating_api, cpp_class):
-    return CppTemplateHelper(empty_generating_api, cpp_class, InsertionFilter())
+def helper(generating_api, cpp_class):
+    return CppTemplateHelper(generating_api, cpp_class, InsertionFilter())
 
 
 def test_public_constructors__no_filter(helper):
