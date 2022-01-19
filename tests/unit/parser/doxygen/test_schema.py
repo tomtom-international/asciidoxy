@@ -151,8 +151,9 @@ class XsdSchema:
         return unique_element_names
 
 
-def test_doxygen_schema__description_parser(xml_data):
-    compound_xsd = xml_data / "cpp/default/xml/compound.xsd"
+def test_doxygen_schema__description_parser(generated_test_data, all_doxygen_versions):
+    compound_xsd = generated_test_data("doxygen", "cpp/default/xml/compound.xsd",
+                                       all_doxygen_versions)
     assert compound_xsd.is_file()
     schema = XsdSchema.from_file(compound_xsd)
 

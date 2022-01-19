@@ -31,6 +31,11 @@ from asciidoxy.generator.filters import (
 from asciidoxy.model import ThrowsClause
 
 
+@pytest.fixture
+def api_reference(api_reference_loader, latest_doxygen_version):
+    return api_reference_loader.version(latest_doxygen_version).add("doxygen", "cpp/default").load()
+
+
 def test_all_string_filter():
     all_filter = AllStringFilter()
 

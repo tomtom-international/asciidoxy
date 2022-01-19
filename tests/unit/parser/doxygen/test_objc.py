@@ -31,7 +31,11 @@ from tests.unit.matchers import (
 )
 
 
-@pytest.mark.parametrize("api_reference_set", [["objc/default"]], ids=[""])
+@pytest.fixture
+def api_reference(api_reference_loader, all_doxygen_versions):
+    return api_reference_loader.version(all_doxygen_versions).add("doxygen", "objc/default").load()
+
+
 @pytest.mark.parametrize("search_params,matcher", [
     param(dict(name="ADCoordinate", kind="class", lang="objc"),
           m_compound(
