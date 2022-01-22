@@ -5,7 +5,7 @@
   <option  id='PROJECT_NUMBER' default='yes' type='string'><value><![CDATA[]]></value></option>
   <option  id='PROJECT_BRIEF' default='yes' type='string'><value><![CDATA[]]></value></option>
   <option  id='PROJECT_LOGO' default='yes' type='string'><value><![CDATA[]]></value></option>
-  <option  id='OUTPUT_DIRECTORY' default='no' type='string'><value><![CDATA[/home/rob/git/asciidoxy/tests/data/generated/xml/1.9.2/objc/default]]></value></option>
+  <option  id='OUTPUT_DIRECTORY' default='no' type='string'><value><![CDATA[/home/rob/git/asciidoxy/tests/data/generated/doxygen/1.9.2/python/default]]></value></option>
   <option  id='CREATE_SUBDIRS' default='yes' type='bool'><value>NO</value></option>
   <option  id='ALLOW_UNICODE_NAMES' default='yes' type='bool'><value>NO</value></option>
   <option  id='OUTPUT_LANGUAGE' default='yes' type='string'><value>English</value></option>
@@ -47,8 +47,7 @@
   <option  id='OPTIMIZE_FOR_FORTRAN' default='yes' type='bool'><value>NO</value></option>
   <option  id='OPTIMIZE_OUTPUT_VHDL' default='yes' type='bool'><value>NO</value></option>
   <option  id='OPTIMIZE_OUTPUT_SLICE' default='yes' type='bool'><value>NO</value></option>
-  <option  id='EXTENSION_MAPPING' default='no' type='stringlist'>
-    <value><![CDATA[h=objective-c]]></value>
+  <option  id='EXTENSION_MAPPING' default='yes' type='stringlist'>
   </option>
   <option  id='MARKDOWN_SUPPORT' default='yes' type='bool'><value>YES</value></option>
   <option  id='TOC_INCLUDE_HEADINGS' default='yes' type='int'><value>5</value></option>
@@ -167,7 +166,7 @@
     <value><![CDATA[*.qsf]]></value>
     <value><![CDATA[*.ice]]></value>
   </option>
-  <option  id='RECURSIVE' default='yes' type='bool'><value>NO</value></option>
+  <option  id='RECURSIVE' default='no' type='bool'><value>YES</value></option>
   <option  id='EXCLUDE' default='yes' type='stringlist'>
   </option>
   <option  id='EXCLUDE_SYMLINKS' default='yes' type='bool'><value>NO</value></option>
@@ -184,7 +183,8 @@
   <option  id='IMAGE_PATH' default='yes' type='stringlist'>
   </option>
   <option  id='INPUT_FILTER' default='yes' type='string'><value><![CDATA[]]></value></option>
-  <option  id='FILTER_PATTERNS' default='yes' type='stringlist'>
+  <option  id='FILTER_PATTERNS' default='no' type='stringlist'>
+    <value><![CDATA["*.py=python ../../../../../documentation/doxypypy.py -a -c"]]></value>
   </option>
   <option  id='FILTER_SOURCE_FILES' default='yes' type='bool'><value>NO</value></option>
   <option  id='FILTER_SOURCE_PATTERNS' default='yes' type='stringlist'>

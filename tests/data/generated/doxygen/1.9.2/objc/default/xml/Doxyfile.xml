@@ -5,7 +5,7 @@
   <option  id='PROJECT_NUMBER' default='yes' type='string'><value><![CDATA[]]></value></option>
   <option  id='PROJECT_BRIEF' default='yes' type='string'><value><![CDATA[]]></value></option>
   <option  id='PROJECT_LOGO' default='yes' type='string'><value><![CDATA[]]></value></option>
-  <option  id='OUTPUT_DIRECTORY' default='no' type='string'><value><![CDATA[/home/rob/git/asciidoxy/tests/data/generated/xml/1.9.2/java/default]]></value></option>
+  <option  id='OUTPUT_DIRECTORY' default='no' type='string'><value><![CDATA[/home/rob/git/asciidoxy/tests/data/generated/doxygen/1.9.2/objc/default]]></value></option>
   <option  id='CREATE_SUBDIRS' default='yes' type='bool'><value>NO</value></option>
   <option  id='ALLOW_UNICODE_NAMES' default='yes' type='bool'><value>NO</value></option>
   <option  id='OUTPUT_LANGUAGE' default='yes' type='string'><value>English</value></option>
@@ -32,7 +32,7 @@
   <option  id='STRIP_FROM_INC_PATH' default='yes' type='stringlist'>
   </option>
   <option  id='SHORT_NAMES' default='yes' type='bool'><value>NO</value></option>
-  <option  id='JAVADOC_AUTOBRIEF' default='no' type='bool'><value>YES</value></option>
+  <option  id='JAVADOC_AUTOBRIEF' default='yes' type='bool'><value>NO</value></option>
   <option  id='JAVADOC_BANNER' default='yes' type='bool'><value>NO</value></option>
   <option  id='QT_AUTOBRIEF' default='yes' type='bool'><value>NO</value></option>
   <option  id='MULTILINE_CPP_IS_BRIEF' default='yes' type='bool'><value>NO</value></option>
@@ -43,11 +43,12 @@
   <option  id='ALIASES' default='yes' type='stringlist'>
   </option>
   <option  id='OPTIMIZE_OUTPUT_FOR_C' default='yes' type='bool'><value>NO</value></option>
-  <option  id='OPTIMIZE_OUTPUT_JAVA' default='no' type='bool'><value>YES</value></option>
+  <option  id='OPTIMIZE_OUTPUT_JAVA' default='yes' type='bool'><value>NO</value></option>
   <option  id='OPTIMIZE_FOR_FORTRAN' default='yes' type='bool'><value>NO</value></option>
   <option  id='OPTIMIZE_OUTPUT_VHDL' default='yes' type='bool'><value>NO</value></option>
   <option  id='OPTIMIZE_OUTPUT_SLICE' default='yes' type='bool'><value>NO</value></option>
-  <option  id='EXTENSION_MAPPING' default='yes' type='stringlist'>
+  <option  id='EXTENSION_MAPPING' default='no' type='stringlist'>
+    <value><![CDATA[h=objective-c]]></value>
   </option>
   <option  id='MARKDOWN_SUPPORT' default='yes' type='bool'><value>YES</value></option>
   <option  id='TOC_INCLUDE_HEADINGS' default='yes' type='int'><value>5</value></option>
@@ -183,8 +184,7 @@
   <option  id='IMAGE_PATH' default='yes' type='stringlist'>
   </option>
   <option  id='INPUT_FILTER' default='yes' type='string'><value><![CDATA[]]></value></option>
-  <option  id='FILTER_PATTERNS' default='no' type='stringlist'>
-    <value><![CDATA["*.java=sed -E 's/@(Nullable|NonNull|CheckForNull|PossiblyNull)([[:space:]]+[[:alnum:]_])/__AT__\1__\2/g'"]]></value>
+  <option  id='FILTER_PATTERNS' default='yes' type='stringlist'>
   </option>
   <option  id='FILTER_SOURCE_FILES' default='yes' type='bool'><value>NO</value></option>
   <option  id='FILTER_SOURCE_PATTERNS' default='yes' type='stringlist'>
