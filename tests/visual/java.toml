@@ -16,4 +16,4 @@
 
 [packages.java-default]
 type = "local"
-package_dir = "tests/data/generated/doxygen/1.8.20/java/default"
+package_dir = "tests/data/generated/doxygen/1.9.2/java/default"
