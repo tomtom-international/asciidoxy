@@ -16,4 +16,4 @@
 
 [packages.objc-default]
 type = "local"
-package_dir = "tests/data/generated/doxygen/1.8.20/objc/default"
+package_dir = "tests/data/generated/doxygen/1.9.2/objc/default"
