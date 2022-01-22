@@ -16,8 +16,8 @@
 
 [packages.cpp-default]
 type = "local"
-package_dir = "tests/data/generated/xml/1.8.20/cpp/default"
+package_dir = "tests/data/generated/doxygen/1.8.20/cpp/default"
 
 [packages.cpp-consumer]
 type = "local"
-package_dir = "tests/data/generated/xml/1.8.20/cpp/consumer"
+package_dir = "tests/data/generated/doxygen/1.8.20/cpp/consumer"

@@ -96,8 +96,7 @@ def document(package_manager, original_file, work_file):
 #
 test_data_dir = Path(__file__).parent.parent / "data"
 generated_test_data_dir = test_data_dir / "generated"
-# TODO: use doxygen instead of xml and use in factory method
-_xml_dir = test_data_dir / "generated" / "xml"
+doxygen_test_data_dir = test_data_dir / "generated" / "doxygen"
 
 
 @pytest.fixture
@@ -111,7 +110,7 @@ def test_data():
 
 
 def _doxygen_versions():
-    return [str(version.name) for version in _xml_dir.glob("*")]
+    return [str(version.name) for version in doxygen_test_data_dir.glob("*")]
 
 
 @pytest.fixture(scope="session", params=_doxygen_versions())
@@ -129,7 +128,7 @@ def generated_test_data():
     def factory(reference_type: str, name: str, version: str = None):
         assert reference_type == "doxygen"
         assert version is not None
-        return generated_test_data_dir / "xml" / version / name
+        return doxygen_test_data_dir / version / name
 
     return factory
 
@@ -148,7 +147,8 @@ def api_reference(_api_reference):
 
 
 @pytest.fixture
-def api_reference_loader(_api_reference, default_config, latest_doxygen_version):
+def api_reference_loader(_api_reference, default_config, latest_doxygen_version,
+                         generated_test_data):
     api_reference_set = [
         ("doxygen", "cpp/default"),
         ("doxygen", "java/default"),
@@ -171,11 +171,7 @@ def api_reference_loader(_api_reference, default_config, latest_doxygen_version)
 
         def add(self, reference_type: str, reference_set_name: str) -> Loader:
             parser = parser_factory(reference_type, _api_reference, default_config)
-            if reference_type == "doxygen":
-                data_path = generated_test_data_dir / "xml" / self._version
-            else:
-                assert False, "Not supported yet"
-            parser.parse(data_path / reference_set_name)
+            parser.parse(generated_test_data(reference_type, reference_set_name, self._version))
             return self
 
         def load(self, resolve_references: bool = True) -> ApiReference:
