@@ -16,4 +16,4 @@
 
 [packages.python-default]
 type = "local"
-package_dir = "tests/data/generated/xml/1.8.20/python/default"
+package_dir = "tests/data/generated/doxygen/1.8.20/python/default"

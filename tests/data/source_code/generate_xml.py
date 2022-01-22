@@ -35,7 +35,7 @@ def main() -> int:
     version = get_doxygen_version(doxygen)
     print(f"Generating XML with doxygen version: {version}")
 
-    xml_dir = (Path(__file__).parent / ".." / "generated" / "xml" / version).resolve()
+    xml_dir = (Path(__file__).parent / ".." / "generated" / "doxygen" / version).resolve()
     xml_dir.mkdir(parents=True, exist_ok=True)
 
     env = {key: value for key, value in os.environ.items()}
