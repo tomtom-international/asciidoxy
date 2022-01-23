@@ -29,11 +29,12 @@ from asciidoxy.generator.filters import (
     filter_from_strings,
 )
 from asciidoxy.model import ThrowsClause
+from tests.unit.api_reference_loader import ApiReferenceLoader
 
 
-@pytest.fixture
-def api_reference(api_reference_loader, latest_doxygen_version):
-    return api_reference_loader.version(latest_doxygen_version).add("doxygen", "cpp/default").load()
+@pytest.fixture(scope="module")
+def api_reference(latest_doxygen_version):
+    return ApiReferenceLoader().version(latest_doxygen_version).add("doxygen", "cpp/default").load()
 
 
 def test_all_string_filter():

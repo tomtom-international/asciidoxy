@@ -14,7 +14,6 @@
 """Factory methods for API reference information parsers."""
 
 from ..api_reference import ApiReference
-from ..config import Configuration
 from .base import ReferenceParserBase
 from .doxygen import Parser as DoxygenParser
 
@@ -34,8 +33,7 @@ class UnsupportedReferenceTypeError(Exception):
         return f"Reference of type {self.reference_type} is not supported."
 
 
-def parser_factory(reference_type: str, api_reference: ApiReference,
-                   config: Configuration) -> ReferenceParserBase:
+def parser_factory(reference_type: str, api_reference: ApiReference) -> ReferenceParserBase:
     """Create a parser for the given type of API reference documentation."""
     if reference_type == "doxygen":
         return DoxygenParser(api_reference)
