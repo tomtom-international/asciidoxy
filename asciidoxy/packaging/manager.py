@@ -243,6 +243,23 @@ class PackageManager:
 
         assert False, "Cannot locate original file"
 
+    def friendly_filename(self, filename: str) -> str:
+        """Show a human-friendly name for an input file.
+
+        Human-friendly means:
+        - Relative to the working directory or package directory.
+        - Including the package name if the file is in a package.
+        """
+        for pkg in self.packages.values():
+            if pkg.adoc_src_dir and filename.startswith(str(pkg.adoc_src_dir)):
+                rel_name = Path(filename).relative_to(pkg.adoc_src_dir)
+                if pkg.is_input_package:
+                    return str(rel_name)
+                else:
+                    return f"{pkg.name}:/{rel_name}"
+        else:
+            return filename
+
     def make_document(self,
                       package_name: Optional[str] = None,
                       file_name: Optional[Union[str, Path]] = None) -> Document:

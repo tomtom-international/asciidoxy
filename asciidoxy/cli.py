@@ -16,7 +16,6 @@
 import json
 import logging
 import sys
-from pathlib import Path
 from typing import List, Optional, Sequence
 
 from mako.exceptions import RichTraceback
@@ -128,12 +127,8 @@ def human_traceback(pkg_mgr: PackageManager) -> str:
         if filename.endswith(".adoc"):
             pending_traceback.clear()
 
-            package_name, original_file = pkg_mgr.find_original_file(Path(filename))
-            if package_name and package_name != "INPUT":
-                filename = f"{package_name}:/{original_file}"
-            elif original_file is not None:
-                filename = str(original_file)
-            message.append(f"  File {filename}, line {lineno}, in AsciiDoc\n    {line}")
+            friendly_filename = pkg_mgr.friendly_filename(filename)
+            message.append(f"  File {friendly_filename}, line {lineno}, in AsciiDoc\n    {line}")
             has_adoc = True
         elif "/mako/" in filename:
             continue

@@ -591,6 +591,25 @@ def test_find_original_file__without_include_dir(package_hint, package_manager, 
                                               package_hint) == ("b", Path("b.adoc"))
 
 
+def test_friendly_filename(package_manager, tmp_path):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+    package_manager.collect(spec_file)
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    in_file = src_dir / "index.adoc"
+    in_file.touch()
+
+    package_manager.set_input_files(in_file)
+
+    assert package_manager.friendly_filename(str(tmp_path / "a/adoc/a.adoc")) == "a:/a.adoc"
+    assert package_manager.friendly_filename(str(tmp_path / "b/adoc/b.adoc")) == "b:/b.adoc"
+    assert package_manager.friendly_filename(str(in_file)) == "index.adoc"
+    assert package_manager.friendly_filename("/other/file.adoc") == "/other/file.adoc"
+
+
 def test_make_document__input_dir(package_manager, tmp_path, build_dir):
     src_dir = tmp_path / "src"
     src_dir.mkdir()
