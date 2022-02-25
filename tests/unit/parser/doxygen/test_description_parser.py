@@ -15,7 +15,10 @@
 
 import xml.etree.ElementTree as ET
 
+import pytest
+
 from asciidoxy.parser.doxygen.description_parser import (
+    UNSUPPORTED,
     Admonition,
     DescriptionElement,
     NestedDescriptionElement,
@@ -38,6 +41,37 @@ def parse(input_xml):
     output = parse_description(ET.fromstring(input_xml), "lang")
     debug_print(output)
     return output
+
+
+def test_parse_unknown_element():
+    input_xml = """\
+        <detaileddescription>
+<para>Text before. <unknown>Text inside unsupported inline tag.</unknown> Text after.
+<unknown>Text inside unsupported tag.</unknown></para>
+<para>Paragraph after.</para>
+        </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Text before.  Text after.
+
+Paragraph after."""
+
+
+@pytest.mark.parametrize("tag_name", UNSUPPORTED.keys())
+def test_parse_unsupported_element(tag_name):
+    input_xml = f"""\
+        <detaileddescription>
+<para>Text before. <{tag_name}>Text inside unsupported inline tag.</{tag_name}> Text after.
+<{tag_name}>Text inside unsupported tag.</{tag_name}></para>
+<para>Paragraph after.</para>
+        </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+Text before.  Text after.
+
+Paragraph after."""
 
 
 def test_parse_styles():

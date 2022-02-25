@@ -24,6 +24,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
   * Escape links in descriptions containing double underscores to prevent triggering a known
     AsciiDoctor bug.
+  * In descriptions text after an unsupported or unknown XML tag was missing.
 
 
 == 0.8.4 (12 Jan 2022)

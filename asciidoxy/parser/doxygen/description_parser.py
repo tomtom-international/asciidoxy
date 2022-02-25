@@ -1323,6 +1323,9 @@ class Skipped(PlainText):
     def add_text(self, text: str) -> None:
         """Ignored."""
 
+    def add_tail(self, parent: "NestedDescriptionElement", text: str) -> None:
+        self.text += text
+
 
 # Map of element tags for which a new element is to be constructed and added the the parent.
 NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
@@ -1470,18 +1473,15 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
     elif xml_element.tag in IGNORE:
         element = Skipped.from_xml(xml_element, language_tag)
 
-    elif xml_element.tag in UNSUPPORTED:
-        warning = UNSUPPORTED[xml_element.tag]
-        if warning:
+    else:
+        warning = UNSUPPORTED.get(xml_element.tag)
+        if warning is None:
+            logger.warning(f"Unknown XML tag <{xml_element.tag}>. Please report an issue on GitHub"
+                           " with example code.")
+        elif warning:
             logger.warning(f"Unsupported XML tag <{xml_element.tag}>. {warning}")
         element = Skipped.from_xml(xml_element, language_tag)
 
-    else:
-        logger.warning(f"Unknown XML tag <{xml_element.tag}>. Please report an issue on GitHub"
-                       " with example code.")
-
-    if element is None:
-        return
     if element is not parent:
         parent.append(element)
 
