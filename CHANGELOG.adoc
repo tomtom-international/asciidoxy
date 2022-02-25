@@ -18,6 +18,17 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.8.5 (25 Feb 2022)
+
+=== Fixed
+
+  * Escape links in descriptions containing double underscores to prevent triggering a known
+    AsciiDoctor bug.
+  * In descriptions text after an unsupported or unknown XML tag was missing.
+  * Exceptions raised from AsciiDoc files were not handled correctly and raised another exception
+    instead of showing a human friendly trace back.
+
+
 == 0.8.4 (12 Jan 2022)
 
 === Fixed

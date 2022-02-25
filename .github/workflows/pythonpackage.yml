@@ -5,9 +5,15 @@ name: Test python package
 
 on:
   push:
-    branches: [ master, develop ]
+    branches:
+      - master
+      - develop
+      - develop-*
   pull_request:
-    branches: [ master, develop ]
+    branches:
+      - master
+      - develop
+      - develop-*
 
 jobs:
   build:

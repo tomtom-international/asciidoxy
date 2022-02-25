@@ -18,6 +18,8 @@ import xml.etree.ElementTree as ET
 from abc import ABC, abstractmethod
 from typing import Iterator, List, Mapping, Optional, Tuple, Type, TypeVar, Union
 
+from .language_traits import unique_id
+
 logger = logging.getLogger(__name__)
 
 
@@ -929,7 +931,7 @@ class Ref(NestedDescriptionElement):
         self.kindref = kindref
 
     def to_asciidoc(self, context: AsciiDocContext = None) -> str:
-        return f"<<{self.language_tag}-{self.refid},{super().to_asciidoc(context)}>>"
+        return f"<<{unique_id(self.language_tag, self.refid)},{super().to_asciidoc(context)}>>"
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}: {self.kindref}[{self.refid}]"
@@ -1321,6 +1323,9 @@ class Skipped(PlainText):
     def add_text(self, text: str) -> None:
         """Ignored."""
 
+    def add_tail(self, parent: "NestedDescriptionElement", text: str) -> None:
+        self.text += text
+
 
 # Map of element tags for which a new element is to be constructed and added the the parent.
 NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
@@ -1468,18 +1473,15 @@ def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement
     elif xml_element.tag in IGNORE:
         element = Skipped.from_xml(xml_element, language_tag)
 
-    elif xml_element.tag in UNSUPPORTED:
-        warning = UNSUPPORTED[xml_element.tag]
-        if warning:
+    else:
+        warning = UNSUPPORTED.get(xml_element.tag)
+        if warning is None:
+            logger.warning(f"Unknown XML tag <{xml_element.tag}>. Please report an issue on GitHub"
+                           " with example code.")
+        elif warning:
             logger.warning(f"Unsupported XML tag <{xml_element.tag}>. {warning}")
         element = Skipped.from_xml(xml_element, language_tag)
 
-    else:
-        logger.warning(f"Unknown XML tag <{xml_element.tag}>. Please report an issue on GitHub"
-                       " with example code.")
-
-    if element is None:
-        return
     if element is not parent:
         parent.append(element)
 
