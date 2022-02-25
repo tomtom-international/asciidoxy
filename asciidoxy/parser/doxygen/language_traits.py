@@ -16,7 +16,7 @@
 import logging
 from abc import ABC
 from enum import Enum, auto
-from typing import Mapping, Optional, Sequence, Tuple
+from typing import Mapping, Optional, Sequence, Tuple, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -254,11 +254,29 @@ class LanguageTraits(ABC):
         Returns:
             Unique identifier.
         """
-        if not id:
-            return None
+        return unique_id(cls.TAG, id)
 
-        # Workaround a bug in asciidoctor: if there is an occurrence of __ the anchor is not parsed
-        # correctly: #2746
-        id = id.replace("__", "-")
 
-        return f"{cls.TAG}-{id}"
+MaybeOptionalStr = TypeVar("MaybeOptionalStr", str, Optional[str])
+
+
+def unique_id(tag: str, id: MaybeOptionalStr) -> MaybeOptionalStr:
+    """Generate a unique id that can be used to refer to an element.
+
+    The unique id is also unique over multiple different languages.
+
+    Args:
+        id: Identifier as reported by Doxygen.
+    Returns:
+        Unique identifier. None only if `id` is None.
+    """
+    if id is None:
+        return None
+    if not id:
+        return ""
+
+    # Workaround a bug in asciidoctor: if there is an occurrence of __ the anchor is not parsed
+    # correctly: #2746
+    id = id.replace("__", "-")
+
+    return f"{tag}-{id}"

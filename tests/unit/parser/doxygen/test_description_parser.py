@@ -832,7 +832,7 @@ Combining ordered and unordered lists.
 * NetBSD"""
 
 
-def test_parse_failure():
+def test_parse_ref_in_parameter():
     input_xml = """\
 <detaileddescription>
 <para><parameterlist kind="param"><parameteritem>
@@ -894,6 +894,66 @@ def test_parse_failure():
         name.contents[0].refid == "classasciidoxy_1_1packaging_1_1collect_1_1SpecificationError")
 
     assert not output.to_asciidoc()
+
+
+def test_parse_ref_in_description():
+    input_xml = """\
+    <detaileddescription>
+<para><ref refid="classasciidoxy_1_1descriptions_1_1_links" kindref="compound">Links</ref> to other elements.</para>
+<para>Some other test classes are: <itemizedlist>
+<listitem><para><ref refid="classasciidoxy_1_1descriptions_1_1_code_block" kindref="compound">CodeBlock</ref> for code blocks. </para>
+</listitem>
+<listitem><para><ref refid="classasciidoxy_1_1descriptions_1_1_diagrams" kindref="compound">Diagrams</ref> for plantUML and Dot. </para>
+</listitem>
+<listitem><para><ref refid="classasciidoxy_1_1descriptions_1_1_sections" kindref="compound">Sections</ref> for all kinds of sections.</para>
+</listitem>
+</itemizedlist>
+Of course there is also <ref refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kindref="member">FunctionDocumentation()</ref>. </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+<<lang-classasciidoxy_1_1descriptions_1_1_links,Links>> to other elements.
+
+Some other test classes are:
+
+* <<lang-classasciidoxy_1_1descriptions_1_1_code_block,CodeBlock>> for code blocks.
+
+* <<lang-classasciidoxy_1_1descriptions_1_1_diagrams,Diagrams>> for plantUML and Dot.
+
+* <<lang-classasciidoxy_1_1descriptions_1_1_sections,Sections>> for all kinds of sections.
+
+Of course there is also <<lang-descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24,FunctionDocumentation()>>."""
+
+
+def test_parse_ref__asciidoctor_anchor_bug_workaround_2746():
+    input_xml = """\
+    <detaileddescription>
+<para><ref refid="class__asciidoxy_1_1descriptions_1_1_links" kindref="compound">Links</ref> to other elements.</para>
+<para>Some other test classes are: <itemizedlist>
+<listitem><para><ref refid="classasciidoxy_1_1descrip__tions_1_1_code_block" kindref="compound">CodeBlock</ref> for code blocks. </para>
+</listitem>
+<listitem><para><ref refid="classasciidoxy_1_1descriptions_1_1_diagrams" kindref="compound">Diagrams</ref> for plantUML and Dot. </para>
+</listitem>
+<listitem><para><ref refid="classasciidoxy_1_1descriptions_1_1_sections" kindref="compound">Sections</ref> for all kinds of sections.</para>
+</listitem>
+</itemizedlist>
+Of course there is also <ref refid="descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24" kindref="member">FunctionDocumentation()</ref>. </para>
+    </detaileddescription>
+"""
+    output = parse(input_xml)
+    assert output.to_asciidoc() == """\
+<<lang-class-asciidoxy_1_1descriptions_1_1_links,Links>> to other elements.
+
+Some other test classes are:
+
+* <<lang-classasciidoxy_1_1descrip-tions_1_1_code_block,CodeBlock>> for code blocks.
+
+* <<lang-classasciidoxy_1_1descriptions_1_1_diagrams,Diagrams>> for plantUML and Dot.
+
+* <<lang-classasciidoxy_1_1descriptions_1_1_sections,Sections>> for all kinds of sections.
+
+Of course there is also <<lang-descriptions_8hpp_1ac2b05985028362b43839a108f8b30a24,FunctionDocumentation()>>."""
 
 
 def test_parse_code_blocks_no_newlines():
