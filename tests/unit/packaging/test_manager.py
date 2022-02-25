@@ -20,7 +20,6 @@ import pytest
 import toml
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.document import Package
 from asciidoxy.packaging.manager import (
     FileCollisionError,
     PackageManager,
@@ -536,64 +535,6 @@ def test_make_image_directory__file_collision__directory_overwrites_file(
         package_manager.make_image_directory(output_dir)
     assert ("Unexpected file a_subdir, blocking creation of a directory from package a."
             in str(excinfo.value))
-
-
-@pytest.mark.parametrize("package_hint", [None, "", "a", "b", Package.INPUT_PACKAGE_NAME])
-def test_find_original_file__with_include_dir(package_hint, package_manager, tmp_path, build_dir):
-    create_package_dir(tmp_path, "a")
-    create_package_dir(tmp_path, "b")
-    spec_file = create_package_spec(tmp_path, "a", "b")
-    package_manager.collect(spec_file)
-
-    src_dir = tmp_path / "src"
-    src_dir.mkdir()
-    in_file = src_dir / "index.adoc"
-    in_file.touch()
-    (src_dir / "chapter.adoc").touch()
-    (src_dir / "other").mkdir()
-    (src_dir / "other" / "another.adoc").touch()
-
-    package_manager.set_input_files(in_file, src_dir)
-    package_manager.prepare_work_directory(in_file)
-
-    assert package_manager.find_original_file(package_manager.work_dir / "index.adoc",
-                                              package_hint) == (Package.INPUT_PACKAGE_NAME,
-                                                                Path("index.adoc"))
-    assert package_manager.find_original_file(package_manager.work_dir / "chapter.adoc",
-                                              package_hint) == (Package.INPUT_PACKAGE_NAME,
-                                                                Path("chapter.adoc"))
-    assert package_manager.find_original_file(package_manager.work_dir / "other/another.adoc",
-                                              package_hint) == (Package.INPUT_PACKAGE_NAME,
-                                                                Path("other/another.adoc"))
-    assert package_manager.find_original_file(package_manager.work_dir / "a.adoc",
-                                              package_hint) == ("a", Path("a.adoc"))
-    assert package_manager.find_original_file(package_manager.work_dir / "b.adoc",
-                                              package_hint) == ("b", Path("b.adoc"))
-
-
-@pytest.mark.parametrize("package_hint", [None, "", "a", "b", Package.INPUT_PACKAGE_NAME])
-def test_find_original_file__without_include_dir(package_hint, package_manager, tmp_path,
-                                                 build_dir):
-    create_package_dir(tmp_path, "a")
-    create_package_dir(tmp_path, "b")
-    spec_file = create_package_spec(tmp_path, "a", "b")
-    package_manager.collect(spec_file)
-
-    src_dir = tmp_path / "src"
-    src_dir.mkdir()
-    in_file = src_dir / "index.adoc"
-    in_file.touch()
-
-    package_manager.set_input_files(in_file)
-    package_manager.prepare_work_directory(in_file)
-
-    assert package_manager.find_original_file(package_manager.work_dir / "index.adoc",
-                                              package_hint) == (Package.INPUT_PACKAGE_NAME,
-                                                                Path("index.adoc"))
-    assert package_manager.find_original_file(package_manager.work_dir / "a.adoc",
-                                              package_hint) == ("a", Path("a.adoc"))
-    assert package_manager.find_original_file(package_manager.work_dir / "b.adoc",
-                                              package_hint) == ("b", Path("b.adoc"))
 
 
 def test_friendly_filename(package_manager, tmp_path):
