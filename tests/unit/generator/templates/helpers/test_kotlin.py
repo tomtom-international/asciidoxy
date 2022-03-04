@@ -34,6 +34,10 @@ def kotlin_class():
 
         # add property
         builder.member_property(prot=visibility)
+        # add constructor
+        builder.member_function(prot=visibility,
+                                name=visibility.capitalize() + "Constructor",
+                                kind="constructor")
         # add some method
         builder.member_function(prot=visibility, name=visibility.capitalize() + "Method")
         # add some method without return type
@@ -84,6 +88,28 @@ def test_public_constants__filter_no_match(helper):
 def test_private_constants__no_filter(helper):
     result = [m.name for m in helper.constants(prot="private")]
     assert result == ["PrivateConstant"]
+
+
+def test_public_constructors__no_filter(helper):
+    result = [m.name for m in helper.constructors(prot="public")]
+    assert result == ["PublicConstructor"]
+
+
+def test_public_constructors__filter_match(helper):
+    helper.insert_filter = InsertionFilter(members="Public")
+    result = [m.name for m in helper.constructors(prot="public")]
+    assert result == ["PublicConstructor"]
+
+
+def test_public_constructors__filter_no_match(helper):
+    helper.insert_filter = InsertionFilter(members="NONE")
+    result = [m.name for m in helper.constructors(prot="public")]
+    assert len(result) == 0
+
+
+def test_private_constructors__no_filter(helper):
+    result = [m.name for m in helper.constructors(prot="private")]
+    assert result == ["PrivateConstructor"]
 
 
 def test_parameter(helper):

@@ -29,9 +29,13 @@ def doxygen_versions():
 
 
 def generated_test_data_factory(reference_type: str, name: str, version: str = None):
-    assert reference_type == "doxygen"
-    assert version is not None
-    return generated_test_data_dir / reference_type / version / name
+    if reference_type == "doxygen":
+        assert version is not None
+        return generated_test_data_dir / reference_type / version / name
+    elif reference_type == "dokka":
+        return generated_test_data_dir / reference_type / name
+    else:
+        assert False
 
 
 class ApiReferenceLoader:

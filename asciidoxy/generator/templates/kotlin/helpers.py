@@ -13,6 +13,7 @@
 # limitations under the License.
 """Helper functions for Kotlin templates."""
 
+from itertools import chain
 from typing import Iterator
 
 from asciidoxy.generator.templates.helpers import TemplateHelper
@@ -38,3 +39,12 @@ class KotlinTemplateHelper(TemplateHelper):
         if method.returns:
             return f": {self.print_ref(method.returns.type, link=link)}"
         return ""
+
+    def constructors(self, prot: str) -> Iterator[Compound]:
+        assert self.element is not None
+        assert self.insert_filter is not None
+
+        # TODO: Fix transcoder to detect constructors
+        return chain((m for m in self.insert_filter.members(self.element)
+                      if m.kind == "constructor" and m.prot == prot),
+                     super().constructors(prot))
