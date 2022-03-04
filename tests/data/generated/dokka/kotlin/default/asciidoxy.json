@@ -37,6 +37,13 @@
                             "dri": "asciidoxy/Coordinate/latitude/#/PointingToDeclaration/",
                             "name": "latitude",
                             "visibility": "public",
+                            "returnType": {
+                                "type": "org.asciidoxy.dokka.JsonGenericTypeConstructor",
+                                "dri": "kotlin/Double///PointingToDeclaration/",
+                                "projections": [
+                                ],
+                                "presentableName": null
+                            },
                             "docs": {
                                 "Property: latitude": "<MARKDOWN_FILE><P>The latitude in degrees.</P></MARKDOWN_FILE>"
                             }
@@ -46,6 +53,13 @@
                             "dri": "asciidoxy/Coordinate/longitude/#/PointingToDeclaration/",
                             "name": "longitude",
                             "visibility": "public",
+                            "returnType": {
+                                "type": "org.asciidoxy.dokka.JsonGenericTypeConstructor",
+                                "dri": "kotlin/Double///PointingToDeclaration/",
+                                "projections": [
+                                ],
+                                "presentableName": null
+                            },
                             "docs": {
                                 "Property: longitude": "<MARKDOWN_FILE><P>The longitude in degrees.</P></MARKDOWN_FILE>"
                             }
@@ -55,6 +69,13 @@
                             "dri": "asciidoxy/Coordinate/altitude/#/PointingToDeclaration/",
                             "name": "altitude",
                             "visibility": "public",
+                            "returnType": {
+                                "type": "org.asciidoxy.dokka.JsonGenericTypeConstructor",
+                                "dri": "kotlin/Double///PointingToDeclaration/",
+                                "projections": [
+                                ],
+                                "presentableName": null
+                            },
                             "docs": {
                                 "Property: altitude": "<MARKDOWN_FILE><P>The altitude in meters.</P></MARKDOWN_FILE>"
                             }
@@ -124,6 +145,7 @@
                         }
                     ],
                     "visibility": "public",
+                    "kind": "class",
                     "docs": {
                         "Description": "<MARKDOWN_FILE><P>Class to hold information about a coordinate.</P><P>A coordinate has a latitude, longitude, and an altitude.</P></MARKDOWN_FILE>",
                         "Property: latitude": "<MARKDOWN_FILE><P>The latitude in degrees.</P></MARKDOWN_FILE>",

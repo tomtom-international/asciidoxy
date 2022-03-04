@@ -1349,6 +1349,7 @@ NEW_ELEMENT: Mapping[str, Type[DescriptionElement]] = {
     "itemizedlist": ListContainer,
     "listitem": ListItem,
     "orderedlist": ListContainer,
+    "p": Para,
     "para": Para,
     "parameterdescription": ParameterDescription,
     "parameteritem": ParameterItem,
@@ -1454,27 +1455,28 @@ UNSUPPORTED = {
 def _parse_description(xml_element: ET.Element, parent: NestedDescriptionElement,
                        language_tag: str):
     element = None
+    tag = xml_element.tag.lower()
 
-    if xml_element.tag in NEW_ELEMENT:
-        element = NEW_ELEMENT[xml_element.tag].from_xml(xml_element, language_tag)
+    if tag in NEW_ELEMENT:
+        element = NEW_ELEMENT[tag].from_xml(xml_element, language_tag)
 
-    elif xml_element.tag in UPDATE_PARENT:
+    elif tag in UPDATE_PARENT:
         assert isinstance(parent, UPDATE_PARENT[xml_element.tag])
         parent.update_from_xml(xml_element)
         element = parent
 
-    elif xml_element.tag in USE_PARENT:
+    elif tag in USE_PARENT:
         assert isinstance(parent, USE_PARENT[xml_element.tag])
         element = parent
 
-    elif xml_element.tag in SpecialCharacter.SPECIAL_CHARACTERS:
+    elif tag in SpecialCharacter.SPECIAL_CHARACTERS:
         element = SpecialCharacter.from_xml(xml_element, language_tag)
 
-    elif xml_element.tag in IGNORE:
+    elif tag in IGNORE:
         element = Skipped.from_xml(xml_element, language_tag)
 
     else:
-        warning = UNSUPPORTED.get(xml_element.tag)
+        warning = UNSUPPORTED.get(tag)
         if warning is None:
             logger.warning(f"Unknown XML tag <{xml_element.tag}>. Please report an issue on GitHub"
                            " with example code.")

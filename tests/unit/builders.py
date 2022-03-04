@@ -120,10 +120,10 @@ class SimpleClassBuilder:
             name=name,
             returns=make_return_value(type=make_type_ref(language=self.lang, name="Type")))
 
-    def member_function(self, has_return_value: bool = True, **kwargs):
+    def member_function(self, has_return_value: bool = True, kind: str = "function", **kwargs):
         if has_return_value:
             returns = make_return_value()
         else:
             returns = None
         self.compound.members.append(
-            make_compound(language=self.lang, kind="function", returns=returns, **kwargs))
+            make_compound(language=self.lang, kind=kind, returns=returns, **kwargs))

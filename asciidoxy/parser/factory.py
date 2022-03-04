@@ -15,6 +15,7 @@
 
 from ..api_reference import ApiReference
 from .base import ReferenceParserBase
+from .dokka import Parser as DokkaParser
 from .doxygen import Parser as DoxygenParser
 
 
@@ -37,5 +38,7 @@ def parser_factory(reference_type: str, api_reference: ApiReference) -> Referenc
     """Create a parser for the given type of API reference documentation."""
     if reference_type == "doxygen":
         return DoxygenParser(api_reference)
+    elif reference_type == "dokka":
+        return DokkaParser(api_reference)
     else:
         raise UnsupportedReferenceTypeError(reference_type)
