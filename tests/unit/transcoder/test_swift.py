@@ -43,8 +43,9 @@ def make_swift_type_ref(**kwargs):
     return make_type_ref(language="swift", **kwargs)
 
 
-def make_swift_throws_clause(**kwargs):
-    return make_throws_clause(language="swift", **kwargs)
+def make_swift_throws_clause(type=None, **kwargs):
+    type = type or make_type_ref(language="swift")
+    return make_throws_clause(type=type, **kwargs)
 
 
 @pytest.fixture

@@ -123,82 +123,82 @@ def test_private_complex_enclosed_types(helper):
 
 
 def test_method_signature__no_params_no_return(helper):
-    method = Compound("swift")
+    method = Compound(language="swift")
     method.name = "start"
     assert helper.method_signature(method) == "func start()"
 
 
 def test_method_signature__no_params_no_return__throws(helper):
-    method = Compound("swift")
+    method = Compound(language="swift")
     method.name = "start"
-    method.exceptions = [ThrowsClause("swift")]
+    method.exceptions = [ThrowsClause()]
     assert helper.method_signature(method) == "func start() throws"
 
 
 def test_method_signature__no_params_simple_return(helper):
-    method = Compound("swift")
+    method = Compound(language="swift")
     method.name = "start"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("swift", name="Int")
+    method.returns.type = TypeRef(language="swift", name="Int")
     assert helper.method_signature(method) == "func start() -> Int"
 
 
 def test_method_signature__no_params_simple_return__throws(helper):
-    method = Compound("swift")
+    method = Compound(language="swift")
     method.name = "start"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("swift", name="Int")
-    method.exceptions = [ThrowsClause("swift")]
+    method.returns.type = TypeRef(language="swift", name="Int")
+    method.exceptions = [ThrowsClause()]
     assert helper.method_signature(method) == "func start() throws -> Int"
 
 
 def test_method_signature__no_params_link_return(helper):
-    method = Compound("swift")
+    method = Compound(language="swift")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("swift", name="Value")
+    method.returns.type = TypeRef(language="swift", name="Value")
     method.returns.type.id = "swift-value"
     assert (
         helper.method_signature(method) == "func retrieveValue() -> xref:swift-value[++Value++]")
 
 
 def test_method_signature__no_params_link_return__throws(helper):
-    method = Compound("swift")
+    method = Compound(language="swift")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("swift", name="Value")
+    method.returns.type = TypeRef(language="swift", name="Value")
     method.returns.type.id = "swift-value"
-    method.exceptions = [ThrowsClause("swift")]
+    method.exceptions = [ThrowsClause()]
     assert (helper.method_signature(method) ==
             "func retrieveValue() throws -> xref:swift-value[++Value++]")
 
 
 def test_method_signature__one_param(helper):
-    method = Compound("swift")
+    method = Compound(language="swift")
     method.name = "setValue"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("swift", name="Value")
+    method.returns.type = TypeRef(language="swift", name="Value")
 
     param1 = Parameter()
     param1.name = "arg1"
-    param1.type = TypeRef("objc", "Type1")
+    param1.type = TypeRef(language="objc", name="Type1")
     method.params = [param1]
 
     assert helper.method_signature(method) == "func setValue(arg1: Type1) -> Value"
 
 
 def test_method_signature__closure_param(helper):
-    method = Compound("swift")
+    method = Compound(language="swift")
     method.name = "setValue"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("swift", name="Value")
+    method.returns.type = TypeRef(language="swift", name="Value")
 
     param1 = Parameter()
     param1.name = "arg1"
-    param1.type = TypeRef("objc")
-    param1.type.returns = TypeRef("objc", "Type1")
+    param1.type = TypeRef(language="objc")
+    param1.type.returns = TypeRef(language="objc", name="Type1")
     param1.type.args = [Parameter()]
-    param1.type.args[0].type = TypeRef("objc", "Type2")
+    param1.type.args[0].type = TypeRef(language="objc", name="Type2")
     param1.type.args[0].name = "arg2"
     method.params = [param1]
 
@@ -206,23 +206,23 @@ def test_method_signature__closure_param(helper):
 
 
 def test_closure_definition__no_params__void_return(helper):
-    closure = Compound("swift")
+    closure = Compound(language="swift")
     closure.name = "SuccessClosure"
     closure.returns = ReturnValue()
-    closure.returns.type = TypeRef("swift", name="Void")
+    closure.returns.type = TypeRef(language="swift", name="Void")
     closure.returns.type.args = []
 
     assert helper.closure_definition(closure) == "typealias SuccessClosure = () -> Void"
 
 
 def test_closure_definition__multiple_params_type_only__void_return(helper):
-    closure = Compound("swift")
+    closure = Compound(language="swift")
     closure.name = "SuccessClosure"
     closure.returns = ReturnValue()
-    closure.returns.type = TypeRef("swift", name="Void")
+    closure.returns.type = TypeRef(language="swift", name="Void")
     closure.returns.type.args = [Parameter(), Parameter()]
-    closure.returns.type.args[0].type = TypeRef("swift", "int")
-    closure.returns.type.args[1].type = TypeRef("swift", "Data")
+    closure.returns.type.args[0].type = TypeRef(language="swift", name="int")
+    closure.returns.type.args[1].type = TypeRef(language="swift", name="Data")
     closure.returns.type.args[1].type.id = "swift-data"
 
     assert (helper.closure_definition(closure) ==
@@ -230,14 +230,14 @@ def test_closure_definition__multiple_params_type_only__void_return(helper):
 
 
 def test_closure_definition__multiple_params_type_and_name__void_return(helper):
-    closure = Compound("swift")
+    closure = Compound(language="swift")
     closure.name = "SuccessClosure"
     closure.returns = ReturnValue()
-    closure.returns.type = TypeRef("swift", name="Void")
+    closure.returns.type = TypeRef(language="swift", name="Void")
     closure.returns.type.args = [Parameter(), Parameter()]
-    closure.returns.type.args[0].type = TypeRef("swift", "int")
+    closure.returns.type.args[0].type = TypeRef(language="swift", name="int")
     closure.returns.type.args[0].name = "number"
-    closure.returns.type.args[1].type = TypeRef("swift", "Data")
+    closure.returns.type.args[1].type = TypeRef(language="swift", name="Data")
     closure.returns.type.args[1].type.id = "swift-data"
     closure.returns.type.args[1].name = "theData"
 
@@ -247,10 +247,10 @@ def test_closure_definition__multiple_params_type_and_name__void_return(helper):
 
 
 def test_closure_definition__no_params__return_type(helper):
-    closure = Compound("swift")
+    closure = Compound(language="swift")
     closure.name = "SuccessClosure"
     closure.returns = ReturnValue()
-    closure.returns.type = TypeRef("swift", name="Data")
+    closure.returns.type = TypeRef(language="swift", name="Data")
     closure.returns.type.id = "swift-data"
     closure.returns.type.args = []
 
@@ -259,7 +259,7 @@ def test_closure_definition__no_params__return_type(helper):
 
 
 def test_parameter(helper):
-    ref = TypeRef("swift")
+    ref = TypeRef(language="swift")
     ref.name = "MyType"
     ref.id = "swift-tomtom_1_MyType"
 

@@ -113,7 +113,7 @@ def test_private_constructors__no_filter(helper):
 
 
 def test_parameter(helper):
-    ref = TypeRef("kotlin")
+    ref = TypeRef(language="kotlin")
     ref.name = "MyType"
     ref.id = "kotlin-tomtom_1_MyType"
 
@@ -127,37 +127,37 @@ def test_parameter(helper):
 
 
 def test_method_signature__no_params_no_return(helper):
-    method = Compound("kotlin")
+    method = Compound(language="kotlin")
     method.name = "start"
     assert helper.method_signature(method) == "fun start()"
 
 
 def test_method_signature__no_params_simple_return(helper):
-    method = Compound("kotlin")
+    method = Compound(language="kotlin")
     method.name = "start"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("kotlin", name="Int")
+    method.returns.type = TypeRef(language="kotlin", name="Int")
     assert helper.method_signature(method) == "fun start(): Int"
 
 
 def test_method_signature__no_params_link_return(helper):
-    method = Compound("kotlin")
+    method = Compound(language="kotlin")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("kotlin", name="Value")
+    method.returns.type = TypeRef(language="kotlin", name="Value")
     method.returns.type.id = "kotlin-value"
     assert helper.method_signature(method) == "fun retrieveValue(): xref:kotlin-value[++Value++]"
 
 
 def test_method_signature__one_param(helper):
-    method = Compound("kotlin")
+    method = Compound(language="kotlin")
     method.name = "setValue"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("kotlin", name="Value")
+    method.returns.type = TypeRef(language="kotlin", name="Value")
 
     param1 = Parameter()
     param1.name = "arg1"
-    param1.type = TypeRef("objc", "Type1")
+    param1.type = TypeRef(language="objc", name="Type1")
     method.params = [param1]
 
     assert helper.method_signature(method) == "fun setValue(arg1: Type1): Value"

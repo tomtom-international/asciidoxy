@@ -192,7 +192,7 @@ class Parser(ReferenceParserBase):
                 full_name=dri.full_name,
                 namespace=dri.namespace,
                 kind=kind,
-                prot=data.get("visibility"),
+                prot=data.get("visibility", ""),
                 returns=return_value,
                 members=data.get("children", []),
                 params=data.get("parameters", []),

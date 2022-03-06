@@ -245,7 +245,7 @@ class TypeParser:
         tokens = tokens[:]
 
         def fallback():
-            return TypeRef(cls.TRAITS.TAG, "".join(t.text for t in original_tokens))
+            return TypeRef(language=cls.TRAITS.TAG, name="".join(t.text for t in original_tokens))
 
         def log_parse_warning():
             logger.warning(f"Could not fully parse `{''.join(t.text for t in original_tokens)}`."
@@ -288,10 +288,10 @@ class TypeParser:
                          f" in `{'`,`'.join(t.text for t in original_tokens)}`")
             suffixes.extend(tokens)
 
-        type_ref = TypeRef(cls.TRAITS.TAG)
+        type_ref = TypeRef(language=cls.TRAITS.TAG)
 
         if arg_types is not None:
-            type_ref.returns = TypeRef(cls.TRAITS.TAG)
+            type_ref.returns = TypeRef(language=cls.TRAITS.TAG)
             type_ref.returns.name = cls.TRAITS.cleanup_name("".join(n.text for n in names))
             type_ref.returns.prefix = "".join(p.text for p in prefixes)
             type_ref.returns.suffix = "".join(s.text for s in suffixes)

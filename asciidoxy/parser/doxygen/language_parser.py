@@ -160,7 +160,7 @@ class LanguageParser(ABC):
         exceptions = []
         if descriptions:
             for desc in descriptions.children_of_type(ParameterItem):
-                exception = ThrowsClause(self.TRAITS.TAG)
+                exception = ThrowsClause()
 
                 name = desc.first_name()
                 assert name is not None
@@ -204,7 +204,7 @@ class LanguageParser(ABC):
         ]
 
     def parse_enumvalue(self, enumvalue_element: ET.Element, parent_name: str) -> Compound:
-        enumvalue = Compound(self.TRAITS.TAG, kind="enumvalue")
+        enumvalue = Compound(language=self.TRAITS.TAG, kind="enumvalue")
         enumvalue.id = self.TRAITS.unique_id(enumvalue_element.get("id"))
         enumvalue.prot = enumvalue_element.get("prot", "")
 
@@ -220,7 +220,7 @@ class LanguageParser(ABC):
         return enumvalue
 
     def parse_member(self, memberdef_element: ET.Element, parent: Compound) -> Optional[Compound]:
-        member = Compound(self.TRAITS.TAG)
+        member = Compound(language=self.TRAITS.TAG)
         member.id = self.TRAITS.unique_id(memberdef_element.get("id"))
         member.kind = memberdef_element.get("kind", "")
         member.prot = memberdef_element.get("prot", "")
@@ -259,7 +259,7 @@ class LanguageParser(ABC):
         return member
 
     def parse_innerclass(self, parent: Compound, innerclass_element: ET.Element) -> None:
-        inner_type = TypeRef(parent.language)
+        inner_type = TypeRef(language=parent.language)
         inner_type.id = self.TRAITS.unique_id(innerclass_element.get("refid"))
         inner_type.name = \
             self.TRAITS.cleanup_name(innerclass_element.text if innerclass_element.text else "")
@@ -269,7 +269,7 @@ class LanguageParser(ABC):
         self._api_reference.add_inner_type_reference(parent, inner_type)
 
     def parse_compounddef(self, compounddef_element: ET.Element) -> None:
-        compound = Compound(self.TRAITS.TAG)
+        compound = Compound(language=self.TRAITS.TAG)
         compound.id = self.TRAITS.unique_id(compounddef_element.get("id"))
         compound.kind = compounddef_element.get("kind", "")
         compound.prot = compounddef_element.get("prot", "")

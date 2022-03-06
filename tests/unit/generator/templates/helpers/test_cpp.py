@@ -143,49 +143,49 @@ def test_private_static_methods__no_filter(helper):
 
 
 def test_method_signature(helper):
-    method = Compound("cpp")
+    method = Compound(language="cpp")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("cpp", "void")
+    method.returns.type = TypeRef(language="cpp", name="void")
 
     assert helper.method_signature(method) == "void ShortMethod()"
 
 
 def test_method_signature__constexpr(helper):
-    method = Compound("cpp")
+    method = Compound(language="cpp")
     method.name = "ShortMethod"
     method.constexpr = True
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("cpp", "void")
+    method.returns.type = TypeRef(language="cpp", name="void")
 
     assert helper.method_signature(method) == "constexpr void ShortMethod()"
 
 
 def test_method_signature__template_params(helper):
     method = Compound(
-        "cpp",
+        language="cpp",
         name="ShortMethod",
-        returns=ReturnValue(type=TypeRef("cpp", "V")),
+        returns=ReturnValue(type=TypeRef(language="cpp", name="V")),
         params=[
             Parameter(
                 kind="tparam",
-                type=TypeRef("cpp", "K", prefix="typename "),
+                type=TypeRef(language="cpp", name="K", prefix="typename "),
             ),
             Parameter(
                 kind="tparam",
-                type=TypeRef("cpp", "V", prefix="class "),
+                type=TypeRef(language="cpp", name="V", prefix="class "),
             ),
             Parameter(
                 name="key",
                 kind="param",
-                type=TypeRef("cpp", "K"),
+                type=TypeRef(language="cpp", name="K"),
             ),
             Parameter(
                 name="default",
                 kind="param",
-                type=TypeRef("cpp", "V"),
+                type=TypeRef(language="cpp", name="V"),
             )
         ],
     )

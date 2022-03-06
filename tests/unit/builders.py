@@ -83,8 +83,8 @@ def make_type_ref(*,
                    **kwargs)
 
 
-def make_throws_clause(*, language="", description="Description", **kwargs):
-    return ThrowsClause(language=language, description=description, **kwargs)
+def make_throws_clause(*, description="Description", **kwargs):
+    return ThrowsClause(description=description, **kwargs)
 
 
 def make_return_value(*, description="Description", **kwargs):
@@ -94,7 +94,7 @@ def make_return_value(*, description="Description", **kwargs):
 class SimpleClassBuilder:
     def __init__(self, lang: str):
         self.lang = lang
-        self.compound = Compound(self.lang)
+        self.compound = Compound(language=self.lang)
 
     def name(self, name: str):
         self.compound.name = name
