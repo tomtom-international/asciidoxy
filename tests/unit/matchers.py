@@ -151,20 +151,6 @@ class IsNotEmpty(Matcher):
         return []
 
 
-class IsFalse(Matcher):
-    def matches(self, other, prefix=""):
-        if other is not False:
-            return [f"{prefix}: is not False"]
-        return []
-
-
-class IsTrue(Matcher):
-    def matches(self, other, prefix=""):
-        if other is not True:
-            return [f"{prefix}: is not True"]
-        return []
-
-
 class IsNone(Matcher):
     def matches(self, other, prefix=""):
         if other is not None:

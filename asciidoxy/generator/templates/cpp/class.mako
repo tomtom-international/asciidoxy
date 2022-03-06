@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.generator.templates.helpers import has, has_any, h1, h2, tc, param_filter
+from asciidoxy.generator.templates.helpers import has, has_any, h1, h2, tc, param_filter, modifiers, suffix_join
 from asciidoxy.generator.templates.cpp.helpers import CppTemplateHelper
 from html import escape
 from itertools import chain
@@ -144,7 +144,7 @@ ${method.brief | tc}
 |*${prot.capitalize()} Methods*
 |
 % for method in helper.methods(prot=prot):
-`<<${method.id},++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${" const" if method.const else ""}++>>`::
+`<<${method.id},++${helper.print_ref(method.returns.type, link=False)} ${method.name}${helper.type_list(method.params)}${suffix_join(*modifiers(method, "const"))}++>>`::
 ${method.brief | tc}
 % endfor
 

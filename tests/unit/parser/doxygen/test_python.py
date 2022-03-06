@@ -20,9 +20,7 @@ from tests.unit.api_reference_loader import ApiReferenceLoader
 from tests.unit.matchers import (
     AtLeast,
     IsEmpty,
-    IsFalse,
     IsNone,
-    IsTrue,
     Unordered,
     m_compound,
     m_parameter,
@@ -105,7 +103,7 @@ def api_reference(all_doxygen_versions):
    Verifies the new information before updating.
 ----""",
                 prot="public",
-                static=IsFalse(),
+                modifiers=IsEmpty(),
                 namespace="asciidoxy.traffic.TrafficEvent",
                 params=[
                     m_parameter(
@@ -150,7 +148,7 @@ def api_reference(all_doxygen_versions):
                       "1a993b41d0a7518e83d751aa90e0d15fbe"),
                   name="from_string",
                   prot="public",
-                  static=IsFalse(),
+                  modifiers=IsEmpty(),
                   params=[
                       m_parameter(
                           type=m_typeref(name="cls", ),
@@ -184,7 +182,7 @@ def api_reference(all_doxygen_versions):
                       "1a4b820d9d0bdf81ddd7e22c243a41421d"),
                   name="combine",
                   prot="public",
-                  static=IsTrue(),
+                  modifiers=["static"],
                   params=[
                       m_parameter(
                           type=m_typeref(name="Coordinate"),
@@ -206,7 +204,7 @@ def api_reference(all_doxygen_versions):
                     "1a0eb652e91c894dc2e49d9fbf3f224aa5"),
                 name="longitude",
                 prot="public",
-                static=IsFalse(),
+                modifiers=IsEmpty(),
                 params=IsEmpty(),
                 exceptions=IsEmpty(),
                 # Not supported by Doxygen yet
@@ -238,7 +236,7 @@ def api_reference(all_doxygen_versions):
                   brief=IsEmpty(),
                   description=IsEmpty(),
                   prot="public",
-                  static=IsFalse(),
+                  modifiers=IsEmpty(),
                   namespace="asciidoxy.geometry.Coordinate",
                   params=[
                       m_parameter(
@@ -258,7 +256,7 @@ def api_reference(all_doxygen_versions):
                       "1a6711de457ebaf61c48358c2d2a37dbfa"),
                   name="from_string_safe",
                   prot="public",
-                  static=IsFalse(),
+                  modifiers=IsEmpty(),
                   params=[
                       m_parameter(
                           type=m_typeref(name="cls"),

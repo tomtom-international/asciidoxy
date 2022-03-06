@@ -22,7 +22,6 @@ from asciidoxy.parser.doxygen.language.objc import ObjectiveCTraits
 from tests.unit.api_reference_loader import ApiReferenceLoader
 from tests.unit.matchers import (
     IsEmpty,
-    IsFalse,
     IsNone,
     Unordered,
     m_compound,
@@ -86,7 +85,7 @@ def api_reference(all_doxygen_versions):
               brief="Update the traffic event data.",
               description="Verifies the new information before updating.",
               prot="public",
-              static=IsFalse(),
+              modifiers=IsEmpty(),
               namespace="ADTrafficEvent",
               params=[
                   m_parameter(

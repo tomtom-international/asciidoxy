@@ -151,8 +151,10 @@ class CppParser(LanguageParser):
         member = super().parse_member(memberdef_element, parent)
 
         if member is not None and member.kind == "function" and member.args:
-            member.default = self.DEFAULTED_RE.search(member.args) is not None
-            member.deleted = self.DELETED_RE.search(member.args) is not None
+            if self.DEFAULTED_RE.search(member.args) is not None:
+                member.modifiers.append("default")
+            if self.DELETED_RE.search(member.args) is not None:
+                member.modifiers.append("delete")
 
         if (member is not None and member.kind == "typedef" and member.definition
                 and member.definition.startswith("using")):

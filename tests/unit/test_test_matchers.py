@@ -19,10 +19,8 @@ from .matchers import (
     AtLeast,
     HasNot,
     IsEmpty,
-    IsFalse,
     IsNone,
     IsNotEmpty,
-    IsTrue,
     PartialModel,
     SizeIs,
     Unordered,
@@ -139,22 +137,6 @@ def test_isnotempty():
 
     m_compound(name=IsNotEmpty()).assert_not_matches(Compound(name=""))
     m_compound(name=IsNotEmpty()).assert_not_matches(Compound(name=None))
-
-
-def test_isfalse():
-    m_compound(static=IsFalse()).assert_matches(Compound(static=False))
-
-    m_compound(static=IsFalse()).assert_not_matches(Compound(static=True))
-    m_compound(static=IsFalse()).assert_not_matches(Compound(static="bla"))
-    m_compound(static=IsFalse()).assert_not_matches(Compound(static=None))
-
-
-def test_istrue():
-    m_compound(static=IsTrue()).assert_matches(Compound(static=True))
-
-    m_compound(static=IsTrue()).assert_not_matches(Compound(static=False))
-    m_compound(static=IsTrue()).assert_not_matches(Compound(static="bla"))
-    m_compound(static=IsTrue()).assert_not_matches(Compound(static=None))
 
 
 def test_isnone():
