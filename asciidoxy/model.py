@@ -157,11 +157,7 @@ class Compound(ReferableElement):
         brief:         Brief description of the compound.
         description:   Full description of the compound.
         sections:      Extra documentation sections with special meanings.
-        static:        True if this is marked as static.
-        const:         True if this is marked as const.
-        deleted:       True if this is marked as deleted.
-        default:       True if this is marked as default.
-        constexpr:     True if this is marked as constexpr.
+        modifiers:     List of modifiers applied to the compound.
     """
 
     members: List["Compound"] = field(default_factory=list)
@@ -181,8 +177,4 @@ class Compound(ReferableElement):
     description: str = ""
     sections: Dict[str, str] = field(default_factory=dict)
 
-    static: bool = False
-    const: bool = False
-    deleted: bool = False
-    default: bool = False
-    constexpr: bool = False
+    modifiers: List[str] = field(default_factory=list)

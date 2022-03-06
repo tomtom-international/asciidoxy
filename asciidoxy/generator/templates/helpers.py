@@ -13,7 +13,7 @@
 # limitations under the License.
 """Helper functions for API reference templates."""
 
-from typing import Iterator, Optional, Sequence
+from typing import Iterator, List, Optional, Sequence
 
 from asciidoxy.generator.asciidoc import Api
 from asciidoxy.generator.filters import InsertionFilter
@@ -146,14 +146,14 @@ class TemplateHelper:
         return f"{start}{joined}{end}"
 
     def method_signature(self, method: Compound, max_width: int = 80) -> str:
-        method_without_params = self._method_join(self._method_prefix(method), method.name)
+        method_without_params = spaced_join(self._method_prefix(method), method.name)
         suffix = self._method_suffix(method)
 
         if not method.params:
             return (f"{method_without_params}(){suffix}")
 
         method_without_params_length = len(
-            self._method_join(self._method_prefix(method, link=False).split("\n")[-1], method.name))
+            spaced_join(self._method_prefix(method, link=False).split("\n")[-1], method.name))
         suffix_length = len(self._method_suffix(method, link=False))
 
         param_sizes = [
@@ -174,33 +174,30 @@ class TemplateHelper:
         return (f"{method_without_params}({first_indent}{formatted_params}){suffix}")
 
     def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
-        static = "static" if method.static else ""
         return_type = self.print_ref(method.returns.type, link=link) if method.returns else ""
-
-        return self._method_join(static, return_type)
+        return spaced_join(*self.modifiers("static"), return_type)
 
     def _method_suffix(self, method: Compound, *, link: bool = True) -> str:
-        if method.const:
-            return " const"
-        return ""
+        return suffix_join(*modifiers(method, "const"))
 
-    @staticmethod
-    def _method_join(*parts: str) -> str:
-        return " ".join(part for part in parts if part).replace("\n ", "\n")
+    def modifiers(self, *which: str) -> List[str]:
+        if self.element is None:
+            return []
+        return modifiers(self.element, *which)
 
     def static_methods(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
-        return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.returns and m.prot == prot and m.static))
+        return (m for m in self.insert_filter.members(self.element) if (
+            m.kind == "function" and m.returns and m.prot == prot and "static" in m.modifiers))
 
     def methods(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
-        return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.returns and m.prot == prot and not m.static))
+        return (m for m in self.insert_filter.members(self.element) if (
+            m.kind == "function" and m.returns and m.prot == prot and "static" not in m.modifiers))
 
     def constructors(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
@@ -274,3 +271,28 @@ def tc(text: str) -> str:
 def param_filter(params: Sequence[Parameter], kind: str = "param") -> Iterator[Parameter]:
     """Return only parameters of a specific kind."""
     return (p for p in params if p.kind == kind)
+
+
+def modifiers(element: Compound, *which: str) -> List[str]:
+    """Return the modifiers applying to the element."""
+    return [m for m in element.modifiers if m in which]
+
+
+def spaced_join(*parts: str) -> str:
+    return " ".join(part for part in parts if part).replace("\n ", "\n")
+
+
+def prefix_join(*parts: str) -> str:
+    joined = spaced_join(*parts)
+    if joined:
+        return f"{joined} "
+    else:
+        return ""
+
+
+def suffix_join(*parts: str) -> str:
+    joined = spaced_join(*parts)
+    if joined:
+        return f" {joined}"
+    else:
+        return ""

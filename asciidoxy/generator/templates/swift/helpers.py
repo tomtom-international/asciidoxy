@@ -49,14 +49,15 @@ class SwiftTemplateHelper(TemplateHelper):
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.prot == prot and m.static))
+                if (m.kind == "function" and m.prot == prot and "static" in m.modifiers))
 
     def methods(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
         assert self.insert_filter is not None
 
         return (m for m in self.insert_filter.members(self.element)
-                if (m.kind == "function" and m.prot == prot and not m.static and m.name != "init"))
+                if (m.kind == "function" and m.prot == prot and "static" not in m.modifiers
+                    and m.name != "init"))
 
     type_methods = static_methods
 

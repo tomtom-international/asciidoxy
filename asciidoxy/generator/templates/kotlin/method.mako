@@ -19,7 +19,7 @@ from asciidoxy.generator.templates.kotlin.helpers import KotlinTemplateHelper
 from html import escape
 %>
 <%
-if element.static:
+if "static" in element.modifiers:
   helper = JavaTemplateHelper(api, element, insert_filter)
 else:
   helper = KotlinTemplateHelper(api, element, insert_filter)

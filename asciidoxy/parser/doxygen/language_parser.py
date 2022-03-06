@@ -251,9 +251,10 @@ class LanguageParser(ABC):
         member.definition = memberdef_element.findtext("definition", "")
         member.args = memberdef_element.findtext("argsstring", "")
         member.members = self.parse_enumvalues(memberdef_element, member.full_name)
-        member.static = _yes_no_to_bool(memberdef_element.get("static", "no"))
-        member.const = _yes_no_to_bool(memberdef_element.get("const", "no"))
-        member.constexpr = _yes_no_to_bool(memberdef_element.get("constexpr", "no"))
+
+        for modifier in ("static", "const", "constexpr"):
+            if memberdef_element.get(modifier) == "yes":
+                member.modifiers.append(modifier)
 
         self._api_reference.append(member)
         return member

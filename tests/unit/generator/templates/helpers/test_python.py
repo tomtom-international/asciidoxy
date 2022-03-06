@@ -27,10 +27,10 @@ def python_class():
     builder = SimpleClassBuilder("python")
     builder.name("MyClass")
 
-    builder.member_function(name="__init__", has_return_value=False, static=False),
-    builder.member_function(name="public_static_method", static=True),
-    builder.member_function(name="_private_static_method", static=True),
-    builder.member_function(name="__mangled_private_static_method", static=True),
+    builder.member_function(name="__init__", has_return_value=False),
+    builder.member_function(name="public_static_method", modifiers=["static"]),
+    builder.member_function(name="_private_static_method", modifiers=["static"]),
+    builder.member_function(name="__mangled_private_static_method", modifiers=["static"]),
     builder.member_function(name="public_method"),
     builder.member_function(name="_private_method"),
     builder.member_function(name="__mangled_private_method"),

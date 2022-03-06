@@ -218,27 +218,27 @@ def cpp_class():
         builder.member_function(prot=visibility,
                                 name="MyClass",
                                 has_return_value=False,
-                                default=True)
+                                modifiers=["default"])
         # deleted constructor
         builder.member_function(prot=visibility,
                                 name="MyClass",
                                 has_return_value=False,
-                                deleted=True)
+                                modifiers=["delete"])
         # destructor
         builder.member_function(prot=visibility, name="~MyClass", has_return_value=False)
 
         # operator
         builder.member_function(prot=visibility, name="operator++")
         # default operator
-        builder.member_function(prot=visibility, name="operator=", default=True)
+        builder.member_function(prot=visibility, name="operator=", modifiers=["default"])
         # deleted operator
-        builder.member_function(prot=visibility, name="operator=", deleted=True)
+        builder.member_function(prot=visibility, name="operator=", modifiers=["delete"])
         # method
         builder.member_function(prot=visibility, name=f"{visibility.capitalize()}Method")
         # static method
         builder.member_function(prot=visibility,
                                 name=visibility.capitalize() + "StaticMethod",
-                                static=True)
+                                modifiers=["static"])
 
     return builder.compound
 
@@ -320,11 +320,7 @@ _custom_types = {
         "brief",
         "description",
         "sections",
-        "static",
-        "const",
-        "deleted",
-        "default",
-        "constexpr",
+        "modifiers",
     ], ["members", "params", "exceptions", "returns"]),
     TypeRef: (["id", "name", "language", "namespace", "kind", "prefix",
                "suffix"], ["nested", "args", "returns"]),

@@ -155,7 +155,7 @@ def test_method_signature(helper):
 def test_method_signature__constexpr(helper):
     method = Compound(language="cpp")
     method.name = "ShortMethod"
-    method.constexpr = True
+    method.modifiers = ["constexpr"]
 
     method.returns = ReturnValue()
     method.returns.type = TypeRef(language="cpp", name="void")
