@@ -16,6 +16,7 @@
 from typing import List, Optional
 
 from .._version import __version__
+from ..api_reference import normalized_type_str
 from ..document import Document
 from ..model import Compound, ReferableElement
 
@@ -105,7 +106,7 @@ class AmbiguousReferenceError(AsciiDocError):
         def element_to_str(element: ReferableElement) -> str:
             signature = ""
             if isinstance(element, Compound) and element.kind == "function":
-                signature = f"({', '.join(str(e.type) for e in element.params)})"
+                signature = f"({', '.join(normalized_type_str(e.type) for e in element.params)})"
 
             return f"{element.language} {element.kind} {element.full_name}{signature}"
 

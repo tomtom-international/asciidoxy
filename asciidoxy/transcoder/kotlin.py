@@ -282,7 +282,7 @@ def transform_array(type_ref: TypeRef, transcoded: TypeRef) -> TypeRef:
                              if type_ref.suffix is not None else "")
         return transcoded
 
-    array_type = TypeRef("kotlin", "Array")
+    array_type = TypeRef(language="kotlin", name="Array")
     array_type.prefix = transcoded.prefix
     array_type.suffix = transcoded.suffix.replace("[]", "")
 

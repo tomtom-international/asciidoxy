@@ -28,7 +28,7 @@ from asciidoxy.generator.filters import (
     combine_specs,
     filter_from_strings,
 )
-from asciidoxy.model import ThrowsClause
+from asciidoxy.model import ThrowsClause, TypeRef
 from tests.unit.api_reference_loader import ApiReferenceLoader
 
 
@@ -172,10 +172,8 @@ def test_member_filter__all(cpp_class):
 
 
 def test_exception_filter__name():
-    throws_clause_1 = ThrowsClause("cpp")
-    throws_clause_1.type.name = "std::runtime_exception"
-    throws_clause_2 = ThrowsClause("cpp")
-    throws_clause_2.type.name = "NumericError"
+    throws_clause_1 = ThrowsClause(type=TypeRef(language="cpp", name="std::runtime_exception"))
+    throws_clause_2 = ThrowsClause(type=TypeRef(language="cpp", name="NumericError"))
 
     member_filter = ExceptionFilter.from_spec(["ALL", "-std::.*"])
     assert member_filter(throws_clause_1) is False

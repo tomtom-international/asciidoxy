@@ -133,7 +133,7 @@ class TranscoderBase(ABC):
         return transcoded
 
     def type_ref(self, type_ref: TypeRef) -> TypeRef:
-        transcoded = TypeRef(self.TARGET)
+        transcoded = TypeRef(language=self.TARGET)
 
         transcoded.id = self.convert_id(type_ref.id)
         transcoded.name = self.convert_name(type_ref)
@@ -171,7 +171,7 @@ class TranscoderBase(ABC):
         return transcoded
 
     def throws_clause(self, throws_clause: ThrowsClause) -> ThrowsClause:
-        transcoded = ThrowsClause(self.TARGET)
+        transcoded = ThrowsClause()
 
         transcoded.type = self.type_ref(throws_clause.type)
         transcoded.description = throws_clause.description
@@ -214,7 +214,7 @@ class TranscoderBase(ABC):
         return transcoded
 
     def referable_element(self, element: ElementType) -> ElementType:
-        transcoded = element.__class__(self.TARGET)
+        transcoded = element.__class__(language=self.TARGET)
 
         transcoded.id = self.convert_id(element.id)
         transcoded.name = self.convert_name(element)

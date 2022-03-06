@@ -26,6 +26,20 @@ from .model import Compound, ReferableElement, TypeRef
 logger = logging.getLogger(__name__)
 
 
+def normalized_type_str(type_ref: Optional[TypeRef]) -> str:
+    if type_ref is None:
+        return ""
+
+    nested_str = ""
+    if type_ref.nested:
+        nested_str = f"<{','.join(normalized_type_str(t) for t in type_ref.nested)}>"
+    args_str = ""
+    if type_ref.args:
+        args_str = f"({','.join(f'{normalized_type_str(p.type)}' for p in type_ref.args)})"
+    suffix = re.sub(r"^\s(\W)", r"\1", type_ref.suffix or '')
+    return f"{type_ref.prefix or ''}{type_ref.name}{nested_str}{args_str}{suffix}"
+
+
 class AmbiguousLookupError(Exception):
     """There are multiple elements matching your query. Make the query more specific.
 
@@ -278,7 +292,7 @@ class ParameterTypeMatcher(ElementFilter):
         for expected_type, param in zip(self.arg_types, params):
             assert param.type
 
-            if self._normalize(str(param.type)) != expected_type:
+            if normalized_type_str(param.type) != expected_type:
                 return False
 
         return True

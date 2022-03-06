@@ -13,25 +13,27 @@
 # limitations under the License.
 """Models of API reference elements."""
 
-from abc import ABC
-from typing import Dict, List, Optional
+import sys
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Optional
+
+if sys.version_info >= (3, 10):
+    dataclass_options = {
+        "slots": True,
+        "kw_only": True,
+    }
+else:
+    dataclass_options: Dict[str, Any] = {}
 
 
 def json_repr(obj):
     data = {"__CLASS__": obj.__class__.__name__}
-    data.update(vars(obj))
+    data.update(asdict(obj))
     return data
 
 
-class ModelBase(ABC):
-    def __init__(self, **kwargs):
-        for name, value in kwargs.items():
-            if not hasattr(self, name):
-                raise TypeError(f"{self.__class__} has no attribute {name}.")
-            setattr(self, name, value)
-
-
-class ReferableElement(ModelBase):
+@dataclass(**dataclass_options)
+class ReferableElement:
     """Base class for all objects that can be referenced/linked to.
 
     Attributes:
@@ -44,29 +46,12 @@ class ReferableElement(ModelBase):
     id: Optional[str] = None
     name: str = ""
     full_name: str = ""
-    language: str
+    language: str = ""
     kind: str = ""
 
-    def __init__(self, language: str = "", **kwargs):
-        super().__init__(**kwargs)
-        self.language = language
 
-    def __str__(self) -> str:
-        text = (f"ReferableElement [\n id [{self.id}]\n  name [{self.name}]\n "
-                f"full name[{self.full_name}]\n lang [{self.language}]\n kind [{self.kind}]")
-        return text + "]"
-
-    def __eq__(self, other) -> bool:
-        if other is None:
-            return False
-        return ((self.id, self.name, self.full_name, self.language,
-                 self.kind) == (other.id, other.name, other.full_name, other.language, other.kind))
-
-    def __hash__(self):
-        return hash((self.id, self.name, self.full_name, self.language, self.kind))
-
-
-class TypeRef(ModelBase):
+@dataclass(**dataclass_options)
+class TypeRef:
     """Reference to a type.
 
     Attributes:
@@ -85,8 +70,8 @@ class TypeRef(ModelBase):
     """
 
     id: Optional[str] = None
-    name: str
-    language: str
+    name: str = ""
+    language: str = ""
     namespace: Optional[str] = None
     kind: Optional[str] = None
 
@@ -97,35 +82,13 @@ class TypeRef(ModelBase):
     returns: Optional["TypeRef"] = None
     prot: Optional[str] = None
 
-    def __init__(self, language: str = "", name: str = "", **kwargs):
-        super().__init__(**kwargs)
-        self.language = language
-        self.name = name
-
-    def __str__(self) -> str:
-        nested_str = ""
-        if self.nested:
-            nested_str = f"< {', '.join(str(t) for t in self.nested)} >"
-        args_str = ""
-        if self.args:
-            args_str = f"({', '.join(f'{p.type} {p.name}' for p in self.args)})"
-        return f"{self.prefix or ''}{self.name}{nested_str}{args_str}{self.suffix or ''}"
-
     def resolve(self, reference_target: ReferableElement) -> None:
         self.id = reference_target.id
         self.kind = reference_target.kind
 
-    def __eq__(self, other) -> bool:
-        if other is None:
-            return False
-        return ((self.id, self.name, self.language, self.namespace, self.kind, self.prefix,
-                 self.suffix, self.nested, self.args, self.returns,
-                 self.prot) == (other.id, other.name, other.language, other.namespace, other.kind,
-                                other.prefix, other.suffix, other.nested, other.args, other.returns,
-                                other.prot))
 
-
-class Parameter(ModelBase):
+@dataclass(**dataclass_options)
+class Parameter:
     """Parameter description.
 
     Representation of doxygen type paramType
@@ -146,15 +109,9 @@ class Parameter(ModelBase):
     prefix: Optional[str] = None
     kind: str = "param"
 
-    def __eq__(self, other) -> bool:
-        if other is None:
-            return False
-        return ((self.type, self.name, self.description, self.default_value, self.prefix,
-                 self.kind) == (other.type, other.name, other.description, other.default_value,
-                                other.prefix, other.kind))
 
-
-class ReturnValue(ModelBase):
+@dataclass(**dataclass_options)
+class ReturnValue:
     """Value returned from a member.
 
     Attributes:
@@ -165,13 +122,9 @@ class ReturnValue(ModelBase):
     type: Optional[TypeRef] = None
     description: str = ""
 
-    def __eq__(self, other) -> bool:
-        if other is None:
-            return False
-        return (self.type, self.description) == (other.type, other.description)
 
-
-class ThrowsClause(ModelBase):
+@dataclass(**dataclass_options)
+class ThrowsClause:
     """Potential exception thrown from a member.
 
     Attributes:
@@ -180,19 +133,11 @@ class ThrowsClause(ModelBase):
 
     """
 
-    type: TypeRef
+    type: TypeRef = field(default_factory=TypeRef)
     description: str = ""
 
-    def __init__(self, language: str = "", type: Optional[TypeRef] = None, **kwargs):
-        super().__init__(**kwargs)
-        self.type = type or TypeRef(language)
 
-    def __eq__(self, other) -> bool:
-        if other is None:
-            return False
-        return (self.type, self.description) == (other.type, other.description)
-
-
+@dataclass(**dataclass_options)
 class Compound(ReferableElement):
     """Compound object. E.g. a class or enum.
 
@@ -219,9 +164,9 @@ class Compound(ReferableElement):
         constexpr:     True if this is marked as constexpr.
     """
 
-    members: List["Compound"]
-    params: List[Parameter]
-    exceptions: List[ThrowsClause]
+    members: List["Compound"] = field(default_factory=list)
+    params: List[Parameter] = field(default_factory=list)
+    exceptions: List[ThrowsClause] = field(default_factory=list)
     returns: Optional[ReturnValue] = None
 
     include: Optional[str] = None
@@ -234,43 +179,10 @@ class Compound(ReferableElement):
 
     brief: str = ""
     description: str = ""
-    sections: Dict[str, str]
+    sections: Dict[str, str] = field(default_factory=dict)
 
     static: bool = False
     const: bool = False
     deleted: bool = False
     default: bool = False
     constexpr: bool = False
-
-    def __init__(self,
-                 language: str = "",
-                 *,
-                 members: Optional[List["Compound"]] = None,
-                 params: Optional[List[Parameter]] = None,
-                 exceptions: Optional[List[ThrowsClause]] = None,
-                 sections: Optional[Dict[str, str]] = None,
-                 **kwargs):
-        super().__init__(language, **kwargs)
-        self.members = members or []
-        self.params = params or []
-        self.exceptions = exceptions or []
-        self.sections = sections or {}
-
-    def __str__(self):
-        return f"Compound [{super().__str__()}]"
-
-    def __eq__(self, other) -> bool:
-        if other is None:
-            return False
-        return (super().__eq__(other)
-                and (self.members, self.params, self.exceptions, self.returns, self.include,
-                     self.namespace, self.prot, self.definition, self.args, self.initializer,
-                     self.brief, self.description, self.sections, self.static, self.const,
-                     self.deleted, self.default, self.constexpr)
-                == (other.members, other.params, other.exceptions, other.returns, other.include,
-                    other.namespace, other.prot, other.definition, other.args, other.initializer,
-                    other.brief, other.description, other.sections, other.static, other.const,
-                    other.deleted, other.default, other.constexpr))
-
-    def __hash__(self):
-        return super().__hash__()
