@@ -38,7 +38,7 @@ def java_class():
         # add static method
         builder.member_function(prot=visibility,
                                 name=visibility.capitalize() + "StaticMethod",
-                                static=True)
+                                modifiers=["static"])
         # add simple variable
         builder.member_variable(prot=visibility)
         # add final variable

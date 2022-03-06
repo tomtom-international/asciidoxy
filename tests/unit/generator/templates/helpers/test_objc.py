@@ -41,7 +41,7 @@ def objc_class():
         # add static method
         builder.member_function(prot=visibility,
                                 name=visibility.capitalize() + "StaticMethod",
-                                static=True)
+                                modifiers=["static"])
 
     # forbidden method
     builder.member_function(name="NS_UNAVAILABLE", prot="public")
@@ -188,7 +188,7 @@ def test_objc_method_signature__multiple_params_linked_return(helper):
 def test_objc_method_signature__class_method(helper):
     method = Compound(language="objc")
     method.name = "start"
-    method.static = True
+    method.modifiers = ["static"]
     method.returns = ReturnValue()
     method.returns.type = TypeRef(language="objc", name="void")
     assert helper.method_signature(method) == "+ (void)start"

@@ -717,7 +717,7 @@ def test_method_signature__no_params(generating_api):
 def test_method_signature__const(generating_api):
     method = Compound(language="lang")
     method.name = "ShortMethod"
-    method.const = True
+    method.modifiers = ["const"]
 
     method.returns = ReturnValue()
     method.returns.type = TypeRef(language="lang", name="void")

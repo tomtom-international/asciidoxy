@@ -22,7 +22,7 @@ class ObjcTemplateHelper(TemplateHelper):
         assert method.returns is not None
 
         method_name_parts = method.name.split(":")
-        static = "+" if method.static else "-"
+        static = "+" if "static" in method.modifiers else "-"
 
         if len(method_name_parts) == 1:
             return f"{static} ({self.print_ref(method.returns.type)}){method.name}"

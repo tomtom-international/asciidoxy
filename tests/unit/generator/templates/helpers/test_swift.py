@@ -43,12 +43,12 @@ def swift_class():
         # add static method
         builder.member_function(prot=visibility,
                                 name=visibility.capitalize() + "TypeMethod",
-                                static=True)
+                                modifiers=["static"])
         # add static method without return type
         builder.member_function(prot=visibility,
                                 name=visibility.capitalize() + "TypeMethodNoReturn",
                                 has_return_value=False,
-                                static=True)
+                                modifiers=["static"])
 
         builder.member_function(prot=visibility, name="init", has_return_value=False)
 

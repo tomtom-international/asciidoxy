@@ -15,13 +15,19 @@
 
 from typing import Iterator
 
-from asciidoxy.generator.templates.helpers import TemplateHelper, has, param_filter
+from asciidoxy.generator.templates.helpers import (
+    TemplateHelper,
+    has,
+    modifiers,
+    param_filter,
+    spaced_join,
+)
 from asciidoxy.model import Compound
 
 
 class CppTemplateHelper(TemplateHelper):
     def constructors(self, prot: str) -> Iterator[Compound]:
-        return (m for m in super().constructors(prot) if (not m.default and not m.deleted))
+        return (m for m in super().constructors(prot) if not has(modifiers(m, "default", "delete")))
 
     def destructors(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
@@ -30,18 +36,18 @@ class CppTemplateHelper(TemplateHelper):
         destructor_name = f"~{self.element.name}"
         return (m for m in self.insert_filter.members(self.element)
                 if (m.kind == "function" and m.name == destructor_name and m.prot == prot
-                    and not m.default and not m.deleted))
+                    and not has(modifiers(m, "default", "delete"))))
 
     def static_methods(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().static_methods(prot) if not m.name.startswith("operator"))
 
     def methods(self, prot: str) -> Iterator[Compound]:
-        return (m for m in super().methods(prot)
-                if (not m.name.startswith("operator") and not m.default and not m.deleted))
+        return (m for m in super().methods(prot) if (
+            not m.name.startswith("operator") and not has(modifiers(m, "default", "delete"))))
 
     def operators(self, prot: str) -> Iterator[Compound]:
         return (m for m in super().methods(prot)
-                if (m.name.startswith("operator") and not m.default and not m.deleted))
+                if (m.name.startswith("operator") and not has(modifiers(m, "default", "delete"))))
 
     def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
         if has(param_filter(method.params, kind="tparam")):
@@ -52,5 +58,5 @@ class CppTemplateHelper(TemplateHelper):
                                       end=">\n")
         else:
             template = ""
-        constexpr = "constexpr" if method.constexpr else ""
-        return self._method_join(template, constexpr, super()._method_prefix(method, link=link))
+        return spaced_join(template, *modifiers(method, "constexpr"),
+                           super()._method_prefix(method, link=link))

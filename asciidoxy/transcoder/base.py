@@ -124,11 +124,7 @@ class TranscoderBase(ABC):
         transcoded.brief = compound.brief
         transcoded.description = compound.description
 
-        transcoded.static = compound.static
-        transcoded.const = compound.const
-        transcoded.deleted = compound.deleted
-        transcoded.default = compound.default
-        transcoded.constexpr = compound.constexpr
+        transcoded.modifiers = compound.modifiers[:]
 
         return transcoded
 
