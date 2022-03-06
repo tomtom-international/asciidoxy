@@ -124,32 +124,27 @@ def test_transcode_compound__with_params(transcoder):
 
 
 def test_transcode_compound__with_exceptions(transcoder):
-    compound = make_compound(language="asm",
-                             name="getLatitude",
-                             exceptions=[
-                                 make_throws_clause(language="asm",
-                                                    type=make_type_ref(language="asm",
-                                                                       name="RuntimeException"))
-                             ])
+    compound = make_compound(
+        language="asm",
+        name="getLatitude",
+        exceptions=[
+            make_throws_clause(type=make_type_ref(language="asm", name="RuntimeException"))
+        ])
     transcoded = transcoder.compound(compound)
 
     assert transcoded is not compound
-    assert transcoded == make_compound(language="smalltalk",
-                                       name="getLatitude",
-                                       exceptions=[
-                                           make_throws_clause(language="smalltalk",
-                                                              type=make_type_ref(
-                                                                  language="smalltalk",
-                                                                  name="RuntimeException"))
-                                       ])
-    assert compound == make_compound(language="asm",
-                                     name="getLatitude",
-                                     exceptions=[
-                                         make_throws_clause(language="asm",
-                                                            type=make_type_ref(
-                                                                language="asm",
-                                                                name="RuntimeException"))
-                                     ])
+    assert transcoded == make_compound(
+        language="smalltalk",
+        name="getLatitude",
+        exceptions=[
+            make_throws_clause(type=make_type_ref(language="smalltalk", name="RuntimeException"))
+        ])
+    assert compound == make_compound(
+        language="asm",
+        name="getLatitude",
+        exceptions=[
+            make_throws_clause(type=make_type_ref(language="asm", name="RuntimeException"))
+        ])
 
 
 def test_transcode_compound__with_return_value(transcoder):
@@ -303,15 +298,12 @@ def test_transcode_return_value__with_type(transcoder):
 
 
 def test_transcode_throws_clause(transcoder):
-    throws_clause = make_throws_clause(language="asm",
-                                       type=make_type_ref(language="asm", name="MyType"))
+    throws_clause = make_throws_clause(type=make_type_ref(language="asm", name="MyType"))
     transcoded = transcoder.throws_clause(throws_clause)
 
     assert transcoded is not throws_clause
-    assert transcoded == make_throws_clause(language="smalltalk",
-                                            type=make_type_ref(language="smalltalk", name="MyType"))
-    assert throws_clause == make_throws_clause(language="asm",
-                                               type=make_type_ref(language="asm", name="MyType"))
+    assert transcoded == make_throws_clause(type=make_type_ref(language="smalltalk", name="MyType"))
+    assert throws_clause == make_throws_clause(type=make_type_ref(language="asm", name="MyType"))
 
 
 def test_transcode__load_and_detect_transcoders():

@@ -46,15 +46,15 @@ def python_class():
 
 
 def test_params__empty():
-    member = Compound("lang")
+    member = Compound(language="lang")
     assert list(params(member)) == []
 
 
 def test_params__normal():
-    type1 = TypeRef("lang")
+    type1 = TypeRef(language="lang")
     type1.name = "int"
 
-    type2 = TypeRef("lang")
+    type2 = TypeRef(language="lang")
     type2.name = "float"
 
     param1 = Parameter()
@@ -65,17 +65,17 @@ def test_params__normal():
     param2.type = type2
     param2.name = "arg2"
 
-    member = Compound("lang")
+    member = Compound(language="lang")
     member.params = [param1, param2]
 
     assert list(params(member)) == [param1, param2]
 
 
 def test_params__self():
-    type1 = TypeRef("lang")
+    type1 = TypeRef(language="lang")
     type1.name = "self"
 
-    type2 = TypeRef("lang")
+    type2 = TypeRef(language="lang")
     type2.name = "float"
 
     param1 = Parameter()
@@ -85,17 +85,17 @@ def test_params__self():
     param2.type = type2
     param2.name = "arg2"
 
-    member = Compound("lang")
+    member = Compound(language="lang")
     member.params = [param1, param2]
 
     assert list(params(member)) == [param2]
 
 
 def test_params__cls():
-    type1 = TypeRef("lang")
+    type1 = TypeRef(language="lang")
     type1.name = "cls"
 
-    type2 = TypeRef("lang")
+    type2 = TypeRef(language="lang")
     type2.name = "float"
 
     param1 = Parameter()
@@ -105,7 +105,7 @@ def test_params__cls():
     param2.type = type2
     param2.name = "arg2"
 
-    member = Compound("lang")
+    member = Compound(language="lang")
     member.params = [param1, param2]
 
     assert list(params(member)) == [param2]
@@ -120,7 +120,7 @@ def test_params__no_type():
     param2.type = None
     param2.name = "arg2"
 
-    member = Compound("lang")
+    member = Compound(language="lang")
     member.params = [param1, param2]
 
     assert list(params(member)) == [param1, param2]
@@ -217,39 +217,39 @@ def test_public_variables__filter_no_match(helper):
 
 
 def test_method_signature__no_params(helper):
-    method = Compound("python")
+    method = Compound(language="python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("python", "None")
+    method.returns.type = TypeRef(language="python", name="None")
 
     assert helper.method_signature(method) == "def ShortMethod() -> None"
 
 
 def test_method_signature__single_param(helper):
-    method = Compound("python")
+    method = Compound(language="python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("python", "int")
+    method.returns.type = TypeRef(language="python", name="int")
 
     method.params = [Parameter()]
     method.params[0].name = "value"
-    method.params[0].type = TypeRef("python", "int")
+    method.params[0].type = TypeRef(language="python", name="int")
 
     assert helper.method_signature(method) == "def ShortMethod(value: int) -> int"
 
 
 def test_method_signature__single_param__too_wide(helper):
-    method = Compound("python")
+    method = Compound(language="python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("python", "str")
+    method.returns.type = TypeRef(language="python", name="str")
 
     method.params = [Parameter()]
     method.params[0].name = "value"
-    method.params[0].type = TypeRef("python", "int")
+    method.params[0].type = TypeRef(language="python", name="int")
 
     assert (helper.method_signature(method, max_width=20) == """\
 def ShortMethod(
@@ -257,19 +257,19 @@ def ShortMethod(
 
 
 def test_method_signature__multiple_params(helper):
-    method = Compound("python")
+    method = Compound(language="python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("python", "None")
+    method.returns.type = TypeRef(language="python", name="None")
 
     method.params = [Parameter(), Parameter(), Parameter()]
     method.params[0].name = "value"
-    method.params[0].type = TypeRef("python", "int")
+    method.params[0].type = TypeRef(language="python", name="int")
     method.params[1].name = "other_value"
-    method.params[1].type = TypeRef("python", "float")
+    method.params[1].type = TypeRef(language="python", name="float")
     method.params[2].name = "text"
-    method.params[2].type = TypeRef("python", "str")
+    method.params[2].type = TypeRef(language="python", name="str")
 
     assert (helper.method_signature(method) == """\
 def ShortMethod(value: int,
@@ -278,19 +278,19 @@ def ShortMethod(value: int,
 
 
 def test_method_signature__multiple_params__first_param_too_wide(helper):
-    method = Compound("python")
+    method = Compound(language="python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("python", "None")
+    method.returns.type = TypeRef(language="python", name="None")
 
     method.params = [Parameter(), Parameter(), Parameter()]
     method.params[0].name = "value"
-    method.params[0].type = TypeRef("python", "int")
+    method.params[0].type = TypeRef(language="python", name="int")
     method.params[1].name = "other_value"
-    method.params[1].type = TypeRef("python", "float")
+    method.params[1].type = TypeRef(language="python", name="float")
     method.params[2].name = "text"
-    method.params[2].type = TypeRef("python", "str")
+    method.params[2].type = TypeRef(language="python", name="str")
 
     assert (helper.method_signature(method, max_width=20) == """\
 def ShortMethod(
@@ -300,19 +300,19 @@ def ShortMethod(
 
 
 def test_method_signature__multiple_params__last_param_too_wide(helper):
-    method = Compound("python")
+    method = Compound(language="python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("python", "Type")
+    method.returns.type = TypeRef(language="python", name="Type")
 
     method.params = [Parameter(), Parameter(), Parameter()]
     method.params[0].name = "value"
-    method.params[0].type = TypeRef("python", "int")
+    method.params[0].type = TypeRef(language="python", name="int")
     method.params[1].name = "other_value"
-    method.params[1].type = TypeRef("python", "float")
+    method.params[1].type = TypeRef(language="python", name="float")
     method.params[2].name = "text" * 10
-    method.params[2].type = TypeRef("python", "str")
+    method.params[2].type = TypeRef(language="python", name="str")
 
     assert (helper.method_signature(method, max_width=40) == f"""\
 def ShortMethod(
@@ -322,31 +322,31 @@ def ShortMethod(
 
 
 def test_method_signature__ignore_return_type_xref_length(helper):
-    method = Compound("python")
+    method = Compound(language="python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("python", "Type")
+    method.returns.type = TypeRef(language="python", name="Type")
     method.returns.type.id = "ab" * 80
 
     method.params = [Parameter()]
     method.params[0].name = "value"
-    method.params[0].type = TypeRef("python", "int")
+    method.params[0].type = TypeRef(language="python", name="int")
 
     assert (helper.method_signature(method) ==
             f"def ShortMethod(value: int) -> xref:{'ab' * 80}[++Type++]")
 
 
 def test_method_signature__ignore_param_type_xref_length(helper):
-    method = Compound("python")
+    method = Compound(language="python")
     method.name = "ShortMethod"
 
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("python", "None")
+    method.returns.type = TypeRef(language="python", name="None")
 
     method.params = [Parameter()]
     method.params[0].name = "value"
-    method.params[0].type = TypeRef("python", "int")
+    method.params[0].type = TypeRef(language="python", name="int")
     method.params[0].type.id = "ab" * 80
 
     assert (helper.method_signature(method) ==
@@ -354,7 +354,7 @@ def test_method_signature__ignore_param_type_xref_length(helper):
 
 
 def test_parameter(helper):
-    ref = TypeRef("lang")
+    ref = TypeRef(language="lang")
     ref.name = "MyType"
     ref.id = "lang-tomtom_1_MyType"
 

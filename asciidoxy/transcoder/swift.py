@@ -113,7 +113,7 @@ class SwiftTranscoder(TranscoderBase):
                         and original_param.type.suffix
                         and original_param.type.suffix.count("*") == 2):
                     assert param.type
-                    throws_clause = ThrowsClause("swift")
+                    throws_clause = ThrowsClause()
                     throws_clause.type = param.type
                     throws_clause.description = param.description
                     transcoded.exceptions.append(throws_clause)

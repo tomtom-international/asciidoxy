@@ -99,55 +99,55 @@ def test_private_properties__no_filter(helper):
 
 
 def test_objc_method_signature__no_params_simple_return(helper):
-    method = Compound("objc")
+    method = Compound(language="objc")
     method.name = "start"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("objc", name="void")
+    method.returns.type = TypeRef(language="objc", name="void")
     assert helper.method_signature(method) == "- (void)start"
 
 
 def test_objc_method_signature__no_params_link_return(helper):
-    method = Compound("objc")
+    method = Compound(language="objc")
     method.name = "retrieveValue"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("objc", name="Value")
+    method.returns.type = TypeRef(language="objc", name="Value")
     method.returns.type.id = "objc-value"
     assert helper.method_signature(method) == "- (xref:objc-value[++Value++])retrieveValue"
 
 
 def test_objc_method_signature__one_param(helper):
-    method = Compound("objc")
+    method = Compound(language="objc")
     method.name = "setValue:"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("objc", name="Value")
+    method.returns.type = TypeRef(language="objc", name="Value")
     method.returns.type.id = "objc-value"
 
     param1 = Parameter()
     param1.name = "arg1"
-    param1.type = TypeRef("objc", "Type1")
+    param1.type = TypeRef(language="objc", name="Type1")
     method.params = [param1]
 
     assert helper.method_signature(method) == "- (xref:objc-value[++Value++])setValue:(Type1)arg1"
 
 
 def test_objc_method_signature__multiple_params_simple_return(helper):
-    method = Compound("objc")
+    method = Compound(language="objc")
     method.name = "setValue:withUnit:andALongerParam:"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("objc", name="Value")
+    method.returns.type = TypeRef(language="objc", name="Value")
 
     param1 = Parameter()
     param1.name = "arg1"
-    param1.type = TypeRef("objc", "Type1")
+    param1.type = TypeRef(language="objc", name="Type1")
 
     param2 = Parameter()
     param2.name = "arg2"
-    param2.type = TypeRef("objc", "Type2")
+    param2.type = TypeRef(language="objc", name="Type2")
     param2.type.id = "objc-type2"
 
     param3 = Parameter()
     param3.name = "arg3"
-    param3.type = TypeRef("objc", "Type3")
+    param3.type = TypeRef(language="objc", name="Type3")
 
     method.params = [param1, param2, param3]
 
@@ -158,24 +158,24 @@ def test_objc_method_signature__multiple_params_simple_return(helper):
 
 
 def test_objc_method_signature__multiple_params_linked_return(helper):
-    method = Compound("objc")
+    method = Compound(language="objc")
     method.name = "setValue:withUnit:andALongerParam:"
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("objc", name="Value")
+    method.returns.type = TypeRef(language="objc", name="Value")
     method.returns.type.id = "objc-value"
 
     param1 = Parameter()
     param1.name = "arg1"
-    param1.type = TypeRef("objc", "Type1")
+    param1.type = TypeRef(language="objc", name="Type1")
 
     param2 = Parameter()
     param2.name = "arg2"
-    param2.type = TypeRef("objc", "Type2")
+    param2.type = TypeRef(language="objc", name="Type2")
     param2.type.id = "objc-type2"
 
     param3 = Parameter()
     param3.name = "arg3"
-    param3.type = TypeRef("objc", "Type3")
+    param3.type = TypeRef(language="objc", name="Type3")
 
     method.params = [param1, param2, param3]
 
@@ -186,9 +186,9 @@ def test_objc_method_signature__multiple_params_linked_return(helper):
 
 
 def test_objc_method_signature__class_method(helper):
-    method = Compound("objc")
+    method = Compound(language="objc")
     method.name = "start"
     method.static = True
     method.returns = ReturnValue()
-    method.returns.type = TypeRef("objc", name="void")
+    method.returns.type = TypeRef(language="objc", name="void")
     assert helper.method_signature(method) == "+ (void)start"
