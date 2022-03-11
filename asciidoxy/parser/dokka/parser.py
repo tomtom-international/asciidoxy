@@ -171,6 +171,11 @@ class Parser(ReferenceParserBase):
         else:
             kind = self._determine_kind(data.get("type"))
 
+        if "modifier" in data:
+            modifiers = [data["modifier"]]
+        else:
+            modifiers = []
+
         description = Description()
         docs = data.get("docs")
         if docs:
@@ -193,6 +198,7 @@ class Parser(ReferenceParserBase):
                 namespace=dri.namespace,
                 kind=kind,
                 prot=data.get("visibility", ""),
+                modifiers=modifiers,
                 returns=return_value,
                 members=data.get("children", []),
                 params=data.get("parameters", []),

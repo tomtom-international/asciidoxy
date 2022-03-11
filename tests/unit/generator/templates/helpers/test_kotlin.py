@@ -113,51 +113,71 @@ def test_private_constructors__no_filter(helper):
 
 
 def test_parameter(helper):
-    ref = TypeRef(language="kotlin")
-    ref.name = "MyType"
-    ref.id = "kotlin-tomtom_1_MyType"
-
-    param = Parameter()
-    param.type = ref
-    param.name = "arg"
-    param.default_value = "12"
-
+    param = Parameter(
+        type=TypeRef(
+            language="kotlin",
+            name="MyType",
+            id="kotlin-tomtom_1_MyType",
+        ),
+        name="arg",
+        default_value="12",
+    )
     assert (helper.parameter(param, default_value=True) == "arg: xref:kotlin-tomtom_1_MyType"
             "[++MyType++] = 12")
 
 
 def test_method_signature__no_params_no_return(helper):
-    method = Compound(language="kotlin")
-    method.name = "start"
+    method = Compound(
+        language="kotlin",
+        name="start",
+    )
     assert helper.method_signature(method) == "fun start()"
 
 
 def test_method_signature__no_params_simple_return(helper):
-    method = Compound(language="kotlin")
-    method.name = "start"
-    method.returns = ReturnValue()
-    method.returns.type = TypeRef(language="kotlin", name="Int")
+    method = Compound(
+        language="kotlin",
+        name="start",
+        returns=ReturnValue(type=TypeRef(language="kotlin", name="Int"), ),
+    )
     assert helper.method_signature(method) == "fun start(): Int"
 
 
 def test_method_signature__no_params_link_return(helper):
-    method = Compound(language="kotlin")
-    method.name = "retrieveValue"
-    method.returns = ReturnValue()
-    method.returns.type = TypeRef(language="kotlin", name="Value")
-    method.returns.type.id = "kotlin-value"
+    method = Compound(
+        language="kotlin",
+        name="retrieveValue",
+        returns=ReturnValue(type=TypeRef(language="kotlin", name="Value", id="kotlin-value"), ),
+    )
     assert helper.method_signature(method) == "fun retrieveValue(): xref:kotlin-value[++Value++]"
 
 
 def test_method_signature__one_param(helper):
-    method = Compound(language="kotlin")
-    method.name = "setValue"
-    method.returns = ReturnValue()
-    method.returns.type = TypeRef(language="kotlin", name="Value")
-
-    param1 = Parameter()
-    param1.name = "arg1"
-    param1.type = TypeRef(language="objc", name="Type1")
-    method.params = [param1]
-
+    method = Compound(
+        language="kotlin",
+        name="setValue",
+        returns=ReturnValue(type=TypeRef(language="kotlin", name="Value"), ),
+        params=[
+            Parameter(
+                name="arg1",
+                type=TypeRef(language="objc", name="Type1"),
+            ),
+        ],
+    )
     assert helper.method_signature(method) == "fun setValue(arg1: Type1): Value"
+
+
+def test_method_signature__modifier(helper):
+    method = Compound(
+        language="kotlin",
+        name="setValue",
+        returns=ReturnValue(type=TypeRef(language="kotlin", name="Value"), ),
+        params=[
+            Parameter(
+                name="arg1",
+                type=TypeRef(language="objc", name="Type1"),
+            ),
+        ],
+        modifiers=["open"],
+    )
+    assert helper.method_signature(method) == "open fun setValue(arg1: Type1): Value"

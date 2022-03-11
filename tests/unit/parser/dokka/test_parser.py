@@ -56,6 +56,7 @@ def test_create_dokka_parser(generated_test_data):
                   namespace="asciidoxy",
                   kind="class",
                   prot="public",
+                  modifiers=["final"],
                   brief="Class to hold information about a coordinate.",
                   description="A coordinate has a latitude, longitude, and an altitude.",
                   members=Unordered(
@@ -77,6 +78,7 @@ def test_create_dokka_parser(generated_test_data):
                 namespace="asciidoxy.Coordinate",
                 kind="function",
                 prot="public",
+                modifiers=["final"],
                 brief="Check if the coordinate is valid.",
                 description="A coordinate is valid if its values are within WGS84 bounds.",
                 params=[],
@@ -99,6 +101,7 @@ def test_create_dokka_parser(generated_test_data):
                 namespace="asciidoxy.Coordinate",
                 kind="property",
                 prot="public",
+                modifiers=["final"],
                 brief="The latitude in degrees.",
                 description=IsEmpty(),
                 returns=m_returnvalue(
@@ -121,6 +124,7 @@ def test_create_dokka_parser(generated_test_data):
                 namespace="asciidoxy.Coordinate",
                 kind="constructor",
                 prot="public",
+                modifiers=["final"],
                 brief=IsEmpty(),
                 params=[
                     m_parameter(

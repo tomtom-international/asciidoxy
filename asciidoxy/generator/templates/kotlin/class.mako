@@ -14,7 +14,7 @@
 
 ################################################################################ Helper includes ##
 <%!
-from asciidoxy.generator.templates.helpers import has, has_any, h1, h2, tc
+from asciidoxy.generator.templates.helpers import has, has_any, h1, h2, tc, prefix_join
 from asciidoxy.generator.templates.java.helpers import JavaTemplateHelper
 from asciidoxy.generator.templates.kotlin.helpers import KotlinTemplateHelper
 from html import escape
@@ -31,7 +31,7 @@ ${api.inserted(element)}
 
 [source,kotlin,subs="-specialchars,macros+"]
 ----
-${element.kind} ${element.full_name}
+${prefix_join(*element.modifiers)}${element.kind} ${element.full_name}
 ----
 ${element.brief}
 
@@ -175,7 +175,7 @@ ${api.insert_fragment(constructor, insert_filter, kind_override="method", levelo
 ${api.inserted(prop)}
 [source,kotlin,subs="-specialchars,macros+"]
 ----
-val ${prop.name}: ${prop.returns.type.name}
+${prefix_join(*prop.modifiers)}val ${prop.name}: ${prop.returns.type.name}
 ----
 
 ${prop.brief | tc}

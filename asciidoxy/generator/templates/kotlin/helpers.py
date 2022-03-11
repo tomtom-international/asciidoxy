@@ -16,7 +16,7 @@
 from itertools import chain
 from typing import Iterator
 
-from asciidoxy.generator.templates.helpers import TemplateHelper
+from asciidoxy.generator.templates.helpers import TemplateHelper, spaced_join
 from asciidoxy.model import Compound
 
 
@@ -33,7 +33,7 @@ class KotlinTemplateHelper(TemplateHelper):
                     and m.returns.type.prefix and "final" in m.returns.type.prefix))
 
     def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
-        return "fun"
+        return spaced_join(*method.modifiers, "fun")
 
     def _method_suffix(self, method: Compound, *, link: bool = True) -> str:
         if method.returns:
