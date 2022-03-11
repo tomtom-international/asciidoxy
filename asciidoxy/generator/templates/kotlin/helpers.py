@@ -23,6 +23,11 @@ from asciidoxy.model import Compound
 class KotlinTemplateHelper(TemplateHelper):
     PARAM_NAME_FIRST = True
     PARAM_NAME_SEP = ": "
+    COMPLEX_ENCLOSED_TYPES = (
+        "class",
+        "interface",
+        "object",
+    )
 
     def constants(self, prot: str) -> Iterator[Compound]:
         assert self.element is not None
@@ -33,7 +38,7 @@ class KotlinTemplateHelper(TemplateHelper):
                     and m.returns.type.prefix and "final" in m.returns.type.prefix))
 
     def _method_prefix(self, method: Compound, *, link: bool = True) -> str:
-        return spaced_join(*method.modifiers, "fun")
+        return spaced_join(*kotlin_modifiers(method), "fun")
 
     def _method_suffix(self, method: Compound, *, link: bool = True) -> str:
         if method.returns:
@@ -48,3 +53,7 @@ class KotlinTemplateHelper(TemplateHelper):
         return chain((m for m in self.insert_filter.members(self.element)
                       if m.kind == "constructor" and m.prot == prot),
                      super().constructors(prot))
+
+
+def kotlin_modifiers(element: Compound):
+    return [m for m in element.modifiers if m != "final"]

@@ -37,4 +37,19 @@ class Coordinate(
      * @return True if valid, false if not.
      */
     fun isValid(): Boolean { ... }
+
+    companion object {
+        /**
+         * Create a coordinate without altitude.
+         *
+         * @param latitude The latitude in degrees.
+         * @param longitude The longitude in degrees.
+         */
+        fun create(latitude: Double, longitude: Double): Coordinate { ... }
+
+        /**
+         * Invalid value for latitudes and longitudes.
+         */
+        const val INVALID: Double = -181.0
+    }
 }
