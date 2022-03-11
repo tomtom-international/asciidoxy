@@ -171,10 +171,16 @@ class Parser(ReferenceParserBase):
         else:
             kind = self._determine_kind(data.get("type"))
 
-        if "modifier" in data:
-            modifiers = [data["modifier"]]
+        if "modifiers" in data:
+            modifiers = data["modifiers"]
         else:
             modifiers = []
+
+        if "isMutable" in data:
+            if data["isMutable"]:
+                modifiers.append("var")
+            else:
+                modifiers.append("val")
 
         description = Description()
         docs = data.get("docs")
