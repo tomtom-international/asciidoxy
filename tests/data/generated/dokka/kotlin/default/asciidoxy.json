@@ -27,6 +27,7 @@
                                 ],
                                 "presentableName": null
                             },
+                            "modifier": "final",
                             "docs": {
                                 "Description": "<MARKDOWN_FILE><P>Check if the coordinate is valid.</P><P>A coordinate is valid if its values are within WGS84 bounds.</P></MARKDOWN_FILE>",
                                 "Return": "<MARKDOWN_FILE><P>True if valid, false if not.</P></MARKDOWN_FILE>"
@@ -44,6 +45,7 @@
                                 ],
                                 "presentableName": null
                             },
+                            "modifier": "final",
                             "docs": {
                                 "Property: latitude": "<MARKDOWN_FILE><P>The latitude in degrees.</P></MARKDOWN_FILE>"
                             }
@@ -60,6 +62,7 @@
                                 ],
                                 "presentableName": null
                             },
+                            "modifier": "final",
                             "docs": {
                                 "Property: longitude": "<MARKDOWN_FILE><P>The longitude in degrees.</P></MARKDOWN_FILE>"
                             }
@@ -76,6 +79,7 @@
                                 ],
                                 "presentableName": null
                             },
+                            "modifier": "final",
                             "docs": {
                                 "Property: altitude": "<MARKDOWN_FILE><P>The altitude in meters.</P></MARKDOWN_FILE>"
                             }
@@ -140,12 +144,14 @@
                                 ],
                                 "presentableName": null
                             },
+                            "modifier": "final",
                             "docs": {
                             }
                         }
                     ],
                     "visibility": "public",
                     "kind": "class",
+                    "modifier": "final",
                     "docs": {
                         "Description": "<MARKDOWN_FILE><P>Class to hold information about a coordinate.</P><P>A coordinate has a latitude, longitude, and an altitude.</P></MARKDOWN_FILE>",
                         "Property: latitude": "<MARKDOWN_FILE><P>The latitude in degrees.</P></MARKDOWN_FILE>",
