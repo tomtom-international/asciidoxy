@@ -30,7 +30,7 @@ import urllib
 import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Mapping, Optional, Sequence, Type, TypeVar, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Type, TypeVar, Union
 
 import aiohttp
 import toml
@@ -95,8 +95,6 @@ class NetrcAuth(aiohttp.BasicAuth):
         login, account, password = auth_tuple
         return super().__new__(cls, login=login, password=password)
 
-
-AUTH_BASIC_NETRC = "basic_netrc"
 
 PackageSpecT = TypeVar("PackageSpecT", bound="PackageSpec")
 
@@ -257,7 +255,7 @@ class HttpPackageSpec(PackageSpec):
     version: str
     url_template: str
     file_names: List[str]
-    authentication_type: Optional[Literal[AUTH_BASIC_NETRC]]
+    authentication_type: Optional[str]
 
     def __init__(self, name: str, version: str, url_template: str):
         super().__init__(name)
@@ -306,7 +304,7 @@ class HttpPackageSpec(PackageSpec):
         await asyncio.gather(*jobs)
 
     def _make_authentication(self, url: str):
-        if self.authentication_type == AUTH_BASIC_NETRC:
+        if self.authentication_type is None:
             try:
                 return NetrcAuth(url)
             except FileNotFoundError:
@@ -341,10 +339,6 @@ class HttpPackageSpec(PackageSpec):
                                  url_template=get("url_template"),
                                  **init_args)
         spec.file_names = get("file_names")
-
-        authentication = get("authentication", optional=True)
-        if authentication:
-            spec.authentication_type = authentication.get("type", None)
 
         if not isinstance(spec.file_names, list):
             raise SpecificationError(f"Package {name} `file_names` must be a list.")
