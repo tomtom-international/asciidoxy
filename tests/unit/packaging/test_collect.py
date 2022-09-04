@@ -15,8 +15,11 @@
 
 from pathlib import Path
 
+import base64
+import os
 import pytest
 from aiohttp import web
+from unittest import mock
 
 from asciidoxy.packaging.collect import (
     DownloadError,
@@ -242,6 +245,58 @@ async def test_http_package__cache_corrupt(aiohttp_server, tmp_path):
     (tmp_path / "test" / "1.0.0" / "contents.toml").touch()
 
     packages = await collect([spec], tmp_path)
+
+    assert len(packages) == 1
+    pkg = packages[0]
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+
+    assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
+    assert pkg.reference_dir.is_dir()
+    assert (pkg.reference_dir / "content.xml").is_file()
+
+    assert pkg.adoc_src_dir == tmp_path / "test" / "1.0.0" / "adoc"
+    assert pkg.adoc_src_dir.is_dir()
+    assert (pkg.adoc_src_dir / "content.adoc").is_file()
+
+    assert pkg.adoc_image_dir == tmp_path / "test" / "1.0.0" / "images"
+    assert pkg.adoc_image_dir.is_dir()
+    assert (pkg.adoc_image_dir / "picture.png").is_file()
+
+    assert pkg.adoc_root_doc == tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc"
+    assert pkg.adoc_root_doc.is_file()
+
+
+async def test_http_package__auth_netrc(aiohttp_server, tmp_path):
+    auth_login = "test_user"
+    auth_password = "test_password"
+
+    netrc_file = tmp_path / "custom_netrc"
+    netrc_file.write_text('\n'.join([
+        "default",
+        f"login {auth_login}",
+        f"password {auth_password}"]))
+
+    async def package_file_response_with_auth(request):
+        auth_header = request.headers.get("Authorization")
+        assert auth_header
+
+        decoded_creds = base64.b64decode(auth_header.split()[-1]).decode()
+        assert decoded_creds == f"{auth_login}:{auth_password}"
+
+        return await package_file_response(request)
+
+
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/package",
+                                                        package_file_response_with_auth))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.file_names = ["package"]
+
+    with mock.patch.dict(os.environ, {"NETRC": str(netrc_file)}):
+        packages = await collect([spec], tmp_path)
 
     assert len(packages) == 1
     pkg = packages[0]

@@ -22,9 +22,11 @@ import asyncio
 import csv
 import io
 import logging
+import netrc
 import os
 import shutil
 import tarfile
+import urllib
 import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -79,6 +81,19 @@ class SpecificationError(Exception):
 
     def __str__(self) -> str:
         return f"Invalid specification: {self.message}"
+
+
+class NetrcAuth(aiohttp.BasicAuth):
+    def __new__(cls, url):
+        netrc_envvar = os.getenv("NETRC")
+        kwargs = {"file": netrc_envvar} if netrc_envvar else {}
+
+        host = urllib.parse.urlparse(url).hostname
+        auth_tuple = netrc.netrc(**kwargs).authenticators(host)
+        if auth_tuple is None:
+            return None
+        login, account, password = auth_tuple
+        return super().__new__(cls, login=login, password=password)
 
 
 PackageSpecT = TypeVar("PackageSpecT", bound="PackageSpec")
@@ -240,12 +255,14 @@ class HttpPackageSpec(PackageSpec):
     version: str
     url_template: str
     file_names: List[str]
+    authentication_type: Optional[str]
 
     def __init__(self, name: str, version: str, url_template: str):
         super().__init__(name)
         self.version = version
         self.url_template = url_template
         self.file_names = []
+        self.authentication_type = None
 
     async def collect(self, download_dir: Path, session: aiohttp.ClientSession) -> Package:
         """See PackageSpec.collect"""
@@ -286,9 +303,18 @@ class HttpPackageSpec(PackageSpec):
             jobs.append(self._download(session, url, package_dir))
         await asyncio.gather(*jobs)
 
+    def _make_authentication(self, url: str):
+        if self.authentication_type is None:
+            try:
+                return NetrcAuth(url)
+            except FileNotFoundError:
+                pass
+        return None
+
     async def _download(self, session: aiohttp.ClientSession, url: str, target_dir: Path):
         try:
-            async with session.get(url) as response:
+            auth = self._make_authentication(url)
+            async with session.get(url, auth=auth) as response:
                 data = await response.read()
         except aiohttp.client_exceptions.ClientResponseError as http_error:
             raise DownloadError(self.name, f"Failed to download: {http_error}.") from http_error
