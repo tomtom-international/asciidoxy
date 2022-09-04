@@ -18,6 +18,16 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.8.6 (4 Sep 2022)
+
+=== Added
+
+  * User name and password for HTTP package sources can be specified in the package spec file. The
+    user name and password can be either hardcoded in the spec file or can be provided in an 
+    environment variable. If no user name or password is specified, the local netrc file is used.
+    Thanks to Andrey Potapov for providing the netrc implementation.
+
+
 == 0.8.5 (25 Feb 2022)
 
 === Fixed

@@ -13,13 +13,13 @@
 # limitations under the License.
 """Tests for collecting source files."""
 
-from pathlib import Path
-
 import base64
 import os
+from pathlib import Path
+from unittest import mock
+
 import pytest
 from aiohttp import web
-from unittest import mock
 
 from asciidoxy.packaging.collect import (
     DownloadError,
@@ -65,18 +65,7 @@ async def text_response(request):
     return web.Response(text="normal text instead of a file")
 
 
-async def test_http_package__contents_toml(aiohttp_server, tmp_path):
-    server = await start_server(aiohttp_server, web.get("/test/1.0.0/package",
-                                                        package_file_response))
-
-    spec = HttpPackageSpec("test", "1.0.0",
-                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
-    spec.file_names = ["package"]
-
-    packages = await collect([spec], tmp_path)
-
-    assert len(packages) == 1
-    pkg = packages[0]
+def verify_default_package(pkg, tmp_path):
     assert pkg.name == "package"
     assert pkg.scoped is True
     assert pkg.reference_type == "doxygen"
@@ -95,6 +84,20 @@ async def test_http_package__contents_toml(aiohttp_server, tmp_path):
 
     assert pkg.adoc_root_doc == tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc"
     assert pkg.adoc_root_doc.is_file()
+
+
+async def test_http_package__contents_toml(aiohttp_server, tmp_path):
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/package",
+                                                        package_file_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.file_names = ["package"]
+
+    packages = await collect([spec], tmp_path)
+
+    assert len(packages) == 1
+    verify_default_package(packages[0], tmp_path)
 
 
 async def test_http_package__contents_toml__spec_dirs_ignored(aiohttp_server, tmp_path):
@@ -110,25 +113,7 @@ async def test_http_package__contents_toml__spec_dirs_ignored(aiohttp_server, tm
     packages = await collect([spec], tmp_path)
 
     assert len(packages) == 1
-    pkg = packages[0]
-    assert pkg.name == "package"
-    assert pkg.scoped is True
-    assert pkg.reference_type == "doxygen"
-
-    assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
-    assert pkg.reference_dir.is_dir()
-    assert (pkg.reference_dir / "content.xml").is_file()
-
-    assert pkg.adoc_src_dir == tmp_path / "test" / "1.0.0" / "adoc"
-    assert pkg.adoc_src_dir.is_dir()
-    assert (pkg.adoc_src_dir / "content.adoc").is_file()
-
-    assert pkg.adoc_image_dir == tmp_path / "test" / "1.0.0" / "images"
-    assert pkg.adoc_image_dir.is_dir()
-    assert (pkg.adoc_image_dir / "picture.png").is_file()
-
-    assert pkg.adoc_root_doc == tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc"
-    assert pkg.adoc_root_doc.is_file()
+    verify_default_package(packages[0], tmp_path)
 
 
 async def test_http_package__old__xml_only(aiohttp_server, tmp_path):
@@ -247,25 +232,7 @@ async def test_http_package__cache_corrupt(aiohttp_server, tmp_path):
     packages = await collect([spec], tmp_path)
 
     assert len(packages) == 1
-    pkg = packages[0]
-    assert pkg.name == "package"
-    assert pkg.scoped is True
-    assert pkg.reference_type == "doxygen"
-
-    assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
-    assert pkg.reference_dir.is_dir()
-    assert (pkg.reference_dir / "content.xml").is_file()
-
-    assert pkg.adoc_src_dir == tmp_path / "test" / "1.0.0" / "adoc"
-    assert pkg.adoc_src_dir.is_dir()
-    assert (pkg.adoc_src_dir / "content.adoc").is_file()
-
-    assert pkg.adoc_image_dir == tmp_path / "test" / "1.0.0" / "images"
-    assert pkg.adoc_image_dir.is_dir()
-    assert (pkg.adoc_image_dir / "picture.png").is_file()
-
-    assert pkg.adoc_root_doc == tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc"
-    assert pkg.adoc_root_doc.is_file()
+    verify_default_package(packages[0], tmp_path)
 
 
 async def test_http_package__auth_netrc(aiohttp_server, tmp_path):
@@ -273,10 +240,8 @@ async def test_http_package__auth_netrc(aiohttp_server, tmp_path):
     auth_password = "test_password"
 
     netrc_file = tmp_path / "custom_netrc"
-    netrc_file.write_text('\n'.join([
-        "default",
-        f"login {auth_login}",
-        f"password {auth_password}"]))
+    netrc_file.write_text('\n'.join(["default", f"login {auth_login}",
+                                     f"password {auth_password}"]))
 
     async def package_file_response_with_auth(request):
         auth_header = request.headers.get("Authorization")
@@ -287,9 +252,8 @@ async def test_http_package__auth_netrc(aiohttp_server, tmp_path):
 
         return await package_file_response(request)
 
-
-    server = await start_server(aiohttp_server, web.get("/test/1.0.0/package",
-                                                        package_file_response_with_auth))
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/package", package_file_response_with_auth))
 
     spec = HttpPackageSpec("test", "1.0.0",
                            f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
@@ -299,25 +263,124 @@ async def test_http_package__auth_netrc(aiohttp_server, tmp_path):
         packages = await collect([spec], tmp_path)
 
     assert len(packages) == 1
-    pkg = packages[0]
-    assert pkg.name == "package"
-    assert pkg.scoped is True
-    assert pkg.reference_type == "doxygen"
+    verify_default_package(packages[0], tmp_path)
 
-    assert pkg.reference_dir == tmp_path / "test" / "1.0.0" / "xml"
-    assert pkg.reference_dir.is_dir()
-    assert (pkg.reference_dir / "content.xml").is_file()
 
-    assert pkg.adoc_src_dir == tmp_path / "test" / "1.0.0" / "adoc"
-    assert pkg.adoc_src_dir.is_dir()
-    assert (pkg.adoc_src_dir / "content.adoc").is_file()
+async def test_http_package__auth_not_in_netrc(aiohttp_server, tmp_path):
+    netrc_file = tmp_path / "custom_netrc"
+    netrc_file.touch()
 
-    assert pkg.adoc_image_dir == tmp_path / "test" / "1.0.0" / "images"
-    assert pkg.adoc_image_dir.is_dir()
-    assert (pkg.adoc_image_dir / "picture.png").is_file()
+    async def package_file_response_with_auth(request):
+        auth_header = request.headers.get("Authorization")
+        assert not auth_header
+        return await package_file_response(request)
 
-    assert pkg.adoc_root_doc == tmp_path / "test" / "1.0.0" / "adoc" / "content.adoc"
-    assert pkg.adoc_root_doc.is_file()
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/package", package_file_response_with_auth))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.file_names = ["package"]
+
+    with mock.patch.dict(os.environ, {"NETRC": str(netrc_file)}):
+        packages = await collect([spec], tmp_path)
+
+    assert len(packages) == 1
+    verify_default_package(packages[0], tmp_path)
+
+
+async def test_http_package__auth_in_spec(aiohttp_server, tmp_path):
+    auth_login = "test_user"
+    auth_password = "test_password"
+
+    async def package_file_response_with_auth(request):
+        auth_header = request.headers.get("Authorization")
+        assert auth_header
+
+        decoded_creds = base64.b64decode(auth_header.split()[-1]).decode()
+        assert decoded_creds == f"{auth_login}:{auth_password}"
+
+        return await package_file_response(request)
+
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/package", package_file_response_with_auth))
+
+    spec = HttpPackageSpec("test",
+                           "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}",
+                           login=auth_login,
+                           password=auth_password)
+    spec.file_names = ["package"]
+
+    packages = await collect([spec], tmp_path)
+
+    assert len(packages) == 1
+    verify_default_package(packages[0], tmp_path)
+
+
+async def test_http_package__auth_in_env(aiohttp_server, tmp_path):
+    auth_login = "test_user"
+    auth_password = "test_password"
+    login_env = "TEST_LOGIN"
+    password_env = "TEST_PASS"
+
+    async def package_file_response_with_auth(request):
+        auth_header = request.headers.get("Authorization")
+        assert auth_header
+
+        decoded_creds = base64.b64decode(auth_header.split()[-1]).decode()
+        assert decoded_creds == f"{auth_login}:{auth_password}"
+
+        return await package_file_response(request)
+
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/package", package_file_response_with_auth))
+
+    spec = HttpPackageSpec("test",
+                           "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}",
+                           login_env=login_env,
+                           password_env=password_env)
+    spec.file_names = ["package"]
+
+    with mock.patch.dict(os.environ, {login_env: auth_login, password_env: auth_password}):
+        packages = await collect([spec], tmp_path)
+
+    assert len(packages) == 1
+    verify_default_package(packages[0], tmp_path)
+
+
+async def test_http_package__auth_spec_overrides_netrc(aiohttp_server, tmp_path):
+    auth_login = "test_user"
+    auth_password = "test_password"
+
+    netrc_file = tmp_path / "custom_netrc"
+    netrc_file.write_text('\n'.join(["default", "login other_user", "password other_password"]))
+
+    async def package_file_response_with_auth(request):
+        auth_header = request.headers.get("Authorization")
+        assert auth_header
+
+        decoded_creds = base64.b64decode(auth_header.split()[-1]).decode()
+        assert decoded_creds == f"{auth_login}:{auth_password}"
+
+        return await package_file_response(request)
+
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/package", package_file_response_with_auth))
+
+    spec = HttpPackageSpec("test",
+                           "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}",
+                           login=auth_login,
+                           password=auth_password)
+    spec.file_names = ["package"]
+
+    with mock.patch.dict(os.environ, {"NETRC": str(netrc_file)}):
+        packages = await collect([spec], tmp_path)
+
+    assert len(packages) == 1
+    verify_default_package(packages[0], tmp_path)
 
 
 async def test_http_package__old__subdirs_not_specified(aiohttp_server, tmp_path):
