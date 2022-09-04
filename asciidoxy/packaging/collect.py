@@ -22,9 +22,11 @@ import asyncio
 import csv
 import io
 import logging
+import netrc
 import os
 import shutil
 import tarfile
+import urllib
 import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -220,6 +222,26 @@ class LocalPackageSpec(PackageSpec):
         return super().from_toml(name, raw_spec, package_dir=Path(get("package_dir")), **init_args)
 
 
+class NetrcAuth(aiohttp.BasicAuth):
+    """Basic authentication using information from netrc.
+
+    Constructs as a None-object if no authentication details are found.
+    """
+    def __new__(cls, url):
+        netrc_envvar = os.getenv("NETRC")
+        kwargs = {"file": netrc_envvar} if netrc_envvar else {}
+
+        host = urllib.parse.urlparse(url).hostname
+        try:
+            auth_tuple = netrc.netrc(**kwargs).authenticators(host)
+        except FileNotFoundError:
+            return None
+        if auth_tuple is None:
+            return None
+        login, account, password = auth_tuple
+        return super().__new__(cls, login=login, password=password)
+
+
 class HttpPackageSpec(PackageSpec):
     """Specification of a package downloaded from a remote server.
 
@@ -233,19 +255,38 @@ class HttpPackageSpec(PackageSpec):
     * `{file_name}`: Replaced with the file name.
 
     Attributes:
-        version: Version number of the package.
-        url_template: Template for creating the URL to download the tar files from.
-        file_names: List of files to download.
+        version:        Version number of the package.
+        url_template:   Template for creating the URL to download the tar files from.
+        file_names:     List of files to download.
+        login:          User name for the URL.
+        password:       Password for the URL.
+        login_env:      Environment variable containing the user name.
+        password_env:   Environment variable containing the password.
     """
     version: str
     url_template: str
     file_names: List[str]
+    login: Optional[str]
+    password: Optional[str]
+    login_env: Optional[str]
+    password_env: Optional[str]
 
-    def __init__(self, name: str, version: str, url_template: str):
+    def __init__(self,
+                 name: str,
+                 version: str,
+                 url_template: str,
+                 login: Optional[str] = None,
+                 password: Optional[str] = None,
+                 login_env: Optional[str] = None,
+                 password_env: Optional[str] = None):
         super().__init__(name)
         self.version = version
         self.url_template = url_template
         self.file_names = []
+        self.login = login
+        self.password = password
+        self.login_env = login_env
+        self.password_env = password_env
 
     async def collect(self, download_dir: Path, session: aiohttp.ClientSession) -> Package:
         """See PackageSpec.collect"""
@@ -288,7 +329,8 @@ class HttpPackageSpec(PackageSpec):
 
     async def _download(self, session: aiohttp.ClientSession, url: str, target_dir: Path):
         try:
-            async with session.get(url) as response:
+            auth = self._make_authentication(url)
+            async with session.get(url, auth=auth) as response:
                 data = await response.read()
         except aiohttp.client_exceptions.ClientResponseError as http_error:
             raise DownloadError(self.name, f"Failed to download: {http_error}.") from http_error
@@ -302,6 +344,28 @@ class HttpPackageSpec(PackageSpec):
                 shutil.rmtree(target_dir)
             raise DownloadError(self.name, f"Cannot read tar file from {url}.") from tar_error
 
+    def _make_authentication(self, url):
+        if self.login_env:
+            login = os.getenv(self.login_env)
+            if login is None:
+                raise SpecificationError(
+                    f"Package {self.name}: environment variable `{self.login_env}` is not set.")
+        else:
+            login = self.login
+
+        if self.password_env:
+            password = os.getenv(self.password_env)
+            if password is None:
+                raise SpecificationError(
+                    f"Package {self.name}: environment variable `{self.password_env}` is not set.")
+        else:
+            password = self.password
+
+        if login or password:
+            return aiohttp.BasicAuth(login=login, password=password)
+        else:
+            return NetrcAuth(url)
+
     @classmethod
     def from_toml(cls, name: str, raw_spec: Mapping[str, Any], **init_args) -> "HttpPackageSpec":
         """See PackageSpec.from_toml"""
@@ -311,6 +375,10 @@ class HttpPackageSpec(PackageSpec):
                                  raw_spec,
                                  version=get("version"),
                                  url_template=get("url_template"),
+                                 login=get("login", optional=True),
+                                 password=get("password", optional=True),
+                                 login_env=get("login_env", optional=True),
+                                 password_env=get("password_env", optional=True),
                                  **init_args)
         spec.file_names = get("file_names")
 

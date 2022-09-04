@@ -99,6 +99,10 @@ The following additional key/value pairs are required:
 The following additional key/value pairs are optional:
 
 `version`:: Version number of the package.
+`login`:: User name to login to the HTTP server.
+`password`:: Password to login to the HTTP server.
+`login_env`:: Environment variable containing the user name to login to the HTTP server.
+`password_env`:: Environment variable containing the password to login to the HTTP server.
 
 The `url_template` can contain the following placeholders, that are replaced when creating the URL
 to download each package file:
@@ -106,6 +110,18 @@ to download each package file:
 `{name}`:: Replaced with the name of the package.
 `{version}`:: Replaced with the version of the package.
 `{file_name}`:: Replaced with the file name.
+
+When one or more of `login`, `password`, `login_env`, or `password_env` is provided, they are used 
+to authenticate to the HTTP server. `login` and `password` contain the authentication details in 
+plain text in the specification file. It is not recommended to use `password`.
+
+`login_env` and `password_env` contain the name of an environment variable providing the value for 
+respectively `login` and `password`. They overrule `login` and `password`. If the environment 
+variable is not set, an error will be given. It is possible to combine `login` with `password_env` 
+and `login_env` with `password`.
+
+If none of `login`, `password`, `login_env`, or `password_env` are given, the system netrc file is 
+inspected to find authentication settings for the host name.
 
 Example:
 
@@ -119,6 +135,8 @@ url_template = "https://example.com/{name}/{version}/{file_name}"
 xml_subdir = "xml"
 include_subdir = "adoc"
 version = "12.3.4"
+login = "asciidoxy"
+password_env = "ASCIIDOXY_PASSWORD"
 ----
 
 If no `version` is specified for the package, the version is retrieved from a version file. The
