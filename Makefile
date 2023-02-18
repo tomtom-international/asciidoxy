@@ -112,7 +112,7 @@ virtualenv: ## set up a development environment
 	. .venv/bin/activate && python3 setup.py develop
 
 docker: dist ## build the docker image
-	cd docker && ./gradlew build
+	docker build -f docker/Dockerfile -t asciidoxy:testing dist/
 
 format: ## format the code
 	yapf -r -i -p setup.py asciidoxy tests/unit
