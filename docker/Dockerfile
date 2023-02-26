@@ -36,7 +36,7 @@ RUN gem install \
   asciidoctor-rouge
 
 COPY *.whl /tmp/
-RUN PYTHON_DEV_PKGS="gcc g++ python3-dev" \
+RUN PYTHON_DEV_PKGS="gcc g++ python3-dev libffi-dev" \
   && apk add --no-cache $PYTHON_DEV_PKGS \
   && pip3 install --no-cache --upgrade /tmp/*.whl \
   && rm -f /tmp/*.whl \

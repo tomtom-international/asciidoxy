@@ -48,6 +48,7 @@ DOXYGEN_VERSIONS := 1.8.17 1.8.18 1.8.20 1.9.1 1.9.2
 export LATEST_DOXYGEN_VERSION := 1.9.2
 
 DOCKER_IMAGE_VERSION ?= testing
+DOCKER_IMAGE_PLATFORM ?= linux/amd64
 
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
@@ -114,7 +115,10 @@ virtualenv: ## set up a development environment
 	. .venv/bin/activate && python3 setup.py develop
 
 docker: dist ## build the docker image
-	docker build -f docker/Dockerfile -t asciidoxy:$(DOCKER_IMAGE_VERSION) dist/
+	docker build -f docker/Dockerfile \
+		-t asciidoxy:$(DOCKER_IMAGE_VERSION) \
+		--platform $(DOCKER_IMAGE_PLATFORM) \
+		dist/
 
 format: ## format the code
 	yapf -r -i -p setup.py asciidoxy tests/unit
@@ -171,7 +175,9 @@ DOCKER_TEST_CASE_BUILD_DIR := build/docker-test
 
 define DOCKER_TEST_template
 docker-test-$(notdir $(basename $(1))): $(patsubst %.toml,%.adoc,$(1))
-	docker run --rm -v `pwd`:`pwd` -w `pwd` asciidoxy:$(DOCKER_IMAGE_VERSION) \
+	docker run --rm -v `pwd`:`pwd` -w `pwd` \
+		--platform $(DOCKER_IMAGE_PLATFORM) \
+		asciidoxy:$(DOCKER_IMAGE_VERSION) \
 		asciidoxy $(patsubst %.toml,%.adoc,$(1)) \
 			--build-dir $(DOCKER_TEST_CASE_BUILD_DIR) \
 			--spec-file $(1) \
