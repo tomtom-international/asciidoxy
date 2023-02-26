@@ -1,6 +1,6 @@
 build==0.7.0
 colorclass==2.2.2
-conan==1.44.0
+conan==1.59.0
 coverage==6.2
 doxypypy==0.8.8.6
 flake8==4.0.1
