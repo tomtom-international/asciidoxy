@@ -1,0 +1,17 @@
+name: Verify changes on develop branches
+
+on:
+  push:
+    branches:
+      - develop
+      - 'develop-*'
+      - docker-image
+
+jobs:
+  docker:
+    name: Create and test Docker images
+    uses: ./.github/workflows/docker.yml
+    with:
+      release: false
+    secrets: inherit
+

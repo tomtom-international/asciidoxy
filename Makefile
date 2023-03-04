@@ -47,6 +47,7 @@ export BUILD_DIR = $(CURDIR)/build
 DOXYGEN_VERSIONS := 1.8.17 1.8.18 1.8.20 1.9.1 1.9.2
 export LATEST_DOXYGEN_VERSION := 1.9.2
 
+DOCKER_IMAGE_NAME ?= silvester747/asciidoxy
 DOCKER_IMAGE_VERSION ?= testing
 DOCKER_IMAGE_PLATFORM ?= linux/amd64
 
@@ -116,7 +117,7 @@ virtualenv: ## set up a development environment
 
 docker: dist ## build the docker image
 	docker build -f docker/Dockerfile \
-		-t asciidoxy:$(DOCKER_IMAGE_VERSION) \
+		-t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) \
 		--platform $(DOCKER_IMAGE_PLATFORM) \
 		dist/
 
@@ -177,7 +178,7 @@ define DOCKER_TEST_template
 docker-test-$(notdir $(basename $(1))): $(patsubst %.toml,%.adoc,$(1))
 	docker run --rm -v `pwd`:`pwd` -w `pwd` \
 		--platform $(DOCKER_IMAGE_PLATFORM) \
-		asciidoxy:$(DOCKER_IMAGE_VERSION) \
+		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) \
 		asciidoxy $(patsubst %.toml,%.adoc,$(1)) \
 			--build-dir $(DOCKER_TEST_CASE_BUILD_DIR) \
 			--spec-file $(1) \
