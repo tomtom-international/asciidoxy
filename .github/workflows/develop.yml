@@ -5,12 +5,16 @@ on:
     branches:
       - develop
       - 'develop-*'
-      - docker-image
 
 jobs:
+  test:
+    name: Test python package
+    uses: ./.github/workflows/python-test.yml
+
   docker:
     name: Create and test Docker images
     uses: ./.github/workflows/docker.yml
+    needs: test
     with:
       release: false
     secrets: inherit
