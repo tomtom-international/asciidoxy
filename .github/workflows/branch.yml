@@ -1,12 +1,10 @@
-name: Verify changes on (PRs to) develop branches
+name: Verify changes on feature branches
 
 on:
   push:
-    branches:
-      - develop
-      - 'develop-*'
-  pull_request:
-    branches:
+    branches-ignore:
+      - master
+      - main
       - develop
       - 'develop-*'
 
@@ -21,6 +19,6 @@ jobs:
     needs: test
     with:
       release: false
-      push: true
+      push: false
     secrets: inherit
 
