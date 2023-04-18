@@ -76,6 +76,7 @@ class Configuration(argparse.Namespace):
     log_level: str
     force_language: Optional[str] = None
     multipage: bool
+    nonav: bool
 
     safe_mode: str
     attribute: List[str]
@@ -154,6 +155,10 @@ def parse_args(argv):
     behavior_group.add_argument("--multipage",
                                 action="store_true",
                                 help="Generate multi-page document.")
+    behavior_group.add_argument("--nonav",
+                                action="store_true",
+                                help="When used with --multipage."
+                                " Generate multi-page document (without navigation bar).")
     behavior_group.add_argument("-W",
                                 "--warnings-are-errors",
                                 action="store_true",

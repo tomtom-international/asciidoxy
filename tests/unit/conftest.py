@@ -168,6 +168,7 @@ def default_config(document, build_dir):
     config.debug = False
     config.log_level = "INFO"
     config.multipage = False
+    config.nonav = False
     config.safe_mode = "unsafe"
     config.attribute = []
     config.doctype = None
