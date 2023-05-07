@@ -195,6 +195,7 @@ following sections:
 `package`:: Metadata for the package.
 `reference`:: The API reference information contained in the package.
 `asciidoc`:: AsciiDoc and other files to be included in AsciiDoc generation.
+`python`:: Python scripts to include in AsciiDoc generation.
 
 === Package section
 
@@ -226,3 +227,11 @@ AsciiDoc files. These files are copied to the image directory used for all Ascii
 `root_doc`:: (Optional) Document to include by default for the package. Used if not specific file
 in the package is mentioned.
 
+=== Python section
+
+The `python` section describes files in the package that are to be included when generating the 
+AsciiDoc files. The subdirectory containing the python files is automatically added to the python 
+path for all files.
+
+`dir`:: (Required) Subdirectory inside the package containing python code to be included in 
+generation.

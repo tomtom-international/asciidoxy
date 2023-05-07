@@ -24,6 +24,7 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
 junit_family = "legacy"
+asyncio_mode = "auto"
 
 [tool.isort]
 profile = "hug"
