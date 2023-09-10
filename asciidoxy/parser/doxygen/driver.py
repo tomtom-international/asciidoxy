@@ -90,9 +90,17 @@ class Driver(DriverBase):
             True if file is parsed. False if the file is invalid.
         """
 
-        tree = ET.parse(file_or_path)
+        try:
+            tree = ET.parse(file_or_path)
+        except ET.ParseError:
+            logger.exception(f"Failure while parsing XML from `{file_or_path}`. The XML may be"
+                             " malformed or the file has encoding errors.")
+            return False
+
         root = tree.getroot()
         if root.tag != "doxygen":
+            if root.tag != "doxygenindex":
+                logger.error(f"File `{file_or_path}` does not contain valid Doxygen XML.")
             return False
 
         for e in root:

@@ -27,6 +27,11 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     The python path can be overridden on the command line. For packages python scripts can be 
     included in a separate directory and specified in the contents file.
 
+=== Fixed
+
+  * #73: Do not crash on Doxygen files with invalid encoding or XML and report a clearer error.
+
+
 == 0.8.6 (4 Sep 2022)
 
 === Added
