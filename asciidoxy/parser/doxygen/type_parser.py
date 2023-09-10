@@ -311,13 +311,19 @@ class TypeParser:
         type_ref.args = arg_types
         type_ref.namespace = namespace
 
-        if (driver is not None and type_ref.name and not type_ref.id
-                and not cls.TRAITS.is_language_standard_type(type_ref.name)):
-            driver.unresolved_ref(type_ref)
-        if (driver is not None and type_ref.returns is not None and type_ref.returns.name
-                and not type_ref.returns.id
-                and not cls.TRAITS.is_language_standard_type(type_ref.returns.name)):
-            driver.unresolved_ref(type_ref.returns)
+        if driver is not None:
+            if type_ref.id:
+                driver.unchecked_ref(type_ref)
+            elif (type_ref.name and not type_ref.id
+                  and not cls.TRAITS.is_language_standard_type(type_ref.name)):
+                driver.unresolved_ref(type_ref)
+
+            if type_ref.returns is not None:
+                if type_ref.returns.id:
+                    driver.unchecked_ref(type_ref.returns)
+                elif (type_ref.returns.name and not type_ref.returns.id
+                      and not cls.TRAITS.is_language_standard_type(type_ref.returns.name)):
+                    driver.unresolved_ref(type_ref.returns)
 
         return type_ref
 

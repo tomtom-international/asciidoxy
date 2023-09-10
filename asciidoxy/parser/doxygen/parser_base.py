@@ -182,7 +182,9 @@ class ParserBase(ABC):
                 exception.description = _to_asciidoc_or_empty(desc.description())
 
                 exceptions.append(exception)
-                if not exception.type.id:
+                if exception.type.id:
+                    self._driver.unchecked_ref(exception.type)
+                else:
                     self._driver.unresolved_ref(exception.type)
         return exceptions
 

@@ -30,6 +30,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Fixed
 
   * #73: Do not crash on Doxygen files with invalid encoding or XML and report a clearer error.
+  * #73: Do not try to link to elements for which Doxygen has generated a refid, but where the
+    element itself is missing.
 
 
 == 0.8.6 (4 Sep 2022)

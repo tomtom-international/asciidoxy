@@ -13,6 +13,7 @@
 # limitations under the License.
 """Generic tests for parsing Doxygen XML files."""
 
+from asciidoxy.parser.doxygen import Driver as ParserDriver
 from tests.unit.shared import ProgressMock
 
 
@@ -249,6 +250,51 @@ def test_resolve_references__report_progress(parser_driver_factory):
 
     assert progress_mock.ready == progress_mock.total
     assert progress_mock.total == unresolved_ref_count
+
+
+def test_check_references__reference_found(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default")
+
+    element = parser.api_reference.find("asciidoxy::geometry::Print")
+    assert element is not None
+    assert len(element.params) == 1
+    assert element.params[0].type
+    assert element.params[0].type.id
+
+    assert parser.unchecked_ref_count > 0
+    parser.check_references()
+    assert parser.unchecked_ref_count == 0
+
+    assert element.params[0].type.id
+
+
+def test_check_references__remove_missing_refids(xml_data):
+    parser = ParserDriver()
+    parser.parse(xml_data / "cpp/default/xml/namespaceasciidoxy_1_1geometry.xml")
+
+    element = parser.api_reference.find("asciidoxy::geometry::Print")
+    assert element is not None
+    assert len(element.params) == 1
+    assert element.params[0].type
+    assert element.params[0].type.id
+
+    assert parser.unchecked_ref_count > 0
+    parser.check_references()
+    assert parser.unchecked_ref_count == 0
+
+    assert not element.params[0].type.id
+
+
+def test_check_references__report_progress(parser_driver_factory):
+    parser = parser_driver_factory("cpp/default", "cpp/consumer")
+    unchecked_ref_count = parser.unchecked_ref_count
+    assert unchecked_ref_count > 0
+
+    progress_mock = ProgressMock()
+    parser.check_references(progress=progress_mock)
+
+    assert progress_mock.ready == progress_mock.total
+    assert progress_mock.total == unchecked_ref_count
 
 
 def test_force_language_java(parser_driver_factory):

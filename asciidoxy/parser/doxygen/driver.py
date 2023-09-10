@@ -35,6 +35,7 @@ class Driver(DriverBase):
     """Driver for parsing Doxygen XML output."""
     api_reference: ApiReference
     _unresolved_refs: List[TypeRef]
+    _unchecked_refs: List[TypeRef]
     _inner_type_refs: List[Tuple[Compound, TypeRef]]
     _force_language: Optional[str]
 
@@ -43,6 +44,7 @@ class Driver(DriverBase):
     def __init__(self, force_language: Optional[str] = None):
         self.api_reference = ApiReference()
         self._unresolved_refs = []
+        self._unchecked_refs = []
         self._inner_type_refs = []
         self._force_language = safe_language_tag(force_language)
 
@@ -63,6 +65,10 @@ class Driver(DriverBase):
     @property
     def unresolved_ref_count(self):
         return len(self._unresolved_refs) + len(self._inner_type_refs)
+
+    @property
+    def unchecked_ref_count(self):
+        return len(self._unchecked_refs)
 
     def _parse_element(self, xml_element: ET.Element) -> None:
         if self._force_language is not None:
@@ -109,6 +115,9 @@ class Driver(DriverBase):
 
     def register(self, element: ReferableElement) -> None:
         self.api_reference.append(element)
+
+    def unchecked_ref(self, ref: TypeRef) -> None:
+        self._unchecked_refs.append(ref)
 
     def unresolved_ref(self, ref: TypeRef) -> None:
         self._unresolved_refs.append(ref)
@@ -159,6 +168,20 @@ class Driver(DriverBase):
 
         self._unresolved_refs = still_unresolved_refs
         self._inner_type_refs = still_unresolved_inner_type_refs
+
+    def check_references(self, progress: Optional[tqdm] = None) -> None:
+        """Verify all references point to an existing element."""
+        if progress is not None:
+            progress.total = len(self._unchecked_refs)
+
+        for ref in self._unchecked_refs:
+            if progress is not None:
+                progress.update()
+            if self.resolve_reference(ref) is None:
+                logger.warning(f"Unknown reference id `{ref.id}`. Some XML files may be missing or"
+                               " cannot be parsed.")
+                ref.id = None
+        self._unchecked_refs = []
 
     def resolve_reference(self, ref: TypeRef) -> Optional[ReferableElement]:
         try:

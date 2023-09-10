@@ -147,6 +147,7 @@
     <member refid="descriptions_8hpp_1af66d50405deb24f05eab85b3ed15f871" kind="function"><name>CopyDoc</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1geometry" kind="namespace"><name>asciidoxy::geometry</name>
+    <member refid="coordinate__io_8hpp_1ade9a5f216ff539684b9b4e80f7da57c7" kind="function"><name>Print</name></member>
   </compound>
   <compound refid="namespaceasciidoxy_1_1relative__namespace" kind="namespace"><name>asciidoxy::relative_namespace</name>
   </compound>
@@ -181,6 +182,8 @@
   <compound refid="constexpr_8hpp" kind="file"><name>constexpr.hpp</name>
   </compound>
   <compound refid="coordinate_8hpp" kind="file"><name>coordinate.hpp</name>
+  </compound>
+  <compound refid="coordinate__io_8hpp" kind="file"><name>coordinate_io.hpp</name>
   </compound>
   <compound refid="default__values_8hpp" kind="file"><name>default_values.hpp</name>
   </compound>
