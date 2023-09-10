@@ -45,7 +45,8 @@ def create_package_dir(parent: Path,
                        adoc: bool = True,
                        images: bool = True,
                        contents: bool = True,
-                       root_doc: bool = False) -> Path:
+                       root_doc: bool = False,
+                       python: bool = True) -> Path:
     pkg_dir = parent / name
     pkg_dir.mkdir(parents=True)
 
@@ -71,6 +72,12 @@ def create_package_dir(parent: Path,
             (pkg_dir / "images" / f"{name}.png").touch()
 
             data["asciidoc"]["image_dir"] = "images"
+
+    if python:
+        (pkg_dir / "python").mkdir()
+        (pkg_dir / "python" / f"{name}.py").touch()
+
+        data["python"] = {"dir": "python"}
 
     if contents:
         with (pkg_dir / "contents.toml").open("w", encoding="utf-8") as contents_file:
@@ -124,6 +131,8 @@ def test_collect(package_manager, tmp_path, build_dir):
     assert pkg_a.adoc_src_dir.is_dir()
     assert pkg_a.adoc_image_dir is not None
     assert pkg_a.adoc_image_dir.is_dir()
+    assert pkg_a.python_dir is not None
+    assert pkg_a.python_dir.is_dir()
 
     pkg_b = packages["b"]
     assert pkg_b.reference_dir is not None
@@ -132,6 +141,8 @@ def test_collect(package_manager, tmp_path, build_dir):
     assert pkg_b.adoc_src_dir.is_dir()
     assert pkg_b.adoc_image_dir is not None
     assert pkg_b.adoc_image_dir.is_dir()
+    assert pkg_b.python_dir is not None
+    assert pkg_b.python_dir.is_dir()
 
 
 def test_load_reference(package_manager, tmp_path, build_dir):
@@ -738,3 +749,86 @@ def test_make_document__wrong_package_file(package_manager, tmp_path, build_dir)
         package_manager.make_document(package_name="a", file_name="b.adoc")
     with pytest.raises(UnknownFileError):
         package_manager.make_document(package_name="b", file_name="a.adoc")
+
+
+def test_python_paths__all_packages(package_manager, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+
+    package_manager.collect(spec_file)
+    assert sorted(package_manager.python_paths()) == sorted(
+        [tmp_path / "a" / "python", tmp_path / "b" / "python"])
+
+
+def test_python_paths__some_packages(package_manager, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a", python=False)
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+
+    package_manager.collect(spec_file)
+    assert sorted(package_manager.python_paths()) == sorted([tmp_path / "b" / "python"])
+
+
+def test_python_paths__no_packages(package_manager, tmp_path, build_dir):
+    create_package_dir(tmp_path, "a", python=False)
+    create_package_dir(tmp_path, "b", python=False)
+    spec_file = create_package_spec(tmp_path, "a", "b")
+
+    package_manager.collect(spec_file)
+    assert len(package_manager.python_paths()) == 0
+
+
+def test_python_paths__default_input_file(package_manager, tmp_path, build_dir):
+    input_file = tmp_path / "src" / "input.adoc"
+    input_file.parent.mkdir(parents=True)
+    input_file.touch()
+
+    package_manager.set_input_files(input_file)
+    assert sorted(package_manager.python_paths()) == sorted([tmp_path / "src"])
+
+
+def test_python_paths__separate_include_dir(package_manager, tmp_path, build_dir):
+    input_file = tmp_path / "src" / "input.adoc"
+    input_file.parent.mkdir(parents=True)
+    input_file.touch()
+
+    include_dir = tmp_path / "includes"
+    include_dir.mkdir(parents=True)
+
+    package_manager.set_input_files(input_file, include_dir=include_dir)
+    assert sorted(package_manager.python_paths()) == sorted([tmp_path / "includes"])
+
+
+def test_python_paths__separate_python_dir(package_manager, tmp_path, build_dir):
+    input_file = tmp_path / "src" / "input.adoc"
+    input_file.parent.mkdir(parents=True)
+    input_file.touch()
+
+    include_dir = tmp_path / "includes"
+    include_dir.mkdir(parents=True)
+
+    python_dir = tmp_path / "python"
+    python_dir.mkdir(parents=True)
+
+    package_manager.set_input_files(input_file, include_dir=include_dir, python_dir=python_dir)
+    assert sorted(package_manager.python_paths()) == sorted([tmp_path / "python"])
+
+
+def test_python_paths__python_dir_and_packages(package_manager, tmp_path, build_dir):
+    input_file = tmp_path / "src" / "input.adoc"
+    input_file.parent.mkdir(parents=True)
+    input_file.touch()
+
+    python_dir = tmp_path / "python"
+    python_dir.mkdir(parents=True)
+
+    package_manager.set_input_files(input_file, python_dir=python_dir)
+
+    create_package_dir(tmp_path, "a")
+    create_package_dir(tmp_path, "b")
+    spec_file = create_package_spec(tmp_path, "a", "b")
+
+    package_manager.collect(spec_file)
+    assert sorted(package_manager.python_paths()) == sorted(
+        [tmp_path / "python", tmp_path / "a" / "python", tmp_path / "b" / "python"])

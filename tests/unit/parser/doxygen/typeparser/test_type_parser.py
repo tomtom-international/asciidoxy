@@ -438,13 +438,14 @@ class TypeTestData(NamedTuple):
                   whitespace(),
                   name("long")]),
     TypeTestData([ref("MyType", refid="mytype", kind="compound")],
-                 [ExpectedType("", "MyType", "", kind="compound", refid="mytype")]),
-    TypeTestData([ref("MyType", refid="mytype")], [ExpectedType("", "MyType", "", refid="mytype")]),
+                 [ExpectedType("", "MyType", "", kind="compound", refid="mylang-mytype")]),
+    TypeTestData([ref("MyType", refid="mytype")],
+                 [ExpectedType("", "MyType", "", refid="mylang-mytype")]),
     TypeTestData([
         ref("MyType", refid="mytype", kind="compound"),
         whitespace(),
         ref("OtherType", refid="othertype", kind="compound")
-    ], [ExpectedType("", "MyType OtherType", "", kind="compound", refid="mytype")]),
+    ], [ExpectedType("", "MyType OtherType", "", kind="compound", refid="mylang-mytype")]),
 ],
                 ids=lambda ps: "".join(p.text for p in ps[0]))
 def names(request):
@@ -485,7 +486,7 @@ def names(request):
         nested_end()
     ], [
         ExpectedType("", "NestedType", ""),
-        ExpectedType("", "OtherType", "", refid="othertype", kind="compound"),
+        ExpectedType("", "OtherType", "", refid="mylang-othertype", kind="compound"),
     ]),
     TypeTestData([
         nested_start(),
@@ -496,7 +497,7 @@ def names(request):
         name("OtherType"),
         nested_end(),
     ], [
-        ExpectedType("", "NestedType", "", refid="nestedtype"),
+        ExpectedType("", "NestedType", "", refid="mylang-nestedtype"),
         ExpectedType("", "OtherType", ""),
     ]),
     TypeTestData([
@@ -567,7 +568,7 @@ def _match_expected_type(actual, expected):
     if expected.refid is None:
         assert actual.id is None
     else:
-        assert actual.id == f"mylang-{expected.refid}"
+        assert actual.id == expected.refid
     assert not actual.nested
     assert actual.language == "mylang"
 
@@ -589,7 +590,7 @@ def _match_type(actual,
     if refid is None:
         assert actual.id is None
     else:
-        assert actual.id == f"mylang-{refid}"
+        assert actual.id == refid
 
     assert actual.language == "mylang"
 
@@ -638,17 +639,26 @@ def test_type_parser__type_from_tokens(prefixes, names, nested_types, arg_types,
                     refid=names.expected_types[0].refid,
                     nested=nested_types.expected_types)
 
-    unresolved_types = []
-    if not names.expected_types[0].refid:
-        unresolved_types.append(names.expected_types[0].name)
+    unresolved_type_names = []
+    unchecked_type_ids = []
+    if names.expected_types[0].refid:
+        unchecked_type_ids.append(names.expected_types[0].refid)
+    else:
+        unresolved_type_names.append(names.expected_types[0].name)
     for expected_type in nested_types.expected_types:
-        if not expected_type.refid:
-            unresolved_types.append(expected_type.name)
+        if expected_type.refid:
+            unchecked_type_ids.append(expected_type.refid)
+        else:
+            unresolved_type_names.append(expected_type.name)
     for expected_type in arg_types.expected_types:
-        if not expected_type.refid:
-            unresolved_types.append(expected_type.name)
+        if expected_type.refid:
+            unchecked_type_ids.append(expected_type.refid)
+        else:
+            unresolved_type_names.append(expected_type.name)
     assert (sorted([args[0].name for args, _ in driver_mock.unresolved_ref.call_args_list
-                    ]) == sorted(unresolved_types))
+                    ]) == sorted(unresolved_type_names))
+    assert (sorted([args[0].id for args, _ in driver_mock.unchecked_ref.call_args_list
+                    ]) == sorted(unchecked_type_ids))
 
 
 @pytest.mark.parametrize("tokens,expected_type", [
@@ -1033,6 +1043,7 @@ def test_type_parser__parse_xml__unresolved_ref_with_driver():
     driver_mock = MagicMock()
     type_ref = TestParser.parse_xml(element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_called_once_with(type_ref)
+    driver_mock.unchecked_ref.assert_not_called()
 
     assert type_ref is not None
     assert type_ref.name == "MyType"
@@ -1041,13 +1052,14 @@ def test_type_parser__parse_xml__unresolved_ref_with_driver():
     assert not type_ref.nested
 
 
-def test_type_parser__parse_xml__do_not_register_ref_with_id():
+def test_type_parser__parse_xml__register_ref_with_id_as_unchecked():
     element = ET.Element("type")
     sub_element(element, "ref", text="MyType", refid="my_type", kindref="compound")
 
     driver_mock = MagicMock()
     type_ref = TestParser.parse_xml(element, driver=driver_mock)
     driver_mock.unresolved_ref.assert_not_called()
+    driver_mock.unchecked_ref.assert_called_once_with(type_ref)
 
     assert type_ref is not None
     assert type_ref.name == "MyType"
@@ -1063,6 +1075,7 @@ def test_type_parser__parse_xml__namespace():
     driver_mock = MagicMock()
     type_ref = TestParser.parse_xml(element, driver=driver_mock, namespace="asciidoxy::test")
     driver_mock.unresolved_ref.assert_not_called()
+    driver_mock.unchecked_ref.assert_called_once_with(type_ref)
 
     assert type_ref is not None
     assert type_ref.name == "MyType"

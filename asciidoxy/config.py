@@ -63,6 +63,7 @@ class Configuration(argparse.Namespace):
     image_dir: Optional[Path] = None
     spec_file: Optional[Path] = None
     version_file: Optional[Path] = None
+    python_dir: Optional[Path] = None
 
     build_dir: Path
     destination_dir: Path
@@ -106,6 +107,13 @@ def parse_args(argv):
         help="Directory containing images to include. If no image directory is"
         " specified, only images in the `images` directory next to the input file"
         " can be included.")
+    input_group.add_argument("--python-dir",
+                             metavar="PYTHON_DIR",
+                             type=PathArgument(existing_dir=True),
+                             help="Directory containg Python code to include in the documentation."
+                             " If no explicit Python directory is specified, either `BASE_DIR`"
+                             " or the directory containing the input file is used to find Python"
+                             " code")
 
     external_data_group = parser.add_argument_group(title="Loading external data")
     external_data_group.add_argument("-s",

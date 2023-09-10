@@ -26,6 +26,14 @@ class DriverBase(ABC):
         pass
 
     @abstractmethod
+    def unchecked_ref(self, ref: TypeRef) -> None:
+        """Register an unchecked reference.
+
+        Unchecked references have an associated id, but existence of the id must still be verified.
+        """
+        pass
+
+    @abstractmethod
     def unresolved_ref(self, ref: TypeRef) -> None:
         """Register an unresolved reference."""
         pass

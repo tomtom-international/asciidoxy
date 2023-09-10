@@ -34,6 +34,9 @@ dir = "xml"
 src_dir = "adoc"
 image_dir = "images"
 root_doc = "index.adoc"
+
+[python]
+dir = "py"
 """
 
     pkg = Package("my-package")
@@ -46,6 +49,7 @@ root_doc = "index.adoc"
     assert pkg.adoc_src_dir == tmp_path / "adoc"
     assert pkg.adoc_image_dir == tmp_path / "images"
     assert pkg.adoc_root_doc == tmp_path / "adoc" / "index.adoc"
+    assert pkg.python_dir == tmp_path / "py"
 
 
 def test_package__from_toml__no_name(tmp_path):
@@ -142,6 +146,34 @@ root_doc = "index.adoc"
     assert pkg.adoc_src_dir is None
     assert pkg.adoc_image_dir is None
     assert pkg.adoc_root_doc is None
+
+
+def test_package__from_toml__no_python_code(tmp_path):
+    contents = """\
+[package]
+name = "package"
+
+[reference]
+type = "doxygen"
+dir = "xml"
+
+[asciidoc]
+src_dir = "adoc"
+image_dir = "images"
+root_doc = "index.adoc"
+"""
+
+    pkg = Package("my-package")
+    pkg.load_from_toml(tmp_path, toml.loads(contents))
+
+    assert pkg.name == "package"
+    assert pkg.scoped is True
+    assert pkg.reference_type == "doxygen"
+    assert pkg.reference_dir == tmp_path / "xml"
+    assert pkg.adoc_src_dir == tmp_path / "adoc"
+    assert pkg.adoc_image_dir == tmp_path / "images"
+    assert pkg.adoc_root_doc == tmp_path / "adoc" / "index.adoc"
+    assert pkg.python_dir is None
 
 
 def test_document__file_paths(tmp_path):

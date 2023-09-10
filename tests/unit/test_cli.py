@@ -239,6 +239,8 @@ def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, desti
         str(in_file),
         "--base-dir",
         str(in_file.parent),
+        "--python-dir",
+        str(in_file.parent),
         "--image-dir",
         str(image_dir),
         "--spec-file",

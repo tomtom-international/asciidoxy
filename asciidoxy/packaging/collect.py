@@ -29,7 +29,7 @@ import tarfile
 import urllib
 import warnings
 from abc import ABC, abstractmethod
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Type, TypeVar, Union
 
 import aiohttp
@@ -447,9 +447,8 @@ def _combine_dict(a: Dict[Any, Any], b: Dict[Any, Any]):
     return a
 
 
-def specs_from_file(
-        spec_file: Union[os.PathLike, str],
-        version_file: Optional[Union[os.PathLike, str]] = None) -> Sequence[PackageSpec]:
+def specs_from_file(spec_file: Union[PurePath, str],
+                    version_file: Optional[Union[PurePath, str]] = None) -> Sequence[PackageSpec]:
     """Load package specifications from a file.
 
     Optionally a version CSV file is used to provide package versions.

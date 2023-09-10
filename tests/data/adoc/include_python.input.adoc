@@ -1,0 +1,6 @@
+= Include some python code from another file
+
+<%
+import include_python
+%>
+${include_python.test()}

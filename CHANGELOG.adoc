@@ -18,6 +18,22 @@ The format is based on https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 
+== 0.8.7 (10 Sep 2023)
+
+=== Added
+
+  * Python path management to easily include external python scripts. By default the directory
+    containing the document being generated is added to the python path when the file is generated. 
+    The python path can be overridden on the command line. For packages python scripts can be 
+    included in a separate directory and specified in the contents file.
+
+=== Fixed
+
+  * #73: Do not crash on Doxygen files with invalid encoding or XML and report a clearer error.
+  * #73: Do not try to link to elements for which Doxygen has generated a refid, but where the
+    element itself is missing.
+
+
 == 0.8.6 (4 Sep 2022)
 
 === Added

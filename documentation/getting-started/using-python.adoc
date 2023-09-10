@@ -105,6 +105,20 @@ This results in:
 The factorial of 5 is ${math.factorial(5)}.
 ====
 
+=== Python path handling
+
+For `import` statements to work, the imported modules need to be on the python path. For libraries 
+included with python or installed with `pip` this is automatic. To include your own python modules, 
+AsciiDoxy needs to know where to look.
+
+By default, the directory containing the input AsciiDoc file is used to look for additional python 
+modules. If needed, you can specify a different path to be included using the `--python-dir` 
+command line option.
+
+When using ${cross_document_ref("packages.adoc", link_text="packages")}, you can specify a 
+${cross_document_ref("../reference/packages.adoc", anchor="_python_section",
+link_text="subdirectory in the package to load python code from")}.
+
 == Custom functions
 
 Module-level blocks can also be used to define custom functions to reuse in your AsciiDoc files.

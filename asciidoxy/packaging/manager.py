@@ -17,7 +17,7 @@ import asyncio
 import logging
 import shutil
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from tqdm import tqdm
 
@@ -81,7 +81,8 @@ class PackageManager:
     def set_input_files(self,
                         in_file: Path,
                         include_dir: Optional[Path] = None,
-                        image_dir: Optional[Path] = None) -> None:
+                        image_dir: Optional[Path] = None,
+                        python_dir: Optional[Path] = None) -> None:
         """Set the input files to collect.
 
         Args:
@@ -91,6 +92,9 @@ class PackageManager:
             image_dir:   Directory containing iamges to include from AsciiDoc files. If `None` and
                             directory named `images` is present next to the `in_file`, that
                             directory is used for images. Otherwise, no images are copied.
+            python_dir:  Directory containing Python code to include in the documentation. This
+                            directory will be added to the Python path for the input file and any
+                            document in the include_dir.
         """
         pkg = Package(Package.INPUT_PACKAGE_NAME)
         pkg.adoc_src_dir = include_dir
@@ -105,6 +109,11 @@ class PackageManager:
         if include_dir is None:
             pkg.copy_adoc_src_dir = False
             pkg.adoc_src_dir = in_file.parent
+
+        if python_dir:
+            pkg.python_dir = python_dir
+        else:
+            pkg.python_dir = pkg.adoc_src_dir
 
         self.packages[Package.INPUT_PACKAGE_NAME] = pkg
 
@@ -297,6 +306,14 @@ class PackageManager:
             raise UnknownFileError(package_name, file_name)
 
         return doc
+
+    def python_paths(self) -> List[Path]:
+        """Get the paths containing python code to be included in the generated documents.
+
+        Returns:
+            A list of python paths. Can be empty.
+        """
+        return [pkg.python_dir for pkg in self.packages.values() if pkg.python_dir]
 
     def _warning_or_error(self, error: Exception):
         if self.warnings_are_errors:

@@ -4,6 +4,7 @@
     <compoundname>coordinate.hpp</compoundname>
     <includes local="no">exception</includes>
     <includes local="no">tuple</includes>
+    <includedby refid="coordinate__io_8hpp" local="yes">coordinate_io.hpp</includedby>
     <incdepgraph>
       <node id="1">
         <label>coordinate.hpp</label>
@@ -20,6 +21,18 @@
         <label>tuple</label>
       </node>
     </incdepgraph>
+    <invincdepgraph>
+      <node id="1">
+        <label>coordinate.hpp</label>
+        <link refid="coordinate_8hpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>coordinate_io.hpp</label>
+        <link refid="coordinate__io_8hpp_source"/>
+      </node>
+    </invincdepgraph>
     <innerclass refid="classasciidoxy_1_1geometry_1_1_invalid_coordinate" prot="public">asciidoxy::geometry::InvalidCoordinate</innerclass>
     <innerclass refid="classasciidoxy_1_1geometry_1_1_coordinate" prot="public">asciidoxy::geometry::Coordinate</innerclass>
     <innernamespace refid="namespaceasciidoxy">asciidoxy</innernamespace>
