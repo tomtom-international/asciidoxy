@@ -66,7 +66,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             sys.exit(1)
 
         with tqdm(desc="Loading API reference   ", unit="pkg") as progress:
-            pkg_mgr.load_reference(api_reference, config, progress)
+            pkg_mgr.load_reference(api_reference, progress)
 
         with tqdm(desc="Resolving references    ", unit="ref") as progress:
             api_reference.resolve_references(progress)

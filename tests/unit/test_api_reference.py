@@ -22,17 +22,18 @@ from asciidoxy.api_reference import (
     ParameterTypeMatcher,
 )
 from asciidoxy.parser import parser_factory
+from tests.unit.api_reference_loader import ApiReferenceLoader
 from tests.unit.shared import ProgressMock
 
 
-@pytest.fixture
-def api_reference(api_reference_loader, latest_doxygen_version):
-    return api_reference_loader.version(latest_doxygen_version).add("doxygen", "cpp/default").load()
+@pytest.fixture(scope="module")
+def api_reference(latest_doxygen_version):
+    return ApiReferenceLoader().version(latest_doxygen_version).add("doxygen", "cpp/default").load()
 
 
-@pytest.fixture
-def unresolved_api_reference(api_reference_loader):
-    return api_reference_loader.add("doxygen", "cpp/default").add(
+@pytest.fixture(scope="function")
+def unresolved_api_reference(latest_doxygen_version):
+    return ApiReferenceLoader().version(latest_doxygen_version).add("doxygen", "cpp/default").add(
         "doxygen", "cpp/consumer").load(resolve_references=False)
 
 
@@ -289,8 +290,8 @@ def test_find_by_name_with_spaces(api_reference):
                               namespace="asciidoxy::tparam") is not None
 
 
-def test_find_by_name_and_kind(test_data, default_config):
-    parser = parser_factory("doxygen", ApiReference(), default_config)
+def test_find_by_name_and_kind(test_data):
+    parser = parser_factory("doxygen", ApiReference())
     parser.parse(test_data / "ambiguous_names.xml")
 
     element = parser.api_reference.find("Coordinate", kind="class")
@@ -304,8 +305,8 @@ def test_find_by_name_and_kind(test_data, default_config):
     assert parser.api_reference.find("Coordinate", kind="function") is None
 
 
-def test_find_by_name_and_lang(test_data, default_config):
-    parser = parser_factory("doxygen", ApiReference(), default_config)
+def test_find_by_name_and_lang(test_data):
+    parser = parser_factory("doxygen", ApiReference())
     parser.parse(test_data / "ambiguous_names.xml")
 
     element = parser.api_reference.find("BoundingBox", lang="java")
@@ -347,8 +348,8 @@ def test_find_by_name__prefer_exact_match(api_reference):
                               namespace="asciidoxy::geometry").namespace == "asciidoxy::geometry"
 
 
-def test_find_by_name_ambiguous(test_data, default_config):
-    parser = parser_factory("doxygen", ApiReference(), default_config)
+def test_find_by_name_ambiguous(test_data):
+    parser = parser_factory("doxygen", ApiReference())
     parser.parse(test_data / "ambiguous_names.xml")
 
     with pytest.raises(AmbiguousLookupError) as exception1:
@@ -395,8 +396,8 @@ def test_find_by_name__overload_set__multiple_namespaces_are_ambiguous(api_refer
     assert len(exception.value.candidates) == 3
 
 
-def test_find_by_name__overload_set__multiple_kinds_are_ambiguous(test_data, default_config):
-    parser = parser_factory("doxygen", ApiReference(), default_config)
+def test_find_by_name__overload_set__multiple_kinds_are_ambiguous(test_data):
+    parser = parser_factory("doxygen", ApiReference())
     parser.parse(test_data / "ambiguous_names.xml")
 
     with pytest.raises(AmbiguousLookupError) as exception:
@@ -416,8 +417,8 @@ def test_find_by_name__overload_set__multiple_kinds_are_ambiguous(test_data, def
     assert element.kind == "interface"
 
 
-def test_find_by_name__overload_set__multiple_languages_are_ambiguous(test_data, default_config):
-    parser = parser_factory("doxygen", ApiReference(), default_config)
+def test_find_by_name__overload_set__multiple_languages_are_ambiguous(test_data):
+    parser = parser_factory("doxygen", ApiReference())
     parser.parse(test_data / "ambiguous_names.xml")
 
     with pytest.raises(AmbiguousLookupError) as exception:
@@ -734,8 +735,8 @@ def test_check_references__reference_found(unresolved_api_reference):
     assert element.params[0].type.id
 
 
-def test_check_references__remove_missing_refids(api_reference_loader):
-    api_reference = api_reference_loader.add(
+def test_check_references__remove_missing_refids(latest_doxygen_version):
+    api_reference = ApiReferenceLoader().version(latest_doxygen_version).add(
         "doxygen", "cpp/default/xml/namespaceasciidoxy_1_1geometry.xml").load()
 
     element = api_reference.find("asciidoxy::geometry::Print")

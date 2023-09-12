@@ -20,18 +20,19 @@ import pytest
 from asciidoxy.document import Document
 from asciidoxy.generator.asciidoc import process_adoc
 from asciidoxy.generator.errors import ConsistencyError, IncludeFileNotFoundError
+from tests.unit.api_reference_loader import ApiReferenceLoader
 
 from ..shared import ProgressMock
 
 
-@pytest.fixture
-def api_reference(api_reference_loader, all_doxygen_versions):
-    return api_reference_loader.version(all_doxygen_versions).load_all()
+@pytest.fixture(scope="module")
+def api_reference(all_doxygen_versions):
+    return ApiReferenceLoader().version(all_doxygen_versions).load_all()
 
 
-@pytest.fixture
-def cpp_api_reference(api_reference_loader, all_doxygen_versions):
-    return api_reference_loader.version(all_doxygen_versions).add("doxygen", "cpp/default").add(
+@pytest.fixture(scope="module")
+def cpp_api_reference(all_doxygen_versions):
+    return ApiReferenceLoader().version(all_doxygen_versions).add("doxygen", "cpp/default").add(
         "doxygen", "cpp/consumer").load()
 
 
