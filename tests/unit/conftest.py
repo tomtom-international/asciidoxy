@@ -25,8 +25,8 @@ from asciidoxy.generator.asciidoc import GeneratingApi, PreprocessingApi
 from asciidoxy.generator.context import Context
 from asciidoxy.model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 from asciidoxy.packaging import PackageManager
-from asciidoxy.parser import parser_factory
 
+from .api_reference_loader import doxygen_versions, generated_test_data_factory
 from .builders import SimpleClassBuilder
 from .file_builder import FileBuilder
 
@@ -95,8 +95,6 @@ def document(package_manager, original_file, work_file):
 # Test data files
 #
 test_data_dir = Path(__file__).parent.parent / "data"
-generated_test_data_dir = test_data_dir / "generated"
-doxygen_test_data_dir = test_data_dir / "generated" / "doxygen"
 
 
 @pytest.fixture
@@ -109,77 +107,24 @@ def test_data():
     return test_data_dir
 
 
-def _doxygen_versions():
-    return [str(version.name) for version in doxygen_test_data_dir.glob("*")]
-
-
-@pytest.fixture(scope="session", params=_doxygen_versions())
+@pytest.fixture(scope="session", params=doxygen_versions())
 def all_doxygen_versions(request):
     return request.param
 
 
 @pytest.fixture(scope="session")
 def latest_doxygen_version():
-    return sorted(_doxygen_versions())[-1]
+    return sorted(doxygen_versions())[-1]
 
 
 @pytest.fixture(scope="session")
 def generated_test_data():
-    def factory(reference_type: str, name: str, version: str = None):
-        assert reference_type == "doxygen"
-        assert version is not None
-        return doxygen_test_data_dir / version / name
-
-    return factory
+    return generated_test_data_factory
 
 
 @pytest.fixture
-def _api_reference():
-    """Prevent circular fixture references when overriding `api_reference` and using
-    `api_reference_loader`.
-    """
+def api_reference():
     return ApiReference()
-
-
-@pytest.fixture
-def api_reference(_api_reference):
-    return _api_reference
-
-
-@pytest.fixture
-def api_reference_loader(_api_reference, default_config, latest_doxygen_version,
-                         generated_test_data):
-    api_reference_set = [
-        ("doxygen", "cpp/default"),
-        ("doxygen", "java/default"),
-        ("doxygen", "objc/default"),
-        ("doxygen", "python/default"),
-    ]
-
-    class Loader:
-        def __init__(self):
-            self._version = latest_doxygen_version
-
-        def version(self, version: str) -> Loader:
-            self._version = version
-            return self
-
-        def load_all(self) -> ApiReference:
-            for reference_type, reference_set_name in api_reference_set:
-                self.add(reference_type, reference_set_name)
-            return self.load()
-
-        def add(self, reference_type: str, reference_set_name: str) -> Loader:
-            parser = parser_factory(reference_type, _api_reference, default_config)
-            parser.parse(generated_test_data(reference_type, reference_set_name, self._version))
-            return self
-
-        def load(self, resolve_references: bool = True) -> ApiReference:
-            if resolve_references:
-                _api_reference.resolve_references()
-            return _api_reference
-
-    return Loader()
 
 
 #

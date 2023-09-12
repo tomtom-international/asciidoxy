@@ -16,6 +16,7 @@
 import pytest
 from pytest import param
 
+from tests.unit.api_reference_loader import ApiReferenceLoader
 from tests.unit.matchers import (
     AtLeast,
     HasNot,
@@ -34,9 +35,9 @@ from tests.unit.matchers import (
 )
 
 
-@pytest.fixture
-def api_reference(api_reference_loader, all_doxygen_versions):
-    return api_reference_loader.version(all_doxygen_versions).add("doxygen", "cpp/default").load()
+@pytest.fixture(scope="module")
+def api_reference(all_doxygen_versions):
+    return ApiReferenceLoader().version(all_doxygen_versions).add("doxygen", "cpp/default").load()
 
 
 @pytest.mark.parametrize("search_params,matcher", [

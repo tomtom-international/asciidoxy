@@ -20,7 +20,6 @@ import pytest
 import toml
 
 from asciidoxy.api_reference import ApiReference
-from asciidoxy.config import Configuration
 from asciidoxy.document import Package
 from asciidoxy.packaging.manager import (
     FileCollisionError,
@@ -159,7 +158,7 @@ def test_load_reference(package_manager, tmp_path, parser_mock):
     spec_file = create_package_spec(tmp_path, "a", "b")
     package_manager.collect(spec_file)
 
-    package_manager.load_reference(ApiReference(), Configuration())
+    package_manager.load_reference(ApiReference())
     parser_mock.parse.assert_has_calls(
         [call(pkg_a_dir / "xml"), call(pkg_b_dir / "xml")], any_order=True)
 

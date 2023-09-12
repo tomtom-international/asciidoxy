@@ -38,12 +38,19 @@ from asciidoxy.generator.errors import (
 )
 from asciidoxy.packaging import Package
 from asciidoxy.parser import parser_factory
+from tests.unit.api_reference_loader import ApiReferenceLoader
 
 
-@pytest.fixture
-def api_reference(api_reference_loader, latest_doxygen_version):
-    return api_reference_loader.version(latest_doxygen_version).add("doxygen",
+@pytest.fixture(scope="module")
+def api_reference(latest_doxygen_version):
+    return ApiReferenceLoader().version(latest_doxygen_version).add("doxygen",
                                                                     "cpp/consumer").load_all()
+
+
+@pytest.fixture(scope="function")
+def unique_generating_api(context, latest_doxygen_version):
+    context.reference = ApiReferenceLoader().version(latest_doxygen_version).load_all()
+    return GeneratingApi(context)
 
 
 @pytest.fixture(params=[True, False], ids=["multi-page", "single-page"])
@@ -158,24 +165,24 @@ def test_insert_with_custom_template_override_name(generating_api, context, tmp_
     assert result == "Hello my class"
 
 
-def test_insert__transcode__explicit(generating_api):
-    generating_api.language("kotlin", source="java")
-    result = generating_api.insert("com.asciidoxy.geometry.Coordinate", lang="kotlin")
+def test_insert__transcode__explicit(unique_generating_api):
+    unique_generating_api.language("kotlin", source="java")
+    result = unique_generating_api.insert("com.asciidoxy.geometry.Coordinate", lang="kotlin")
     assert "class com.asciidoxy.geometry.Coordinate" in result
     assert "kotlin" in result
 
 
-def test_insert__transcode__implicit(generating_api):
-    generating_api.language("kotlin", source="java")
-    result = generating_api.insert("com.asciidoxy.geometry.Coordinate")
+def test_insert__transcode__implicit(unique_generating_api):
+    unique_generating_api.language("kotlin", source="java")
+    result = unique_generating_api.insert("com.asciidoxy.geometry.Coordinate")
     assert "class com.asciidoxy.geometry.Coordinate" in result
     assert "kotlin" in result
 
 
-def test_insert__transcode__reset(generating_api):
-    generating_api.language("kotlin", source="java")
-    generating_api.language(None)
-    result = generating_api.insert("com.asciidoxy.geometry.Coordinate")
+def test_insert__transcode__reset(unique_generating_api):
+    unique_generating_api.language("kotlin", source="java")
+    unique_generating_api.language(None)
+    result = unique_generating_api.insert("com.asciidoxy.geometry.Coordinate")
     assert "class com.asciidoxy.geometry.Coordinate" in result
     assert "kotlin" not in result
 
@@ -218,9 +225,8 @@ def test_insert_error_when_reference_not_found(generating_api):
         generating_api.insert("asciidoxy::geometry::Sphere")
 
 
-def test_insert_error_when_kind_not_supported(api_reference, generating_api, default_config,
-                                              test_data):
-    parser = parser_factory("doxygen", api_reference, default_config)
+def test_insert_error_when_kind_not_supported(api_reference, generating_api, test_data):
+    parser = parser_factory("doxygen", api_reference)
     parser.parse(test_data / "namespaceasciidoxy_1_1unsupported__kind.xml")
     with pytest.raises(TemplateMissingError):
         generating_api.insert("asciidoxy::unsupported_kind::kUnsupportedKindSample")

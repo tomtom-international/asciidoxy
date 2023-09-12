@@ -15,10 +15,12 @@
 
 import pytest
 
+from tests.unit.api_reference_loader import ApiReferenceLoader
 
-@pytest.fixture
-def api_reference(api_reference_loader, all_doxygen_versions):
-    return api_reference_loader.version(all_doxygen_versions).load_all()
+
+@pytest.fixture(scope="module")
+def api_reference(all_doxygen_versions):
+    return ApiReferenceLoader().version(all_doxygen_versions).load_all()
 
 
 @pytest.mark.parametrize("element_name,language,expected_result", [
