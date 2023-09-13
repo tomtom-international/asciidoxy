@@ -67,8 +67,10 @@ class TranscoderBase(ABC):
             for _, name, _ in pkgutil.iter_modules([os.path.dirname(__file__)]):
                 importlib.import_module(f".{name}", __package__)
 
-            TranscoderBase.__transcoders = {(t.SOURCE, t.TARGET): t
-                                            for t in TranscoderBase.__subclasses__()}
+            TranscoderBase.__transcoders = {
+                (t.SOURCE, t.TARGET): t
+                for t in TranscoderBase.__subclasses__()
+            }
 
         transcoder = TranscoderBase.__transcoders.get((source, target), None)
         if transcoder is None:
