@@ -20,6 +20,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == Unreleased
 
+This release is introducing many breaking changes working towards a stable 1.0.0 release.
+
+
 === Removed
 
   * The `api.` prefix for commands is no longer supported.
@@ -27,6 +30,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     `include_subdir` entries in the package specification file are now ignored.
   * The `--force-language` command line argument is no longer supported. Make sure the correct
     language support is enabled when using Doxygen.
+  * Python 3.7 (end of life) is no longer supported.
 
 
 == 0.8.7 (10 Sep 2023)

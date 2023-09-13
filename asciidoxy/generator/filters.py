@@ -15,7 +15,6 @@
 
 import collections
 import re
-import sys
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Generator, List, Mapping, Optional, Pattern, Sequence, Type, TypeVar, Union
@@ -67,11 +66,6 @@ class IncludeStringFilter(StringFilter):
         else:
             return FilterAction.NEUTRAL
 
-    if sys.version_info < (3, 7):
-
-        def __deepcopy__(self, memo):
-            return IncludeStringFilter(self.include_pattern.pattern)
-
 
 class ExcludeStringFilter(StringFilter):
     """Exclude all values that match a regular expression."""
@@ -85,11 +79,6 @@ class ExcludeStringFilter(StringFilter):
             return FilterAction.EXCLUDE
         else:
             return FilterAction.NEUTRAL
-
-    if sys.version_info < (3, 7):
-
-        def __deepcopy__(self, memo):
-            return ExcludeStringFilter(self.exclude_pattern.pattern)
 
 
 class ChainedStringFilter(StringFilter):
