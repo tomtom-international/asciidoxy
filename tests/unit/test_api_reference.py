@@ -242,8 +242,9 @@ def test_find_complete_match(api_reference):
     assert api_reference.find("asciidoxy::geometry::Coordinate", kind="function",
                               lang="cpp") is None
     assert api_reference.find("asciidoxy::geometry::Coordinate", kind="class", lang="java") is None
-    assert api_reference.find(
-        "asciidoxy::geometry::Coordinate::Coordinate", kind="class", lang="cpp") is None
+    assert api_reference.find("asciidoxy::geometry::Coordinate::Coordinate",
+                              kind="class",
+                              lang="cpp") is None
     assert api_reference.find("asciidoxy::geometry::Coordinate", kind="class",
                               lang="cpp") is not None
 
