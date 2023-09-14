@@ -22,3 +22,15 @@ jobs:
       push: ${{ startswith(github.ref, 'refs/heads/develop') }}
     secrets: inherit
 
+  check:
+    name: All passed
+    needs: [test, docker]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: All OK
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Something failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
