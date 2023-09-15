@@ -133,7 +133,7 @@ docs: doxygen ## generate documentation
 define DOXYGEN_template
 doxygen-$(1):
 	CONAN_USER_HOME=$(BUILD_DIR) CONAN_DEFAULT_PROFILE_PATH="" DOXYGEN_VERSION=$(1) \
-									conan install doxygen/conanfile.py --install-folder=build/doxygen-$(1) --build missing
+									conan install doxygen/conanfile.py --output-folder=build/doxygen-$(1) --build missing -u
 endef
 $(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call DOXYGEN_template,$(version))))
 
@@ -141,7 +141,7 @@ doxygen: doxygen-$(LATEST_DOXYGEN_VERSION) ## Install the latest doxygen version
 
 define GENERATE_TEST_XML_template
 generate-test-xml-$(1): doxygen-$(1)
-	. build/doxygen-$(1)/activate_run.sh; cd tests/data/source_code; python3 generate_xml.py doxygen
+	. build/doxygen-$(1)/conanbuildenv.sh; cd tests/data/source_code; python3 generate_xml.py doxygen
 
 ALL_GENERATE_TEST_XML := $$(ALL_GENERATE_TEST_XML) generate-test-xml-$(1)
 endef

@@ -14,13 +14,16 @@
 
 import os
 
-from conans import ConanFile
+from conan import ConanFile
 
 
 class DoxygenConan(ConanFile):
     generators = (
-        "virtualrunenv",
+        "VirtualBuildEnv",
     )
-    build_requires = (
+    tool_requires = (
         f"doxygen/{os.environ['DOXYGEN_VERSION']}",
     )
+    default_build_options = {
+        "doxygen/*:enable_search": False,
+    }
