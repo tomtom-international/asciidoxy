@@ -11,12 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Version information."""
+# syntax=docker/dockerfile:1
+FROM alpine:3.17.2
 
-__title__ = "asciidoxy"
-__description__ = "AsciiDoxy generates API documentation from Doxygen XML output to AsciiDoc."
-__url__ = "https://asciidoxy.org"
-__version__ = "0.8.7"
-__author__ = "Rob van der Most"
-__author_email__ = "Rob.vanderMost@TomTom.com"
-__license__ = "Apache 2.0"
+RUN apk add --no-cache \
+  bash \
+  doxygen \
+  font-freefont \
+  graphviz \
+  plantuml \
+  python3 \
+  ruby
+
+RUN python3 -m ensurepip
+RUN pip3 install --no-cache --upgrade \
+  pip \
+  setuptools \
+  wheel
+
+RUN gem install \
+  asciidoctor \
+  asciidoctor-diagram \
+  asciidoctor-pdf \
+  asciidoctor-rouge
+
+COPY *.whl /tmp/
+RUN PYTHON_DEV_PKGS="gcc g++ python3-dev libffi-dev" \
+  && apk add --no-cache $PYTHON_DEV_PKGS \
+  && pip3 install --no-cache --upgrade /tmp/*.whl \
+  && rm -f /tmp/*.whl \
+  && apk del $PYTHON_DEV_PKGS

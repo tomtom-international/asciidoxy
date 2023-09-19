@@ -181,7 +181,7 @@ class Context(object):
         self.document_stack = [document]
 
         self.templates = TemplateCache(config.template_dir, config.cache_dir)
-        self.document_cache = DocumentCache(config.cache_dir)
+        self.document_cache = DocumentCache(config.cache_dir, package_manager.python_paths())
 
         self.config = config
 

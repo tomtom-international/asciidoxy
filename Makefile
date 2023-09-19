@@ -47,6 +47,10 @@ export BUILD_DIR = $(CURDIR)/build
 DOXYGEN_VERSIONS := 1.8.17 1.8.18 1.8.20 1.9.1 1.9.2
 export LATEST_DOXYGEN_VERSION := 1.9.2
 
+DOCKER_IMAGE_NAME ?= silvester747/asciidoxy
+DOCKER_IMAGE_VERSION ?= testing
+DOCKER_IMAGE_PLATFORM ?= linux/amd64
+
 help:
 	@python3 -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
@@ -108,11 +112,14 @@ install: clean ## install the package to the active Python's site-packages
 virtualenv: ## set up a development environment
 	python3 -m venv .venv
 	. .venv/bin/activate && pip install wheel
-	. .venv/bin/activate && pip install -r requirements_dev.txt
+	. .venv/bin/activate && pip install -r dev-requirements.txt
 	. .venv/bin/activate && python3 setup.py develop
 
 docker: dist ## build the docker image
-	cd docker && ./gradlew build
+	docker build -f docker/Dockerfile \
+		-t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) \
+		--platform $(DOCKER_IMAGE_PLATFORM) \
+		dist/
 
 format: ## format the code
 	yapf -r -i -p setup.py asciidoxy tests/unit
@@ -162,3 +169,27 @@ endef
 $(foreach visual_test,$(VISUAL_TEST_CASES),$(eval $(call VISUAL_TEST_template,$(visual_test))))
 
 visual-test: $(ALL_VISUAL_TEST_CASES) ## run visual inspection test cases
+
+# Generate output to test Docker image
+#
+DOCKER_TEST_CASE_BUILD_DIR := build/docker-test
+
+define DOCKER_TEST_template
+docker-test-$(notdir $(basename $(1))): $(patsubst %.toml,%.adoc,$(1))
+	docker run --rm -v `pwd`:`pwd` -w `pwd` \
+		--platform $(DOCKER_IMAGE_PLATFORM) \
+		$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) \
+		asciidoxy $(patsubst %.toml,%.adoc,$(1)) \
+			--build-dir $(DOCKER_TEST_CASE_BUILD_DIR) \
+			--spec-file $(1) \
+			--warnings-are-errors \
+			--require asciidoctor-diagram \
+			--failure-level ERROR \
+			--multipage
+
+ALL_DOCKER_TEST_CASES := $$(ALL_DOCKER_TEST_CASES) docker-test-$(notdir $(basename $(1)))
+endef
+
+$(foreach visual_test,$(VISUAL_TEST_CASES),$(eval $(call DOCKER_TEST_template,$(visual_test))))
+
+docker-test: $(ALL_DOCKER_TEST_CASES) ## run Docker test cases

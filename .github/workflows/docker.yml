@@ -1,0 +1,160 @@
+name: Create and test Docker image
+
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: Is this an official release?
+        type: boolean
+        default: false
+      push:
+        description: Should images be pushed to Docker Hub?
+        type: boolean
+        default: false
+
+jobs:
+  package:
+    name: Create Python package
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install python dependencies
+        run: |
+          pip3 install wheel
+          pip3 install -r dev-requirements.txt
+
+      - name: Prepare Python package
+        run: |
+          make dist
+
+      - name: Store wheel artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheel
+          path: ./dist/*.whl
+          if-no-files-found: error
+
+  determine-tags:
+    name: Determine tags to publish
+    if: inputs.push
+    runs-on: ubuntu-latest
+
+    outputs:
+      tags: ${{ env.DOCKER_METADATA_OUTPUT_TAGS }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Get AsciiDoxy version
+        id: asciidoxy-version
+        run: |
+          python -c 'import asciidoxy; print(f"version={asciidoxy.__version__}")' >> "$GITHUB_OUTPUT"
+
+      - name: Select tags to publish (develop)
+        if: ${{ !inputs.release }}
+        uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96  # 4.3.0
+        with:
+          images: |
+            silvester747/asciidoxy
+          tags: |
+            type=raw,value=develop-${{ steps.asciidoxy-version.outputs.version }}
+            type=sha,prefix=develop-${{ steps.asciidoxy-version.outputs.version }}-
+
+      - name: Select tags to publish (release)
+        if: inputs.release
+        uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96  # 4.3.0
+        with:
+          images: |
+            silvester747/asciidoxy
+          tags: |
+            type=raw,value=${{ steps.asciidoxy-version.outputs.version }}
+            type=raw,value=latest
+
+
+  docker-test:
+    name: Build and test Docker image
+    strategy:
+      matrix:
+        platform: ['linux/amd64', 'linux/arm64']
+    runs-on: ubuntu-latest
+    needs: [package]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get wheel
+        uses: actions/download-artifact@v3
+        with:
+          name: wheel
+          path: ./dist/
+
+      - name: Enable multiarch build with qemu
+        uses: docker/setup-qemu-action@e81a89b1732b9c48d79cd809d8d81d79c4647a18  # v2.1.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f03ac48505955848960e80bbb68046aa35c7b9e7  # v2.4.1
+
+      - name: Build Docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671  # 4.0.0
+        with:
+          file: ./docker/Dockerfile
+          platforms: ${{ matrix.platform }}
+          context: ./dist/
+          push: false
+          load: true
+          tags: silvester747/asciidoxy:testing
+
+      - name: Test Docker image
+        run: >
+          make docker-test
+          DOCKER_IMAGE_PLATFORM=${{ matrix.platform }}
+          DOCKER_IMAGE_VERSION=testing
+
+  docker-publish:
+    name: Publish multi platform Docker image
+    if: inputs.push
+    runs-on: ubuntu-latest
+    needs: [package, determine-tags, docker-test]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get wheel
+        uses: actions/download-artifact@v3
+        with:
+          name: wheel
+          path: ./dist/
+
+      - name: Enable multiarch build with qemu
+        uses: docker/setup-qemu-action@e81a89b1732b9c48d79cd809d8d81d79c4647a18  # v2.1.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f03ac48505955848960e80bbb68046aa35c7b9e7  # v2.4.1
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a  # 2.1.0
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Publish Docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671  # 4.0.0
+        with:
+          file: ./docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          context: ./dist/
+          push: true
+          tags: ${{ needs.determine-tags.outputs.tags }}
+

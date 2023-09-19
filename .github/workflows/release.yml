@@ -1,0 +1,19 @@
+name: Release new version
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  python-package:
+    name: Publish Python package
+    uses: ./.github/workflows/python-publish.yml
+    secrets: inherit
+
+  docker-image:
+    name: Publish Docker image
+    uses: ./.github/workflows/docker.yml
+    with:
+      release: true
+      push: true
+    secrets: inherit

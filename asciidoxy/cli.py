@@ -72,6 +72,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         with tqdm(desc="Resolving references    ", unit="ref") as progress:
             xml_parser.resolve_references(progress)
 
+        with tqdm(desc="Checking references     ", unit="ref") as progress:
+            xml_parser.check_references(progress)
+
         if config.debug:
             logger.info("Writing debug data, sorry for the delay!")
             with (config.build_dir / "debug.json").open("w", encoding="utf-8") as f:

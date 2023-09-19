@@ -14,7 +14,7 @@
 """Cache implementation for Mako templates supporting package resources."""
 
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
@@ -41,10 +41,28 @@ class BaseCache(TemplateLookup):
         super().__init__(*args, **kwargs)
 
 
+def _generate_python_path_code(python_paths: Optional[List[Path]]) -> List[str]:
+    if python_paths:
+        imports = ["import sys"]
+        imports.extend(f"sys.path.insert(1, \"{p}\")" for p in python_paths)
+        imports.append("del sys")
+        return imports
+
+    return []
+
+
 class DocumentCache(BaseCache):
     """Cache for input documents."""
-    def __init__(self, cache_dir: Optional[Path] = None, *args, **kwargs):
-        super().__init__("documents", cache_dir, *args, **kwargs)
+    def __init__(self,
+                 cache_dir: Optional[Path] = None,
+                 python_paths: Optional[List[Path]] = None,
+                 *args,
+                 **kwargs):
+        super().__init__("documents",
+                         cache_dir,
+                         imports=_generate_python_path_code(python_paths),
+                         *args,
+                         **kwargs)
 
     def get_document(self, document: Document) -> Template:
         return self.get_template(str(document.original_file))
