@@ -13,4 +13,4 @@ twine==4.0.2
 types-toml==0.10.8.7
 watchdog==3.0.0
 wheel==0.41.2
-yapf==0.40.1
+yapf==0.40.2
