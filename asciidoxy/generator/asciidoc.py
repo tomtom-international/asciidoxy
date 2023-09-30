@@ -43,7 +43,7 @@ from ..api_reference import AmbiguousLookupError, ApiReference
 from ..compat import importlib_resources
 from ..config import Configuration
 from ..document import Document
-from ..model import ReferableElement
+from ..model import Compound
 from ..packaging import PackageManager, UnknownFileError, UnknownPackageError
 from ..parser.doxygen import safe_language_tag
 from ..path_utils import relative_path
@@ -86,7 +86,7 @@ _WrappedFunc = TypeVar("_WrappedFunc", bound=Callable[..., Any])
 def _arg_to_str(arg: Optional[Any]) -> str:
     if arg is None:
         return "None"
-    if isinstance(arg, ReferableElement):
+    if isinstance(arg, Compound):
         return f"'{arg.full_name}'"
     return repr(arg)
 
@@ -546,7 +546,7 @@ class Api(ABC):
                      *,
                      kind: Optional[str] = None,
                      lang: Optional[str] = None,
-                     allow_overloads: bool = False) -> ReferableElement:
+                     allow_overloads: bool = False) -> Compound:
         """Find a reference to API documentation.
 
         Only `name` is mandatory. Multiple names may match the same name. Use `kind` and `lang` to
@@ -612,7 +612,7 @@ class Api(ABC):
         """
         ...
 
-    def inserted(self, element: ReferableElement) -> str:
+    def inserted(self, element: Compound) -> str:
         """Register that an element has been inserted."""
         return ""
 
@@ -731,7 +731,7 @@ class PreprocessingApi(Api):
         self._render(element, insert_filter, kind_override)
         return ""
 
-    def inserted(self, element: ReferableElement) -> str:
+    def inserted(self, element: Compound) -> str:
         self._context.insert(element)
         return ""
 

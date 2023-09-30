@@ -15,7 +15,7 @@
 
 from typing import Optional, Union
 
-from ..model import Compound, ReferableElement, ThrowsClause, TypeRef
+from ..model import Compound, ThrowsClause, TypeRef
 from .base import TranscoderBase
 
 
@@ -40,12 +40,12 @@ class SwiftTranscoder(TranscoderBase):
         "BOOL": "Bool",
     }
 
-    def convert_kind(self, source_element: Union[ReferableElement, TypeRef]) -> Optional[str]:
+    def convert_kind(self, source_element: Union[Compound, TypeRef]) -> Optional[str]:
         if source_element.kind is None:
             return None
         return {"block": "closure"}.get(source_element.kind, source_element.kind)
 
-    def convert_name(self, source_element: Union[ReferableElement, TypeRef]) -> str:
+    def convert_name(self, source_element: Union[Compound, TypeRef]) -> str:
         name = source_element.name
 
         name = self.convert_bridged_type_name(name)
@@ -55,7 +55,7 @@ class SwiftTranscoder(TranscoderBase):
 
         return name
 
-    def convert_full_name(self, source_element: ReferableElement) -> str:
+    def convert_full_name(self, source_element: Compound) -> str:
         full_name = source_element.full_name
 
         full_name = self.convert_bridged_type_name(full_name)

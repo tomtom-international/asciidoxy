@@ -18,7 +18,7 @@ from typing import List, Optional
 from .._version import __version__
 from ..api_reference import normalized_type_str
 from ..document import Document
-from ..model import Compound, ReferableElement
+from ..model import Compound
 
 
 class AsciiDocError(Exception):
@@ -96,14 +96,14 @@ class AmbiguousReferenceError(AsciiDocError):
         candidates: All candidates that match the search query.
     """
     name: str
-    candidates: List[ReferableElement]
+    candidates: List[Compound]
 
-    def __init__(self, name: str, candidates: List[ReferableElement]):
+    def __init__(self, name: str, candidates: List[Compound]):
         self.name = name
         self.candidates = candidates
 
     def __str__(self) -> str:
-        def element_to_str(element: ReferableElement) -> str:
+        def element_to_str(element: Compound) -> str:
             signature = ""
             if isinstance(element, Compound) and element.kind == "function":
                 signature = f"({', '.join(normalized_type_str(e.type) for e in element.params)})"

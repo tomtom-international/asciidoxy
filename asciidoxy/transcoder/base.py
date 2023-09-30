@@ -21,7 +21,7 @@ from typing import Callable, Mapping, Optional, Tuple, Type, TypeVar, Union
 
 from ..api_reference import ApiReference
 from ..generator.errors import AsciiDocError
-from ..model import Compound, Parameter, ReferableElement, ReturnValue, ThrowsClause, TypeRef
+from ..model import Compound, Parameter, ReturnValue, ThrowsClause, TypeRef
 
 
 class TranscoderError(AsciiDocError):
@@ -78,8 +78,7 @@ class TranscoderBase(ABC):
         return transcoder(reference)
 
     @staticmethod
-    def transcode(element: ReferableElement, target: str,
-                  reference: ApiReference) -> ReferableElement:
+    def transcode(element: Compound, target: str, reference: ApiReference) -> Compound:
         """Transcode an element from its source language to another language.
 
         Args:
@@ -185,16 +184,16 @@ class TranscoderBase(ABC):
 
         return f"{self.TARGET}-{old_id}"
 
-    def convert_kind(self, source_element: Union[ReferableElement, TypeRef]) -> Optional[str]:
+    def convert_kind(self, source_element: Union[Compound, TypeRef]) -> Optional[str]:
         return source_element.kind
 
-    def convert_name(self, source_element: Union[ReferableElement, TypeRef]) -> str:
+    def convert_name(self, source_element: Union[Compound, TypeRef]) -> str:
         return source_element.name
 
-    def convert_full_name(self, source_element: ReferableElement) -> str:
+    def convert_full_name(self, source_element: Compound) -> str:
         return source_element.full_name
 
-    ElementType = TypeVar("ElementType", bound=ReferableElement)
+    ElementType = TypeVar("ElementType", bound=Compound)
 
     def find_or_transcode(self, element: ElementType,
                           transcode_func: Callable[[ElementType], ElementType]) -> ElementType:

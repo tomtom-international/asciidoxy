@@ -21,7 +21,7 @@ from typing import Dict, List, Optional, Set, Tuple, TypeVar
 
 from tqdm import tqdm
 
-from .model import Compound, ReferableElement, TypeRef
+from .model import Compound, TypeRef
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +46,9 @@ class AmbiguousLookupError(Exception):
     Attributes:
         candidates: All candidates that match the search query.
     """
-    candidates: List[ReferableElement]
+    candidates: List[Compound]
 
-    def __init__(self, candidates: List[ReferableElement]):
+    def __init__(self, candidates: List[Compound]):
         self.candidates = candidates
 
 
@@ -56,7 +56,7 @@ class ElementFilter(ABC):
     """Base class for filters that can be applied to find specific elements in the API reference.
     """
     @abstractmethod
-    def __call__(self, potential_match: ReferableElement) -> bool:
+    def __call__(self, potential_match: Compound) -> bool:
         """Apply the filter to a potential match.
 
         Args:
@@ -95,7 +95,7 @@ class CombinedFilter(ElementFilter):
         """
         self._filters = [f for f in filters if f.applies]
 
-    def __call__(self, potential_match: ReferableElement) -> bool:
+    def __call__(self, potential_match: Compound) -> bool:
         return all(f(potential_match) for f in self._filters)
 
     @property
@@ -128,7 +128,7 @@ class SimpleAttributeFilter(ElementFilter):
         """
         self._value = value
 
-    def __call__(self, potential_match: ReferableElement) -> bool:
+    def __call__(self, potential_match: Compound) -> bool:
         return getattr(potential_match, self.ATTR_NAME, None) == self._value
 
     @property
@@ -178,7 +178,7 @@ class NameFilter(ElementFilter):
             self._name_parts = NamespaceList()
             self._namespace_parts = NamespaceList()
 
-    def __call__(self, potential_match: ReferableElement) -> bool:
+    def __call__(self, potential_match: Compound) -> bool:
         if self._name is None:
             return False
 
@@ -274,7 +274,7 @@ class ParameterTypeMatcher(ElementFilter):
             self.name = ""
             self.arg_types = None
 
-    def __call__(self, potential_match: ReferableElement) -> bool:
+    def __call__(self, potential_match: Compound) -> bool:
         if self.arg_types is None:
             return True
 
@@ -375,9 +375,9 @@ class ApiReference:
     Attributes:
         elements: All contained API reference elements.
     """
-    elements: List[ReferableElement]
-    _id_index: Dict[str, ReferableElement]
-    _name_index: Dict[str, List[ReferableElement]]
+    elements: List[Compound]
+    _id_index: Dict[str, Compound]
+    _name_index: Dict[str, List[Compound]]
     _unresolved_refs: List[TypeRef]
     _unchecked_refs: List[TypeRef]
     _inner_type_refs: List[Tuple[Compound, TypeRef]]
@@ -398,7 +398,7 @@ class ApiReference:
     def unchecked_ref_count(self):
         return len(self._unchecked_refs)
 
-    def append(self, element: ReferableElement) -> None:
+    def append(self, element: Compound) -> None:
         self.elements.append(element)
 
         assert element.id
@@ -415,7 +415,7 @@ class ApiReference:
              kind: Optional[str] = None,
              lang: Optional[str] = None,
              target_id: Optional[str] = None,
-             allow_overloads: bool = False) -> Optional[ReferableElement]:
+             allow_overloads: bool = False) -> Optional[Compound]:
         """Find information about an API element.
 
         The minimum search uses either `name` or `target_id`. If `target_id` is not None, all other
@@ -548,7 +548,7 @@ class ApiReference:
                 ref.id = None
         self._unchecked_refs = []
 
-    def resolve_reference(self, ref: TypeRef) -> Optional[ReferableElement]:
+    def resolve_reference(self, ref: TypeRef) -> Optional[Compound]:
         try:
             return self.find(ref.name, target_id=ref.id, lang=ref.language, namespace=ref.namespace)
         except AmbiguousLookupError:

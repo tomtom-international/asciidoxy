@@ -15,7 +15,7 @@
 
 from typing import List, Optional, Tuple, Union
 
-from ..model import Compound, Parameter, ReferableElement, TypeRef
+from ..model import Compound, Parameter, TypeRef
 from .base import TranscoderBase
 
 # https://kotlinlang.org/docs/reference/java-interop.html#mapped-types
@@ -172,10 +172,10 @@ class KotlinTranscoder(TranscoderBase):
     SOURCE = "java"
     TARGET = "kotlin"
 
-    def convert_name(self, source_element: Union[ReferableElement, TypeRef]) -> str:
+    def convert_name(self, source_element: Union[Compound, TypeRef]) -> str:
         return _MAPPED_TYPES.get(source_element.name, source_element.name)
 
-    def convert_full_name(self, source_element: ReferableElement) -> str:
+    def convert_full_name(self, source_element: Compound) -> str:
         return _MAPPED_TYPES.get(source_element.full_name, source_element.full_name)
 
     def _compound(self, compound: Compound) -> Compound:

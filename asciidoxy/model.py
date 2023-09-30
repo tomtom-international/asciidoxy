@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Models of API reference elements."""
+from __future__ import annotations
 
 import sys
 from dataclasses import asdict, dataclass, field
@@ -30,24 +31,6 @@ def json_repr(obj):
     data = {"__CLASS__": obj.__class__.__name__}
     data.update(asdict(obj))
     return data
-
-
-@dataclass(**dataclass_options)
-class ReferableElement:
-    """Base class for all objects that can be referenced/linked to.
-
-    Attributes:
-        id:        Unique identifier, if available.
-        name:      Short name of the element.
-        full_name: Fully qualified name.
-        language:  Language the element is written in.
-        kind:      Kind of language element.
-    """
-    id: Optional[str] = None
-    name: str = ""
-    full_name: str = ""
-    language: str = ""
-    kind: str = ""
 
 
 @dataclass(**dataclass_options)
@@ -82,7 +65,7 @@ class TypeRef:
     returns: Optional["TypeRef"] = None
     prot: Optional[str] = None
 
-    def resolve(self, reference_target: ReferableElement) -> None:
+    def resolve(self, reference_target: Compound) -> None:
         self.id = reference_target.id
         self.kind = reference_target.kind
 
@@ -138,12 +121,17 @@ class ThrowsClause:
 
 
 @dataclass(**dataclass_options)
-class Compound(ReferableElement):
+class Compound:
     """Compound object. E.g. a class or enum.
 
     Representation of the doxygen type compound.
 
     Attributes:
+        id:        Unique identifier, if available.
+        name:      Short name of the element.
+        full_name: Fully qualified name.
+        language:  Language the element is written in.
+        kind:      Kind of language element.
         members:       List of members in the compound.
         params:        List of parameters.
         exceptions:    List of exceptions that can be thrown.
@@ -159,6 +147,11 @@ class Compound(ReferableElement):
         sections:      Extra documentation sections with special meanings.
         modifiers:     List of modifiers applied to the compound.
     """
+    id: Optional[str] = None
+    name: str = ""
+    full_name: str = ""
+    language: str = ""
+    kind: str = ""
 
     members: List["Compound"] = field(default_factory=list)
     params: List[Parameter] = field(default_factory=list)

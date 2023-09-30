@@ -24,7 +24,7 @@ from tqdm import tqdm
 from ..api_reference import ApiReference
 from ..config import Configuration
 from ..document import Document, Package
-from ..model import ReferableElement
+from ..model import Compound
 from ..packaging import PackageManager, UnknownFileError
 from .cache import DocumentCache, TemplateCache
 from .errors import ConsistencyError, DuplicateAnchorError, UnknownAnchorError
@@ -185,7 +185,7 @@ class Context(object):
 
         self.config = config
 
-    def insert(self, element: ReferableElement) -> None:
+    def insert(self, element: Compound) -> None:
         """Register insertion of an element."""
         assert element.id
         if element.id in self.inserted:
