@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # syntax=docker/dockerfile:1
-FROM alpine:3.18.3
+FROM alpine:3.18.4
 
 RUN apk add --no-cache \
   bash \
