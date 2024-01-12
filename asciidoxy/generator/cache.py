@@ -44,7 +44,7 @@ class BaseCache(TemplateLookup):
 def _generate_python_path_code(python_paths: Optional[List[Path]]) -> List[str]:
     if python_paths:
         imports = ["import sys"]
-        imports.extend(f"sys.path.insert(1, \"{p}\")" for p in python_paths)
+        imports.extend(f"sys.path.insert(1, \"{p.as_posix()}\")" for p in python_paths)
         imports.append("del sys")
         return imports
 
@@ -65,7 +65,7 @@ class DocumentCache(BaseCache):
                          **kwargs)
 
     def get_document(self, document: Document) -> Template:
-        return self.get_template(str(document.original_file))
+        return self.get_template(document.original_file.as_posix())
 
     def get_template(self, uri: str) -> Template:
         try:
