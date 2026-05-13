@@ -107,7 +107,12 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python3 setup.py install
+	#python3 setup.py install
+	pip install .
+
+container-install: clean ## install the package to the active Python's site-packages
+	#python3 setup.py install
+	pip install --break-system-packages .
 
 virtualenv: ## set up a development environment
 	python3 -m venv .venv

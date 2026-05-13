@@ -244,6 +244,7 @@ class Api(ABC):
                members: Optional[FilterSpec] = None,
                exceptions: Optional[FilterSpec] = None,
                ignore_global_filter: bool = False,
+               allow_overloads: bool = False,
                leveloffset: str = "+1",
                template: Optional[str] = None) -> str:
         """Insert API reference documentation.
@@ -263,6 +264,7 @@ class Api(ABC):
                                       filtering on the `name` of the exception type only.
             ignore_global_filter: True to ignore the global filter set with `Api.filter()`. False
                                       to apply the filters on top of the global filter.
+            allow_overloads:      Insert first match in an overload set. Disabled by default.
             leveloffset:          Offset of the top header of the inserted text from the top level
                                       header of the including document.
             template:             *Experimental* Alternative template to use when inserting the
@@ -281,7 +283,7 @@ class Api(ABC):
         return self.insert_fragment(self.find_element(name,
                                                       kind=kind,
                                                       lang=lang,
-                                                      allow_overloads=False),
+                                                      allow_overloads=allow_overloads),
                                     insert_filter,
                                     leveloffset,
                                     kind_override=template)
