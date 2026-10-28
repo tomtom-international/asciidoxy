@@ -138,8 +138,7 @@ class PackageManager:
             progress.update(0)
 
         download_dir = self.build_dir / "download"
-        loop = asyncio.get_event_loop_policy().new_event_loop()
-        packages = loop.run_until_complete(collect(specs, download_dir, progress))
+        packages = asyncio.run(collect(specs, download_dir, progress))
         self.packages.update({pkg.name: pkg for pkg in packages})
 
     def load_reference(self, parser: Driver, progress: Optional[tqdm] = None) -> None:

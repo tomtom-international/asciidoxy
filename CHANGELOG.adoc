@@ -23,6 +23,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 === Fixed
 
   * Crash on Python 3.12 and newer because the required version of `packaging` used `distutils`.
+  * Deprecation warning on Python 3.14 and newer about the asyncio event loop policy.
 
 
 == 0.8.7 (10 Sep 2023)
