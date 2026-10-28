@@ -7,7 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AsciiDoxy turns AsciiDoc files into documentation (single page or multipage HTML, PDF, or plain
 AsciiDoc). It treats each `.adoc` input as a Mako template: documents call methods on an `api`
 object to insert API reference generated from Doxygen XML (C++, Java, Objective-C, Python), and
-can transcode elements to other languages (Java→Kotlin, ObjC→Swift). Python 3.7+.
+can transcode elements to other languages (Java→Kotlin, ObjC→Swift). Tested on Python 3.11 to
+3.15. `python_requires` still allows 3.7 and up, partly because the Docker image (Alpine 3.17)
+ships Python 3.10. The dev requirements need 3.10 or newer.
 
 ## Commands
 
@@ -19,7 +21,7 @@ Set up the dev environment with `make virtualenv`, then `. .venv/bin/activate`.
 - `make lint` runs `flake8 asciidoxy tests/unit` (max line length 100)
 - `make type-check` runs `mypy asciidoxy`
 - `make format` runs `yapf` (config in `.style.yapf`) and `isort` (profile `hug`)
-- `make test-all` runs tox over py37–py311 (pytest, flake8 and mypy); run it before a PR
+- `make test-all` runs tox over py311–py315 (pytest, flake8 and mypy); run it before a PR
 - `pytest --update-expected-results` rewrites the expected `.adoc` output files after a template
   change. Check the diff afterwards for unintended changes.
 - `make generate-test-xml` regenerates the Doxygen XML test data for every supported Doxygen

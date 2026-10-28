@@ -20,6 +20,10 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == Unreleased
 
+=== Changed
+
+  * Test on Python 3.11 to 3.15. Python 3.7 to 3.10 are end-of-life and no longer tested.
+
 === Fixed
 
   * Crash on Python 3.12 and newer because the required version of `packaging` used `distutils`.
