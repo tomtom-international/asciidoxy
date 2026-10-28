@@ -8,8 +8,8 @@ AsciiDoxy turns AsciiDoc files into documentation (single page or multipage HTML
 AsciiDoc). It treats each `.adoc` input as a Mako template: documents call methods on an `api`
 object to insert API reference generated from Doxygen XML (C++, Java, Objective-C, Python), and
 can transcode elements to other languages (Java→Kotlin, ObjC→Swift). Tested on Python 3.11 to
-3.15. `python_requires` still allows 3.7 and up, partly because the Docker image (Alpine 3.17)
-ships Python 3.10. The dev requirements need 3.10 or newer.
+3.15, and `python_requires` (under `[options]` in `setup.cfg`) is 3.11 and up. The Docker image (`docker/Dockerfile`, Alpine 3.24) installs AsciiDoxy into a virtual environment
+with the system Python 3.14, and the Docker and publish workflows build with 3.14 as well.
 
 ## Commands
 
