@@ -13,7 +13,6 @@
 # limitations under the License.
 """Running AsciiDoctor on the generated AsciiDoc files."""
 
-import platform
 import subprocess
 from pathlib import Path
 from typing import List
