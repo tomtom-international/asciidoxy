@@ -337,8 +337,14 @@ class HttpPackageSpec(PackageSpec):
 
         try:
             target_dir.mkdir(parents=True, exist_ok=True)
-            tar_file = tarfile.open(fileobj=io.BytesIO(data))
-            tar_file.extractall(target_dir)
+            with tarfile.open(fileobj=io.BytesIO(data)) as tar_file:
+                # The data filter rejects members that would end up outside the target directory
+                tar_file.extractall(target_dir, filter="data")
+        except tarfile.FilterError as filter_error:
+            if target_dir.exists():
+                shutil.rmtree(target_dir)
+            raise DownloadError(
+                self.name, f"Unsafe file in tar file from {url}: {filter_error}.") from filter_error
         except tarfile.TarError as tar_error:
             if target_dir.exists():
                 shutil.rmtree(target_dir)
