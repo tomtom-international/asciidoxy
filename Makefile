@@ -107,13 +107,13 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python3 setup.py install
+	pip install .
 
 virtualenv: ## set up a development environment
 	python3 -m venv .venv
 	. .venv/bin/activate && pip install wheel
 	. .venv/bin/activate && pip install -r requirements_dev.txt
-	. .venv/bin/activate && python3 setup.py develop
+	. .venv/bin/activate && pip install -e .
 
 docker: dist ## build the docker image
 	docker build -f docker/Dockerfile \
