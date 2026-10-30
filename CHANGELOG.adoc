@@ -34,6 +34,8 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   * Deprecation warning on Python 3.14 and newer about the asyncio event loop policy.
   * Downloaded packages could write files outside the download directory. Tar files with members
     that point outside the download directory are now rejected.
+  * #126: Running AsciiDoctor failed on Linux and macOS when the path of the build directory
+    contained spaces. Thank you Matthias Schulz!
 
 
 == 0.8.7 (10 Sep 2023)

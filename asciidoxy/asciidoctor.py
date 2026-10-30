@@ -13,7 +13,6 @@
 # limitations under the License.
 """Running AsciiDoctor on the generated AsciiDoc files."""
 
-import platform
 import subprocess
 from pathlib import Path
 from typing import List
@@ -101,10 +100,7 @@ def write_asciidoctor_runner(documents: List[Document], config: Configuration,
 
 def run_ruby(script: Path) -> None:
     args = ["ruby", str(script)]
-    if platform.system() == "Windows":
-        subprocess.run(args, shell=True, check=True)
-    else:
-        subprocess.run(" ".join(args), shell=True, check=True)
+    subprocess.run(args, shell=False, check=True)
 
 
 def convert_documents(documents: List[Document], config: Configuration, pkg_mgr: PackageManager):
