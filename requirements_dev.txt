@@ -1,7 +1,7 @@
 build==0.10.0
 colorclass==2.2.2
 conan==1.66.0
-coverage==7.2.1
+coverage==7.17.0
 doxypypy==0.8.8.7
 flake8==7.4.1
 isort==5.12.0
