@@ -1454,6 +1454,24 @@ def test_process_adoc__embedded_doc_included(single_and_multipage, api_reference
     assert progress_mock.total == 2
 
 
+@pytest.mark.parametrize("no_navigation_bar", [True, False],
+                         ids=["no-navigation-bar", "navigation-bar"])
+def test_process_adoc__no_navigation_bar(no_navigation_bar, single_and_multipage, api_reference,
+                                         package_manager, adoc_data_document, default_config):
+    main_doc = adoc_data_document("multifile_test.input.adoc")
+
+    default_config.warnings_are_errors = True
+    default_config.multipage = single_and_multipage
+    default_config.no_navigation_bar = no_navigation_bar
+    output_docs = process_adoc(main_doc, api_reference, package_manager, config=default_config)
+    assert len(output_docs) == 3
+
+    expect_navigation_bar = single_and_multipage and not no_navigation_bar
+    for doc in output_docs:
+        content = doc.work_file.read_text()
+        assert ('<div id="navigation">' in content) == expect_navigation_bar
+
+
 def test_process_adoc_custom_templates(warnings_are_errors, single_and_multipage, adoc_data,
                                        api_reference, package_manager, update_expected_results,
                                        doxygen_version, tmp_path, default_config):

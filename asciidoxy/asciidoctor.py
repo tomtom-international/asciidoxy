@@ -49,8 +49,8 @@ def generate_attributes(doc: Document, config: Configuration, pkg_mgr: PackageMa
     if config.multipage:
         values.append("multipage")
 
-    if config.nonav:
-        values.append("nonav")
+    if config.no_navigation_bar:
+        values.append("no-navigation-bar")
 
     values.extend(config.attribute)
     return " ".join(values)

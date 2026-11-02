@@ -99,6 +99,7 @@ class FileBuilder:
         config.debug = False
         config.log_level = "INFO"
         config.multipage = self.multipage
+        config.no_navigation_bar = False
         config.extra = []
 
         c = Context(reference=ApiReference(),
