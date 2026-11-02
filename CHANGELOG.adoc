@@ -36,6 +36,9 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
     that point outside the download directory are now rejected.
   * #126: Running AsciiDoctor failed on Linux and macOS when the path of the build directory
     contained spaces. Thank you Matthias Schulz!
+  * #119: Generating documents failed on Windows, because backslashes in the paths of the input
+    documents and the python path were read as escape sequences. Thank you David Christoffer
+    Hansen!
 
 
 == 0.8.7 (10 Sep 2023)
