@@ -39,6 +39,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
   * #119: Generating documents failed on Windows, because backslashes in the paths of the input
     documents and the python path were read as escape sequences. Thank you David Christoffer
     Hansen!
+  * Crash with `--debug` when the build directory did not exist yet.
 
 
 == 0.8.7 (10 Sep 2023)
