@@ -326,6 +326,32 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
     assert processed_file.is_file()
 
 
+@pytest.mark.parametrize("multipage", [True, False], ids=["multi-page", "single-page"])
+def test_no_navigation_bar(multipage, asciidoctor_mock, build_dir, spec_file, destination_dir,
+                           adoc_data, caplog):
+    in_file = adoc_data / "simple_test.input.adoc"
+
+    args = [
+        str(in_file),
+        "--spec-file",
+        str(spec_file),
+        "--destination-dir",
+        str(destination_dir),
+        "--build-dir",
+        str(build_dir),
+        "--no-navigation-bar",
+    ]
+    if multipage:
+        args.append("--multipage")
+    main(args)
+
+    runner = read_asciidoctor_runner(asciidoctor_mock)
+    assert "no-navigation-bar" in runner
+
+    warning = "--no-navigation-bar has no effect without --multipage."
+    assert (warning in caplog.messages) != multipage
+
+
 def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_data):
     in_file = adoc_data / "no_api_reference.input.adoc"
 

@@ -20,6 +20,11 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 
 == Unreleased
 
+=== Added
+
+  * #78: Command line option `--no-navigation-bar` to generate multipage documents without a
+    navigation bar at the bottom of each page. Thank you Markus Napp!
+
 === Changed
 
   * Test on Python 3.11 to 3.15. Python 3.7 to 3.10 are end-of-life and no longer tested.

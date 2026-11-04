@@ -128,6 +128,17 @@ The link called `Reference` will take you to a file containing only the contents
 `reference.adoc`. Both pages will also have a navigation bar at the bottom. With the navigation bar
 you can easily jump between pages.
 
+If you want standalone pages without a navigation bar, add `--no-navigation-bar`:
+
+[source,bash]
+----
+asciidoxy --base-dir src --multipage --no-navigation-bar src/index.adoc
+----
+
+AsciiDoxy then also sets the `no-navigation-bar` attribute, so your documents can check for it
+with `ifdef::no-navigation-bar[]`, for example to add links of their own. The option has no effect
+without `--multipage`.
+
 == Improving what the link looks like
 
 By default, AsciiDoxy uses the first title detected in the included file for the link text. If it
