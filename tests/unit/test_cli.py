@@ -125,6 +125,23 @@ def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, a
     assert processed_file.is_file()
 
 
+def test_process_file__debug_with_new_build_dir(asciidoctor_mock, spec_file, destination_dir,
+                                                adoc_data, tmp_path):
+    in_file = adoc_data / "simple_test.input.adoc"
+    build_dir = tmp_path / "new-build"
+    assert not build_dir.exists()
+
+    main([
+        str(in_file), "--spec-file",
+        str(spec_file), "--destination-dir",
+        str(destination_dir), "--build-dir",
+        str(build_dir), "--debug"
+    ])
+
+    assert (build_dir / "debug.json").is_file()
+    assert (build_dir / "intermediate" / "simple_test.input.adoc").is_file()
+
+
 def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destination_dir,
                                   adoc_data):
     in_file = adoc_data / "simple_test.input.adoc"
