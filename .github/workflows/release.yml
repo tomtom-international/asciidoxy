@@ -5,10 +5,54 @@ on:
     types: [created]
 
 jobs:
-  python-package:
+  python-build:
+    name: Build Python package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+
+      - name: Build package
+        run: python -m build
+
+      - name: Store package
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-package
+          path: dist/
+          if-no-files-found: error
+
+  python-publish:
     name: Publish Python package
-    uses: ./.github/workflows/python-publish.yml
-    secrets: inherit
+    needs: python-build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/asciidoxy/
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Retrieve package
+        uses: actions/download-artifact@v8
+        with:
+          name: python-package
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
 
   docker-image:
     name: Publish Docker image
