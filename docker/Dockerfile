@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # syntax=docker/dockerfile:1
-FROM alpine:3.17.2
+FROM alpine:3.24.3
 
 RUN apk add --no-cache \
   bash \
@@ -23,7 +23,9 @@ RUN apk add --no-cache \
   python3 \
   ruby
 
-RUN python3 -m ensurepip
+# The system Python is externally managed (PEP 668), so install into a virtual environment
+RUN python3 -m venv /opt/asciidoxy
+ENV PATH="/opt/asciidoxy/bin:$PATH"
 RUN pip3 install --no-cache --upgrade \
   pip \
   setuptools \
@@ -34,6 +36,9 @@ RUN gem install \
   asciidoctor-diagram \
   asciidoctor-pdf \
   asciidoctor-rouge
+
+# asciidoctor-diagram no longer bundles PlantUML; use the JAR from the Alpine package
+ENV DIAGRAM_PLANTUML_CLASSPATH=/usr/share/java/plantuml.jar
 
 COPY *.whl /tmp/
 RUN PYTHON_DEV_PKGS="gcc g++ python3-dev libffi-dev" \

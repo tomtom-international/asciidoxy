@@ -121,7 +121,7 @@ class TypeParser:
     @classmethod
     def adapt_separators(cls, tokens: List[Token]) -> List[Token]:
         """Set the correct category for separator tokens."""
-        scope_types = []
+        scope_types: List[TokenCategory] = []
         for i, token in enumerate(tokens):
             if token.category in (TokenCategory.NESTED_START, TokenCategory.NESTED_END,
                                   TokenCategory.ARGS_START, TokenCategory.ARGS_END):

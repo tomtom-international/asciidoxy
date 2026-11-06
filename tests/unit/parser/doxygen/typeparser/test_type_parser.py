@@ -278,8 +278,10 @@ def test_type_parser__tokenize_text(text, tokens):
 
 
 def _generate_whitespace_data():
+    # Fixed seed: pytest-xdist workers must collect the same parameters
+    rng = random.Random(20)
     whitespace_chars = tuple(string.whitespace)
-    return ["".join(random.choices(whitespace_chars, k=random.randrange(1, 10))) for _ in range(20)]
+    return ["".join(rng.choices(whitespace_chars, k=rng.randrange(1, 10))) for _ in range(20)]
 
 
 @pytest.mark.parametrize("text", _generate_whitespace_data())

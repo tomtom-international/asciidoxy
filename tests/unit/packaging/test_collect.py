@@ -14,7 +14,9 @@
 """Tests for collecting source files."""
 
 import base64
+import io
 import os
+import tarfile
 from pathlib import Path
 from unittest import mock
 
@@ -438,6 +440,78 @@ async def test_http_package_not_a_tarfile(aiohttp_server, tmp_path):
     with pytest.raises(DownloadError):
         await collect([spec], tmp_path)
     assert not (tmp_path / "test" / "1.0.0").exists()
+
+
+def _make_tar(*members):
+    buffer = io.BytesIO()
+    with tarfile.open(fileobj=buffer, mode="w:gz") as tar_file:
+        for name, link_type, link_name in members:
+            info = tarfile.TarInfo(name)
+            if link_type is None:
+                content = b"malicious content"
+                info.size = len(content)
+                tar_file.addfile(info, io.BytesIO(content))
+            else:
+                info.type = link_type
+                info.linkname = link_name
+                tar_file.addfile(info)
+    return buffer.getvalue()
+
+
+@pytest.mark.parametrize("members", [
+    [("../../escaped.txt", None, None)],
+    [("xml/../../../escaped.txt", None, None)],
+    [("link", tarfile.SYMTYPE, "../../escaped.txt")],
+    [("link", tarfile.SYMTYPE, "{abs}")],
+    [("link", tarfile.SYMTYPE, "../.."), ("link/escaped.txt", None, None)],
+    [("link", tarfile.LNKTYPE, "{abs}")],
+],
+                         ids=[
+                             "parent-path", "nested-parent-path", "relative-symlink",
+                             "absolute-symlink", "write-through-symlink", "absolute-hardlink"
+                         ])
+async def test_http_package_rejects_members_outside_target_dir(aiohttp_server, tmp_path, members):
+    download_dir = tmp_path / "download"
+    escaped_file = tmp_path / "escaped.txt"
+    members = [(name.format(abs=escaped_file), link_type,
+                link_name.format(abs=escaped_file) if link_name else link_name)
+               for name, link_type, link_name in members]
+    data = _make_tar(*members)
+
+    async def malicious_response(request):
+        return web.Response(body=data)
+
+    server = await start_server(aiohttp_server, web.get("/test/1.0.0/evil", malicious_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.file_names = ["evil"]
+
+    with pytest.raises(DownloadError):
+        await collect([spec], download_dir)
+    assert not escaped_file.exists()
+    assert not (download_dir / "test" / "1.0.0").exists()
+
+
+async def test_http_package_does_not_extract_absolute_paths_outside_target_dir(
+        aiohttp_server, tmp_path):
+    download_dir = tmp_path / "download"
+    escaped_file = tmp_path / "escaped.txt"
+    data = _make_tar((str(escaped_file), None, None))
+
+    async def absolute_path_response(request):
+        return web.Response(body=data)
+
+    server = await start_server(aiohttp_server,
+                                web.get("/test/1.0.0/absolute", absolute_path_response))
+
+    spec = HttpPackageSpec("test", "1.0.0",
+                           f"http://localhost:{server.port}/{{name}}/{{version}}/{{file_name}}")
+    spec.file_names = ["absolute"]
+
+    with pytest.raises(InvalidPackageError):
+        await collect([spec], download_dir)
+    assert not escaped_file.exists()
 
 
 async def test_http_package_name_interpolation_in_file_names(aiohttp_server, tmp_path):

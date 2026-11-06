@@ -107,13 +107,13 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python3 setup.py install
+	pip install .
 
 virtualenv: ## set up a development environment
 	python3 -m venv .venv
 	. .venv/bin/activate && pip install wheel
 	. .venv/bin/activate && pip install -r dev-requirements.txt
-	. .venv/bin/activate && python3 setup.py develop
+	. .venv/bin/activate && pip install -e .
 
 docker: dist ## build the docker image
 	docker build -f docker/Dockerfile \
@@ -148,6 +148,7 @@ $(foreach version,$(DOXYGEN_VERSIONS),$(eval $(call GENERATE_TEST_XML_template,$
 generate-test-xml: $(ALL_GENERATE_TEST_XML) ## generate Doxygen XML files required for test cases
 
 # Generate output for visual inspection tests
+# A test case can add command line options in a `.options` file next to its `.toml` file.
 VISUAL_TEST_CASES := $(wildcard tests/visual/*.toml)
 VISUAL_TEST_CASE_BUILD_DIR := build/visual-test
 
@@ -160,7 +161,8 @@ visual-test-$(notdir $(basename $(1))): $(patsubst %.toml,%.adoc,$(1))
 		--debug \
 		--require asciidoctor-diagram \
 		--failure-level ERROR \
-		--multipage
+		--multipage \
+		$(if $(wildcard $(patsubst %.toml,%.options,$(1))),$(shell cat $(patsubst %.toml,%.options,$(1))))
 	mv $(VISUAL_TEST_CASE_BUILD_DIR)/debug.json $(VISUAL_TEST_CASE_BUILD_DIR)/$(notdir $(basename $(1))).debug.json
 
 ALL_VISUAL_TEST_CASES := $$(ALL_VISUAL_TEST_CASES) visual-test-$(notdir $(basename $(1)))

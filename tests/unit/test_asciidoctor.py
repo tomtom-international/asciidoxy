@@ -103,6 +103,32 @@ exit 1 if (logger.respond_to? :max_severity) &&
 """
 
 
+def test_write_asciidoctor_runner__no_navigation_bar(default_config, document, package_manager):
+    docs = [document, document.with_relative_path("included.adoc")]
+    docs[0].is_root = True
+    docs[0].include(docs[1])
+    default_config.multipage = True
+    default_config.no_navigation_bar = True
+
+    runner_path = asciidoctor.write_asciidoctor_runner(docs, default_config, package_manager)
+    assert runner_path.is_file()
+    work_dir = package_manager.work_dir
+    out_dir = default_config.destination_dir
+    assert runner_path.read_text() == f"""\
+require 'asciidoctor'
+Asciidoctor.convert_file '{work_dir}/input_file.adoc', to_file: '{out_dir}/input_file.html', \
+safe: :unsafe, backend: 'html5', mkdirs: true, basedir: '{work_dir}', attributes: \
+'imagesdir@=''images'' stylesheet@=''asciidoxy-no-toc.css'' multipage no-navigation-bar'
+Asciidoctor.convert_file '{work_dir}/included.adoc', to_file: '{out_dir}/included.html', \
+safe: :unsafe, backend: 'html5', mkdirs: true, basedir: '{work_dir}', attributes: \
+'imagesdir@=''images'' stylesheet@=''asciidoxy-no-toc.css'' multipage no-navigation-bar'
+logger = Asciidoctor::LoggerManager.logger
+exit 1 if (logger.respond_to? :max_severity) &&
+  logger.max_severity &&
+  logger.max_severity >= (::Logger::Severity.const_get 'FATAL')
+"""
+
+
 def test_write_asciidoctor_runner__plugins(default_config, document, package_manager):
     docs = [
         document,

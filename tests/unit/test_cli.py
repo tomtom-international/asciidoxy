@@ -106,8 +106,7 @@ def test_help():
     assert exc_info.value.code == 0
 
 
-def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, adoc_data,
-                      event_loop):
+def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, adoc_data):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -126,8 +125,25 @@ def test_process_file(asciidoctor_mock, build_dir, spec_file, destination_dir, a
     assert processed_file.is_file()
 
 
+def test_process_file__debug_with_new_build_dir(asciidoctor_mock, spec_file, destination_dir,
+                                                adoc_data, tmp_path):
+    in_file = adoc_data / "simple_test.input.adoc"
+    build_dir = tmp_path / "new-build"
+    assert not build_dir.exists()
+
+    main([
+        str(in_file), "--spec-file",
+        str(spec_file), "--destination-dir",
+        str(destination_dir), "--build-dir",
+        str(build_dir), "--debug"
+    ])
+
+    assert (build_dir / "debug.json").is_file()
+    assert (build_dir / "intermediate" / "simple_test.input.adoc").is_file()
+
+
 def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destination_dir,
-                                  adoc_data, event_loop):
+                                  adoc_data):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -152,7 +168,7 @@ def test_process_file_backend_pdf(asciidoctor_mock, build_dir, spec_file, destin
 
 
 def test_process_file_backend_adoc(asciidoctor_mock, build_dir, spec_file, destination_dir,
-                                   adoc_data, event_loop):
+                                   adoc_data):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -173,7 +189,7 @@ def test_process_file_backend_adoc(asciidoctor_mock, build_dir, spec_file, desti
 
 
 def test_process_custom_file_template_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
-                                          adoc_data, event_loop, tmp_path):
+                                          adoc_data, tmp_path):
     in_file = adoc_data / "custom_templates.input.adoc"
     template_dir = tmp_path / "templates"
     (template_dir / "cpp").mkdir(parents=True)
@@ -194,7 +210,7 @@ def test_process_custom_file_template_dir(asciidoctor_mock, build_dir, spec_file
 
 
 def test_process_default_cache_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
-                                   adoc_data, event_loop):
+                                   adoc_data):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -209,7 +225,7 @@ def test_process_default_cache_dir(asciidoctor_mock, build_dir, spec_file, desti
 
 
 def test_process_custom_cache_dir(asciidoctor_mock, build_dir, spec_file, destination_dir,
-                                  adoc_data, event_loop, tmp_path):
+                                  adoc_data, tmp_path):
     in_file = adoc_data / "simple_test.input.adoc"
     cache_dir = tmp_path / "my-cache"
 
@@ -230,7 +246,7 @@ def test_process_custom_cache_dir(asciidoctor_mock, build_dir, spec_file, destin
 
 
 def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
-                     adoc_data, event_loop, tmp_path):
+                     adoc_data, tmp_path):
     in_file = adoc_data / "simple_test.input.adoc"
     image_dir = tmp_path / "images"
     image_dir.mkdir()
@@ -269,7 +285,7 @@ def test_all_options(asciidoctor_mock, build_dir, spec_file, version_file, desti
 
 
 def test_forward_asciidoctor_options(asciidoctor_mock, build_dir, spec_file, destination_dir,
-                                     adoc_data, event_loop):
+                                     adoc_data):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -295,7 +311,7 @@ def test_forward_asciidoctor_options(asciidoctor_mock, build_dir, spec_file, des
 
 
 def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file, destination_dir,
-                           adoc_data, event_loop):
+                           adoc_data):
     in_file = adoc_data / "simple_test.input.adoc"
 
     main([
@@ -327,7 +343,33 @@ def test_all_short_options(asciidoctor_mock, build_dir, spec_file, version_file,
     assert processed_file.is_file()
 
 
-def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_data, event_loop):
+@pytest.mark.parametrize("multipage", [True, False], ids=["multi-page", "single-page"])
+def test_no_navigation_bar(multipage, asciidoctor_mock, build_dir, spec_file, destination_dir,
+                           adoc_data, caplog):
+    in_file = adoc_data / "simple_test.input.adoc"
+
+    args = [
+        str(in_file),
+        "--spec-file",
+        str(spec_file),
+        "--destination-dir",
+        str(destination_dir),
+        "--build-dir",
+        str(build_dir),
+        "--no-navigation-bar",
+    ]
+    if multipage:
+        args.append("--multipage")
+    main(args)
+
+    runner = read_asciidoctor_runner(asciidoctor_mock)
+    assert "no-navigation-bar" in runner
+
+    warning = "--no-navigation-bar has no effect without --multipage."
+    assert (warning in caplog.messages) != multipage
+
+
+def test_no_reference_loaded(asciidoctor_mock, build_dir, destination_dir, adoc_data):
     in_file = adoc_data / "no_api_reference.input.adoc"
 
     main([str(in_file), "--destination-dir", str(destination_dir), "--build-dir", str(build_dir)])

@@ -148,3 +148,6 @@ documentation/copy/
 .DS_Store
 
 asciidoxy/parser/doxygen/description_parser.png
+
+## Ruby Environments
+.ruby-version

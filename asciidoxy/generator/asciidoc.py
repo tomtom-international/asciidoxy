@@ -894,7 +894,8 @@ class GeneratingApi(Api):
 
         with self._context.document.work_file.open("w", encoding="utf-8") as f:
             print(rendered_doc, file=f)
-            if self._context.config.multipage and not self._context.document.is_embedded:
+            if (self._context.config.multipage and not self._context.config.no_navigation_bar
+                    and not self._context.document.is_embedded):
                 nav_bar = navigation_bar(self._context.document)
                 if nav_bar:
                     print(nav_bar, file=f)

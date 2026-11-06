@@ -53,6 +53,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     logger = logging.getLogger(__name__)
 
+    if config.no_navigation_bar and not config.multipage:
+        logger.warning("--no-navigation-bar has no effect without --multipage.")
+
     pkg_mgr = PackageManager(config.build_dir, config.warnings_are_errors)
     if config.spec_file is not None:
         try:
@@ -77,6 +80,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
         if config.debug:
             logger.info("Writing debug data, sorry for the delay!")
+            config.build_dir.mkdir(parents=True, exist_ok=True)
             with (config.build_dir / "debug.json").open("w", encoding="utf-8") as f:
                 json.dump(xml_parser.api_reference.elements, f, default=json_repr, indent=2)
 

@@ -62,7 +62,7 @@ Finally, install AsciiDoxy using `pip`:
 
 [source,bash]
 ----
-pip3 install --update asciidoxy
+pip3 install --upgrade asciidoxy
 ----
 
 Now you are ready to go.

@@ -13,9 +13,11 @@
 # limitations under the License.
 """Test the template cache implementation."""
 
+from pathlib import PurePosixPath, PureWindowsPath
+
 import pytest
 
-from asciidoxy.generator.cache import DocumentCache
+from asciidoxy.generator.cache import DocumentCache, _generate_python_path_code
 
 
 def test_get_document(document):
@@ -47,3 +49,25 @@ def test_cache_dir(tmp_path, document):
     assert template.source.startswith("= My document")
     assert (cache_dir / "documents" /
             str(document.original_file.with_suffix(".adoc.py"))[1:]).is_file()
+
+
+def test_python_path_code__no_paths():
+    assert _generate_python_path_code(None) == []
+    assert _generate_python_path_code([]) == []
+
+
+@pytest.mark.parametrize("path,expected", [
+    (PurePosixPath("/home/user/python"), "/home/user/python"),
+    (PurePosixPath("/home/user/my python"), "/home/user/my python"),
+    (PureWindowsPath(r"C:\Users\user\python"), "C:/Users/user/python"),
+    (PureWindowsPath(r"C:\Users\user\my python"), "C:/Users/user/my python"),
+])
+def test_python_path_code(path, expected):
+    code = _generate_python_path_code([path])
+    assert code == ["import sys", f"sys.path.insert(1, \"{expected}\")", "del sys"]
+
+    # The generated code must be valid Python that adds the path. Windows paths used to contain
+    # backslashes that Python read as escape sequences, like `\U`.
+    sys_path = ["first"]
+    exec("\n".join(code[1:-1]), {"sys": type("sys", (), {"path": sys_path})})
+    assert sys_path == ["first", expected]
